@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab — San Lee</title>
+  <meta name="description" content="Front-end experiments — a sandbox for learning in the open." />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+
+  <main class="wrap article-body">
+    <a class="back" href="../index.html">&larr; Back to portfolio</a>
+    <h1>Lab</h1>
+    <p class="subtitle">
+      A sandbox for learning front-end in the open. Experiments live here so the
+      front page can stay clean &mdash; expect rough edges; that's the point.
+    </p>
+
+    <h2>Experiments</h2>
+    <ul>
+      <li><em>Coming soon as we climb the tiers — CSS motion, canvas, dataviz, WebGL.</em></li>
+    </ul>
+  </main>
+
+  <script src="../assets/theme.js"></script>
+</body>
+</html>
