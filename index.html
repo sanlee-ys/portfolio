@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>San Lee — Systems &amp; Product</title>
+  <meta name="description" content="San Lee — engineer building toward technical program management. Systems thinking, event-driven architecture, applied ML." />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">San Lee</p>
+      <h1>I build systems, then make them legible.</h1>
+      <p class="lede">
+        Engineer by training, moving toward technical program management. My work
+        is the substrate: event-driven services, applied ML pipelines, and the
+        architecture that ties independent pieces into one system &mdash; documented
+        so the decisions, not just the code, are the deliverable.
+      </p>
+      <div class="cta">
+        <a class="btn" href="#work">See the work</a>
+        <a class="btn ghost" href="https://github.com/sanlee-ys">GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="work">
+    <h2 class="section-title">Selected work</h2>
+    <p class="section-sub">Two pieces that show the range: designing a system, and building a component that feeds it.</p>
+
+    <section class="cards">
+      <article class="card">
+        <p class="kicker">Systems design &middot; cross-repo architecture</p>
+        <h3>The System</h3>
+        <p>
+          Four independent repositories &mdash; an API, a classifier, an agent, and a
+          knowledge base &mdash; designed to operate as one coherent system. A two-tier
+          ADR convention records every cross-cutting decision; a central portal makes
+          the whole thing navigable.
+        </p>
+        <p class="meta">Architecture &middot; ADRs &middot; event-driven integration</p>
+        <a class="card-link" href="projects/the-system.html">Read the writeup &rarr;</a>
+      </article>
+
+      <article class="card">
+        <p class="kicker">Applied ML &middot; data pipeline</p>
+        <h3>Defense News Classifier</h3>
+        <p>
+          An ML classifier that ingests defense-news items, tags them, and publishes
+          results onto a Kafka topic &mdash; closing a consume-then-writeback loop with
+          the notes API downstream. The component that makes the system move.
+        </p>
+        <p class="meta">Python &middot; classification &middot; Kafka</p>
+        <a class="card-link" href="projects/defense-news-classifier.html">Read the writeup &rarr;</a>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>San Lee</p>
+      <nav>
+        <a href="https://github.com/sanlee-ys">GitHub</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
