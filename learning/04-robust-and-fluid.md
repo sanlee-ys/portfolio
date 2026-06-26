@@ -29,9 +29,15 @@ below `MIN` or above `MAX`. Applied to the hero padding, the tagline, and the
 section title, the type and spacing now scale *smoothly* across screen sizes
 instead of jumping at breakpoints.
 
-This let me **delete the last media query.** Combined with the auto-fit grid from
-Lesson 3, the page is now fully responsive with **zero `@media` rules**. You
-describe the bounds; the browser interpolates.
+This let me **delete the last viewport breakpoint.** Combined with the auto-fit
+grid from Lesson 3, the page is now fully responsive with **zero width-based
+`@media` rules** — you describe the bounds, the browser interpolates.
+
+> Caveat (and a real distinction): two `@media` rules *do* remain — the
+> `prefers-reduced-motion` blocks. Those are **feature/preference queries**, not
+> **viewport breakpoints**. Both use the `@media` keyword, but one asks "how wide
+> is the screen?" and the other asks "has the user requested less motion?" Don't
+> conflate them.
 
 ## Container queries — respond to the *container*, not the viewport
 
@@ -64,7 +70,8 @@ the same card might sit in a wide slot or a narrow one, and it should adapt to
   without a replacement.
 - **`clamp(min, preferred, max)`** = fluid type/spacing; often replaces media
   queries entirely.
-- **The page now has zero media queries** and is still fully responsive.
+- **The page now has zero viewport breakpoints** and is still fully responsive
+  (the only `@media` left are `prefers-reduced-motion` preference queries).
 - **Container queries** ask about the *container's* size — the right tool for
   components reused at different widths.
 

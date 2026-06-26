@@ -346,5 +346,7 @@ body {
 }
 
 /* Responsive */
-/* No media queries left: the grid auto-fits and the spacing/type clamp.
-   The layout is intrinsically responsive. */
+/* No viewport/breakpoint media queries left: the grid auto-fits and the
+   spacing/type clamp, so the layout is intrinsically responsive. (The only
+   @media rules remaining are prefers-reduced-motion — a user *preference*
+   query, not a screen-width breakpoint.) */
