@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scroll-driven storytelling — Lab — San Lee</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+  <style>
+    /* ---- Experiment-specific CSS (kept out of the global stylesheet) ---- */
+
+    /* 1) STICKY PANEL: the left panel pins while the right column scrolls past. */
+    .story {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px 30vh;
+    }
+    .story-sticky {
+      position: sticky;
+      top: 22vh;
+      /* CRITICAL: in a grid/flex, items stretch to fill the track by default,
+         which breaks sticky. align-self:start lets it be its natural height so
+         it has room to stick. */
+      align-self: start;
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+    .story-sticky h2 { margin: 0 0 10px; }
+    .story-sticky p { margin: 0; color: var(--muted); }
+    .story-step {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      font-size: 1.4rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* 2) SCROLL-SCRUBBED REVEALS: each block animates as it ENTERS the viewport,
+       scrubbed by scroll position (animation-timeline: view()) — no JS. */
+    .scrub-section { max-width: var(--maxw); margin: 0 auto; padding: 20vh 24px; }
+    .scrub-item {
+      padding: 30px;
+      margin-bottom: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      font-size: 1.2rem;
+    }
+
+    /* Progressive enhancement: WITHOUT scroll-timeline support, items are just
+       visible. WITH support, they scrub in as they enter the viewport. */
+    @supports (animation-timeline: view()) {
+      .scrub-item {
+        animation: scrub-in linear both;
+        animation-timeline: view();
+        /* run the animation over the element's ENTRY into the scrollport */
+        animation-range: entry 0% entry 100%;
+      }
+    }
+    @keyframes scrub-in {
+      from { opacity: 0; transform: translateY(40px) scale(0.96); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .scrub-item { animation: none; opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+
+  <main class="wrap article-body">
+    <a class="back" href="index.html">&larr; Back to lab</a>
+    <h1>Scroll-driven storytelling</h1>
+    <p class="subtitle">
+      Two native techniques, zero JavaScript: a <code>position: sticky</code> panel
+      that pins while content scrolls past it, and <code>animation-timeline: view()</code>
+      reveals that scrub as elements enter the viewport. Scroll down.
+    </p>
+  </main>
+
+  <!-- STICKY PANEL DEMO -->
+  <section class="story">
+    <div class="story-sticky">
+      <h2>This panel sticks</h2>
+      <p>It pins in place while the steps on the right scroll past, then releases
+         at the bottom of the section. That's <code>position: sticky</code>.</p>
+    </div>
+    <div class="story-scroll">
+      <div class="story-step">Step one &mdash; scroll on.</div>
+      <div class="story-step">Step two &mdash; the panel is still pinned.</div>
+      <div class="story-step">Step three &mdash; about to release.</div>
+    </div>
+  </section>
+
+  <!-- SCROLL-SCRUBBED REVEALS -->
+  <section class="scrub-section">
+    <div class="scrub-item">I fade and rise as I enter &mdash; scrubbed by scroll.</div>
+    <div class="scrub-item">Scroll up a little and I animate back. It's reversible.</div>
+    <div class="scrub-item">No IntersectionObserver, no JS &mdash; pure CSS timeline.</div>
+    <div class="scrub-item">The animation's progress IS my position in the viewport.</div>
+  </section>
+
+  <script src="../assets/theme.js"></script>
+</body>
+</html>

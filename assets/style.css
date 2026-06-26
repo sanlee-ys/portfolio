@@ -57,6 +57,41 @@ body, .card, .btn, .hero { transition: background-color 0.2s ease, border-color 
 html[data-theme="dark"] .theme-icon-light { display: none; }
 html[data-theme="light"] .theme-icon-dark { display: none; }
 
+/* Scroll progress bar (Lesson 5) — fills as you scroll the page.
+   Driven by scroll position, not time: animation-timeline: scroll(). */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  height: 3px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%; /* grow from the left edge */
+}
+
+/* Only animate where scroll timelines are supported; elsewhere the bar stays
+   at scaleX(0) (invisible) — no broken UI. */
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation-name: progress-grow;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    /* tie progress to the root scroller's vertical (block) axis */
+    animation-timeline: scroll(root block);
+  }
+}
+
+@keyframes progress-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress { animation: none; }
+}
+
 html { scroll-behavior: smooth; }
 
 body {
