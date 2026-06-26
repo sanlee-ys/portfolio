@@ -6,8 +6,21 @@
   <title>San Lee — Systems &amp; Product</title>
   <meta name="description" content="San Lee — product and systems. Selected work: cross-repo architecture and applied ML." />
   <link rel="stylesheet" href="assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
 </head>
 <body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
   <header class="hero">
     <div class="wrap">
       <p class="eyebrow">Portfolio</p>
@@ -65,5 +78,6 @@
       </nav>
     </div>
   </footer>
+  <script src="assets/theme.js"></script>
 </body>
 </html>
