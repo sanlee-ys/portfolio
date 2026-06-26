@@ -8,6 +8,7 @@
   --accent-soft: rgba(110, 168, 254, 0.12);
   --border: #232a35;
   --btn-text: #0b0e13;
+  --shadow: rgba(0, 0, 0, 0.35);
   --radius: 14px;
   --maxw: 880px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -22,6 +23,7 @@ html[data-theme="light"] {
   --accent-soft: rgba(37, 99, 235, 0.10);
   --border: #e4e8ee;
   --btn-text: #ffffff;
+  --shadow: rgba(20, 30, 60, 0.12);
 }
 
 /* smooth the swap */
@@ -74,10 +76,37 @@ body {
 
 /* Hero */
 .hero {
+  position: relative;
+  overflow: hidden;
   padding: 96px 0 72px;
   border-bottom: 1px solid var(--border);
+}
+
+/* Ambient animated gradient — three soft accent blobs that slowly drift.
+   Lives on a ::before layer behind the content so text stays crisp. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  z-index: 0;
+  pointer-events: none;
   background:
-    radial-gradient(900px 400px at 20% -10%, var(--accent-soft), transparent 70%);
+    radial-gradient(40% 40% at 18% 28%, var(--accent-soft), transparent 70%),
+    radial-gradient(38% 38% at 82% 22%, var(--accent-soft), transparent 70%),
+    radial-gradient(34% 34% at 60% 82%, var(--accent-soft), transparent 70%);
+  animation: hero-drift 20s ease-in-out infinite alternate;
+}
+
+/* Content must sit above the gradient layer. */
+.hero .wrap { position: relative; z-index: 1; }
+
+@keyframes hero-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(0, -4%, 0) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before { animation: none; }
 }
 
 .eyebrow {
@@ -158,10 +187,14 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 26px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px var(--shadow);
+}
 
 .kicker {
   text-transform: uppercase;
@@ -189,6 +222,15 @@ body {
 }
 
 .card-link:hover { text-decoration: underline; }
+
+/* Arrow nudge: when the card is hovered, the arrow slides right.
+   inline-block is required — you can't transform a plain inline element. */
+.card-link .arrow {
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+
+.card:hover .card-link .arrow { transform: translateX(5px); }
 
 /* Footer */
 .footer {
