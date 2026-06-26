@@ -177,12 +177,20 @@ body {
 /* Cards */
 .cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* auto-fit + minmax = responsive with NO media query: each column is at least
+     280px and grows to share leftover space (1fr). When the row can't fit two
+     280px columns, it wraps to one automatically. */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 22px;
   padding-bottom: 80px;
 }
 
 .card {
+  /* flex COLUMN: stack children vertically, one dimension. Combined with the
+     grid stretching all cards to equal height, this lets us pin the link to
+     the bottom no matter how long the description is. */
+  display: flex;
+  flex-direction: column;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -209,13 +217,32 @@ body {
 
 .card p { color: var(--muted); margin: 0 0 16px; }
 
-.card .meta {
-  font-size: 0.85rem;
+/* Tag pills: a flex ROW that wraps. Demonstrates the other axis of flexbox
+   plus flex-wrap + gap. */
+.tags {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tags li {
+  font-size: 0.76rem;
   color: var(--muted);
-  opacity: 0.8;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 11px;
 }
 
 .card-link {
+  /* margin-top:auto in a flex column eats all the leftover vertical space above
+     this element — pushing it to the bottom. align-self stops it stretching
+     full width (flex columns stretch children on the cross axis by default). */
+  margin-top: auto;
+  align-self: flex-start;
   color: var(--accent);
   text-decoration: none;
   font-weight: 600;
@@ -295,6 +322,6 @@ body {
 
 /* Responsive */
 @media (max-width: 680px) {
-  .cards { grid-template-columns: 1fr; }
+  /* the cards no longer need a breakpoint — auto-fit handles the wrap itself. */
   .hero { padding: 64px 0 48px; }
 }
