@@ -78,7 +78,8 @@ body {
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 96px 0 72px;
+  /* fluid padding: scales with viewport between the min and max — no breakpoint. */
+  padding: clamp(56px, 10vw, 96px) 0 clamp(40px, 7vw, 72px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -126,7 +127,7 @@ body {
 }
 
 .tagline {
-  font-size: 1.35rem;
+  font-size: clamp(1.15rem, 3.5vw, 1.4rem);
   color: var(--text);
   font-weight: 500;
   margin: 0 0 18px;
@@ -164,7 +165,7 @@ body {
 
 /* Sections */
 .section-title {
-  font-size: 1.6rem;
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
   margin: 72px 0 6px;
   letter-spacing: -0.01em;
 }
@@ -191,6 +192,10 @@ body {
      the bottom no matter how long the description is. */
   display: flex;
   flex-direction: column;
+  /* make the card a query container so its children can react to the CARD's
+     width (not the viewport's). The card is wider in 2-col, narrow in 1-col. */
+  container-type: inline-size;
+  container-name: card;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -235,6 +240,26 @@ body {
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 4px 11px;
+}
+
+/* When the CARD itself is under 330px wide, tighten its type. Note this keys off
+   the card's width, not the screen — the same component adapts wherever it lives. */
+@container card (max-width: 330px) {
+  .card h3 { font-size: 1.15rem; }
+  .tags li { font-size: 0.72rem; }
+}
+
+/* Focus rings for keyboard users. :focus-visible (not :focus) means the ring
+   shows on keyboard navigation but NOT on mouse clicks — no ugly outline when
+   you click a button, but full visibility when you Tab. Accessibility, done right. */
+.btn:focus-visible,
+.card-link:focus-visible,
+.theme-toggle:focus-visible,
+.footer a:focus-visible,
+.back:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 .card-link {
@@ -321,7 +346,5 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 680px) {
-  /* the cards no longer need a breakpoint — auto-fit handles the wrap itself. */
-  .hero { padding: 64px 0 48px; }
-}
+/* No media queries left: the grid auto-fits and the spacing/type clamp.
+   The layout is intrinsically responsive. */

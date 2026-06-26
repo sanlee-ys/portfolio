@@ -24,3 +24,4 @@ The plan is to climb, not skip:
 | [01](01-scroll-reveal.md) | Scroll-reveal | 1 | `IntersectionObserver`, CSS transitions, `transform`, `prefers-reduced-motion` |
 | [02](02-hover-and-gradient.md) | Hover micro-interactions + animated gradient | 1 | `@keyframes`, `animation`, pseudo-elements, z-index stacking, `inline-block` for transforms |
 | [03](03-layout-flexbox-grid.md) | Layout: Flexbox & Grid | 1 | 1D vs 2D, `auto-fit`/`minmax`, `fr`, flex axes, `margin-top:auto`, `flex-wrap` |
+| [04](04-robust-and-fluid.md) | Robust & fluid | 1 | `:focus-visible`, `clamp()`, container queries, zero-media-query responsive |
