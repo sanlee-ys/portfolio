@@ -135,24 +135,22 @@
     <div class="decision">
       <p class="tag">Decision &middot; SYS-005 (system-level)</p>
       <h3>In-process, idempotent writeback to the notes API</h3>
-      <p>As a component of the larger system, the classifier's Kafka consumer calls
-        <code>classify()</code> in-process and writes labels back as namespaced tags
-        with replace semantics, so reprocessing the same event converges instead of
+      <p>As a component of the larger system, the classifier is invoked by a
+        FastAPI BackgroundTask in notes-api and writes labels back as namespaced tags
+        with replace semantics, so reprocessing the same note converges instead of
         piling up duplicate tags.</p>
-      <p class="tradeoff"><strong>Why:</strong> Kafka's at-least-once delivery makes
-        reprocessing certain, so idempotency is a requirement, not a nicety.
-        <strong>Tradeoff:</strong> the consumer carries real retry and
-        poison-message logic. See <a href="the-system.html">The System</a> for the
+      <p class="tradeoff"><strong>Why:</strong> replace semantics make reprocessing
+        safe by design, so idempotency is a requirement, not a nicety.
+        <strong>Tradeoff:</strong> the background task carries real retry and
+        error-handling logic. See <a href="the-system.html">The System</a> for the
         full loop.</p>
     </div>
 
     <h2>Stack</h2>
     <p>
       Python, the Anthropic SDK (Sonnet for classification, Opus as the v2 judge),
-      pandas for the eval tables, FastAPI for the HTTP endpoint, kafka-python for
-      the consumer, and rank-bm25 for the grounding experiment. Tested with pytest
-      on mocked calls, plus an opt-in testcontainers integration test that spins a
-      real Kafka broker.
+      pandas for the eval tables, FastAPI for the HTTP endpoint, and rank-bm25 for
+      the grounding experiment. Tested with pytest on mocked calls.
     </p>
 
     <h2>What it demonstrates</h2>
