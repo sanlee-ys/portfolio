@@ -90,9 +90,11 @@
     <div class="decision">
       <p class="tag">Decision &middot; SYS-005</p>
       <h3>Make the enrichment loop async and idempotent by design</h3>
-      <p>Creating a note triggers a FastAPI BackgroundTask. The classifier
-        classifies in-process, and writes labels back as namespaced tags
-        (<code>category:</code> / <code>domain:</code>) with replace semantics.</p>
+      <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
+        calls the classifier, then writes the returned labels back as namespaced
+        tags (<code>category:</code> / <code>domain:</code>) with replace
+        semantics — notes-api owns the writeback, the classifier stays a pure
+        provider.</p>
       <p class="tradeoff"><strong>Why:</strong> running classification in a
         BackgroundTask keeps note creation fast and decouples it from classifier
         latency, while replace semantics ensure reprocessing converges instead of
@@ -127,10 +129,10 @@
 
     <h2>How it flows</h2>
     <ol class="flow">
-      <li>A note is created in <strong>notes-api</strong> (<code>POST /notes</code>), which enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it.</li>
-      <li>The <strong>background task</strong> calls the classifier in-process.</li>
-      <li>It classifies the text (one Sonnet call, structured output forced via tool-use) into a category and an operational domain.</li>
-      <li>It writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags.</li>
+      <li>A note is created in <strong>notes-api</strong> (<code>POST /notes</code>), which enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately; the task runs after the response is sent.</li>
+      <li>The <strong>background task</strong> POSTs the note text to the classifier's <code>/classify</code> endpoint.</li>
+      <li>The <strong>classifier</strong> classifies the text (one Sonnet call, structured output forced via tool-use) into a category and an operational domain, and returns them.</li>
+      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags. <code>CLASSIFIER_URL</code> unset makes the whole step a no-op.</li>
       <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
     </ol>
 
