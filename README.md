@@ -21,8 +21,8 @@ that points at real projects and frames them in systems / product language.
 
 - **The System** (`projects/the-system.html`) — cross-repo architecture: how four
   independent repos operate as one system, recorded via a two-tier ADR convention.
-- **Defense News Classifier** (`projects/defense-news-classifier.html`) — applied
-  ML classifier feeding a Kafka consume-then-writeback loop.
+- **Defense News Classifier** (`projects/defense-news-classifier.html`): an LLM
+  classifier feeding a Kafka consume-then-writeback loop.
 
 ## Local preview
 
