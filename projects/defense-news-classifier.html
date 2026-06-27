@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Defense News Classifier — San Lee</title>
+  <title>Defense News Classifier &middot; San Lee</title>
   <link rel="stylesheet" href="../assets/style.css" />
   <script>
     (function () {
@@ -23,16 +23,145 @@
   <main class="wrap article-body">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Defense News Classifier</h1>
-    <p class="subtitle">Applied ML — classification feeding a Kafka writeback loop.</p>
+    <p class="subtitle">An LLM classifier, and the eval harness that kept me honest about it.</p>
 
-    <h2>The problem</h2>
-    <p><em>Writeup in progress.</em></p>
+    <p class="lead">
+      This labels defense-news text by category (procurement, operations, policy,
+      technology, industry) and operational domain (air, land, sea, cyber, space,
+      multi). That part is a single model call. The interesting part is the eval
+      harness, because more than once it told me I was wrong, and the only correct
+      response was to believe it over my own intuition.
+    </p>
+
+    <h2>What the eval caught</h2>
+    <p>
+      Two moments are the whole point of building an eval at all.
+    </p>
+
+    <div class="decision">
+      <p class="tag">The prompt that read better and performed worse</p>
+      <p>I sharpened the system prompt to draw a cleaner line between
+        <code>procurement</code> (a purchase, the buyer's view) and
+        <code>industry</code> (a company's own business news). It read better to a
+        human. It measured worse: category accuracy fell from 79.0% to 76.7%, and
+        <code>industry</code> recall dropped from 0.217 to 0.100. The sharper rule
+        gave the model an even cleaner excuse to dump borderline company stories
+        into <code>procurement</code>. I reverted it.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> a change that sounds right can
+        move the decision boundary the wrong way, and intuition cannot see that.
+        Only the measurement can.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">The grounding that did not pay</p>
+      <p>I added BM25 lexical retrieval to ground each classification in similar
+        documents, expecting a clear win. Measured lift: +1.9% category accuracy,
+        +0.0% on domain. A flip analysis showed grounding fixed about as many calls
+        as it broke. The conclusion wrote itself: lexical retrieval does not earn
+        the cost of moving to embeddings here.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> a negative result is still a
+        result. Measuring first and escalating only when the eval says it pays is
+        the discipline, and here it said do not bother.</p>
+    </div>
+
+    <h2>Why the numbers can be trusted</h2>
+    <p>
+      The eval went through two versions, and the gap between them is the honest
+      part. v1 graded the model on 300 snippets it generated itself. Those numbers
+      measure consistency, not correctness, and they hid a real hole:
+      <code>industry</code> recall was 0.217, the model catching one in five. v2
+      replaced that with 54 hand-labeled real snippets (DoD news wire plus SEC
+      filings), cross-checked by an Opus judge. On real financial text with actual
+      vocabulary, <code>industry</code> went to an F1 of 1.000. Circular evals catch
+      whether a model is consistent. Only real, human-labeled data catches whether
+      it is right.
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real</th><th>v2 grounded</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td></tr>
+        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td></tr>
+        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td></tr>
+        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td></tr>
+      </tbody>
+    </table>
+    <p>
+      The domain numbers <em>drop</em> from v1 to v2, and that is the point.
+      Synthetic text the model wrote was easy to grade. Real text is harder and the
+      lower number is the trustworthy one.
+    </p>
 
     <h2>The decisions</h2>
-    <p><em>Writeup in progress.</em></p>
 
-    <h2>The outcome</h2>
-    <p><em>Writeup in progress.</em></p>
+    <div class="decision">
+      <p class="tag">Decision &middot; ADR-002</p>
+      <h3>Force structured output with tool-use, not prompt parsing</h3>
+      <p>The model is called with a forced tool schema (both fields required, strict
+        enums), so an invalid label is rejected at the API layer before it reaches
+        application code.</p>
+      <p class="tradeoff"><strong>Why:</strong> the schema becomes the contract, and
+        the app code stays free of defensive parsing. <strong>Tradeoff:</strong>
+        tool-use costs a few extra tokens and a more verbose call signature than
+        plain chat. Out-of-enum responses were rare (once in 300) and a single
+        re-sample handled them.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision</p>
+      <h3>One model call, not a multi-step pipeline</h3>
+      <p>Classification is a single call, not a generate-reasoning-then-classify
+        chain.</p>
+      <p class="tradeoff"><strong>Why:</strong> the goal was to measure classifier
+        quality honestly, and a simpler baseline makes the eval cleaner to reason
+        about. <strong>Tradeoff:</strong> gives up any lift a reasoning step might
+        add, which the eval can always be used to revisit later.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; ADR-004</p>
+      <h3>Implement the metrics by hand</h3>
+      <p>Precision, recall, F1, and confusion matrices are computed directly with
+        pandas and arithmetic, no ML framework.</p>
+      <p class="tradeoff"><strong>Why:</strong> on a project about building ML
+        systems, writing the metrics by hand is a statement that I understand what I
+        am measuring, and it keeps the dependency surface to <code>anthropic</code>
+        plus <code>pandas</code>. <strong>Tradeoff:</strong> about 40 lines that
+        <code>sklearn.metrics</code> would replace, accepted for clarity.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; SYS-005 (system-level)</p>
+      <h3>In-process, idempotent writeback to the notes API</h3>
+      <p>As a component of the larger system, the classifier's Kafka consumer calls
+        <code>classify()</code> in-process and writes labels back as namespaced tags
+        with replace semantics, so reprocessing the same event converges instead of
+        piling up duplicate tags.</p>
+      <p class="tradeoff"><strong>Why:</strong> Kafka's at-least-once delivery makes
+        reprocessing certain, so idempotency is a requirement, not a nicety.
+        <strong>Tradeoff:</strong> the consumer carries real retry and
+        poison-message logic. See <a href="the-system.html">The System</a> for the
+        full loop.</p>
+    </div>
+
+    <h2>Stack</h2>
+    <p>
+      Python, the Anthropic SDK (Sonnet for classification, Opus as the v2 judge),
+      pandas for the eval tables, FastAPI for the HTTP endpoint, kafka-python for
+      the consumer, and rank-bm25 for the grounding experiment. Tested with pytest
+      on mocked calls, plus an opt-in testcontainers integration test that spins a
+      real Kafka broker.
+    </p>
+
+    <h2>What it demonstrates</h2>
+    <p>
+      The dataset is small and the scale is personal. The transferable part is the
+      method: evals are the unit tests of an ML system, a negative result is a
+      finding, and measurement outranks intuition every time the two disagree. That
+      is the habit that matters when the model, the data, or the stakes get bigger.
+    </p>
   </main>
   <script src="../assets/theme.js"></script>
 </body>

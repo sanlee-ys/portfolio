@@ -453,6 +453,23 @@ body {
 }
 .decision .tradeoff { color: var(--muted); font-size: 0.95rem; }
 
+/* Results table */
+.article-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 18px 0;
+  font-size: 0.95rem;
+}
+.article-body th,
+.article-body td {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.article-body th { color: var(--muted); font-weight: 600; }
+.article-body td:not(:first-child),
+.article-body th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+
 .article-body h1 { font-size: 2.2rem; margin: 18px 0 8px; letter-spacing: -0.02em; }
 .article-body .subtitle { color: var(--muted); font-size: 1.05rem; margin: 0 0 36px; }
 .article-body h2 { margin: 40px 0 12px; font-size: 1.3rem; }
