@@ -216,7 +216,7 @@ body {
   /* auto-fit + minmax = responsive with NO media query: each column is at least
      280px and grows to share leftover space (1fr). When the row can't fit two
      280px columns, it wraps to one automatically. */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 22px;
   padding-bottom: 80px;
 }
@@ -351,6 +351,7 @@ body {
 /* Stagger: the 2nd card lands a beat after the 1st. */
 .reveal[data-delay="1"] { transition-delay: 0.12s; }
 .reveal[data-delay="2"] { transition-delay: 0.24s; }
+.reveal[data-delay="3"] { transition-delay: 0.36s; }
 
 /* Accessibility: users who ask for less motion get the content, not the animation. */
 @media (prefers-reduced-motion: reduce) {
@@ -470,8 +471,25 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .article-body th { color: var(--muted); font-weight: 600; }
-.article-body td:not(:first-child),
-.article-body th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.article-body table.metrics td:not(:first-child),
+.article-body table.metrics th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Now / Next / Later roadmap */
+.roadmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+.roadmap > div {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--panel);
+}
+.roadmap h3 { margin: 0 0 8px; font-size: 1rem; }
+.roadmap ul { margin: 0; padding-left: 1.1rem; }
+.roadmap li { font-size: 0.92rem; color: var(--muted); margin-bottom: 6px; }
 
 /* Interactive system diagram (SVG, Tier 3) */
 .diagram-wrap { margin: 18px 0; }

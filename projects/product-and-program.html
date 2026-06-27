@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product &amp; Program &middot; San Lee</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+  <main class="wrap article-body">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <h1>Product &amp; Program</h1>
+    <p class="subtitle">The same system, seen from above. How I frame it as a product and run it as a program, with the limits named.</p>
+
+    <p class="lead">
+      The other two writeups are about building the system. This one is about
+      framing and running it: who it is for, how success is measured, how the work
+      is sequenced, and what could go wrong. One thing stated plainly upfront,
+      because it is the first thing a sharp reader will think: this is a solo build,
+      so the program layer is simulated. There is no real cross-team coordination to
+      manage. The workstreams, dependencies, sequencing, and risk reasoning are real
+      and transferable. The org around them is not. Naming that is more credible than
+      pretending otherwise.
+    </p>
+
+    <h2>The problem (product framing)</h2>
+    <p>
+      Defense developments are scattered across many sources and arrive faster than
+      one person can triage. An analyst spends a disproportionate share of time
+      finding and sorting, judging relevance and assigning a category, before any
+      real analysis begins. No lightweight, personal system ingests the firehose,
+      classifies it by topic, and makes the result queryable, so the analyst starts
+      from a raw feed instead of a triaged knowledge base.
+    </p>
+
+    <h2>Who it is for</h2>
+    <p>
+      <strong>Primary user:</strong> a defense-news analyst who must stay current
+      across programs, contracts, geopolitics, and technology, and brief others on
+      what matters. This is a notional persona, and defense is a deliberately chosen
+      vertical, not a claim of domain expertise. <strong>Design partner:</strong> me,
+      dogfooding, as the first user and the early validation loop.
+    </p>
+
+    <div class="decision">
+      <p class="tag">Job to be done</p>
+      <p>When a stream of defense news comes in, help me quickly know <strong>what
+        matters</strong> and <strong>where it fits</strong>, so I spend my time
+        analyzing instead of sorting.</p>
+    </div>
+
+    <h2>Success metrics</h2>
+    <p>Split deliberately into two kinds, because they answer different questions.</p>
+
+    <h3>User-outcome metrics (does it help the analyst?)</h3>
+    <ul>
+      <li><strong>Auto-triage rate:</strong> share of incoming items correctly categorized automatically, so the analyst never hand-sorts them.</li>
+      <li><strong>Coverage (recall):</strong> share of genuinely relevant developments surfaced rather than missed.</li>
+      <li><strong>Answer usefulness:</strong> for a query, the agent returns a correct, cited answer, fast.</li>
+    </ul>
+
+    <h3>AI-quality metrics (can it be measured, not just demoed?)</h3>
+    <ul>
+      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On v2 real, human-labeled text, category is 88.9% (macro-F1 0.906) and operational domain 88.9% (macro-F1 0.894). The ceiling is label ambiguity, not model horsepower.</li>
+      <li><strong>Retrieval quality (RAG):</strong> recall@k, answer groundedness, citation correctness.</li>
+      <li><strong>Regression gate:</strong> an eval pass-rate threshold wired into CI, so a change that drops below it does not merge.</li>
+    </ul>
+
+    <h2>Roadmap (program framing)</h2>
+    <p>Sequenced Now / Next / Later, harvested from real delivery rather than wishful planning.</p>
+    <div class="roadmap">
+      <div>
+        <h3>Now</h3>
+        <ul>
+          <li>Product one-pager and this program view</li>
+          <li>Agent tool-layer contract (SYS-003), accepted and implemented</li>
+          <li>Evals-as-CI running across all three code repos</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Next</h3>
+        <ul>
+          <li>Event loop closed: publish, consume, idempotent writeback</li>
+          <li>Integration tests on both seams (Testcontainers-Kafka)</li>
+          <li>A weekly status cadence from real progress</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Later</h3>
+        <ul>
+          <li>Containerize, then Kafka on K8s (Strimzi)</li>
+          <li>OpenTelemetry observability across services</li>
+          <li>Other verticals: an explicit non-goal, articulated not built</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Risk register</h2>
+    <table>
+      <thead>
+        <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Duplicate event processing (at-least-once redelivery)</td><td>Low</td><td>Idempotent namespaced-tag writeback; commit the offset only after success</td></tr>
+        <tr><td>Classifier accuracy ceiling (label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model; refine the taxonomy or judge boundary cases</td></tr>
+        <tr><td>Breadth creep (verticals without depth)</td><td>Medium</td><td>Deep on one vehicle; other verticals are an explicit non-goal</td></tr>
+        <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep artifacts thin and living, tied to real delivery only</td></tr>
+        <tr><td>Silent contract drift (separate repos)</td><td>Medium</td><td>Frozen wire contracts plus contract tests on both sides in CI</td></tr>
+        <tr><td>Simulated program (no real cross-team coordination)</td><td>Low (honesty)</td><td>Stated plainly; the reasoning and artifacts are real, the org is not</td></tr>
+      </tbody>
+    </table>
+
+    <h2>What it demonstrates</h2>
+    <p>
+      The ability to put the product and program hats on over real engineering work:
+      to name the user and the job, to measure outcomes in two registers, to sequence
+      dependent workstreams, and to track risk honestly, including the risk of the
+      exercise itself. The scale is personal and the program is simulated, and both
+      are named on purpose. The source documents live in the architecture repo:
+      <a href="https://github.com/sanlee-ys/architecture/blob/main/product/one-pager.md">the product one-pager</a>
+      and <a href="https://github.com/sanlee-ys/architecture/blob/main/program/README.md">the program view</a>.
+    </p>
+  </main>
+  <script src="../assets/theme.js"></script>
+</body>
+</html>
