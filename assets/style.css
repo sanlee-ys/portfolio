@@ -385,6 +385,9 @@ body {
   padding: 3px 10px;
 }
 
+/* About paragraph on the front page */
+.about-text { max-width: 620px; color: var(--muted); padding-bottom: 40px; }
+
 /* ---- Project writeup components ---- */
 .article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
 
