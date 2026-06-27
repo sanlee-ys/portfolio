@@ -43,7 +43,7 @@
 
     <h2>What it grew into</h2>
     <ul class="repo-grid">
-      <li><strong>notes-api</strong><span>Spring Boot REST service. The knowledge base and data layer.</span></li>
+      <li><strong>notes-api</strong><span>FastAPI REST service. The knowledge base and data layer.</span></li>
       <li><strong>defense-news-classifier</strong><span>LLM classifier with a real eval harness. Labels the content.</span></li>
       <li><strong>kb-agent</strong><span>RAG and tool-use agent. The hub that reasons over the system.</span></li>
       <li><strong>learning-notes</strong><span>Plain-language notes on the techniques behind it all.</span></li>
@@ -52,7 +52,7 @@
     <h2>The map</h2>
     <p>Click a box to see what each part does. The same flow is written out in words further down, so this is an enhancement, not a requirement.</p>
     <figure class="diagram-wrap">
-      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="img" aria-label="Interactive map of the system: notes-api, Kafka note-events, defense-news-classifier, and kb-agent, connected by an event-driven loop.">
+      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="img" aria-label="Interactive map of the system: notes-api, defense-news-classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop.">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z"></path>
@@ -79,7 +79,7 @@
     <div class="decision">
       <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
       <h3>Decouple with contracts, not shared code</h3>
-      <p>The repos talk over frozen HTTP and event contracts with explicit
+      <p>The repos talk over frozen HTTP contracts with explicit
         versioning rules. Both sides carry contract tests in CI.</p>
       <p class="tradeoff"><strong>Why:</strong> decoupling without a contract is
         just hope. A renamed field breaks the consumer silently at runtime.
@@ -89,15 +89,17 @@
 
     <div class="decision">
       <p class="tag">Decision &middot; SYS-005</p>
-      <h3>Make the loop event-driven and idempotent by design</h3>
-      <p>Creating a note emits a Kafka event. The classifier consumes it,
-        classifies in-process, and writes labels back as namespaced tags
-        (<code>category:</code> / <code>domain:</code>) with replace semantics.</p>
-      <p class="tradeoff"><strong>Why:</strong> Kafka's at-least-once delivery means
-        events arrive twice, so the writeback has to converge on reprocessing
-        instead of accumulating, and note creation never waits on classifier
-        uptime. <strong>Tradeoff:</strong> idempotency is real design work
-        (independent retry paths, poison-message handling), not naive
+      <h3>Make the enrichment loop async and idempotent by design</h3>
+      <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
+        calls the classifier, then writes the returned labels back as namespaced
+        tags (<code>category:</code> / <code>domain:</code>) with replace
+        semantics — notes-api owns the writeback, the classifier stays a pure
+        provider.</p>
+      <p class="tradeoff"><strong>Why:</strong> running classification in a
+        BackgroundTask keeps note creation fast and decouples it from classifier
+        latency, while replace semantics ensure reprocessing converges instead of
+        accumulating duplicate tags. <strong>Tradeoff:</strong> idempotency is real
+        design work (independent retry paths, error handling), not naive
         fire-and-forget.</p>
     </div>
 
@@ -127,10 +129,10 @@
 
     <h2>How it flows</h2>
     <ol class="flow">
-      <li>A note is created in <strong>notes-api</strong>, which publishes a <code>NoteCreated</code> event to the Kafka <code>note-events</code> topic.</li>
-      <li>The <strong>classifier's consumer</strong> reads the event.</li>
-      <li>It classifies the text in-process (one Sonnet call, structured output forced via tool-use) into a category and an operational domain.</li>
-      <li>It writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags.</li>
+      <li>A note is created in <strong>notes-api</strong> (<code>POST /notes</code>), which enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately; the task runs after the response is sent.</li>
+      <li>The <strong>background task</strong> POSTs the note text to the classifier's <code>/classify</code> endpoint.</li>
+      <li>The <strong>classifier</strong> classifies the text (one Sonnet call, structured output forced via tool-use) into a category and an operational domain, and returns them.</li>
+      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags. <code>CLASSIFIER_URL</code> unset makes the whole step a no-op.</li>
       <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
     </ol>
 

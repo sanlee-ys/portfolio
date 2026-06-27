@@ -65,14 +65,13 @@
         <p class="kicker">LLM classification &middot; eval harness</p>
         <h3>Defense News Classifier</h3>
         <p>
-          An LLM classifier that ingests defense-news items, tags them, and publishes
-          results onto a Kafka topic, closing a consume-then-writeback loop with the
-          notes API downstream. The component that started the whole system.
+          An LLM classifier that ingests defense-news items, tags them, and triggers
+          a BackgroundTasks enrichment loop that writes labels back to the notes API
+          downstream. The component that started the whole system.
         </p>
         <ul class="tags">
           <li>Python</li>
           <li>Classification</li>
-          <li>Kafka</li>
         </ul>
         <a class="card-link" href="projects/defense-news-classifier.html">Read the writeup <span class="arrow">&rarr;</span></a>
       </article>

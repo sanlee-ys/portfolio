@@ -11,20 +11,16 @@
 
   // ---- The data: the system as nodes + edges ----
   var nodes = [
-    { id: "notes-api",  label: "notes-api",  x: 165, y: 215,
-      desc: "Spring Boot REST service. Owns the knowledge base and serves notes. Publishes a NoteCreated event whenever a note is created." },
-    { id: "kafka",      label: "Kafka: note-events", x: 400, y: 80,
-      desc: "The event backbone. Carries NoteCreated events with at-least-once delivery, which is exactly why the consumer is built to be idempotent." },
-    { id: "classifier", label: "defense-news-classifier", x: 635, y: 215,
-      desc: "Consumes events, classifies the text in-process (one Sonnet call), and writes labels back as namespaced tags with replace semantics." },
-    { id: "kb-agent",   label: "kb-agent",   x: 400, y: 355,
+    { id: "notes-api",  label: "notes-api",  x: 170, y: 150,
+      desc: "FastAPI REST service. Owns the knowledge base and serves notes. On create, it runs a FastAPI BackgroundTask that calls the classifier and writes the labels back to itself as namespaced tags (PUT /notes/{id}/tags, replace semantics)." },
+    { id: "classifier", label: "defense-news-classifier", x: 630, y: 150,
+      desc: "Classifies text in-process (one Sonnet call, structured output) into a category and an operational domain. A pure provider: called by the notes-api background task and by kb-agent, it knows nothing about either." },
+    { id: "kb-agent",   label: "kb-agent",   x: 400, y: 320,
       desc: "RAG and tool-use agent. Reads notes to ground its answers, and can also call the classifier synchronously." },
   ];
 
   var edges = [
-    { from: "notes-api",  to: "kafka",      label: "NoteCreated" },
-    { from: "kafka",      to: "classifier", label: "consume" },
-    { from: "classifier", to: "notes-api",  label: "PUT /tags" },
+    { from: "notes-api",  to: "classifier", label: "classify (async)" },
     { from: "kb-agent",   to: "notes-api",  label: "GET /notes" },
     { from: "kb-agent",   to: "classifier", label: "POST /classify" },
   ];
