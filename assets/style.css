@@ -385,6 +385,74 @@ body {
   padding: 3px 10px;
 }
 
+/* ---- Project writeup components ---- */
+.article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
+
+/* Repo cards (the pieces of the system) */
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+  padding: 0;
+  list-style: none;
+}
+.repo-grid li {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--panel);
+}
+.repo-grid strong { display: block; margin-bottom: 4px; }
+.repo-grid span { color: var(--muted); font-size: 0.92rem; }
+
+/* Numbered data-flow */
+.flow { list-style: none; counter-reset: step; padding: 0; margin: 18px 0; }
+.flow li {
+  position: relative;
+  padding: 6px 0 16px 42px;
+  border-left: 2px solid var(--border);
+  margin-left: 14px;
+}
+.flow li:last-child { border-left-color: transparent; }
+.flow li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: -15px;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--btn-text);
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Decision blocks */
+.decision {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 16px 0;
+  background: var(--panel);
+}
+.decision h3 { margin: 0 0 8px; font-size: 1.08rem; }
+.decision p { margin: 6px 0; }
+.decision .tag {
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+.decision .tradeoff { color: var(--muted); font-size: 0.95rem; }
+
 .article-body h1 { font-size: 2.2rem; margin: 18px 0 8px; letter-spacing: -0.02em; }
 .article-body .subtitle { color: var(--muted); font-size: 1.05rem; margin: 0 0 36px; }
 .article-body h2 { margin: 40px 0 12px; font-size: 1.3rem; }

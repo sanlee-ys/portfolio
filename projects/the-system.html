@@ -23,16 +23,106 @@
   <main class="wrap article-body">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>The System</h1>
-    <p class="subtitle">Cross-repo architecture — four repos, one coherent system.</p>
+    <p class="subtitle">Four independent repositories, engineered to operate as one system &mdash; without collapsing into a monolith.</p>
+
+    <p class="lead">
+      The interesting work in a multi-project system isn't the projects &mdash; it's
+      the seams between them. This is a system of four repos that talk to each
+      other over frozen contracts, run an event-driven classification loop, and
+      stay independently deployable. The deliverable isn't just that it works;
+      it's that every cross-cutting decision is written down and reviewable.
+    </p>
 
     <h2>The problem</h2>
-    <p><em>Writeup in progress.</em></p>
+    <p>
+      Four useful-on-their-own projects needed to behave as one product:
+    </p>
+    <ul class="repo-grid">
+      <li><strong>notes-api</strong><span>Spring Boot REST service &mdash; the knowledge base and data layer.</span></li>
+      <li><strong>defense-news-classifier</strong><span>LLM classifier with a real eval harness &mdash; labels content.</span></li>
+      <li><strong>kb-agent</strong><span>RAG + tool-use agent &mdash; the hub that reasons over the system.</span></li>
+      <li><strong>learning-notes</strong><span>Plain-language notes on the techniques behind it all.</span></li>
+    </ul>
+    <p>
+      The easy path is to fuse them into one codebase so they can call each other
+      directly. That buys convenience and pays for it with independence: one
+      release cycle, one blast radius, one thing to break. The harder, better goal
+      was to let them act as one system while each stays deployable on its own.
+      That's an architecture problem, not a coding problem &mdash; it lives in the
+      contracts between the pieces.
+    </p>
 
     <h2>The decisions</h2>
-    <p><em>Writeup in progress.</em></p>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
+      <h3>Decouple with contracts, not shared code</h3>
+      <p>The repos talk over frozen HTTP and event contracts with explicit
+        versioning rules; both sides carry contract tests in CI.</p>
+      <p class="tradeoff"><strong>Why:</strong> "decoupling" without a contract is
+        just hope &mdash; a renamed field breaks the consumer silently at runtime.
+        <strong>Tradeoff:</strong> more upfront ceremony (freeze the wire shape,
+        write the tests) so that drift fails a build instead of production.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; SYS-005</p>
+      <h3>Make the loop event-driven and idempotent by design</h3>
+      <p>Creating a note emits a Kafka event; the classifier consumes it,
+        classifies in-process, and writes labels back as namespaced tags
+        (<code>category:</code> / <code>domain:</code>) with replace semantics.</p>
+      <p class="tradeoff"><strong>Why:</strong> Kafka's at-least-once delivery means
+        events arrive twice, so the writeback has to <em>converge</em> on reprocessing,
+        not accumulate. Note creation never waits on classifier uptime.
+        <strong>Tradeoff:</strong> idempotency is real design work (independent
+        retry paths, poison-message handling) versus naive fire-and-forget.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; SYS-002</p>
+      <h3>Gate model choice on evidence, not vibes</h3>
+      <p>Default to Sonnet across the system; escalate to Opus only where an eval
+        shows the quality gain pays.</p>
+      <p class="tradeoff"><strong>Why:</strong> the classifier's accuracy ceiling
+        turned out to be label ambiguity, not model horsepower &mdash; paying ~1.7&times;
+        for a bigger model would have bought nothing. <strong>Tradeoff:</strong> you
+        have to run the eval to justify the tier, instead of just defaulting to the
+        biggest model.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; SYS-001 / SYS-008</p>
+      <h3>Record decisions, then make the system legible</h3>
+      <p>Cross-repo decisions live as two-tier ADRs (repo-local stays local; system
+        decisions are <code>SYS-NNN</code> in one place). A generated portal
+        aggregates every repo's docs into one browsable view, deep-linking to code
+        &mdash; aggregate, never duplicate.</p>
+      <p class="tradeoff"><strong>Why:</strong> a system you can't see in one place is
+        narrated, not legible &mdash; and a decision that isn't written down gets
+        re-argued.</p>
+    </div>
+
+    <h2>How it flows</h2>
+    <ol class="flow">
+      <li>A note is created in <strong>notes-api</strong>, which publishes a <code>NoteCreated</code> event to the Kafka <code>note-events</code> topic.</li>
+      <li>The <strong>classifier's consumer</strong> reads the event.</li>
+      <li>It classifies the text in-process &mdash; one Sonnet call, structured output forced via tool-use &mdash; into a category and an operational domain.</li>
+      <li>It writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags.</li>
+      <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
+    </ol>
 
     <h2>The outcome</h2>
-    <p><em>Writeup in progress.</em></p>
+    <ul>
+      <li><strong>Create a note &rarr; it's automatically classified and tagged</strong>, asynchronously, with no coupling between note creation and classifier availability.</li>
+      <li><strong>Four repos stay independently deployable</strong>, and cross-repo drift is caught by a red build &mdash; not a production incident.</li>
+      <li><strong>The whole system is browsable in one portal</strong>, with links straight to the real code.</li>
+      <li><strong>It's articulated, not just built:</strong> a skill map (SYS-007) names the AI-era capabilities the system exercises &mdash; evals, context engineering, agents, observability &mdash; and the honest gap (security on the agent's tool seam).</li>
+    </ul>
+    <p>
+      What it demonstrates: systems thinking. The value lives in the seams and the
+      decisions &mdash; chosen deliberately, recorded so they're reviewable, and
+      protected so they don't silently rot.
+    </p>
   </main>
   <script src="../assets/theme.js"></script>
 </body>
