@@ -49,6 +49,21 @@
       <li><strong>learning-notes</strong><span>Plain-language notes on the techniques behind it all.</span></li>
     </ul>
 
+    <h2>The map</h2>
+    <p>Click a box to see what each part does. The same flow is written out in words further down, so this is an enhancement, not a requirement.</p>
+    <figure class="diagram-wrap">
+      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="img" aria-label="Interactive map of the system: notes-api, Kafka note-events, defense-news-classifier, and kb-agent, connected by an event-driven loop.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z"></path>
+          </marker>
+        </defs>
+        <g id="diagram-edges"></g>
+        <g id="diagram-nodes"></g>
+      </svg>
+      <figcaption class="diagram-detail" id="diagram-detail">Click a box above to see what each part does.</figcaption>
+    </figure>
+
     <h2>The problem</h2>
     <p>
       Once it was four repos, the easy path was to fuse them so they could call
@@ -135,5 +150,6 @@
     </p>
   </main>
   <script src="../assets/theme.js"></script>
+  <script src="../assets/diagram.js"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ The plan is to climb, not skip:
 
 1. **CSS craft** — motion, transforms, `IntersectionObserver` ✅ *(Lessons 1–5)*
 2. **Canvas 2D** — the render loop, particles
-3. **SVG + dataviz** — the interactive system diagram
+3. **SVG + dataviz** — the interactive system diagram ✅ *(Lesson 6)*
 4. **WebGL / shaders** — the deep end (lives in `/lab`)
 
 ## Lessons
@@ -26,3 +26,4 @@ The plan is to climb, not skip:
 | [03](03-layout-flexbox-grid.md) | Layout: Flexbox & Grid | 1 | 1D vs 2D, `auto-fit`/`minmax`, `fr`, flex axes, `margin-top:auto`, `flex-wrap` |
 | [04](04-robust-and-fluid.md) | Robust & fluid | 1 | `:focus-visible`, `clamp()`, container queries, zero-media-query responsive |
 | [05](05-scroll-driven-storytelling.md) | Scroll-driven storytelling | 1 | `animation-timeline: scroll()`/`view()`, `position: sticky`, `@supports`, progressive enhancement |
+| [06](06-svg-data-driven-diagram.md) | Data-driven SVG diagram | 3 | SVG `viewBox`, `createElementNS`, data-to-visual binding, `<marker>`, keyboard-operable SVG |

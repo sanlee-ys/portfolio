@@ -473,6 +473,44 @@ body {
 .article-body td:not(:first-child),
 .article-body th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
 
+/* Interactive system diagram (SVG, Tier 3) */
+.diagram-wrap { margin: 18px 0; }
+.diagram {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+#system-diagram marker path { fill: var(--muted); }
+.edge { stroke: var(--muted); stroke-width: 2; opacity: 0.7; }
+.edge-label { fill: var(--muted); font-size: 12px; }
+.edge-label-bg { fill: var(--panel); }
+.node rect {
+  fill: var(--bg);
+  stroke: var(--border);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: stroke 0.15s ease, fill 0.15s ease;
+}
+.node text {
+  fill: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.node:hover rect { stroke: var(--accent); }
+.node.active rect { stroke: var(--accent); fill: var(--accent-soft); }
+.diagram-detail {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--panel);
+  margin-top: 12px;
+  color: var(--muted);
+}
+
 .article-body h1 { font-size: 2.2rem; margin: 18px 0 8px; letter-spacing: -0.02em; }
 .article-body .subtitle { color: var(--muted); font-size: 1.05rem; margin: 0 0 36px; }
 .article-body h2 { margin: 40px 0 12px; font-size: 1.3rem; }
