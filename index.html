@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>San Lee &middot; Systems &amp; Product</title>
-  <meta name="description" content="San Lee, product and systems. Selected work: cross-repo architecture and applied ML." />
+  <meta name="description" content="San Lee, product and systems. Selected work: cross-repo architecture and LLM classification." />
   <link rel="stylesheet" href="assets/style.css" />
   <script>
     (function () {
@@ -29,8 +29,8 @@
       <p class="tagline">I build systems and make them easy to navigate.</p>
       <p class="lede">
         Product, with an engineering background. A few things I've designed and
-        built: event-driven services, applied ML, and the architecture that ties
-        independent pieces into one system.
+        built: event-driven services, an LLM classifier, and the architecture that
+        ties independent pieces into one system.
       </p>
       <div class="cta">
         <a class="btn" href="#work">See the work</a>
@@ -41,7 +41,7 @@
 
   <main class="wrap" id="work">
     <h2 class="section-title reveal">Selected work</h2>
-    <p class="section-sub reveal">Three pieces: the ML component, the system around it, and how I frame the whole thing as product and program.</p>
+    <p class="section-sub reveal">Three pieces: the classifier, the system around it, and how I frame the whole thing as product and program.</p>
 
     <section class="cards">
       <article class="card reveal" data-delay="1">
@@ -62,10 +62,10 @@
       </article>
 
       <article class="card reveal" data-delay="2">
-        <p class="kicker">Applied ML &middot; data pipeline</p>
+        <p class="kicker">LLM classification &middot; eval harness</p>
         <h3>Defense News Classifier</h3>
         <p>
-          An ML classifier that ingests defense-news items, tags them, and publishes
+          An LLM classifier that ingests defense-news items, tags them, and publishes
           results onto a Kafka topic, closing a consume-then-writeback loop with the
           notes API downstream. The component that started the whole system.
         </p>

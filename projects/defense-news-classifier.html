@@ -125,7 +125,7 @@
       <h3>Implement the metrics by hand</h3>
       <p>Precision, recall, F1, and confusion matrices are computed directly with
         pandas and arithmetic, no ML framework.</p>
-      <p class="tradeoff"><strong>Why:</strong> on a project about building ML
+      <p class="tradeoff"><strong>Why:</strong> on a project about building AI
         systems, writing the metrics by hand is a statement that I understand what I
         am measuring, and it keeps the dependency surface to <code>anthropic</code>
         plus <code>pandas</code>. <strong>Tradeoff:</strong> about 40 lines that
@@ -158,7 +158,7 @@
     <h2>What it demonstrates</h2>
     <p>
       The dataset is small and the scale is personal. The transferable part is the
-      method: evals are the unit tests of an ML system, a negative result is a
+      method: evals are the unit tests of an LLM system, a negative result is a
       finding, and measurement outranks intuition every time the two disagree. That
       is the habit that matters when the model, the data, or the stakes get bigger.
     </p>
