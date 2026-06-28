@@ -717,20 +717,42 @@ body {
   margin: 8px 0 0;
 }
 
-/* Colophon ledger: a compact record of human-vs-agent moments. */
-.ledger { list-style: none; padding: 0; margin: 20px 0 0; }
-.ledger > li { padding: 0 0 18px 16px; border-left: 2px solid var(--border); }
-.ledger > li:last-child { padding-bottom: 0; }
-.lg-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.lg-title { font-weight: 600; }
-.lg-date {
-  flex: 0 0 auto;
+/* Colophon ledger, drawn as a vertical timeline. The spine is one absolutely
+   positioned line behind the items; each item draws its own dot as a ::before
+   ring, centered on the spine. Vertical so it stays readable on a phone. */
+.timeline { list-style: none; padding: 0; margin: 24px 0 0; position: relative; }
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--border);
+}
+.timeline > li { position: relative; padding: 0 0 24px 30px; }
+.timeline > li:last-child { padding-bottom: 0; }
+.timeline > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+}
+.tl-date {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.78rem;
-  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
 }
-.lg-body { color: var(--muted); font-size: 0.95rem; margin: 5px 0 0; }
-.lg-quote { color: var(--text); font-style: italic; }
+.tl-title { font-weight: 600; margin-top: 2px; }
+.tl-body { color: var(--muted); font-size: 0.95rem; margin: 4px 0 0; }
+.tl-quote { color: var(--text); font-style: italic; }
 
 /* Inline links inside prose. Without this they fall back to the browser's
    default deep blue, which is nearly unreadable on the dark background. Accent
