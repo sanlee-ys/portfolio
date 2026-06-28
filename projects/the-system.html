@@ -136,6 +136,90 @@
       <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
     </ol>
 
+    <h2>Example run</h2>
+    <p>
+      "How it flows" in words is one thing. Here is the same loop carrying real
+      data. Every request and response field below is the actual schema from the
+      repos, and the classification is a real model prediction, not a mock-up.
+    </p>
+    <p class="ex-caption">
+      The article text and the two predicted labels are real: gold row
+      <code>g002</code> from the classifier's eval set, a prediction that matches
+      both the hand label and the LLM judge. The note's title, <code>id</code>, and
+      timestamps are illustrative placeholders.
+    </p>
+    <ol class="example-run">
+      <li>
+        <p class="ex-step">A note is created</p>
+        <p class="ex-note"><code>POST /notes</code> takes a title and content. It
+          returns <code>201</code> immediately and schedules the enrichment as a
+          background task, so <code>tags</code> is still empty at this point.</p>
+        <pre><code>POST /notes
+{
+  "title": "USS Ronald Reagan first ordnance drop",
+  "content": "F/A-18E Hornets assigned to the \"Eagles\" of Strike Fighter Attack Squadron 115 ... in support of Operation Iraqi Freedom."
+}</code></pre>
+      </li>
+      <li>
+        <p class="ex-step">The classifier is forced to answer in schema</p>
+        <p class="ex-note">The background task POSTs the text to the classifier's
+          <code>/classify</code> endpoint. One <code>claude-sonnet-4-6</code> call
+          with <code>tool_choice</code> pinned to the <code>classify_article</code>
+          tool forces the model to answer only as an enum-validated tool call,
+          which the endpoint returns as <code>{category, operational_domain}</code>.
+          No confidence score, by design.</p>
+        <pre><code>// forced tool_use emitted by the model
+{
+  "name": "classify_article",
+  "input": { "category": "operations", "operational_domain": "air" }
+}</code></pre>
+      </li>
+      <li>
+        <p class="ex-step">Labels become namespaced tags</p>
+        <p class="ex-note">notes-api owns the writeback. It maps the two fields to
+          prefixed tags (note the <code>operational_domain</code> &rarr;
+          <code>domain:</code> rename) and PUTs them with replace semantics, so
+          reprocessing converges instead of piling up duplicates. The user's own
+          tags are preserved.</p>
+        <pre><code>classifier_tags({"category": "operations", "operational_domain": "air"})
+# -&gt; ["category:operations", "domain:air"]
+
+PUT /notes/1/tags
+{ "tags": ["category:operations", "domain:air"] }</code></pre>
+      </li>
+      <li>
+        <p class="ex-step">The note is now enriched</p>
+        <p class="ex-note">Reading it back shows the labels in its flat
+          <code>tags</code> list. There is no <code>status</code> field anywhere:
+          "enriched" is simply the presence of <code>category:</code> /
+          <code>domain:</code> tags, which keeps the schema small and the state
+          honest.</p>
+        <pre><code>GET /notes/1
+{
+  "id": 1,
+  "title": "USS Ronald Reagan first ordnance drop",
+  "content": "F/A-18E Hornets ... Operation Iraqi Freedom.",
+  "tags": ["category:operations", "domain:air"],
+  "created_at": "...",
+  "updated_at": "..."
+}</code></pre>
+      </li>
+      <li>
+        <p class="ex-step">The agent can find it</p>
+        <p class="ex-note">The kb-agent's <code>search_notes</code> tool filters by
+          tag over the same HTTP seam, so the freshly-tagged note is now retrievable
+          for grounding. The result follows the system-wide observation contract
+          (SYS-003): a status, a summary, the payload, and a cited source.</p>
+        <pre><code>search_notes(tag="domain:air")   -&gt;   GET /notes?tag=domain:air
+{
+  "status": "success",
+  "summary": "1 matching note(s).",
+  "payload": [ { "id": 1, "title": "...", "tags": ["category:operations", "domain:air"] } ],
+  "source": "notes-api service, http://127.0.0.1:8000/notes"
+}</code></pre>
+      </li>
+    </ol>
+
     <h2>The outcome</h2>
     <ul>
       <li><strong>Create a note and it is automatically classified and tagged</strong>, asynchronously, with no coupling between note creation and classifier availability.</li>
