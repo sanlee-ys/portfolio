@@ -48,7 +48,7 @@
     <h2 class="section-title reveal">The system</h2>
     <p class="section-sub reveal">Four repositories (an API, an LLM classifier, a RAG agent, and a knowledge base) wired into one working system. Click a component to jump to the decision behind it.</p>
     <figure class="diagram-wrap reveal">
-      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="img" aria-label="Interactive map of the system: notes-api, defense-news-classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop. Click a component to jump to the decision behind it.">
+      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="group" aria-label="Interactive map of the system: notes-api, defense-news-classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop. Click a component to jump to the decision behind it.">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z"></path>
@@ -57,7 +57,7 @@
         <g id="diagram-edges"></g>
         <g id="diagram-nodes"></g>
       </svg>
-      <figcaption class="diagram-detail" id="diagram-detail">Select a component to see what it does and the decision behind it.</figcaption>
+      <figcaption class="diagram-detail" id="diagram-detail" aria-live="polite" aria-atomic="true">Select a component to see what it does and the decision behind it.</figcaption>
     </figure>
     <p class="diagram-more reveal"><a class="card-link" href="projects/the-system.html">Read the full writeup <span class="arrow">&rarr;</span></a></p>
 
