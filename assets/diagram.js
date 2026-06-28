@@ -10,12 +10,18 @@
   var SVG_NS = "http://www.w3.org/2000/svg";
 
   // ---- The data: the system as nodes + edges ----
+  // Each node carries `anchor` (the decision-log entry it governs) and `adr`
+  // (the decision IDs to surface in the caption), so clicking a box jumps to the
+  // decision behind it — the map and the log are two views of one dataset.
   var nodes = [
     { id: "notes-api",  label: "notes-api",  x: 170, y: 150,
+      anchor: "decision-rightsized", adr: ["SYS-005"],
       desc: "FastAPI REST service. Owns the knowledge base and serves notes. On create, it runs a FastAPI BackgroundTask that calls the classifier and writes the labels back to itself as namespaced tags (PUT /notes/{id}/tags, replace semantics)." },
     { id: "classifier", label: "defense-news-classifier", x: 630, y: 150,
+      anchor: "decision-eval", adr: ["ADR-002", "SYS-002"],
       desc: "Classifies text in-process (one Sonnet call, structured output) into a category and an operational domain. A pure provider: called by the notes-api background task and by kb-agent, it knows nothing about either." },
     { id: "kb-agent",   label: "kb-agent",   x: 400, y: 320,
+      anchor: "decision-contracts", adr: ["SYS-003", "SYS-006"],
       desc: "RAG and tool-use agent. Reads notes to ground its answers, and can also call the classifier synchronously." },
   ];
 
@@ -94,7 +100,20 @@
       if (active) active.classList.remove("active");
       g.classList.add("active");
       active = g;
-      detail.textContent = n.label + " — " + n.desc;
+      detail.textContent =
+        n.label + " — " + n.desc + (n.adr ? "  ·  " + n.adr.join(", ") : "");
+      // Second beat: jump to and briefly highlight the decision behind this node.
+      if (n.anchor) {
+        var target = document.getElementById(n.anchor);
+        if (target) {
+          var reduce =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+          target.classList.add("target");
+          setTimeout(function () { target.classList.remove("target"); }, 1300);
+        }
+      }
     }
     g.addEventListener("click", select);
     g.addEventListener("keydown", function (ev) {
