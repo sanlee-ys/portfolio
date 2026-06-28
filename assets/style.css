@@ -596,3 +596,71 @@ body {
    spacing/type clamp, so the layout is intrinsically responsive. (The only
    @media rules remaining are prefers-reduced-motion — a user *preference*
    query, not a screen-width breakpoint.) */
+
+/* ===== Decision Log homepage ===== */
+
+/* Narrow, left-aligned reading column for the log and prose. The diagram
+   masthead above stays at the full .wrap width. */
+.measure { max-width: 720px; }
+
+.log-intro { color: var(--muted); margin: 0 0 24px; }
+
+/* Decision IDs read like a ledger: monospace + tabular figures, so SYS-005,
+   ADR-002, and the EVAL rows line up down the left edge. */
+.decision .tag {
+  font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reversal / right-sizing marker. Muted on purpose: reads as "noted," not "alarm." */
+.pill {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-family: var(--font);
+}
+
+/* Click a diagram node and its matching decision glows briefly. */
+.decision { transition: box-shadow 0.3s ease; }
+.decision.target { box-shadow: 0 0 0 2px var(--accent); }
+@media (prefers-reduced-motion: reduce) { .decision { transition: none; } }
+
+/* In-place evidence via native <details>: keyboard + find-in-page for free. */
+.decision details { margin-top: 12px; }
+.decision summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.decision details > *:not(summary) { color: var(--muted); font-size: 0.96rem; margin: 10px 0 0; }
+
+/* Links inside the reading column (prose + evidence), readable on dark. */
+.measure a { color: var(--accent); }
+.measure p a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.measure p a:hover { text-decoration-color: var(--accent); }
+
+/* Field-notes index: a quiet wrapping list of titles. */
+.notes-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.notes-list li { color: var(--muted); font-size: 0.92rem; }
+.muted-line { color: var(--muted); font-size: 0.92rem; }

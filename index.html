@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>San Lee &middot; Systems &amp; Product</title>
-  <meta name="description" content="San Lee, product and systems. Selected work: cross-repo architecture and LLM classification." />
+  <meta name="description" content="San Lee, product and systems. A decision log: the system, the calls behind it, and the times the evidence overruled me." />
   <link rel="stylesheet" href="assets/style.css" />
   <script>
     (function () {
@@ -27,8 +27,8 @@
       <h1>San Lee</h1>
       <p class="tagline">Platform engineer turned product. I design systems and keep the seams between them legible.</p>
       <p class="lede">
-        Event-driven services, an LLM classifier, and the architecture that
-        ties independent pieces into one system.
+        What follows is the record: the system, the decisions behind it, and the
+        times the evidence overruled me.
       </p>
       <nav class="hero-links" aria-label="Find me elsewhere">
         <a href="https://github.com/sanlee-ys" aria-label="GitHub">
@@ -45,18 +45,10 @@
   </header>
 
   <main class="wrap" id="work">
-    <h2 class="section-title reveal">About</h2>
-    <p class="reveal about-text">
-      I spent years in platform and infrastructure before moving into product. I
-      like building systems where the hard part is the design and the seams between
-      the pieces, and writing the decisions down so they hold up later. The work
-      below is where I keep my hands in the craft.
-    </p>
-
     <h2 class="section-title reveal">The system</h2>
-    <p class="section-sub reveal">Four repositories — an API, an LLM classifier, a RAG agent, and a knowledge base — wired into one event-driven system.</p>
+    <p class="section-sub reveal">Four repositories (an API, an LLM classifier, a RAG agent, and a knowledge base) wired into one working system. Click a component to jump to the decision behind it.</p>
     <figure class="diagram-wrap reveal">
-      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="img" aria-label="Interactive map of the system: notes-api, defense-news-classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop.">
+      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="img" aria-label="Interactive map of the system: notes-api, defense-news-classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop. Click a component to jump to the decision behind it.">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z"></path>
@@ -65,44 +57,143 @@
         <g id="diagram-edges"></g>
         <g id="diagram-nodes"></g>
       </svg>
-      <figcaption class="diagram-detail" id="diagram-detail">Click a box above to see what each part does.</figcaption>
+      <figcaption class="diagram-detail" id="diagram-detail">Select a component to see what it does and the decision behind it.</figcaption>
     </figure>
     <p class="diagram-more reveal"><a class="card-link" href="projects/the-system.html">Read the full writeup <span class="arrow">&rarr;</span></a></p>
 
-    <h2 class="section-title reveal">Selected work</h2>
-    <p class="section-sub reveal">The classifier that started it all, and the same system framed as product and program.</p>
+    <section class="measure">
+      <h2 class="section-title reveal">The decision log</h2>
+      <p class="log-intro reveal">The real calls behind the system. The ones that went the wrong way are here too, set with the same care as the wins, because that is the part worth reading.</p>
 
-    <section class="cards">
-      <article class="card reveal" data-delay="1">
-        <p class="kicker">LLM classification &middot; eval harness</p>
-        <h3>Defense News Classifier</h3>
-        <p>
-          An LLM classifier that ingests defense-news items, tags them, and triggers
-          a BackgroundTasks enrichment loop that writes labels back to the notes API
-          downstream. The component that started the whole system.
-        </p>
-        <ul class="tags">
-          <li>Python</li>
-          <li>Classification</li>
-        </ul>
-        <a class="card-link" href="projects/defense-news-classifier.html">Read the writeup <span class="arrow">&rarr;</span></a>
-      </article>
+      <div class="decision" id="decision-contracts">
+        <p class="tag">SYS-004 &middot; SYS-006</p>
+        <h3>Decouple with contracts, not shared code</h3>
+        <p>The repos talk over frozen HTTP contracts with explicit versioning, and both sides carry contract tests in CI. The system behaves as one thing while each piece stays independently deployable.</p>
+        <p class="tradeoff"><strong>Tradeoff:</strong> more upfront ceremony, so a renamed field fails a build instead of breaking production in silence.</p>
+        <details>
+          <summary>Why it mattered</summary>
+          <p>Decoupling without a contract is just hope. The hard part lives in the seams between the pieces, not the pieces themselves. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
+        </details>
+      </div>
 
-      <article class="card reveal" data-delay="2">
-        <p class="kicker">Product &middot; program management</p>
-        <h3>Product &amp; Program</h3>
-        <p>
-          The same system seen from above: who it's for, how success is measured,
-          how the work is sequenced, and what could go wrong. The program layer is
-          simulated, since it's a solo build, and the writeup says so plainly.
-        </p>
-        <ul class="tags">
-          <li>Product</li>
-          <li>Program</li>
-          <li>Roadmap &amp; risks</li>
-        </ul>
-        <a class="card-link" href="projects/product-and-program.html">Read the writeup <span class="arrow">&rarr;</span></a>
-      </article>
+      <div class="decision" id="decision-eval">
+        <p class="tag">EVAL &middot; v1 &rarr; v2</p>
+        <h3>I rebuilt the eval until it could tell me I was wrong</h3>
+        <p>v1 graded the model on 300 snippets it generated itself, which measures consistency, not correctness. v2 replaced that with 54 hand-labeled real snippets, cross-checked by an Opus judge.</p>
+        <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
+        <details>
+          <summary>Read the numbers</summary>
+          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+        </details>
+      </div>
+
+      <div class="decision" id="decision-grounding">
+        <p class="tag">EVAL &middot; BM25 <span class="pill">rejected</span></p>
+        <h3>I added retrieval grounding, measured it, and cut it</h3>
+        <p>A negative result is still a result. I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
+        <p class="tradeoff"><strong>The result:</strong> +1.9% category accuracy, +0.0% on domain, and a flip analysis showed it fixed about as many calls as it broke. It did not earn the jump to embeddings, so it did not ship.</p>
+        <details>
+          <summary>The discipline</summary>
+          <p>Measure first, escalate only when the eval says it pays. Here it said do not bother. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+        </details>
+      </div>
+
+      <div class="decision" id="decision-prompt">
+        <p class="tag">EVAL &middot; PROMPT <span class="pill">reverted</span></p>
+        <h3>A prompt that read better and measured worse, reverted</h3>
+        <p>A change that sounds right can move the decision boundary the wrong way, and intuition cannot see that. I sharpened the procurement-versus-industry rule so it read cleaner to a human.</p>
+        <p class="tradeoff"><strong>The result:</strong> category accuracy dropped from 79.0% to 76.7% and industry recall from 0.217 to 0.100. I reverted it.</p>
+        <details>
+          <summary>Why measurement won</summary>
+          <p>The sharper rule gave the model a cleaner excuse to dump borderline company stories into the wrong bucket. Only the eval could see that. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+        </details>
+      </div>
+
+      <div class="decision" id="decision-model">
+        <p class="tag">SYS-002</p>
+        <h3>Gate model choice on evidence, not vibes</h3>
+        <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself.</p>
+        <p class="tradeoff"><strong>Tradeoff:</strong> you have to run the eval to justify the tier instead of reaching for the biggest model.</p>
+        <details>
+          <summary>What the eval showed</summary>
+          <p>The classifier's ceiling was label ambiguity, not model horsepower, so paying roughly 1.7&times; for a larger model would have bought nothing. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
+        </details>
+      </div>
+
+      <div class="decision" id="decision-tooluse">
+        <p class="tag">ADR-002</p>
+        <h3>Force structured output with tool-use, not prompt parsing</h3>
+        <p>The model is called with a forced tool schema (both fields required, strict enums), so an invalid label is rejected at the API layer before it reaches application code.</p>
+        <p class="tradeoff"><strong>Tradeoff:</strong> a few extra tokens and a more verbose call, in exchange for app code with no defensive parsing.</p>
+        <details>
+          <summary>How it held up</summary>
+          <p>The schema becomes the contract. Out-of-enum responses were rare (once in 300) and a single re-sample handled them. <a href="projects/defense-news-classifier.html">Full writeup &rarr;</a></p>
+        </details>
+      </div>
+
+      <div class="decision" id="decision-rightsized">
+        <p class="tag">ARCH <span class="pill">right-sized</span></p>
+        <h3>I built the loop on Kafka, then cut it</h3>
+        <p>The honest move was to right-size it, not defend it. I built the enrichment loop on Kafka to learn event-driven architecture properly: an idempotent consumer, at-least-once delivery, offset management.</p>
+        <p class="tradeoff"><strong>Then I cut it.</strong> A single-user workload with derived, idempotent tags never needed a distributed log, so it is now an in-process FastAPI BackgroundTask.</p>
+        <details>
+          <summary>What that trades away</summary>
+          <p>You give up durability across a crash and replay, neither of which this workload needs yet. The day it does, the move is an outbox and a queue, not a reflex reach for a broker. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
+        </details>
+      </div>
+    </section>
+
+    <section class="measure">
+      <h2 class="section-title reveal">The evidence</h2>
+      <p class="reveal">The classifier's numbers, with the honest part kept in. Two versions: synthetic self-graded, then real hand-labeled.</p>
+      <table class="metrics">
+        <thead>
+          <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real</th><th>v2 grounded</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td></tr>
+          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td></tr>
+          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td></tr>
+          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td></tr>
+        </tbody>
+      </table>
+      <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. The v2 gold set is 54 snippets, hand-labeled.</p>
+    </section>
+
+    <section class="measure">
+      <h2 class="section-title reveal">Field notes</h2>
+      <p class="reveal">Notes I keep while learning, in plain language, on the techniques behind all of this. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
+      <ul class="notes-list reveal">
+        <li>Structured output via tool-use</li>
+        <li>Eval-driven development</li>
+        <li>Reading the numbers</li>
+        <li>Tool use, the general idea</li>
+        <li>The agentic tool-use loop</li>
+        <li>RAG: answering from your own docs</li>
+        <li>Embeddings and vector stores</li>
+        <li>Synthetic data and circular eval</li>
+        <li>Tiered model routing</li>
+        <li>Secrets and env</li>
+        <li>Reproducible environments with uv</li>
+        <li>Checkpoint, resume, and retries</li>
+      </ul>
+      <p class="muted-line reveal">More are being written up.</p>
+    </section>
+
+    <section class="measure">
+      <h2 class="section-title reveal">About, honestly</h2>
+      <p class="reveal about-text">
+        I spent years in platform and infrastructure before moving into product. I
+        like building systems where the hard part is the design and the seams
+        between the pieces, and writing the decisions down so they hold up later.
+      </p>
+      <p class="reveal">
+        One limit, named plainly: this is a solo build, so the program layer is
+        simulated. The workstreams, dependencies, and risk reasoning are real and
+        transferable. The org around them is not. I also frame the whole thing as
+        <a href="projects/product-and-program.html">product and program</a>, limits
+        and all.
+      </p>
     </section>
   </main>
 
