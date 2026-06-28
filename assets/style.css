@@ -694,3 +694,21 @@ body {
   border: 1px solid var(--border);
   display: block;
 }
+
+/* Sango: one small frame, not a gallery. */
+.sango { margin: 20px 0 0; max-width: 150px; }
+.sango img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: block;
+}
+.sango figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
