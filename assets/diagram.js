@@ -88,7 +88,7 @@
   var active = null;
 
   nodes.forEach(function (n) {
-    var g = el("g", { class: "node", tabindex: "0", role: "button" });
+    var g = el("g", { class: "node", tabindex: "0", role: "button", "aria-label": n.label });
     g.appendChild(el("rect", {
       x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h, rx: 9,
     }));
@@ -101,8 +101,9 @@
       g.classList.add("active");
       active = g;
       detail.textContent =
-        n.label + " — " + n.desc + (n.adr ? "  ·  " + n.adr.join(", ") : "");
-      // Second beat: jump to and briefly highlight the decision behind this node.
+        n.label + ": " + n.desc + (n.adr ? "  ·  " + n.adr.join(", ") : "");
+      // Second beat: jump to, focus, and briefly highlight the decision behind
+      // this node. Focus move + the live-region caption announce it to AT.
       if (n.anchor) {
         var target = document.getElementById(n.anchor);
         if (target) {
@@ -111,6 +112,8 @@
             window.matchMedia("(prefers-reduced-motion: reduce)").matches;
           target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
           target.classList.add("target");
+          target.setAttribute("tabindex", "-1");
+          target.focus({ preventScroll: true });
           setTimeout(function () { target.classList.remove("target"); }, 1300);
         }
       }

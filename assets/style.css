@@ -238,6 +238,10 @@ body {
   margin: 0 0 36px;
 }
 
+/* Every section's intro paragraph sits the same distance below its title,
+   whether or not it carries an intro class. */
+.section-title + p { margin-top: 0; }
+
 /* Cards */
 .cards {
   display: grid;
@@ -318,6 +322,8 @@ body {
 .btn:focus-visible,
 .card-link:focus-visible,
 .hero-links a:focus-visible,
+.decision summary:focus-visible,
+.measure a:focus-visible,
 .theme-toggle:focus-visible,
 .footer a:focus-visible,
 .back:focus-visible {
@@ -555,6 +561,10 @@ body {
 }
 .node:hover rect { stroke: var(--accent); }
 .node.active rect { stroke: var(--accent); fill: var(--accent-soft); }
+/* Keyboard focus ring for the diagram's nodes (the only new interactive controls).
+   Style the rect stroke; outline clips unreliably on an SVG <g>. */
+.node:focus { outline: none; }
+.node:focus-visible rect { stroke: var(--accent); stroke-width: 2.5; }
 .diagram-detail {
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
@@ -605,8 +615,9 @@ body {
 
 .log-intro { color: var(--muted); margin: 0 0 24px; }
 
-/* Decision IDs read like a ledger: monospace + tabular figures, so SYS-005,
-   ADR-002, and the EVAL rows line up down the left edge. */
+/* Decision IDs in monospace as a deliberate ledger/ID aesthetic. They already
+   left-align via the shared .decision padding; tabular-nums just keeps any
+   figures even-width. */
 .decision .tag {
   font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, monospace;
   font-variant-numeric: tabular-nums;
@@ -658,9 +669,16 @@ body {
   list-style: none;
   padding: 0;
   margin: 14px 0 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 6px 22px;
 }
 .notes-list li { color: var(--muted); font-size: 0.92rem; }
 .muted-line { color: var(--muted); font-size: 0.92rem; }
+
+/* Narrow screens: the 800-wide diagram downscales hard, so bump the in-viewBox
+   text up a notch to keep the labels legible. */
+@media (max-width: 600px) {
+  #system-diagram .node text { font-size: 21px; }
+  #system-diagram .edge-label { font-size: 16px; }
+}
