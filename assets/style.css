@@ -186,21 +186,23 @@ body {
   margin: 0 0 28px;
 }
 
-/* Content-first hero: a quiet row of links instead of big buttons. The work
-   itself sits right below, so the hero points to it by proximity, not a CTA. */
+/* Content-first hero: a quiet row of social icons instead of big buttons. The
+   work itself sits right below, so the hero points to it by proximity, not a CTA.
+   Icons rest in the muted tone and warm to the accent on hover. */
 .hero-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 22px;
-  margin-top: 4px;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
 }
 .hero-links a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
+  display: inline-flex;
+  color: var(--muted);
+  transition: color 0.15s ease, transform 0.12s ease;
 }
-.hero-links a:hover { text-decoration: underline; }
+.hero-links a:hover { color: var(--accent); transform: translateY(-1px); }
+.hero-links a svg { width: 22px; height: 22px; display: block; }
 
 .cta { display: flex; gap: 14px; flex-wrap: wrap; }
 
@@ -419,8 +421,9 @@ body {
   padding: 3px 10px;
 }
 
-/* About paragraph on the front page */
-.about-text { max-width: 620px; color: var(--muted); padding-bottom: 40px; }
+/* About paragraph on the front page (now sits just under the hero, so the next
+   section's top margin owns the spacing — no extra padding needed). */
+.about-text { max-width: 620px; color: var(--muted); }
 
 /* ---- Project writeup components ---- */
 .article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
@@ -572,6 +575,21 @@ body {
   border-radius: 6px;
   font-size: 0.9em;
 }
+
+/* Inline links inside prose. Without this they fall back to the browser's
+   default deep blue, which is nearly unreadable on the dark background. Accent
+   color + a soft underline that firms up on hover reads clearly as a link. */
+.article-body p a,
+.article-body li a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.15s ease;
+}
+.article-body p a:hover,
+.article-body li a:hover { text-decoration-color: var(--accent); }
 
 /* Responsive */
 /* No viewport/breakpoint media queries left: the grid auto-fits and the
