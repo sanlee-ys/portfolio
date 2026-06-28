@@ -236,7 +236,7 @@ body {
 .proof {
   list-style: none;
   padding: 0;
-  margin: 0 0 28px;
+  margin: 20px 0 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -435,28 +435,30 @@ body {
 .footer .wrap {
   display: flex;
   justify-content: center;
-  align-items: center;
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 18px;
 }
 
 .footer a {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;        /* comfortable tap target on a phone */
+  min-height: 44px;
   color: var(--muted);
   text-decoration: none;
-  margin-left: 18px;
 }
 .footer a:hover { color: var(--text); }
 
 @media (max-width: 560px) {
-  /* Footer is just a link row now — tighten margins so all five fit on one line. */
   .footer nav {
-    display: flex;
     flex-wrap: nowrap;
-    column-gap: 14px;
+    gap: 0 12px;
   }
   .footer a {
-    margin-left: 0;
     min-height: 36px;
     font-size: 0.85rem;
   }
