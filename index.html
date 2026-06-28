@@ -24,44 +24,42 @@
   <div class="scroll-progress" aria-hidden="true"></div>
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">Portfolio</p>
       <h1>San Lee</h1>
-      <p class="tagline">I build systems and make them easy to navigate.</p>
+      <p class="tagline">Platform engineer turned product. I design systems and keep the seams between them legible.</p>
       <p class="lede">
-        Product, with an engineering background. A few things I've designed and
-        built: event-driven services, an LLM classifier, and the architecture that
+        Event-driven services, an LLM classifier, and the architecture that
         ties independent pieces into one system.
       </p>
-      <div class="cta">
-        <a class="btn" href="#work">See the work</a>
-        <a class="btn ghost" href="https://github.com/sanlee-ys">GitHub</a>
-      </div>
+      <nav class="hero-links" aria-label="Find me elsewhere">
+        <a href="https://github.com/sanlee-ys">GitHub</a>
+        <a href="https://www.linkedin.com/in/leesan/">LinkedIn</a>
+        <a href="https://www.instagram.com/sanleeeee/">Instagram</a>
+      </nav>
     </div>
   </header>
 
   <main class="wrap" id="work">
+    <h2 class="section-title reveal">The system</h2>
+    <p class="section-sub reveal">Four repositories — an API, an LLM classifier, a RAG agent, and a knowledge base — wired into one event-driven system.</p>
+    <figure class="diagram-wrap reveal">
+      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="img" aria-label="Interactive map of the system: notes-api, Kafka note-events, defense-news-classifier, and kb-agent, connected by an event-driven loop.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z"></path>
+          </marker>
+        </defs>
+        <g id="diagram-edges"></g>
+        <g id="diagram-nodes"></g>
+      </svg>
+      <figcaption class="diagram-detail" id="diagram-detail">Click a box above to see what each part does.</figcaption>
+    </figure>
+    <p class="diagram-more reveal"><a class="card-link" href="projects/the-system.html">Read the full writeup <span class="arrow">&rarr;</span></a></p>
+
     <h2 class="section-title reveal">Selected work</h2>
-    <p class="section-sub reveal">Three pieces: the classifier, the system around it, and how I frame the whole thing as product and program.</p>
+    <p class="section-sub reveal">The classifier that started it all, and the same system framed as product and program.</p>
 
     <section class="cards">
       <article class="card reveal" data-delay="1">
-        <p class="kicker">Systems design &middot; cross-repo architecture</p>
-        <h3>The System</h3>
-        <p>
-          Four independent repositories (an API, a classifier, an agent, and a
-          knowledge base) that grew into one coherent system. A two-tier ADR
-          convention records the cross-cutting decisions; a central portal makes
-          the whole thing navigable.
-        </p>
-        <ul class="tags">
-          <li>Architecture</li>
-          <li>ADRs</li>
-          <li>Event-driven integration</li>
-        </ul>
-        <a class="card-link" href="projects/the-system.html">Read the writeup <span class="arrow">&rarr;</span></a>
-      </article>
-
-      <article class="card reveal" data-delay="2">
         <p class="kicker">LLM classification &middot; eval harness</p>
         <h3>Defense News Classifier</h3>
         <p>
@@ -76,7 +74,7 @@
         <a class="card-link" href="projects/defense-news-classifier.html">Read the writeup <span class="arrow">&rarr;</span></a>
       </article>
 
-      <article class="card reveal" data-delay="3">
+      <article class="card reveal" data-delay="2">
         <p class="kicker">Product &middot; program management</p>
         <h3>Product &amp; Program</h3>
         <p>
@@ -108,11 +106,13 @@
       <nav>
         <a href="https://github.com/sanlee-ys">GitHub</a>
         <a href="https://www.linkedin.com/in/leesan/">LinkedIn</a>
+        <a href="https://www.instagram.com/sanleeeee/">Instagram</a>
         <a href="lab/index.html">Lab</a>
       </nav>
     </div>
   </footer>
   <script src="assets/theme.js"></script>
   <script src="assets/reveal.js"></script>
+  <script src="assets/diagram.js"></script>
 </body>
 </html>
