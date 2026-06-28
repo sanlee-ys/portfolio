@@ -186,6 +186,14 @@ body {
   margin: 0 0 28px;
 }
 
+/* Present-tense anchor under the arc: who/where now (the employer + tenure),
+   the way Lee Robinson names Cursor up top. Quiet, so it sits below the arc. */
+.now {
+  color: var(--muted);
+  font-size: 1rem;
+  margin: -6px 0 24px;
+}
+
 /* Content-first hero: a quiet row of social icons instead of big buttons. The
    work itself sits right below, so the hero points to it by proximity, not a CTA.
    Icons rest in the muted tone and warm to the accent on hover. */
