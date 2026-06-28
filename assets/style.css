@@ -150,6 +150,16 @@ body {
   .hero::before { animation: none; }
 }
 
+/* On small phones the hero padding eats into the visible viewport, pushing the
+   nav links below the iOS Safari toolbar. Tighten it so the doors nav is
+   reachable without scrolling even when the browser chrome is fully shown. */
+@media (max-width: 430px) {
+  .hero {
+    padding-top: 32px;
+    padding-bottom: 20px;
+  }
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -229,11 +239,12 @@ body {
   margin: 0 0 28px;
   display: flex;
   flex-wrap: wrap;
-  font-size: 0.8rem;
+  justify-content: center;
+  font-size: 0.75rem;
   letter-spacing: 0.01em;
   color: var(--muted);
 }
-.proof li::after { content: "\00b7"; margin: 0 12px; opacity: 0.45; }
+.proof li::after { content: "\00b7"; margin: 0 8px; opacity: 0.45; }
 .proof li:last-child::after { content: none; }
 
 /* The doors: a clean link row between the hero and the work, so every reader can
@@ -426,6 +437,10 @@ body {
   align-items: center;
 }
 
+.footer p {
+  margin: 0;
+}
+
 .footer a {
   display: inline-flex;
   align-items: center;
@@ -435,6 +450,25 @@ body {
   margin-left: 18px;
 }
 .footer a:hover { color: var(--text); }
+
+/* On mobile, space-between compresses "San Lee" to 2 lines and stacks links
+   awkwardly. Stack name above a wrapping link row instead. */
+@media (max-width: 560px) {
+  .footer .wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 16px;
+  }
+  .footer a {
+    margin-left: 0;
+    min-height: 36px;
+  }
+}
 
 /* Scroll-reveal (Lesson 1) */
 /* Resting state: invisible + nudged down. JS adds .is-visible to animate in. */
