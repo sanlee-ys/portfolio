@@ -193,11 +193,19 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 18px;
-  margin-top: 8px;
+  gap: 2px;
+  /* The icons stay 22px, but each link is a 44px tap target (padded hit area)
+     for comfortable thumbing on a phone. The negative left margin pulls the
+     first icon back so it still lines up with the text above rather than being
+     inset by its own padding. */
+  margin: 2px 0 0 -11px;
 }
 .hero-links a {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   color: var(--muted);
   transition: color 0.15s ease, transform 0.12s ease;
 }
@@ -410,7 +418,14 @@ body {
   align-items: center;
 }
 
-.footer a { color: var(--muted); text-decoration: none; margin-left: 18px; }
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;        /* comfortable tap target on a phone */
+  color: var(--muted);
+  text-decoration: none;
+  margin-left: 18px;
+}
 .footer a:hover { color: var(--text); }
 
 /* Scroll-reveal (Lesson 1) */
