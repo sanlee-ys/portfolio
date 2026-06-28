@@ -438,7 +438,11 @@ body {
 
 /* Project pages */
 .article-body {
-  padding: 72px 0 96px;
+  /* Keep the same 24px side gutter as .wrap. The old `0` here zeroed the
+     horizontal padding (shorthand overrides .wrap), so on a phone the body
+     text ran edge-to-edge. On desktop this just insets the 720px column a
+     touch; on mobile it gives the content room to breathe. */
+  padding: 72px 24px 96px;
   max-width: 720px;
 }
 
