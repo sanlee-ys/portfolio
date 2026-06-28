@@ -675,10 +675,3 @@ body {
 }
 .notes-list li { color: var(--muted); font-size: 0.92rem; }
 .muted-line { color: var(--muted); font-size: 0.92rem; }
-
-/* Narrow screens: the 800-wide diagram downscales hard, so bump the in-viewBox
-   text up a notch to keep the labels legible. */
-@media (max-width: 600px) {
-  #system-diagram .node text { font-size: 21px; }
-  #system-diagram .edge-label { font-size: 16px; }
-}
