@@ -204,6 +204,42 @@ body {
 .hero-links a:hover { color: var(--accent); transform: translateY(-1px); }
 .hero-links a svg { width: 22px; height: 22px; display: block; }
 
+/* "What the record shows": a quiet legend, not a banner. The page below is the
+   proof; this is just the map legend a rushed reader can read in one glance.
+   Kept deliberately muted and small so it reads under the lede, never over it. */
+.proof {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+.proof li::after { content: "\00b7"; margin: 0 12px; opacity: 0.45; }
+.proof li:last-child::after { content: none; }
+
+/* The doors: a clean link row between the hero and the work, so every reader can
+   reach the project pages without first reading the whole homepage. The doors are
+   the same for everyone; we don't tell a reader which one is "theirs". */
+.doors { border-bottom: 1px solid var(--border); }
+.doors .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.doors a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+.doors a:hover { color: var(--accent); }
+
 .cta { display: flex; gap: 14px; flex-wrap: wrap; }
 
 .btn {
@@ -322,6 +358,7 @@ body {
 .btn:focus-visible,
 .card-link:focus-visible,
 .hero-links a:focus-visible,
+.doors a:focus-visible,
 .decision summary:focus-visible,
 .measure a:focus-visible,
 .theme-toggle:focus-visible,
@@ -541,6 +578,18 @@ body {
 
 /* Interactive system diagram (SVG, Tier 3) */
 .diagram-wrap { margin: 18px 0; }
+/* Static text version of the system flow, sitting just above the interactive map.
+   The map is the enhancement; this line is the seam in plain words, so the flow
+   survives JS-off, mobile, screenshots, and a screen reader skimming the page. */
+.flow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+.flow .flow-arrow { color: var(--accent); opacity: 0.85; }
 .diagram {
   width: 100%;
   height: auto;
