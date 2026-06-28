@@ -464,9 +464,11 @@ body {
   padding: 3px 10px;
 }
 
-/* About paragraph on the front page (now sits just under the hero, so the next
-   section's top margin owns the spacing — no extra padding needed). */
-.about-text { max-width: 620px; color: var(--muted); }
+/* About section: scope the prose to the whole section so every paragraph shares
+   one width and tone. The drift came from tagging only two of the four <p>s with
+   a class (620px + muted) and leaving the other two at full width + default
+   color. Styling the section's children once keeps them uniform. */
+.about p { max-width: 640px; color: var(--muted); margin: 0 0 16px; }
 
 /* ---- Project writeup components ---- */
 .article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
@@ -779,7 +781,7 @@ body {
 .muted-line { color: var(--muted); font-size: 0.92rem; }
 
 /* Sango: one small frame, not a gallery. */
-.sango { margin: 20px 0 0; max-width: 150px; }
+.sango { margin: 24px 0 0; max-width: 260px; }
 .sango img {
   width: 100%;
   height: auto;
