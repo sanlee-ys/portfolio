@@ -236,7 +236,7 @@ body {
 .proof {
   list-style: none;
   padding: 0;
-  margin: 0 0 28px;
+  margin: 16px 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
