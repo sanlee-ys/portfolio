@@ -845,7 +845,7 @@ body {
 .muted-line { color: var(--muted); font-size: 0.92rem; }
 
 /* Sango: one small frame, not a gallery. */
-.sango { margin: 24px 0 0; max-width: 260px; }
+.sango { margin: 24px 0 0; max-width: 320px; }
 .sango img {
   width: 100%;
   height: auto;
