@@ -581,7 +581,7 @@ body {
 /* Static text version of the system flow, sitting just above the interactive map.
    The map is the enhancement; this line is the seam in plain words, so the flow
    survives JS-off, mobile, screenshots, and a screen reader skimming the page. */
-.flow {
+.flow-line {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.8rem;
   line-height: 1.9;
@@ -589,7 +589,7 @@ body {
   color: var(--muted);
   margin: 0 0 14px;
 }
-.flow .flow-arrow { color: var(--accent); opacity: 0.85; }
+.flow-line .flow-arrow { color: var(--accent); opacity: 0.85; }
 .diagram {
   width: 100%;
   height: auto;
@@ -639,6 +639,49 @@ body {
   padding: 2px 6px;
   border-radius: 6px;
   font-size: 0.9em;
+}
+
+/* Block code (the Example-run artifacts). The page only had inline <code>
+   before, so a <code> inside a <pre> needs the inline pill styling reset off. */
+.article-body pre {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 15px;
+  margin: 8px 0 0;
+  overflow-x: auto;
+  font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+.article-body pre code { background: none; padding: 0; border-radius: 0; font-size: inherit; }
+
+/* Example run: a numbered trace carrying real request/response data. */
+.example-run { list-style: none; counter-reset: ex; padding: 0; margin: 20px 0 0; }
+.example-run > li { counter-increment: ex; margin: 0 0 22px; }
+.example-run .ex-step { font-weight: 600; margin: 0; display: flex; align-items: center; }
+.example-run .ex-step::before {
+  content: counter(ex);
+  flex: 0 0 auto;
+  width: 22px; height: 22px;
+  margin-right: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.example-run .ex-note { color: var(--muted); font-size: 0.92rem; margin: 6px 0 0; }
+.ex-caption {
+  color: var(--muted);
+  font-size: 0.92rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 8px 8px 0;
+  padding: 9px 14px;
+  margin: 8px 0 0;
 }
 
 /* Inline links inside prose. Without this they fall back to the browser's
