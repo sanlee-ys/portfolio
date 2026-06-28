@@ -1,3 +1,8 @@
+/* Geist: one screen-first sans, loaded once here so every page that links
+   this stylesheet picks it up. (Self-hosting the woff2 is a later perf/privacy
+   upgrade; @import is the simplest correct first step.) */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');
+
 :root {
   /* dark theme (default) */
   --bg: #0f1115;
@@ -11,7 +16,7 @@
   --shadow: rgba(0, 0, 0, 0.35);
   --radius: 14px;
   --maxw: 880px;
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 html[data-theme="light"] {
@@ -161,20 +166,41 @@ body {
   letter-spacing: -0.02em;
 }
 
+/* Hero identity line: the warm, first-person "who I am" statement.
+   Lighter weight + capped measure so it reads as a sentence, not a banner. */
 .tagline {
-  font-size: clamp(1.15rem, 3.5vw, 1.4rem);
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
   color: var(--text);
-  font-weight: 500;
-  margin: 0 0 18px;
+  font-weight: 400;
+  line-height: 1.45;
+  max-width: 42ch;
+  margin: 0 0 16px;
   letter-spacing: -0.01em;
 }
 
 .lede {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--muted);
-  max-width: 620px;
-  margin: 0 0 36px;
+  line-height: 1.55;
+  max-width: 52ch;
+  margin: 0 0 28px;
 }
+
+/* Content-first hero: a quiet row of links instead of big buttons. The work
+   itself sits right below, so the hero points to it by proximity, not a CTA. */
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 4px;
+}
+.hero-links a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.hero-links a:hover { text-decoration: underline; }
 
 .cta { display: flex; gap: 14px; flex-wrap: wrap; }
 
@@ -289,6 +315,7 @@ body {
    you click a button, but full visibility when you Tab. Accessibility, done right. */
 .btn:focus-visible,
 .card-link:focus-visible,
+.hero-links a:focus-visible,
 .theme-toggle:focus-visible,
 .footer a:focus-visible,
 .back:focus-visible {
@@ -318,6 +345,12 @@ body {
 }
 
 .card:hover .card-link .arrow { transform: translateX(5px); }
+
+/* Standalone writeup link (under the homepage diagram) nudges on its own hover. */
+.card-link:hover .arrow { transform: translateX(4px); }
+
+/* Spacing for the "read the full writeup" link beneath the homepage diagram. */
+.diagram-more { margin: 14px 0 8px; }
 
 /* Footer */
 .footer {
