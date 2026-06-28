@@ -649,7 +649,11 @@ body {
   border-radius: 10px;
   padding: 13px 15px;
   margin: 8px 0 0;
-  overflow-x: auto;
+  /* Wrap long lines instead of scrolling sideways. pre-wrap keeps the JSON
+     indentation and newlines; overflow-wrap breaks an over-long string/URL so
+     the reader never has to scroll horizontally to read the artifact. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.8rem;
   line-height: 1.5;

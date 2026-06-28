@@ -210,11 +210,17 @@ PUT /notes/1/tags
           tag over the same HTTP seam, so the freshly-tagged note is now retrievable
           for grounding. The result follows the system-wide observation contract
           (SYS-003): a status, a summary, the payload, and a cited source.</p>
-        <pre><code>search_notes(tag="domain:air")   -&gt;   GET /notes?tag=domain:air
+        <pre><code>search_notes(tag="domain:air")  -&gt;  GET /notes?tag=domain:air
 {
   "status": "success",
   "summary": "1 matching note(s).",
-  "payload": [ { "id": 1, "title": "...", "tags": ["category:operations", "domain:air"] } ],
+  "payload": [
+    {
+      "id": 1,
+      "title": "USS Ronald Reagan first ordnance drop",
+      "tags": ["category:operations", "domain:air"]
+    }
+  ],
   "source": "notes-api service, http://127.0.0.1:8000/notes"
 }</code></pre>
       </li>
