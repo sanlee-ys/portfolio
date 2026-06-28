@@ -93,15 +93,15 @@
       <div>
         <h3>Next</h3>
         <ul>
-          <li>Event loop closed: publish, consume, idempotent writeback</li>
-          <li>Integration tests on both seams (Testcontainers-Kafka)</li>
+          <li>Async enrichment loop: create, classify, idempotent writeback</li>
+          <li>Integration tests across both seams (pytest, fully offline)</li>
           <li>A weekly status cadence from real progress</li>
         </ul>
       </div>
       <div>
         <h3>Later</h3>
         <ul>
-          <li>Containerize, then Kafka on K8s (Strimzi)</li>
+          <li>Containerize and deploy the services</li>
           <li>OpenTelemetry observability across services</li>
           <li>Other verticals: an explicit non-goal, articulated not built</li>
         </ul>
@@ -114,7 +114,7 @@
         <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
       </thead>
       <tbody>
-        <tr><td>Duplicate event processing (at-least-once redelivery)</td><td>Low</td><td>Idempotent namespaced-tag writeback; commit the offset only after success</td></tr>
+        <tr><td>Enrichment lost if the background task fails or the process restarts (no broker redelivery)</td><td>Low</td><td>Tags are derived and reclassification is idempotent (namespaced-tag replace), so enrichment re-runs safely; note creation never fails on classifier errors</td></tr>
         <tr><td>Classifier accuracy ceiling (label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model; refine the taxonomy or judge boundary cases</td></tr>
         <tr><td>Breadth creep (verticals without depth)</td><td>Medium</td><td>Deep on one vehicle; other verticals are an explicit non-goal</td></tr>
         <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep artifacts thin and living, tied to real delivery only</td></tr>
