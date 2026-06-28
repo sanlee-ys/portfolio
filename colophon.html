@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colophon &middot; San Lee</title>
+  <meta name="description" content="How this site was built: an honest note on directing an AI agent, and verifying its output, the same way I'd run any small project." />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+  <main class="wrap article-body">
+    <a class="back" href="index.html">&larr; Back</a>
+    <h1>Colophon</h1>
+    <p class="lead">
+      How this site was built, because a site about being honest should be honest
+      about how it was made.
+    </p>
+    <p>
+      This site was built the way I would run any small project with an agent: I
+      set the direction, the contracts, and the bar; an AI (Claude) did most of
+      the typing; and I verified the output against the real repos before it
+      shipped. The decisions and the tradeoffs are mine. The keystrokes mostly are
+      not, and pretending otherwise would undercut the one thing this site is
+      about.
+    </p>
+    <p>
+      That claim gets the same standard as everything else here: evidence over
+      assertion. So the honest version is not that I was in control, but the record
+      of it, the times I overruled the agent and the times the evidence overruled
+      me. Knowing where you ended up is not the same as proving how you got there,
+      and the record is the part worth keeping.
+    </p>
+    <p>
+      Directing a capable agent well, setting the contracts, catching the
+      overreach, refusing the convenient answer, is the work I think matters as
+      the tools get stronger. This site is the practice rep, and this page is me
+      saying so out loud.
+    </p>
+  </main>
+  <script src="assets/theme.js"></script>
+</body>
+</html>
