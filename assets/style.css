@@ -500,21 +500,27 @@ body {
 .decision .tradeoff { color: var(--muted); font-size: 0.95rem; }
 
 /* Results table */
-.article-body table {
+.article-body table,
+.measure table {
   border-collapse: collapse;
   width: 100%;
   margin: 18px 0;
   font-size: 0.95rem;
 }
 .article-body th,
-.article-body td {
+.article-body td,
+.measure th,
+.measure td {
   text-align: left;
   padding: 9px 12px;
   border-bottom: 1px solid var(--border);
 }
-.article-body th { color: var(--muted); font-weight: 600; }
+.article-body th,
+.measure th { color: var(--muted); font-weight: 600; }
 .article-body table.metrics td:not(:first-child),
-.article-body table.metrics th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.article-body table.metrics th:not(:first-child),
+.measure table.metrics td:not(:first-child),
+.measure table.metrics th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* Now / Next / Later roadmap */
 .roadmap {
