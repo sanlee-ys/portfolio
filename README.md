@@ -1,13 +1,13 @@
 # portfolio
 
-Public-facing portfolio site for San Lee — the curated front door to the work,
-framed for hiring managers.
+Public portfolio site for San Lee — a curated front door to the systems and
+product work I build for myself.
 
 **Live site:** _(GitHub Pages — link added once enabled)_
 
-This repo is deliberately **public**. It's the showcase end of the pipeline: the
-private career/strategy thinking lives elsewhere; this is the polished artifact
-that points at real projects and frames them in systems / product language.
+This repo is deliberately **public**. It's the polished, showcase end of my
+personal projects: the artifact that points at real work and frames it in
+systems / product language.
 
 ## Layout
 
