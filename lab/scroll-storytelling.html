@@ -49,6 +49,16 @@
       border-bottom: 1px solid var(--border);
     }
 
+    /* On a phone the two columns collapse to ~150px each and the panel text
+       breaks one word per line. Stack to a single column: the sticky panel
+       pins at the top and the steps scroll beneath it, which still demonstrates
+       position: sticky — just vertically instead of side-by-side. */
+    @media (max-width: 640px) {
+      .story { grid-template-columns: 1fr; gap: 8px; }
+      .story-sticky { top: 12vh; margin-bottom: 8px; }
+      .story-step { min-height: 60vh; font-size: 1.25rem; }
+    }
+
     /* 2) SCROLL-SCRUBBED REVEALS: each block animates as it ENTERS the viewport,
        scrubbed by scroll position (animation-timeline: view()), no JS. */
     .scrub-section { max-width: var(--maxw); margin: 0 auto; padding: 20vh 24px; }
@@ -101,7 +111,7 @@
   <section class="story">
     <div class="story-sticky">
       <h2>This panel sticks</h2>
-      <p>It pins in place while the steps on the right scroll past, then releases
+      <p>It pins in place while the steps scroll past it, then releases
          at the bottom of the section. That's <code>position: sticky</code>.</p>
     </div>
     <div class="story-scroll">
