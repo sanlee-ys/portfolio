@@ -76,7 +76,7 @@
 
     <h2>The decisions</h2>
 
-    <div class="decision">
+    <div class="decision" id="decision-contracts">
       <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
       <h3>Decouple with contracts, not shared code</h3>
       <p>The repos talk over frozen HTTP contracts with explicit
@@ -87,7 +87,7 @@
         write the tests) so that drift fails a build instead of production.</p>
     </div>
 
-    <div class="decision">
+    <div class="decision" id="decision-rightsized">
       <p class="tag">Decision &middot; SYS-005</p>
       <h3>Make the enrichment loop async and idempotent by design</h3>
       <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
@@ -103,7 +103,7 @@
         fire-and-forget.</p>
     </div>
 
-    <div class="decision">
+    <div class="decision" id="decision-eval">
       <p class="tag">Decision &middot; SYS-002</p>
       <h3>Gate model choice on evidence, not vibes</h3>
       <p>Default to Sonnet across the system. Escalate to Opus only where an eval

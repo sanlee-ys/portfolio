@@ -3,7 +3,7 @@
 Public portfolio site for San Lee — a curated front door to the systems and
 product work I build for myself.
 
-**Live site:** _(GitHub Pages — link added once enabled)_
+**Live site:** https://sanlee.me
 
 This repo is deliberately **public**. It's the polished, showcase end of my
 personal projects: the artifact that points at real work and frames it in
@@ -21,8 +21,13 @@ systems / product language.
 
 - **The System** (`projects/the-system.html`) — cross-repo architecture: how four
   independent repos operate as one system, recorded via a two-tier ADR convention.
-- **Defense News Classifier** (`projects/defense-news-classifier.html`): an LLM
-  classifier feeding a Kafka consume-then-writeback loop.
+- **Defense News Classifier** (`projects/defense-news-classifier.html`) — an LLM
+  classifier that enriches notes via an in-process FastAPI BackgroundTask, scored on a
+  real hand-labeled eval (88.9% on category and operational domain).
+- **Product & Program** (`projects/product-and-program.html`) — the same system read as
+  product and program work: scope cuts, risk reasoning, and decision framing.
+- **Lab** (`lab/index.html`) — a front-end sandbox where the experiments live so the
+  front page stays clean.
 
 ## Local preview
 
