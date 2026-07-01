@@ -872,6 +872,20 @@ body {
 .notes-list li { color: var(--muted); font-size: 0.92rem; }
 .muted-line { color: var(--muted); font-size: 0.92rem; }
 
+/* Glossary filter */
+.glossary-filter {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 8px 0 28px;
+}
+.glossary-filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.glossary-list .decision[hidden] { display: none; }
+
 /* Sango: one small frame, not a gallery. */
 .sango { margin: 24px 0 0; max-width: 320px; }
 .sango img {
