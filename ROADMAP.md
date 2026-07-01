@@ -21,10 +21,11 @@ down carries the full reasoning for each item.
 
 ### Now — cheap, high-leverage, no decision required
 
-- [ ] **Social share cards** (`og:` + `twitter:`). Highest leverage here; the
-      site exists to be shared and today it unfurls bare.
-- [ ] **Meta descriptions** on the 4 pages missing them. Ships in the same pass.
-- [ ] **Favicon.**
+- [x] **Social share cards** (`og:` + `twitter:`). Highest leverage here; the
+      site exists to be shared and today it unfurls bare. *(Shipped: branded
+      1200×630 card + full OG/Twitter tags on all 9 pages.)*
+- [x] **Meta descriptions** on the 4 pages missing them. Ships in the same pass.
+- [x] **Favicon.** *(Shipped: accent monogram, 16/32 PNG + apple-touch.)*
 - [ ] **Résumé link + contact `mailto:`.** Cheap, high value, no design debate.
 - [ ] **Resolve the orphaned `learning/` dir** (wire in or delete).
 
@@ -56,14 +57,16 @@ down carries the full reasoning for each item.
 
 These have no tradeoffs worth debating. None were previously planned.
 
-- [ ] **Social share cards** (`og:` + `twitter:` tags) on every page. Highest
+- [x] **Social share cards** (`og:` + `twitter:` tags) on every page. Highest
       leverage: the site's job is to get shared, and right now it unfurls as a
-      bare URL with no title, image, or blurb. Reuse a photo from `assets/img/`
-      as the `og:image`.
-- [ ] **Meta descriptions** on the pages missing them:
+      bare URL with no title, image, or blurb. *Shipped a branded 1200×630
+      `og-cover.png` (dark theme, name, tagline, proof chips) rather than a
+      photo — a stronger face for a systems/product portfolio.*
+- [x] **Meta descriptions** on the pages missing them:
       `projects/the-system.html`, `projects/defense-news-classifier.html`,
       `projects/product-and-program.html`, `lab/scroll-storytelling.html`.
-- [ ] **Favicon** — currently the bare-tab default on every page.
+- [x] **Favicon** — was the bare-tab default on every page. *Shipped an accent
+      "S" monogram: 16/32px PNG + a full-bleed apple-touch icon.*
 - [ ] **Custom `404.html`** — GitHub Pages serves it automatically; keeps a bad
       link on-brand instead of dumping to the default.
 - [ ] **`sitemap.xml` + `robots.txt`** — small, standard, helps indexing.
