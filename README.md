@@ -29,6 +29,12 @@ systems / product language.
 - **Lab** (`lab/index.html`) — a front-end sandbox where the experiments live so the
   front page stays clean.
 
+## Analytics
+
+Traffic is measured with [Plausible](https://plausible.io) — privacy-friendly,
+no cookie banner, script tag on every page. Dashboard: `sanlee.me` in the
+Plausible account tied to this repo.
+
 ## Local preview
 
 It's static HTML — open `index.html` in a browser, or serve the folder:
