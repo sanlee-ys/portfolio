@@ -29,7 +29,9 @@ down carries the full reasoning for each item.
 - [ ] **Résumé link + contact.** Contact *shipped* — `mailto:hi@sanlee.me`
       (branded custom-domain address, routed to Proton) in the hero icons and
       footer. Résumé link still to add.
-- [ ] **Resolve the orphaned `learning/` dir** (wire in or delete).
+- [x] **Resolve the orphaned `learning/` dir.** *Kept, not deleted — it's a
+      real front-end learning log, not filler. Wired into the Lab page as a
+      "Learning log" section linking the six lessons on GitHub.*
 
 ### Next — valuable, but needs a small decision or more build
 
@@ -72,9 +74,12 @@ These have no tradeoffs worth debating. None were previously planned.
 - [ ] **Custom `404.html`** — GitHub Pages serves it automatically; keeps a bad
       link on-brand instead of dumping to the default.
 - [ ] **`sitemap.xml` + `robots.txt`** — small, standard, helps indexing.
-- [ ] **Orphaned `learning/` directory** — six `.md` files nothing links to;
-      the site points at the external `learning-notes` repo instead. Either wire
-      them in or delete them so the repo doesn't imply dead pages.
+- [x] **Orphaned `learning/` directory** — six `.md` files nothing linked to.
+      On inspection it's a genuine front-end learning log (distinct from the
+      external `learning-notes`, which is AI techniques), so it was *kept and
+      surfaced*, not deleted: the Lab page now has a "Learning log" section
+      linking each lesson on GitHub (which renders the Markdown; `.nojekyll`
+      means the repo serves `.md` as raw text).
 
 ### Positioning — needs a decision from San, not just execution
 
