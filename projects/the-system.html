@@ -70,69 +70,6 @@
       <figcaption class="diagram-detail" id="diagram-detail" aria-live="polite" aria-atomic="true">Click a box above to see what each part does.</figcaption>
     </figure>
 
-    <h2>The problem</h2>
-    <p>
-      Once it was four repos, the easy path was to fuse them so they could call
-      each other directly. That buys convenience and pays for it with independence:
-      one release cycle, one blast radius, one thing to break. The goal was the
-      opposite, to let them act as one system while each stays deployable on its
-      own. That problem lives in the contracts between the pieces, not in the
-      pieces themselves.
-    </p>
-
-    <h2>The decisions</h2>
-
-    <div class="decision" id="decision-contracts">
-      <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
-      <h3>Decouple with contracts, not shared code</h3>
-      <p>The repos talk over frozen HTTP contracts with explicit
-        versioning rules. Both sides carry contract tests in CI.</p>
-      <p class="tradeoff"><strong>Why:</strong> decoupling without a contract is
-        just hope. A renamed field breaks the consumer silently at runtime.
-        <strong>Tradeoff:</strong> more upfront ceremony (freeze the wire shape,
-        write the tests) so that drift fails a build instead of production.</p>
-    </div>
-
-    <div class="decision" id="decision-rightsized">
-      <p class="tag">Decision &middot; SYS-005</p>
-      <h3>Make the enrichment loop async and idempotent by design</h3>
-      <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
-        calls the classifier, then writes the returned labels back as namespaced
-        tags (<code>category:</code> / <code>domain:</code>) with replace
-        semantics — notes-api owns the writeback, the classifier stays a pure
-        provider.</p>
-      <p class="tradeoff"><strong>Why:</strong> running classification in a
-        BackgroundTask keeps note creation fast and decouples it from classifier
-        latency, while replace semantics ensure reprocessing converges instead of
-        accumulating duplicate tags. <strong>Tradeoff:</strong> idempotency is real
-        design work (independent retry paths, error handling), not naive
-        fire-and-forget.</p>
-    </div>
-
-    <div class="decision" id="decision-eval">
-      <p class="tag">Decision &middot; SYS-002</p>
-      <h3>Gate model choice on evidence, not vibes</h3>
-      <p>Default to Sonnet across the system. Escalate to Opus only where an eval
-        shows the quality gain pays for itself.</p>
-      <p class="tradeoff"><strong>Why:</strong> the classifier's accuracy ceiling
-        turned out to be label ambiguity, not model horsepower, so paying roughly
-        1.7&times; for a bigger model would have bought nothing.
-        <strong>Tradeoff:</strong> you have to run the eval to justify the tier
-        instead of defaulting to the biggest model.</p>
-    </div>
-
-    <div class="decision">
-      <p class="tag">Decision &middot; SYS-001 / SYS-008</p>
-      <h3>Record decisions, then make the system legible</h3>
-      <p>Cross-repo decisions live as two-tier ADRs (repo-local choices stay local;
-        system-level ones are <code>SYS-NNN</code> in one place). A generated portal
-        aggregates every repo's docs into one browsable view that deep-links to the
-        code. Aggregate, never duplicate.</p>
-      <p class="tradeoff"><strong>Why:</strong> a system you cannot see in one place
-        is narrated, not legible, and a decision that is not written down gets
-        re-argued.</p>
-    </div>
-
     <h2>How it flows</h2>
     <ol class="flow">
       <li>A note is created in <strong>notes-api</strong> (<code>POST /notes</code>), which enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately; the task runs after the response is sent.</li>
@@ -231,6 +168,69 @@ PUT /notes/1/tags
 }</code></pre>
       </li>
     </ol>
+
+    <h2>The problem</h2>
+    <p>
+      Once it was four repos, the easy path was to fuse them so they could call
+      each other directly. That buys convenience and pays for it with independence:
+      one release cycle, one blast radius, one thing to break. The goal was the
+      opposite, to let them act as one system while each stays deployable on its
+      own. That problem lives in the contracts between the pieces, not in the
+      pieces themselves.
+    </p>
+
+    <h2>The decisions</h2>
+
+    <div class="decision" id="decision-contracts">
+      <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
+      <h3>Decouple with contracts, not shared code</h3>
+      <p>The repos talk over frozen HTTP contracts with explicit
+        versioning rules. Both sides carry contract tests in CI.</p>
+      <p class="tradeoff"><strong>Why:</strong> decoupling without a contract is
+        just hope. A renamed field breaks the consumer silently at runtime.
+        <strong>Tradeoff:</strong> more upfront ceremony (freeze the wire shape,
+        write the tests) so that drift fails a build instead of production.</p>
+    </div>
+
+    <div class="decision" id="decision-rightsized">
+      <p class="tag">Decision &middot; SYS-005</p>
+      <h3>Make the enrichment loop async and idempotent by design</h3>
+      <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
+        calls the classifier, then writes the returned labels back as namespaced
+        tags (<code>category:</code> / <code>domain:</code>) with replace
+        semantics — notes-api owns the writeback, the classifier stays a pure
+        provider.</p>
+      <p class="tradeoff"><strong>Why:</strong> running classification in a
+        BackgroundTask keeps note creation fast and decouples it from classifier
+        latency, while replace semantics ensure reprocessing converges instead of
+        accumulating duplicate tags. <strong>Tradeoff:</strong> idempotency is real
+        design work (independent retry paths, error handling), not naive
+        fire-and-forget.</p>
+    </div>
+
+    <div class="decision" id="decision-eval">
+      <p class="tag">Decision &middot; SYS-002</p>
+      <h3>Gate model choice on evidence, not vibes</h3>
+      <p>Default to Sonnet across the system. Escalate to Opus only where an eval
+        shows the quality gain pays for itself.</p>
+      <p class="tradeoff"><strong>Why:</strong> the classifier's accuracy ceiling
+        turned out to be label ambiguity, not model horsepower, so paying roughly
+        1.7&times; for a bigger model would have bought nothing.
+        <strong>Tradeoff:</strong> you have to run the eval to justify the tier
+        instead of defaulting to the biggest model.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; SYS-001 / SYS-008</p>
+      <h3>Record decisions, then make the system legible</h3>
+      <p>Cross-repo decisions live as two-tier ADRs (repo-local choices stay local;
+        system-level ones are <code>SYS-NNN</code> in one place). A generated portal
+        aggregates every repo's docs into one browsable view that deep-links to the
+        code. Aggregate, never duplicate.</p>
+      <p class="tradeoff"><strong>Why:</strong> a system you cannot see in one place
+        is narrated, not legible, and a decision that is not written down gets
+        re-argued.</p>
+    </div>
 
     <h2>The outcome</h2>
     <ul>
