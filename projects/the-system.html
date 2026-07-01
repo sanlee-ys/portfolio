@@ -240,11 +240,10 @@ PUT /notes/1/tags
       <li><strong>It is articulated, not just built:</strong> a skill map (SYS-007) names the AI-era capabilities the system exercises (evals, context engineering, agents, observability) and the honest gap, which is security on the agent's tool seam.</li>
     </ul>
     <p>
-      What this shows is not that I designed a perfect system upfront. Nobody does.
-      It is that as the system grew, I reached for the seam-level discipline
-      (contracts, idempotency, recorded decisions, evidence over intuition) that
-      keeps a multi-repo system from turning into a tangle. The proof is in the
-      ADRs and the contract tests, not just in this paragraph.
+      No one designs a perfect system upfront, including me. What I did do, as it
+      grew, was keep applying the same discipline at every seam: freeze the
+      contract, make it idempotent, write down why, check the evidence instead of
+      guessing. The ADRs and contract tests back this up.
     </p>
   </main>
   <script src="../assets/theme.js"></script>
