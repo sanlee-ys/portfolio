@@ -455,8 +455,8 @@ body {
 
 @media (max-width: 560px) {
   .footer nav {
-    flex-wrap: nowrap;
-    gap: 0 12px;
+    flex-wrap: wrap;
+    gap: 2px 14px;
   }
   .footer a {
     min-height: 36px;
