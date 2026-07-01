@@ -129,11 +129,11 @@
       <div class="decision" id="decision-grounding">
         <p class="tag">EVAL &middot; BM25 <span class="pill">rejected</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
-        <p>Not every experiment needs to succeed to be worth running. I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
+        <p>I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
         <p class="tradeoff"><strong>The result:</strong> +1.9% category accuracy, +0.0% on domain, and a flip analysis showed it fixed about as many calls as it broke. It did not earn the jump to embeddings, so it did not ship.</p>
         <details>
           <summary>The discipline</summary>
-          <p>Measure first, escalate only when the eval says it pays. Here it said do not bother. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>My rule is to measure before spending more, and I only move up to something heavier like embeddings if the eval shows it&rsquo;s worth the cost, which here it didn&rsquo;t. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -144,7 +144,7 @@
         <p class="tradeoff"><strong>The result:</strong> category accuracy dropped from 79.0% to 76.7% and industry recall from 0.217 to 0.100. I reverted it.</p>
         <details>
           <summary>Why measurement won</summary>
-          <p>The sharper rule gave the model a cleaner excuse to dump borderline company stories into the wrong bucket. Only the eval could see that. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>The sharper rule gave the model a cleaner excuse to dump borderline company stories into the wrong bucket, which I only caught once I ran the eval. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -173,7 +173,7 @@
       <div class="decision" id="decision-rightsized">
         <p class="tag">ARCH <span class="pill">right-sized</span></p>
         <h3>I built the loop on Kafka, then cut it</h3>
-        <p>The honest move was to right-size it, not defend it. I built the enrichment loop on Kafka to learn event-driven architecture properly: an idempotent consumer, at-least-once delivery, offset management.</p>
+        <p>I built the enrichment loop on Kafka to learn event-driven architecture properly: an idempotent consumer, at-least-once delivery, offset management.</p>
         <p class="tradeoff"><strong>Then I cut it.</strong> A single-user workload with derived, idempotent tags never needed a distributed log, so it is now an in-process FastAPI BackgroundTask.</p>
         <details>
           <summary>What that trades away</summary>

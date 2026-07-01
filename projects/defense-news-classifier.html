@@ -79,9 +79,10 @@
       <code>industry</code> recall was 0.217, the model catching one in five. v2
       replaced that with 54 hand-labeled real snippets (DoD news wire plus SEC
       filings), cross-checked by an Opus judge. On real financial text with actual
-      vocabulary, <code>industry</code> went to an F1 of 1.000. Circular evals catch
-      whether a model is consistent. Only real, human-labeled data catches whether
-      it is right.
+      vocabulary, <code>industry</code> went to an F1 of 1.000. A model graded on
+      its own output only tells you it&rsquo;s internally consistent. To know
+      whether it&rsquo;s actually correct, you need real data that a person
+      labeled.
     </p>
 
     <table class="metrics">
