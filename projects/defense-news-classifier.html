@@ -49,11 +49,11 @@
       <p class="tag">The prompt that read better and performed worse</p>
       <p>I sharpened the system prompt to draw a cleaner line between
         <code>procurement</code> (a purchase, the buyer's view) and
-        <code>industry</code> (a company's own business news). It read better to a
-        human. It measured worse: category accuracy fell from 79.0% to 76.7%, and
-        <code>industry</code> recall dropped from 0.217 to 0.100. The sharper rule
-        gave the model an even cleaner excuse to dump borderline company stories
-        into <code>procurement</code>. I reverted it.</p>
+        <code>industry</code> (a company's own business news). It read better to
+        me. Then the numbers came in: category accuracy fell from 79.0% to 76.7%,
+        and <code>industry</code> recall dropped from 0.217 to 0.100. The sharper
+        rule gave the model an even cleaner excuse to dump borderline company
+        stories into <code>procurement</code>. I reverted it.</p>
       <p class="tradeoff"><strong>The lesson:</strong> a change that sounds right can
         move the decision boundary the wrong way, and intuition cannot see that.
         Only the measurement can.</p>
