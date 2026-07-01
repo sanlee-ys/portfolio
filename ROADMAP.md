@@ -26,9 +26,9 @@ down carries the full reasoning for each item.
       1200×630 card + full OG/Twitter tags on all 9 pages.)*
 - [x] **Meta descriptions** on the 4 pages missing them. Ships in the same pass.
 - [x] **Favicon.** *(Shipped: accent monogram, 16/32 PNG + apple-touch.)*
-- [ ] **Résumé link + contact.** Contact *shipped* — `mailto:hi@sanlee.me`
-      (branded custom-domain address, routed to Proton) in the hero icons and
-      footer. Résumé link still to add.
+- [x] **Résumé link + contact.** Both shipped — `mailto:hi@sanlee.me` in the
+      hero icons and footer, and a grounded neutral-master `resume.html`
+      (self-contained page, print-to-PDF) linked from the hero and footer.
 - [x] **Resolve the orphaned `learning/` dir.** *Kept, not deleted — it's a
       real front-end learning log, not filler. Wired into the Lab page as a
       "Learning log" section linking the six lessons on GitHub.*
