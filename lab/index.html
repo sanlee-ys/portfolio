@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lab &middot; San Lee</title>
+  <link rel="canonical" href="https://sanlee.me/lab/index.html" />
+  <meta property="og:site_name" content="San Lee" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sanlee.me/lab/index.html" />
+  <meta property="og:title" content="Lab &middot; San Lee" />
+  <meta property="og:description" content="Front-end experiments, a sandbox for learning in the open." />
+  <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lab &middot; San Lee" />
+  <meta name="twitter:description" content="Front-end experiments, a sandbox for learning in the open." />
+  <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
   <meta name="description" content="Front-end experiments, a sandbox for learning in the open." />
   <link rel="stylesheet" href="../assets/style.css" />
   <script>
@@ -42,6 +58,22 @@
       <li><a href="scroll-storytelling.html">Scroll-driven storytelling</a>: sticky panel + scroll-scrubbed reveals, no JS (Tier 1).</li>
       <li><a href="gallery.html">Photo gallery</a>: a CSS-columns masonry grid and a keyboard-accessible lightbox, vanilla JS (Tier 2).</li>
     </ul>
+
+    <h2>Learning log</h2>
+    <p>
+      I came from infra and backend, so the front-end here is me climbing the UI
+      envelope in the open, one technique at a time. Each lesson captures the
+      concept, the why, and the files that changed. They render on GitHub:
+    </p>
+    <ul>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/01-scroll-reveal.md">Scroll-reveal</a>: <code>IntersectionObserver</code>, CSS transitions, <code>prefers-reduced-motion</code>.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/02-hover-and-gradient.md">Hover micro-interactions + animated gradient</a>: <code>@keyframes</code>, pseudo-elements, z-index stacking.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/03-layout-flexbox-grid.md">Layout: Flexbox &amp; Grid</a>: 1D vs 2D, <code>auto-fit</code>/<code>minmax</code>, <code>fr</code> units.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/04-robust-and-fluid.md">Robust &amp; fluid</a>: <code>:focus-visible</code>, <code>clamp()</code>, container queries.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/05-scroll-driven-storytelling.md">Scroll-driven storytelling</a>: scroll/view timelines, <code>position: sticky</code>, progressive enhancement.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/06-svg-data-driven-diagram.md">Data-driven SVG diagram</a>: <code>viewBox</code>, <code>createElementNS</code>, keyboard-operable SVG.</li>
+    </ul>
+    <p class="muted-line"><a href="https://github.com/sanlee-ys/portfolio/tree/main/learning">The full log &rarr;</a></p>
   </main>
 
   <script src="../assets/theme.js"></script>

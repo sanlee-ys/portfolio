@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résumé &middot; San Lee</title>
+  <meta name="description" content="San Lee — technical product and program. Roles, scope, and responsibilities across JPMorganChase, an MBA, and U.S. Army leadership." />
+  <link rel="canonical" href="https://sanlee.me/resume.html" />
+  <meta property="og:site_name" content="San Lee" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:url" content="https://sanlee.me/resume.html" />
+  <meta property="og:title" content="Résumé &middot; San Lee" />
+  <meta property="og:description" content="Technical product and program. Roles, scope, and responsibilities across JPMorganChase, an MBA, and U.S. Army leadership." />
+  <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Résumé &middot; San Lee" />
+  <meta name="twitter:description" content="Technical product and program. Roles, scope, and responsibilities across JPMorganChase, an MBA, and U.S. Army leadership." />
+  <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #0f1115; --panel: #161a21; --text: #e7eaf0; --muted: #9aa3b2;
+      --accent: #6ea8fe; --border: #232a35;
+      --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    html[data-theme="light"] {
+      --bg: #fbfcfe; --panel: #ffffff; --text: #1a1f29; --muted: #5b6472;
+      --accent: #2563eb; --border: #e4e8ee;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text); font-family: var(--font);
+      line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 56px 28px 96px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .top-actions {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 36px; font-size: 0.92rem;
+    }
+    .top-actions .back { color: var(--muted); }
+    .top-actions .back:hover { color: var(--accent); }
+    .theme-toggle {
+      background: var(--panel); color: var(--text); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 14px; cursor: pointer; font: inherit; font-size: 0.85rem;
+    }
+    .theme-toggle:hover { border-color: var(--accent); }
+
+    header.masthead { border-bottom: 1px solid var(--border); padding-bottom: 22px; margin-bottom: 30px; }
+    header.masthead h1 { font-size: 2.6rem; margin: 0 0 6px; letter-spacing: -0.02em; }
+    .role-line { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; margin: 0 0 12px; }
+    .contact { color: var(--muted); font-size: 0.94rem; }
+    .contact a { color: var(--muted); }
+    .contact a:hover { color: var(--accent); }
+    .contact .sep { opacity: 0.5; margin: 0 8px; }
+
+    section { margin-top: 30px; }
+    h2.sec {
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--muted); margin: 0 0 16px; font-weight: 700;
+    }
+    .summary { color: var(--text); margin: 0; }
+
+    .entry { margin-bottom: 22px; }
+    .entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+    .entry-head .org { font-weight: 700; font-size: 1.05rem; }
+    .entry-head .dates { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+    .entry .role { color: var(--muted); font-size: 0.95rem; margin: 2px 0 10px; }
+    .entry ul { margin: 0; padding-left: 20px; }
+    .entry ul li { margin-bottom: 6px; }
+
+    .edu-item, .lead-item { margin-bottom: 12px; }
+    .edu-item .deg { color: var(--muted); font-size: 0.94rem; }
+    .edu-item .edu-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .edu-item .edu-head .school { font-weight: 600; }
+    .edu-item .edu-head .dates { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
+
+    .skills p { margin: 0 0 8px; }
+    .skills .k { color: var(--muted); }
+
+    @media print {
+      :root { --bg: #ffffff; --panel: #ffffff; --text: #14181f; --muted: #444c5a; --accent: #1a4fc4; --border: #cbd2dc; }
+      html[data-theme="dark"] { --bg:#ffffff; --text:#14181f; --muted:#444c5a; --accent:#1a4fc4; --border:#cbd2dc; }
+      .top-actions { display: none; }
+      .wrap { padding: 0; max-width: 100%; }
+      body { font-size: 11pt; }
+      .entry, .edu-item { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-actions">
+      <a class="back" href="index.html">&larr; Back to portfolio</a>
+      <button id="theme-toggle" class="theme-toggle" type="button">Toggle theme</button>
+    </div>
+
+    <header class="masthead">
+      <h1>San Lee</h1>
+      <p class="role-line">Senior Product Associate</p>
+      <p class="contact">
+        <a href="mailto:hi@sanlee.me">hi@sanlee.me</a><span class="sep">&middot;</span>
+        <a href="https://www.linkedin.com/in/leesan/">linkedin.com/in/leesan</a><span class="sep">&middot;</span>
+        <a href="https://sanlee.me">sanlee.me</a>
+      </p>
+    </header>
+
+    <section>
+      <h2 class="sec">Summary</h2>
+      <p class="summary">
+        Product professional at JPMorganChase, currently owning enterprise
+        collaboration products (SharePoint Online and OneDrive) &mdash; after
+        seven years in infrastructure and platform engineering at the same firm,
+        an MBA, and service as a U.S. Army veteran. I work across the
+        technical/product seam: turning stakeholder needs into sequenced,
+        testable delivery, and trusting evidence over intuition when the two
+        disagree. Increasingly focused on AI systems &mdash; I build and
+        document LLM applications (evals, RAG, agentic tool-use) in the open.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="sec">Experience</h2>
+
+      <div class="entry">
+        <div class="entry-head">
+          <span class="org">JPMorganChase</span>
+          <span class="dates">Jun 2026 &ndash; Present</span>
+        </div>
+        <p class="role">Senior Product Associate, Content Creation &amp; Collaboration &middot; Jersey City, NJ</p>
+        <ul>
+          <li>Own planning, build, and delivery of enterprise collaboration features across SharePoint Online and OneDrive, moving them through a structured release lifecycle.</li>
+          <li>Gather and document requirements across lines of business; report roadmap, delivery status, risks, and dependencies to stakeholders and senior leadership.</li>
+          <li>Apply capacity management and prioritization to a high-demand, many-to-one user base &mdash; tracking execution in JIRA and partnering closely with product engineering.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-head">
+          <span class="org">JPMorganChase</span>
+          <span class="dates">Oct 2018 &ndash; Jul 2024</span>
+        </div>
+        <p class="role">Senior Associate, Software Engineer III &middot; Jersey City, NJ</p>
+        <ul>
+          <li>Built and ran microservices on a 4&ndash;5 engineer team working toward zero-touch provisioning (ZTP) of network devices &mdash; fully shared ownership, everyone with a hand in every service rather than an isolated slice.</li>
+          <li>Practiced test-driven development and pair programming; designed and documented REST APIs (Swagger/OpenAPI).</li>
+          <li>Containerized services with Docker and deployed on Kubernetes; built event-driven flows with Kafka and worked day-to-day in Linux over SSH.</li>
+          <li>Maintained CI/CD pipelines across projects, triaging bugs and applying firm-wide best practices.</li>
+          <li>Worked with SRE on observability &mdash; instrumenting endpoints and tracing API calls with OpenTelemetry to troubleshoot latency &mdash; and shared the team's operational load: documentation, on-call, and weekend failover and resiliency testing.</li>
+          <li>Remediated security vulnerabilities (FARM findings) to firm standards.</li>
+          <li>Specced and ordered infrastructure, right-sizing it to &ldquo;just enough&rdquo; to keep costs in check.</li>
+          <li>Pushed back on stakeholders with clear tradeoffs to keep scope and budget grounded.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-head">
+          <span class="org">JPMorganChase</span>
+          <span class="dates">Sep 2017 &ndash; Oct 2018</span>
+        </div>
+        <p class="role">Analyst, Merchant Services Command Center Engineer &middot; Jersey City, NJ</p>
+        <ul>
+          <li>Owned real-time monitoring and incident response for mission-critical merchant network systems supporting $1T+ in annual transaction volume.</li>
+          <li>Coordinated cross-functional triage across engineering, infrastructure, and operations &mdash; prioritizing by business impact and risk &mdash; and drove systemic fixes that reduced recurring incidents.</li>
+        </ul>
+      </div>
+
+      <div class="entry">
+        <div class="entry-head">
+          <span class="org">U.S. Army, NJ Army National Guard</span>
+          <span class="dates">Sep 2011 &ndash; Sep 2017</span>
+        </div>
+        <p class="role">Corporal, Infantryman / Team Leader &middot; Freehold, NJ</p>
+        <ul>
+          <li>Led a 3-person infantry team on an overseas deployment to Qatar (Operation Enduring Freedom, 2014&ndash;2015), under strict security, risk, and accountability standards; honorably discharged.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="sec">Selected Projects</h2>
+      <div class="entry">
+        <p class="role" style="margin-top:0">Built and documented in the open &mdash; <a href="https://sanlee.me">sanlee.me</a>.</p>
+        <ul>
+          <li><strong>Defense-news LLM classifier + eval harness</strong> &mdash; forced tool-use classification, scored on a hand-labeled gold set with an LLM judge; negative results kept (reverted prompt, cut BM25 grounding).</li>
+          <li><strong>kb-agent</strong> &mdash; RAG / tool-use agent answering from a notes knowledge base over versioned HTTP contracts.</li>
+          <li><strong>Cross-repo system</strong> &mdash; four services wired by frozen contracts, an async idempotent enrichment loop, and evals-as-CI.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="sec">Education</h2>
+      <div class="edu-item">
+        <div class="edu-head">
+          <span class="school">Seoul National University, Graduate School of Business</span>
+          <span class="dates">Aug 2024 &ndash; Aug 2025</span>
+        </div>
+        <div class="deg">MBA, Management Track &middot; Seoul, South Korea</div>
+      </div>
+      <div class="edu-item">
+        <div class="edu-head">
+          <span class="school">Rutgers University, School of Communication and Information</span>
+          <span class="dates">Sep 2010 &ndash; May 2016</span>
+        </div>
+        <div class="deg">B.A., Information Technology &amp; Informatics &middot; New Brunswick, NJ</div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="sec">Leadership</h2>
+      <div class="lead-item"><strong>Vector Regional Lead, Jersey City</strong> &mdash; ran the local chapter of JPMorganChase's global, multi-location technical knowledge-sharing program, organizing sessions for engineers in the office. <span style="color:var(--muted)">(Sep 2023 &ndash; Jul 2024)</span></div>
+      <div class="lead-item">Int'l Relations Committee Leader, SNU MBA Student Council &middot; VP, SNU MBA Sports Club (&#8361;2M budget, 33 members)</div>
+    </section>
+
+    <section class="skills">
+      <h2 class="sec">Skills &amp; Certifications</h2>
+      <p><span class="k">AI / LLM:</span> LLM application development &mdash; structured output &amp; tool-use, RAG, agentic tool-use, eval-driven development, LLM-as-judge, model routing; Anthropic Claude API; Claude Code (agentic coding); Microsoft Copilot; prompt engineering</p>
+      <p><span class="k">Product &amp; Program:</span> cross-functional program management, roadmap planning, stakeholder communication, dependency &amp; incident management, tradeoff evaluation, compliance &amp; audit readiness</p>
+      <p><span class="k">Technical:</span> Python, Java, SQL, AWS, Kubernetes, Docker, Jenkins, CI/CD, OpenTelemetry &nbsp;&middot;&nbsp; <span class="k">Tools:</span> JIRA, Confluence</p>
+      <p><span class="k">Certifications:</span> AWS Cloud Practitioner (2023) &nbsp;&middot;&nbsp; <span class="k">Languages:</span> Native English, Intermediate Korean</p>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById("theme-toggle").addEventListener("click", function () {
+      var cur = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", cur);
+      try { localStorage.setItem("theme", cur); } catch (e) {}
+    });
+  </script>
+</body>
+</html>
