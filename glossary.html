@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Glossary &middot; San Lee</title>
-  <meta name="description" content="Terms used across this site, defined in plain language and grounded in the actual system." />
+  <meta name="description" content="Terms I use across this site, defined the way I actually use them, tied back to why each one mattered in this system." />
   <link rel="stylesheet" href="assets/style.css" />
   <script>
     (function () {
@@ -31,8 +31,8 @@
     <a class="back" href="index.html">&larr; Back</a>
     <h1>Glossary</h1>
     <p class="lead">
-      Terms used across this site, defined the way they're actually used here &mdash;
-      not textbook definitions, but what each one means in this system.
+      Terms I use across this site, defined the way I actually use them &mdash;
+      not textbook definitions, but why each one mattered here.
     </p>
 
     <input
@@ -49,50 +49,51 @@
       <div class="decision" id="term-adr" data-term="adr sys architecture decision record">
         <p class="tag">Convention</p>
         <h3>ADR / SYS-NNN</h3>
-        <p>A short written record of one architecture decision: context, choice,
-          tradeoff, alternatives considered. Numbered so it can be cited instead
-          of re-argued.</p>
-        <p class="tradeoff"><strong>In this system:</strong> <code>ADR-NNN</code>
-          are decisions scoped to one repo; <code>SYS-NNN</code> are decisions
-          that cross repo boundaries &mdash; the contracts wiring notes-api, the
+        <p>I write one of these for every decision worth defending later:
+          context, choice, tradeoff, alternatives considered. Numbered so I
+          can cite it instead of re-arguing it.</p>
+        <p class="tradeoff"><strong>Here:</strong> <code>ADR-NNN</code> are
+          decisions scoped to one repo; <code>SYS-NNN</code> are the ones that
+          cross repo boundaries &mdash; the contracts wiring notes-api, the
           classifier, and kb-agent together.</p>
       </div>
 
       <div class="decision" id="term-agent" data-term="agent kb-agent">
         <p class="tag">AI</p>
         <h3>Agent</h3>
-        <p>Software that chains tool calls toward a goal instead of answering in
-          one shot: pick a tool, read the result, decide the next step, repeat
-          until done or stuck.</p>
-        <p class="tradeoff"><strong>In this system:</strong> kb-agent searches
-          the knowledge base and synthesizes a grounded answer, rather than
-          guessing from what the model already knows.</p>
+        <p>Software that chains tool calls toward a goal instead of answering
+          in one shot: pick a tool, read the result, decide the next step,
+          repeat until done or stuck.</p>
+        <p class="tradeoff"><strong>Here:</strong> kb-agent is mine &mdash;
+          it searches the knowledge base and synthesizes a grounded answer
+          instead of guessing from what the model already knows.</p>
       </div>
 
       <div class="decision" id="term-backgroundtask" data-term="backgroundtask fastapi kafka async">
-        <p class="tag">Systems</p>
+        <p class="tag">ARCH</p>
         <h3>BackgroundTask</h3>
-        <p>A way to run a follow-up step right after a request without standing
-          up a message queue. The caller gets its response immediately; the
-          extra work runs in the same process a moment later.</p>
-        <p class="tradeoff"><strong>In this system:</strong> notes-api uses
-          FastAPI's <code>BackgroundTask</code> to call the classifier and write
-          its labels back as tags &mdash; the loop was built on Kafka first, then
-          cut when the workload didn't earn a broker.
+        <p>A way to run a follow-up step right after a request without
+          standing up a message queue: the caller gets a response
+          immediately, and the extra work runs in the same process a moment
+          later.</p>
+        <p class="tradeoff"><strong>Here:</strong> notes-api uses FastAPI's
+          <code>BackgroundTask</code> to call the classifier and write its
+          labels back as tags. I actually built this loop on Kafka first,
+          then cut it once the workload didn't earn a broker.
           <a href="index.html#decision-rightsized">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-bm25" data-term="bm25 keyword search lexical retrieval">
-        <p class="tag">Retrieval</p>
+        <p class="tag">EVAL</p>
         <h3>BM25</h3>
-        <p>A keyword-scoring algorithm for search: it ranks documents by how
-          often and how distinctively they contain the words in your query, no
-          model required. Fast, cheap, a solid baseline.</p>
-        <p class="tradeoff"><strong>In this system:</strong> BM25 was tried as
-          retrieval grounding for the classifier, measured, and cut &mdash; it
-          moved category accuracy +1.9% but domain +0.0%, and fixed about as
-          many calls as it broke. <a href="index.html#decision-grounding">Full
-          decision &rarr;</a></p>
+        <p>A sparse keyword-retrieval method: it scores documents by how
+          often and how distinctively they contain your query terms, no
+          model required.</p>
+        <p class="tradeoff"><strong>Here:</strong> I tested it as a
+          lightweight grounding layer for the classifier. The measured lift
+          (+1.9% category accuracy, +0.0% domain) didn't justify the added
+          complexity, so it didn't ship.
+          <a href="index.html#decision-grounding">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-classification" data-term="classification classifier label">
@@ -100,63 +101,85 @@
         <h3>Classification</h3>
         <p>Sorting text into a fixed set of labels using a model, instead of
           hand-written rules.</p>
-        <p class="tradeoff"><strong>In this system:</strong> the classifier
-          assigns two labels to each defense-news item &mdash; a category
-          (procurement, operations, policy, technology, industry) and an
-          operational domain (air, land, sea, cyber, space, multi).
+        <p class="tradeoff"><strong>Here:</strong> my classifier assigns two
+          labels to each defense-news item &mdash; a category (procurement,
+          operations, policy, technology, industry) and an operational
+          domain (air, land, sea, cyber, space, multi).
           <a href="projects/defense-news-classifier.html">Full writeup &rarr;</a></p>
       </div>
 
-      <div class="decision" id="term-contract" data-term="contract interface api schema">
-        <p class="tag">Systems</p>
-        <h3>Contract</h3>
-        <p>An explicit, versioned interface between two systems: what one side
-          promises to produce, what the other is allowed to assume. Neither
-          side needs to know how the other works internally, only that the
-          shape holds.</p>
-        <p class="tradeoff"><strong>In this system:</strong> three frozen
-          contracts (SYS-004, SYS-005, SYS-006) wire the repos together, each
-          with contract tests in CI, so a renamed field fails a build instead
-          of breaking production. <a href="index.html#decision-contracts">Full
-          decision &rarr;</a></p>
+      <div class="decision" id="term-contract" data-term="contract seam interface api schema">
+        <p class="tag">SYSTEMS</p>
+        <h3>Contract seam</h3>
+        <p>The boundary where one service depends on another through a
+          stable request/response shape. The point is to make integration
+          explicit instead of relying on hidden assumptions.</p>
+        <p class="tradeoff"><strong>Here:</strong> I froze three of these
+          (SYS-004, SYS-005, SYS-006) with contract tests in CI, so a
+          renamed field fails a build instead of breaking production in
+          silence. <a href="index.html#decision-contracts">Full decision &rarr;</a></p>
       </div>
 
-      <div class="decision" id="term-eval" data-term="eval evaluation eval-driven development testing">
-        <p class="tag">AI</p>
-        <h3>Eval / eval-driven development</h3>
-        <p>A scored test set with known-correct answers, used to check whether a
-          change actually helped &mdash; instead of trusting that it reads
-          better.</p>
-        <p class="tradeoff"><strong>In this system:</strong> this is the whole
-          discipline the site is built to demonstrate. Every prompt change,
-          retrieval experiment, and model choice here was measured against an
-          eval, including the ones that failed and got reverted.
+      <div class="decision" id="term-eval" data-term="eval evaluation eval harness eval-driven development testing">
+        <p class="tag">EVAL</p>
+        <h3>Eval / eval harness</h3>
+        <p>A scored test set with known-correct answers, used to check
+          whether a change actually helped &mdash; instead of trusting that
+          it reads better.</p>
+        <p class="tradeoff"><strong>Here:</strong> this is the discipline
+          the whole site is built to demonstrate. Every prompt change,
+          retrieval experiment, and model choice got measured against one,
+          including the changes that failed and got reverted.
           <a href="index.html#decision-eval">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-f1" data-term="f1 precision recall macro-f1 accuracy metrics">
-        <p class="tag">AI</p>
+        <p class="tag">EVAL</p>
         <h3>F1 / precision / recall</h3>
-        <p>The numbers used to score a classifier instead of trusting a skim.
-          <strong>Precision:</strong> of everything labeled X, how much was
-          actually X. <strong>Recall:</strong> of everything that was actually
-          X, how much got caught. <strong>F1:</strong> the balance of the two
-          &mdash; useful exactly when one alone would flatter the model.</p>
-        <p class="tradeoff"><strong>In this system:</strong> see the classifier
+        <p>The numbers I use to score the classifier instead of trusting a
+          skim. <strong>Precision:</strong> of everything I labeled X, how
+          much was actually X. <strong>Recall:</strong> of everything that
+          was actually X, how much I caught. <strong>F1:</strong> the balance
+          of the two &mdash; useful exactly when one alone would flatter the
+          model.</p>
+        <p class="tradeoff"><strong>Here:</strong> see the classifier
           evidence table for the real numbers, synthetic vs. hand-labeled.
           <a href="index.html#work">Full table &rarr;</a></p>
       </div>
 
+      <div class="decision" id="term-gold-set" data-term="gold set hand-labeled reference answer key">
+        <p class="tag">EVAL</p>
+        <h3>Gold set</h3>
+        <p>A hand-labeled evaluation set used as the reference answer key.</p>
+        <p class="tradeoff"><strong>Here:</strong> mine is small (54
+          snippets) and pulled from real DoD news wire and SEC filings, not
+          model-generated. Its job is to test label boundaries and eval
+          discipline, not production-scale generalization.
+          <a href="index.html#decision-eval">Full decision &rarr;</a></p>
+      </div>
+
       <div class="decision" id="term-idempotency" data-term="idempotency idempotent retry">
-        <p class="tag">Systems</p>
+        <p class="tag">SYSTEMS</p>
         <h3>Idempotency</h3>
-        <p>An operation that produces the same result whether it runs once or
-          five times &mdash; safe to retry, no side effects pile up.</p>
-        <p class="tradeoff"><strong>In this system:</strong> it's why the
-          classify-and-tag writeback didn't need Kafka's delivery guarantees.
-          The tags it writes are derived and idempotent, so re-running the step
-          just re-arrives at the same state.
+        <p>An operation that produces the same result whether it runs once
+          or five times &mdash; safe to retry, no side effects pile up.</p>
+        <p class="tradeoff"><strong>Here:</strong> it's why the
+          classify-and-tag writeback didn't need Kafka's delivery
+          guarantees. The tags I write are derived and idempotent, so
+          re-running the step just re-arrives at the same state.
           <a href="index.html#decision-rightsized">Full decision &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-judge-model" data-term="judge model llm judge opus judge grading">
+        <p class="tag">EVAL</p>
+        <h3>Judge model</h3>
+        <p>A separate model used to grade another model's output against the
+          gold set, instead of grading it by hand at scale.</p>
+        <p class="tradeoff"><strong>Here:</strong> I cross-check the
+          classifier's real-text eval with an Opus judge &mdash; useful for
+          catching errors hand-review can't keep up with, as long as I still
+          spot-check the judge itself.
+          <a href="index.html#decision-eval">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-rag" data-term="rag retrieval augmented generation">
@@ -164,10 +187,10 @@
         <h3>RAG (retrieval-augmented generation)</h3>
         <p>Instead of asking a model to answer from memory, retrieve the
           relevant documents first, then hand only those to the model as
-          grounding for its answer. Fixes the model's biggest weakness &mdash;
-          it doesn't know your data &mdash; without retraining it.</p>
-        <p class="tradeoff"><strong>In this system:</strong> kb-agent is the
-          RAG layer, retrieving from the knowledge base before it answers a
+          grounding for its answer. Fixes the model's biggest weakness
+          &mdash; it doesn't know your data &mdash; without retraining it.</p>
+        <p class="tradeoff"><strong>Here:</strong> kb-agent is the RAG
+          layer, retrieving from the knowledge base before it answers a
           query. <a href="index.html#work">Full system &rarr;</a></p>
       </div>
 
@@ -175,11 +198,11 @@
         <p class="tag">AI</p>
         <h3>Tool use / structured output</h3>
         <p>Forcing a model to respond through a defined schema &mdash; a
-          function call with typed, required fields &mdash; instead of parsing
-          free text and hoping the format holds.</p>
-        <p class="tradeoff"><strong>In this system:</strong> the classifier's
-          tool schema makes an invalid label a rejected API call, not a
-          runtime bug. Out-of-enum responses were rare (once in 300).
+          function call with typed, required fields &mdash; instead of
+          parsing free text and hoping the format holds.</p>
+        <p class="tradeoff"><strong>Here:</strong> my classifier's tool
+          schema makes an invalid label a rejected API call, not a runtime
+          bug. Out-of-enum responses were rare: once in 300.
           <a href="index.html#decision-tooluse">Full decision &rarr;</a></p>
       </div>
     </div>
