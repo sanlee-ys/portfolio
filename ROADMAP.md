@@ -26,7 +26,9 @@ down carries the full reasoning for each item.
       1200×630 card + full OG/Twitter tags on all 9 pages.)*
 - [x] **Meta descriptions** on the 4 pages missing them. Ships in the same pass.
 - [x] **Favicon.** *(Shipped: accent monogram, 16/32 PNG + apple-touch.)*
-- [ ] **Résumé link + contact `mailto:`.** Cheap, high value, no design debate.
+- [ ] **Résumé link + contact.** Contact *shipped* — `mailto:hi@sanlee.me`
+      (branded custom-domain address, routed to Proton) in the hero icons and
+      footer. Résumé link still to add.
 - [ ] **Resolve the orphaned `learning/` dir** (wire in or delete).
 
 ### Next — valuable, but needs a small decision or more build
