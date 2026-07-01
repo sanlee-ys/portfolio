@@ -434,7 +434,16 @@ body {
 
 .footer .wrap {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer .disclaimer {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  opacity: 0.85;
+  text-align: center;
 }
 
 .footer nav {
