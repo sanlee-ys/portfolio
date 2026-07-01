@@ -462,6 +462,12 @@ body {
     min-height: 36px;
     font-size: 0.85rem;
   }
+  /* Tables must never widen the page. Let them scroll inside their own box. */
+  main table {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+  }
 }
 
 /* Scroll-reveal (Lesson 1) */
