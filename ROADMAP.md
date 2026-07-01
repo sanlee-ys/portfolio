@@ -35,8 +35,8 @@ down carries the full reasoning for each item.
 
 ### Next — valuable, but needs a small decision or more build
 
-- [ ] **Custom `404.html`.**
-- [ ] **`sitemap.xml` + `robots.txt`.**
+- [x] **Custom `404.html`.** *Shipped — on-brand "not in the record" page.*
+- [x] **`sitemap.xml` + `robots.txt`.** *Shipped.*
 - [ ] **Career-story depth.** Needs San to decide how much to tell first.
 - [ ] **Voice pass** (soften the relentlessness). Stylistic, optional.
 
@@ -71,9 +71,12 @@ These have no tradeoffs worth debating. None were previously planned.
       `projects/product-and-program.html`, `lab/scroll-storytelling.html`.
 - [x] **Favicon** — was the bare-tab default on every page. *Shipped an accent
       "S" monogram: 16/32px PNG + a full-bleed apple-touch icon.*
-- [ ] **Custom `404.html`** — GitHub Pages serves it automatically; keeps a bad
-      link on-brand instead of dumping to the default.
-- [ ] **`sitemap.xml` + `robots.txt`** — small, standard, helps indexing.
+- [x] **Custom `404.html`** — GitHub Pages serves it automatically; keeps a bad
+      link on-brand instead of dumping to the default. *Shipped: styled 404 with
+      absolute asset paths, noindex, and links back to the main sections.*
+- [x] **`sitemap.xml` + `robots.txt`** — small, standard, helps indexing.
+      *Shipped: sitemap lists all 10 public pages; robots allows all and points
+      to the sitemap.*
 - [x] **Orphaned `learning/` directory** — six `.md` files nothing linked to.
       On inspection it's a genuine front-end learning log (distinct from the
       external `learning-notes`, which is AI techniques), so it was *kept and

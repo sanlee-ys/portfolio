@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 &middot; San Lee</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="/assets/style.css" />
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+  <main class="wrap article-body">
+    <h1>404 &mdash; not in the record</h1>
+    <p class="lead">
+      The page you asked for isn't here &mdash; a stale link, or a path that
+      never existed. No decision was logged for it.
+    </p>
+    <p>Here is the way back:</p>
+    <ul>
+      <li><a href="/index.html">The front page</a></li>
+      <li><a href="/projects/the-system.html">The System</a> &middot; <a href="/projects/defense-news-classifier.html">Defense News Classifier</a> &middot; <a href="/projects/product-and-program.html">Product &amp; Program</a></li>
+      <li><a href="/lab/index.html">Lab</a> &middot; <a href="/glossary.html">Glossary</a> &middot; <a href="/resume.html">Résumé</a></li>
+    </ul>
+  </main>
+  <script src="/assets/theme.js"></script>
+</body>
+</html>
