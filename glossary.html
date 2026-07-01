@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glossary &middot; San Lee</title>
+  <meta name="description" content="Terms used across this site, defined in plain language and grounded in the actual system." />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+  <main class="wrap article-body">
+    <a class="back" href="index.html">&larr; Back</a>
+    <h1>Glossary</h1>
+    <p class="lead">
+      Terms used across this site, defined the way they're actually used here &mdash;
+      not textbook definitions, but what each one means in this system.
+    </p>
+
+    <input
+      type="search"
+      id="glossary-filter"
+      class="glossary-filter"
+      placeholder="Filter terms&hellip;"
+      aria-label="Filter glossary terms"
+      autocomplete="off"
+    />
+    <p id="glossary-empty" class="muted-line" hidden>No terms match.</p>
+
+    <div class="glossary-list">
+      <div class="decision" id="term-adr" data-term="adr sys architecture decision record">
+        <p class="tag">Convention</p>
+        <h3>ADR / SYS-NNN</h3>
+        <p>A short written record of one architecture decision: context, choice,
+          tradeoff, alternatives considered. Numbered so it can be cited instead
+          of re-argued.</p>
+        <p class="tradeoff"><strong>In this system:</strong> <code>ADR-NNN</code>
+          are decisions scoped to one repo; <code>SYS-NNN</code> are decisions
+          that cross repo boundaries &mdash; the contracts wiring notes-api, the
+          classifier, and kb-agent together.</p>
+      </div>
+
+      <div class="decision" id="term-agent" data-term="agent kb-agent">
+        <p class="tag">AI</p>
+        <h3>Agent</h3>
+        <p>Software that chains tool calls toward a goal instead of answering in
+          one shot: pick a tool, read the result, decide the next step, repeat
+          until done or stuck.</p>
+        <p class="tradeoff"><strong>In this system:</strong> kb-agent searches
+          the knowledge base and synthesizes a grounded answer, rather than
+          guessing from what the model already knows.</p>
+      </div>
+
+      <div class="decision" id="term-backgroundtask" data-term="backgroundtask fastapi kafka async">
+        <p class="tag">Systems</p>
+        <h3>BackgroundTask</h3>
+        <p>A way to run a follow-up step right after a request without standing
+          up a message queue. The caller gets its response immediately; the
+          extra work runs in the same process a moment later.</p>
+        <p class="tradeoff"><strong>In this system:</strong> notes-api uses
+          FastAPI's <code>BackgroundTask</code> to call the classifier and write
+          its labels back as tags &mdash; the loop was built on Kafka first, then
+          cut when the workload didn't earn a broker.
+          <a href="index.html#decision-rightsized">Full decision &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-bm25" data-term="bm25 keyword search lexical retrieval">
+        <p class="tag">Retrieval</p>
+        <h3>BM25</h3>
+        <p>A keyword-scoring algorithm for search: it ranks documents by how
+          often and how distinctively they contain the words in your query, no
+          model required. Fast, cheap, a solid baseline.</p>
+        <p class="tradeoff"><strong>In this system:</strong> BM25 was tried as
+          retrieval grounding for the classifier, measured, and cut &mdash; it
+          moved category accuracy +1.9% but domain +0.0%, and fixed about as
+          many calls as it broke. <a href="index.html#decision-grounding">Full
+          decision &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-classification" data-term="classification classifier label">
+        <p class="tag">AI</p>
+        <h3>Classification</h3>
+        <p>Sorting text into a fixed set of labels using a model, instead of
+          hand-written rules.</p>
+        <p class="tradeoff"><strong>In this system:</strong> the classifier
+          assigns two labels to each defense-news item &mdash; a category
+          (procurement, operations, policy, technology, industry) and an
+          operational domain (air, land, sea, cyber, space, multi).
+          <a href="projects/defense-news-classifier.html">Full writeup &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-contract" data-term="contract interface api schema">
+        <p class="tag">Systems</p>
+        <h3>Contract</h3>
+        <p>An explicit, versioned interface between two systems: what one side
+          promises to produce, what the other is allowed to assume. Neither
+          side needs to know how the other works internally, only that the
+          shape holds.</p>
+        <p class="tradeoff"><strong>In this system:</strong> three frozen
+          contracts (SYS-004, SYS-005, SYS-006) wire the repos together, each
+          with contract tests in CI, so a renamed field fails a build instead
+          of breaking production. <a href="index.html#decision-contracts">Full
+          decision &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-eval" data-term="eval evaluation eval-driven development testing">
+        <p class="tag">AI</p>
+        <h3>Eval / eval-driven development</h3>
+        <p>A scored test set with known-correct answers, used to check whether a
+          change actually helped &mdash; instead of trusting that it reads
+          better.</p>
+        <p class="tradeoff"><strong>In this system:</strong> this is the whole
+          discipline the site is built to demonstrate. Every prompt change,
+          retrieval experiment, and model choice here was measured against an
+          eval, including the ones that failed and got reverted.
+          <a href="index.html#decision-eval">Full decision &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-f1" data-term="f1 precision recall macro-f1 accuracy metrics">
+        <p class="tag">AI</p>
+        <h3>F1 / precision / recall</h3>
+        <p>The numbers used to score a classifier instead of trusting a skim.
+          <strong>Precision:</strong> of everything labeled X, how much was
+          actually X. <strong>Recall:</strong> of everything that was actually
+          X, how much got caught. <strong>F1:</strong> the balance of the two
+          &mdash; useful exactly when one alone would flatter the model.</p>
+        <p class="tradeoff"><strong>In this system:</strong> see the classifier
+          evidence table for the real numbers, synthetic vs. hand-labeled.
+          <a href="index.html#work">Full table &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-idempotency" data-term="idempotency idempotent retry">
+        <p class="tag">Systems</p>
+        <h3>Idempotency</h3>
+        <p>An operation that produces the same result whether it runs once or
+          five times &mdash; safe to retry, no side effects pile up.</p>
+        <p class="tradeoff"><strong>In this system:</strong> it's why the
+          classify-and-tag writeback didn't need Kafka's delivery guarantees.
+          The tags it writes are derived and idempotent, so re-running the step
+          just re-arrives at the same state.
+          <a href="index.html#decision-rightsized">Full decision &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-rag" data-term="rag retrieval augmented generation">
+        <p class="tag">AI</p>
+        <h3>RAG (retrieval-augmented generation)</h3>
+        <p>Instead of asking a model to answer from memory, retrieve the
+          relevant documents first, then hand only those to the model as
+          grounding for its answer. Fixes the model's biggest weakness &mdash;
+          it doesn't know your data &mdash; without retraining it.</p>
+        <p class="tradeoff"><strong>In this system:</strong> kb-agent is the
+          RAG layer, retrieving from the knowledge base before it answers a
+          query. <a href="index.html#work">Full system &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-tool-use" data-term="tool use structured output schema function calling">
+        <p class="tag">AI</p>
+        <h3>Tool use / structured output</h3>
+        <p>Forcing a model to respond through a defined schema &mdash; a
+          function call with typed, required fields &mdash; instead of parsing
+          free text and hoping the format holds.</p>
+        <p class="tradeoff"><strong>In this system:</strong> the classifier's
+          tool schema makes an invalid label a rejected API call, not a
+          runtime bug. Out-of-enum responses were rare (once in 300).
+          <a href="index.html#decision-tooluse">Full decision &rarr;</a></p>
+      </div>
+    </div>
+  </main>
+  <script src="assets/theme.js"></script>
+  <script src="assets/glossary.js"></script>
+</body>
+</html>
