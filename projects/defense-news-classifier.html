@@ -132,10 +132,10 @@
       <h3>Implement the metrics by hand</h3>
       <p>Precision, recall, F1, and confusion matrices are computed directly with
         pandas and arithmetic, no ML framework.</p>
-      <p class="tradeoff"><strong>Why:</strong> on a project about building AI
-        systems, writing the metrics by hand is a statement that I understand what I
-        am measuring, and it keeps the dependency surface to <code>anthropic</code>
-        plus <code>pandas</code>. <strong>Tradeoff:</strong> about 40 lines that
+      <p class="tradeoff"><strong>Why:</strong> the call here was to hold off on
+        ML tooling until it earns its place, not to default to it because it&rsquo;s
+        there. It keeps the dependency surface to <code>anthropic</code> plus
+        <code>pandas</code>. <strong>Tradeoff:</strong> about 40 lines that
         <code>sklearn.metrics</code> would replace, accepted for clarity.</p>
     </div>
 
