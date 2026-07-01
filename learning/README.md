@@ -12,6 +12,8 @@ lesson and its actual `git` history sit side by side.
 
 The plan is to climb, not skip:
 
+0. **Plumbing** — not a rung, the ground the ladder stands on: DNS, the domain,
+   email routing ✅ *(Lesson 7)*
 1. **CSS craft** — motion, transforms, `IntersectionObserver` ✅ *(Lessons 1–5)*
 2. **Canvas 2D** — the render loop, particles
 3. **SVG + dataviz** — the interactive system diagram ✅ *(Lesson 6)*
@@ -27,3 +29,4 @@ The plan is to climb, not skip:
 | [04](04-robust-and-fluid.md) | Robust & fluid | 1 | `:focus-visible`, `clamp()`, container queries, zero-media-query responsive |
 | [05](05-scroll-driven-storytelling.md) | Scroll-driven storytelling | 1 | `animation-timeline: scroll()`/`view()`, `position: sticky`, `@supports`, progressive enhancement |
 | [06](06-svg-data-driven-diagram.md) | Data-driven SVG diagram | 3 | SVG `viewBox`, `createElementNS`, data-to-visual binding, `<marker>`, keyboard-operable SVG |
+| [07](07-domain-dns-email.md) | The domain: DNS, CNAMEs & email forwarding | 0 | `A` vs `CNAME`, apex rules, repo `CNAME` file vs DNS record, `MX`, receive-only forwarding |
