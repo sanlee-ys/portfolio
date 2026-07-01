@@ -1,0 +1,27 @@
+name: QA
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check internal links
+        run: node scripts/link-check.cjs
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install playwright
+          npx playwright install --with-deps chromium
+
+      - name: Mobile QA gate (no horizontal overflow at 320/360/390/430)
+        run: node scripts/mobile-qa.cjs

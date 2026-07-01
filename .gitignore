@@ -1,0 +1,5 @@
+# This is a no-build static site. Playwright is installed ad hoc (locally or in
+# CI) to run the QA scripts; none of that belongs in the repo.
+node_modules/
+package.json
+package-lock.json

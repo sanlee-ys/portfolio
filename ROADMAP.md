@@ -53,6 +53,31 @@ down carries the full reasoning for each item.
 > Note: the System roadmap's "Now" is effectively all shipped. The Site "Now"
 > above is what actually keeps a live roadmap live.
 
+### Adversarial round (2026-07-01) — attack the gap between claims and practice
+
+- [x] **Homepage/résumé disagreed about the present.** Hero said "Seven years
+      at JPMorganChase"; the résumé says currently there in product. Hero now
+      reads from the present.
+- [x] **"The proof is in the ADRs" but nothing linked to them.** All four
+      system repos are public — now linked from the writeups where they're
+      named. (Standing rule: never link private repos.)
+- [x] **A repo preaching evals-as-CI had no CI.** GitHub Actions now runs the
+      mobile-overflow gate and an internal-link checker on every PR and push.
+- [x] **`resume.html` had no analytics** despite the README's "every page."
+- [x] **README layout table was stale** — now lists the actual site.
+- [x] **Employer hygiene** — "views and projects are my own" disclaimer on the
+      homepage footer and the résumé.
+- [x] **Metrics table showed a rejected variant unlabeled** — "v2 grounded"
+      column now says *(not shipped)*.
+- [x] **Dogfood the analytics** — custom events (diagram clicks, decision-card
+      expands, résumé clicks) via `assets/events.js`.
+- [ ] **Security on the agent's tool seam** — the gap SYS-007 itself names.
+      Prompt-injection hardening of kb-agent + a writeup (threat model, attacks
+      tried, what held). Strongest candidate for the "second artifact" slot.
+- [ ] **Check `www.sanlee.me` resolves/redirects** — owner-side, two minutes.
+- [ ] **"What readers actually read"** — once the custom events accumulate,
+      publish the read on them: real usage data, on-thesis.
+
 ---
 
 ## Detail & reasoning

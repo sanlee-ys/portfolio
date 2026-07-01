@@ -102,7 +102,7 @@
 
     <table class="metrics">
       <thead>
-        <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real</th><th>v2 grounded</th></tr>
+        <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real</th><th>v2 grounded (not shipped)</th></tr>
       </thead>
       <tbody>
         <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td></tr>
@@ -173,7 +173,9 @@
     <p>
       Python, the Anthropic SDK (Sonnet for classification, Opus as the v2 judge),
       pandas for the eval tables, FastAPI for the HTTP endpoint, and rank-bm25 for
-      the grounding experiment. Tested with pytest on mocked calls.
+      the grounding experiment. Tested with pytest on mocked calls. The repo is
+      public: <a href="https://github.com/sanlee-ys/defense-news-classifier">github.com/sanlee-ys/defense-news-classifier</a>
+      &mdash; the eval harness, gold set, and ADRs are all checkable.
     </p>
 
     <h2>What it demonstrates</h2>
