@@ -74,6 +74,14 @@ down carries the full reasoning for each item.
 - [ ] **Security on the agent's tool seam** — the gap SYS-007 itself names.
       Prompt-injection hardening of kb-agent + a writeup (threat model, attacks
       tried, what held). Strongest candidate for the "second artifact" slot.
+      **Phase 1 (threat model) drafted** — parked at
+      [`handoff/kb-agent-threat-model-draft.md`](handoff/kb-agent-threat-model-draft.md)
+      since this session couldn't write to `kb-agent` directly. 4 tools mapped,
+      7 attack scenarios (T1&ndash;T7) numbered for the Phase 2 gold set, two
+      existing mitigations credited (system-prompt spotlighting, host
+      allowlisting). Unverified against real source — see its Open Questions
+      section before treating it as final. Next: verify, commit into
+      `kb-agent`, then build the attack gold set (Phase 2).
 - [ ] **Check `www.sanlee.me` resolves/redirects** — owner-side, two minutes.
 - [ ] **"What readers actually read"** — once the custom events accumulate,
       publish the read on them: real usage data, on-thesis.
