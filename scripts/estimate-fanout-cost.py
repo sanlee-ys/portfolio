@@ -7,33 +7,28 @@ many tool calls and how much reading the agents choose to do mid-run. But the
 that is enough to answer the only question that matters before you hit go:
 "could this blow my usage window?"
 
-Outputs, per tier and model: estimated weighted tokens, the fraction of one
-5-hour usage window that represents, and whether it's safe / caution / will
-exhaust the window.
+CALIBRATION ANCHOR (measured, 2026-07-02)
+-----------------------------------------
+A deep-research fan-out running entirely on a premium model (claude-fable-5,
+confirmed from the transcript) measured ~4.5M billing-weighted tokens
+(~18.3M raw; ~90%% cache reads, which bill at ~0.1x) and consumed ~95%% of a
+5-hour usage window in ~45 minutes. So the window holds ~4.75M weighted tokens
+AT PREMIUM (Fable/Opus) RATES. That single point is the anchor below.
 
-CALIBRATION
------------
-Example anchor: one Sonnet-fleet deep-research fan-out measured ~4.5M weighted
-tokens and consumed ~95% of a 5-hour usage window -> the window holds roughly
-4.75M weighted Sonnet-equivalent tokens. Set WINDOW_SONNET_EQUIV to your own
-plan: run one job, check your usage status for the %% consumed, back out the
-total.
-
-Premium models draw the window down FASTER per token. MODEL_WEIGHT is that
-relative draw (Sonnet = 1.0). The Opus / Fable 5 multipliers are ESTIMATES -
-confirm against current pricing / your own usage readings and adjust. This is
-the single biggest lever in the estimate, so calibrate it before trusting a
-premium-model number.
+MODEL_WEIGHT is each model's window-draw per token relative to premium = 1.0.
+Only the premium point is measured; the Sonnet/Haiku ratios are ESTIMATES -
+calibrate them by running one small job per model and reading the %% consumed
+from your usage status. This cross-model ratio is the biggest source of error.
 """
 import sys
 
-# ---- calibrate these two to your plan --------------------------------------
-WINDOW_SONNET_EQUIV = 4_750_000          # weighted Sonnet-equiv tokens per 5-hr window
-MODEL_WEIGHT = {
-    "haiku":  0.25,
-    "sonnet": 1.0,
-    "opus":   5.0,   # estimate - premium tier
-    "fable":  5.0,   # estimate - premium tier; CONFIRM before relying
+# ---- calibrate to your plan ------------------------------------------------
+WINDOW_WEIGHTED_TOKENS = 4_750_000   # measured: ~95%% window = ~4.5M weighted on Fable 5
+MODEL_WEIGHT = {                     # window-draw per token, premium = 1.0
+    "fable":  1.0,   # MEASURED anchor
+    "opus":   1.0,   # premium tier; assumed same as Fable pending calibration
+    "sonnet": 0.2,   # ESTIMATE (~5x cheaper than premium)
+    "haiku":  0.05,  # ESTIMATE
 }
 # ----------------------------------------------------------------------------
 
@@ -56,16 +51,15 @@ def band(frac):
 
 
 def rec_cap(low):
-    tokens = int(low)  # cap is on raw weighted tokens, model-independent
-    k = max(50, round(tokens / 1000 / 2))
+    k = max(50, round(int(low) / 1000 / 2))
     return f"+{k}k"
 
 
 def row(tier, model):
     low, high = TIERS[tier]
     w = MODEL_WEIGHT[model]
-    flo = low * w / WINDOW_SONNET_EQUIV
-    fhi = high * w / WINDOW_SONNET_EQUIV
+    flo = low * w / WINDOW_WEIGHTED_TOKENS
+    fhi = high * w / WINDOW_WEIGHTED_TOKENS
     return (f"  {tier:7} {model:7} "
             f"{low/1e6:4.2f}-{high/1e6:4.2f}M tok  "
             f"{flo*100:5.0f}-{fhi*100:3.0f}%% window   "
@@ -78,8 +72,8 @@ def main():
     tiers = ["inline", "small", "full"]
     if len(args) == 2:
         tiers, models = [args[0]], [args[1]]
-    print(f"\nWindow = {WINDOW_SONNET_EQUIV/1e6:.2f}M weighted Sonnet-equiv tokens "
-          f"(calibrate to your plan)\n")
+    print(f"\nWindow = {WINDOW_WEIGHTED_TOKENS/1e6:.2f}M weighted tokens at premium "
+          f"(Fable/Opus) rates; measured 2026-07-02. Calibrate to your plan.\n")
     print("  tier    model   est tokens       %% of 5-hr window   verdict          suggested")
     print("  " + "-" * 82)
     for t in tiers:
