@@ -204,9 +204,9 @@
       <div class="entry">
         <p class="role" style="margin-top:0">Built and documented in the open &mdash; <a href="https://sanlee.me">sanlee.me</a>.</p>
         <ul>
-          <li><strong>Defense-news LLM classifier + eval harness</strong> &mdash; forced tool-use classification, scored on a hand-labeled gold set with an LLM judge; negative results kept (reverted prompt, cut BM25 grounding).</li>
-          <li><strong>kb-agent</strong> &mdash; RAG / tool-use agent answering from a notes knowledge base over versioned HTTP contracts.</li>
-          <li><strong>Cross-repo system</strong> &mdash; four services wired by frozen contracts, an async idempotent enrichment loop, and evals-as-CI.</li>
+          <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; forced tool-use / structured output; scored against a hand-labeled gold set with an LLM-as-judge, catching two regressions (a prompt edit, an unproven retrieval add) that shipped-by-vibes would have missed. Evals as the gate for every change, not a one-time report.</li>
+          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned HTTP contracts instead of a static index.</li>
+          <li><strong>Cross-repo LLM system</strong> &mdash; four services, evidence-gated model routing (Sonnet default, Opus only where an eval proves the lift), async idempotent enrichment pipeline, contract tests in CI.</li>
         </ul>
       </div>
     </section>
