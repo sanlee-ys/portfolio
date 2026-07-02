@@ -204,9 +204,9 @@
       <div class="entry">
         <p class="role" style="margin-top:0">Built and documented in the open &mdash; <a href="https://sanlee.me">sanlee.me</a>.</p>
         <ul>
-          <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; forced tool-use / structured output; scored against a hand-labeled gold set with an LLM-as-judge, catching two regressions (a prompt edit, an unproven retrieval add) that shipped-by-vibes would have missed. Evals as the gate for every change, not a one-time report.</li>
-          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned HTTP contracts instead of a static index.</li>
-          <li><strong>Cross-repo LLM system</strong> &mdash; four services, evidence-gated model routing (Sonnet default, Opus only where an eval proves the lift), async idempotent enrichment pipeline, contract tests in CI.</li>
+          <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; built the eval before trusting the model: an LLM-as-judge scored against a hand-labeled gold set caught two changes I'd have shipped on instinct (a &ldquo;cleaner&rdquo; prompt, an unproven retrieval add) that actually regressed accuracy. The product call: gate every change on evidence, not on how confident it feels.</li>
+          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned contracts instead of a static index, so answers can't silently drift out of sync with the source of truth.</li>
+          <li><strong>Cross-repo LLM system</strong> &mdash; evidence-gated model routing (cheaper model by default, escalate only where an eval proved the lift) cut model cost ~1.7&times; with no quality loss, wired across four services with contract tests and an idempotent async pipeline.</li>
         </ul>
       </div>
     </section>
