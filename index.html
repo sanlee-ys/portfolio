@@ -195,7 +195,7 @@
       <div class="decision" id="decision-rightsized">
         <p class="tag">ARCH <span class="pill">right-sized</span></p>
         <h3>I built the loop on Kafka, then cut it</h3>
-        <p>The honest move was to right-size it, not defend it. I built the enrichment loop on Kafka to learn event-driven architecture properly: an idempotent consumer, at-least-once delivery, offset management.</p>
+        <p>The honest move was to right-size it, not defend it. I built the enrichment loop on Kafka to retrace how a real system I'd worked on used it: an idempotent consumer, at-least-once delivery, offset management.</p>
         <p class="tradeoff"><strong>Then I cut it.</strong> A single-user workload with derived, idempotent tags never needed a distributed log, so it is now an in-process FastAPI BackgroundTask.</p>
         <details>
           <summary>What that trades away</summary>
@@ -219,6 +219,7 @@
         </tbody>
       </table>
       <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. The v2 gold set is 54 snippets, hand-labeled.</p>
+      <p class="reveal">Grounded version scored higher but added retrieval complexity for a marginal gain &mdash; <a href="projects/defense-news-classifier.html#decision-grounding">see Classifier page</a>.</p>
     </section>
 
     <section class="measure">
