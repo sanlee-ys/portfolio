@@ -74,14 +74,15 @@ down carries the full reasoning for each item.
 - [ ] **Security on the agent's tool seam** — the gap SYS-007 itself names.
       Prompt-injection hardening of kb-agent + a writeup (threat model, attacks
       tried, what held). Strongest candidate for the "second artifact" slot.
-      **Phase 1 (threat model) drafted** — parked at
-      [`handoff/kb-agent-threat-model-draft.md`](handoff/kb-agent-threat-model-draft.md)
-      since this session couldn't write to `kb-agent` directly. 4 tools mapped,
-      7 attack scenarios (T1&ndash;T7) numbered for the Phase 2 gold set, two
-      existing mitigations credited (system-prompt spotlighting, host
-      allowlisting). Unverified against real source — see its Open Questions
-      section before treating it as final. Next: verify, commit into
-      `kb-agent`, then build the attack gold set (Phase 2).
+      **Phase 1 (threat model) shipped** — verified against real source and
+      committed into kb-agent at `docs/notes/tool-seam-threat-model.md`. 4 tools
+      mapped, 7 attack scenarios (T1&ndash;T7) numbered for the Phase 2 gold
+      set, mitigations credited (system-prompt spotlighting, dedicated SSRF
+      guard, the 10-iteration loop cap, unforced `tool_choice`). All four draft
+      Open Questions resolved against source — notably the draft's "no rate
+      limit" gap was wrong (`MAX_TOOL_ITERATIONS = 10` caps the loop). Next:
+      build the attack gold set (Phase 2), with citation poisoning (T4) as the
+      likely highest-yield class.
 - [ ] **Check `www.sanlee.me` resolves/redirects** — owner-side, two minutes.
 - [ ] **"What readers actually read"** — once the custom events accumulate,
       publish the read on them: real usage data, on-thesis.

@@ -19,7 +19,7 @@ that's still open, so it doesn't go orphaned the way `learning/` briefly did.
 
 | File | Destination repo | Status |
 |---|---|---|
-| `kb-agent-threat-model-draft.md` | `kb-agent` | Draft — unverified against source, see its own Open Questions section |
+| _(none currently parked)_ | — | — |
 
 ## Picking one up
 
