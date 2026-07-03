@@ -39,6 +39,24 @@ Before committing any layout / style / markup change:
 which drops the effective width to ~375px or less. Test **down to 320px**, not
 just 430 — a layout that only works at 430 will still clip for a real user.
 
+## Private repos: never mention, never link
+
+This site is public and indexed. **Never name, link to, or describe the
+content of private repos** anywhere on this site — not even a generic
+acknowledgment like "plus some private repos." Even confirming a private repo
+exists is a disclosure San doesn't want; the bar is omission, not
+genericization.
+
+Before publishing anything that lists or surveys San's repos, check every
+repo name and every count/scope claim ("all my repos," a specific number)
+against the actual public list (`gh repo list sanlee-ys --visibility
+public`) — if a claim wouldn't be true restricted to just the public repos,
+drop it rather than soften it.
+
+First codified as a standing rule 2026-07-01 (adversarial round,
+`ROADMAP.md`); promoted here 2026-07-03 after the same leak recurred in a
+cross-repo write-up in the `architecture` repo.
+
 ## Deploy note
 
 After merging, GitHub Pages + its CDN can serve **cached** CSS for a few
