@@ -1,0 +1,8 @@
+{
+  "name": "portfolio-qa-tooling",
+  "private": true,
+  "description": "Pinned dependency for the QA workflow's Chromium rendering (mobile-qa.cjs). Not part of the site itself, which has no build step.",
+  "devDependencies": {
+    "playwright": "1.61.1"
+  }
+}

@@ -19,8 +19,9 @@ jobs:
         run: node scripts/link-check.cjs
 
       - name: Install Playwright Chromium
+        working-directory: scripts
         run: |
-          npm install playwright
+          npm ci
           npx playwright install --with-deps chromium
 
       - name: Mobile QA gate (no horizontal overflow at 320/360/390/430)
