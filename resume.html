@@ -57,15 +57,18 @@
 
     .top-actions {
       display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px 16px;
       margin-bottom: 36px; font-size: 0.92rem;
     }
     .top-actions .back { color: var(--muted); }
     .top-actions .back:hover { color: var(--accent); }
-    .theme-toggle {
+    .top-actions .actions-right { display: flex; align-items: center; gap: 10px; }
+    .theme-toggle, .pdf-link {
       background: var(--panel); color: var(--text); border: 1px solid var(--border);
       border-radius: 999px; padding: 6px 14px; cursor: pointer; font: inherit; font-size: 0.85rem;
     }
-    .theme-toggle:hover { border-color: var(--accent); }
+    .theme-toggle:hover, .pdf-link:hover { border-color: var(--accent); }
+    .pdf-link, .pdf-link:hover { text-decoration: none; }
 
     header.masthead { border-bottom: 1px solid var(--border); padding-bottom: 22px; margin-bottom: 30px; }
     header.masthead h1 { font-size: 2.6rem; margin: 0 0 6px; letter-spacing: -0.02em; }
@@ -104,7 +107,12 @@
       html[data-theme="dark"] { --bg:#ffffff; --text:#14181f; --muted:#444c5a; --accent:#1a4fc4; --border:#cbd2dc; }
       .top-actions { display: none; }
       .wrap { padding: 0; max-width: 100%; }
-      body { font-size: 11pt; }
+      body { font-size: 10.5pt; }
+      section { margin-top: 18px; }
+      h2.sec { margin-bottom: 10px; }
+      .entry { margin-bottom: 14px; }
+      .entry ul li { margin-bottom: 4px; }
+      .edu-item, .lead-item { margin-bottom: 8px; }
       .entry, .edu-item { break-inside: avoid; }
       a { color: inherit; text-decoration: none; }
     }
@@ -114,7 +122,10 @@
   <div class="wrap">
     <div class="top-actions">
       <a class="back" href="index.html">&larr; Back to portfolio</a>
-      <button id="theme-toggle" class="theme-toggle" type="button">Toggle theme</button>
+      <div class="actions-right">
+        <a class="pdf-link" href="resume.pdf" download="San-Lee-resume.pdf">Download PDF</a>
+        <button id="theme-toggle" class="theme-toggle" type="button">Toggle theme</button>
+      </div>
     </div>
 
     <header class="masthead">
@@ -165,11 +176,8 @@
         <p class="role">Senior Associate, Software Engineer III &middot; Jersey City, NJ</p>
         <ul>
           <li>Built and ran microservices on a 4&ndash;5 engineer team working toward zero-touch provisioning (ZTP) of network devices &mdash; fully shared ownership, everyone with a hand in every service rather than an isolated slice.</li>
-          <li>Practiced test-driven development and pair programming; designed and documented REST APIs (Swagger/OpenAPI).</li>
-          <li>Containerized services with Docker and deployed on Kubernetes; built event-driven flows with Kafka and worked day-to-day in Linux over SSH.</li>
-          <li>Maintained CI/CD pipelines across projects, triaging bugs and applying firm-wide best practices.</li>
+          <li>Practiced test-driven development and pair programming; designed and documented REST APIs (Swagger/OpenAPI), containerized services with Docker and Kubernetes, built event-driven flows with Kafka, maintained CI/CD pipelines, and remediated security scan findings to firm standards.</li>
           <li>Worked with SRE on observability &mdash; instrumenting endpoints and tracing API calls with OpenTelemetry to troubleshoot latency &mdash; and shared the team's operational load: documentation, on-call, and weekend failover and resiliency testing.</li>
-          <li>Remediated security scan findings to firm standards.</li>
           <li>Specced and ordered infrastructure, right-sizing it to &ldquo;just enough&rdquo; to keep costs in check.</li>
           <li>Pushed back on stakeholders with clear tradeoffs to keep scope and budget grounded.</li>
         </ul>
