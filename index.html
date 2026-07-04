@@ -152,7 +152,7 @@
         <p class="tag">EVAL &middot; BM25 <span class="pill">rejected</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
         <p>A negative result is still a result. I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
-        <p class="tradeoff"><strong>The result:</strong> +1.9% category accuracy, +0.0% on domain, and a flip analysis showed it fixed about as many calls as it broke. It did not earn the jump to embeddings, so it did not ship.</p>
+        <p class="tradeoff"><strong>The result:</strong> +1.9% on category (a net of one call in 54) and +0.0% on domain, where it fixed as many calls as it broke. It did not earn the jump to embeddings, so it did not ship.</p>
         <details>
           <summary>The discipline</summary>
           <p>Measure first, escalate only when the eval says it pays. Here it said do not bother. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
@@ -195,7 +195,7 @@
       <div class="decision" id="decision-rightsized">
         <p class="tag">ARCH <span class="pill">right-sized</span></p>
         <h3>I built the loop on Kafka, then cut it</h3>
-        <p>The honest move was to right-size it, not defend it. I built the enrichment loop on Kafka to retrace how a real system I'd worked on used it: an idempotent consumer, at-least-once delivery, offset management.</p>
+        <p>The honest move was to right-size it, not defend it. I first built the enrichment loop on Kafka, with the broker semantics that implies: an idempotent consumer, at-least-once delivery, offset management.</p>
         <p class="tradeoff"><strong>Then I cut it.</strong> A single-user workload with derived, idempotent tags never needed a distributed log, so it is now an in-process FastAPI BackgroundTask.</p>
         <details>
           <summary>What that trades away</summary>
