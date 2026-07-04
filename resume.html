@@ -102,17 +102,22 @@
     .skills p { margin: 0 0 8px; }
     .skills .k { color: var(--muted); }
 
+    .proof { color: var(--muted); font-size: 0.86rem; overflow-wrap: break-word; }
+    .proof a { color: var(--muted); }
+    .proof a:hover { color: var(--accent); }
+
     @media print {
       :root { --bg: #ffffff; --panel: #ffffff; --text: #14181f; --muted: #444c5a; --accent: #1a4fc4; --border: #cbd2dc; }
       html[data-theme="dark"] { --bg:#ffffff; --text:#14181f; --muted:#444c5a; --accent:#1a4fc4; --border:#cbd2dc; }
       .top-actions { display: none; }
       .wrap { padding: 0; max-width: 100%; }
-      body { font-size: 10.5pt; }
-      section { margin-top: 18px; }
-      h2.sec { margin-bottom: 10px; }
-      .entry { margin-bottom: 14px; }
-      .entry ul li { margin-bottom: 4px; }
-      .edu-item, .lead-item { margin-bottom: 8px; }
+      body { font-size: 10pt; }
+      section { margin-top: 10px; }
+      h2.sec { margin-bottom: 6px; }
+      .entry { margin-bottom: 10px; }
+      .entry ul li { margin-bottom: 3px; }
+      .edu-item, .lead-item { margin-bottom: 6px; }
+      .skills p { margin-bottom: 3px; }
       .entry, .edu-item { break-inside: avoid; }
       a { color: inherit; text-decoration: none; }
     }
@@ -210,11 +215,11 @@
     <section>
       <h2 class="sec">Selected Projects</h2>
       <div class="entry">
-        <p class="role" style="margin-top:0">Built and documented in the open &mdash; <a href="https://sanlee.me">sanlee.me</a>.</p>
+        <p class="role" style="margin-top:0">Built and documented in the open &mdash; every claim below links to its writeup and the public code behind it. <a href="https://sanlee.me">sanlee.me</a></p>
         <ul>
-          <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; built the eval before trusting the model: an LLM-as-judge scored against a hand-labeled gold set caught two changes I'd have shipped on instinct (a &ldquo;cleaner&rdquo; prompt, an unproven retrieval add) that actually regressed accuracy. The product call: gate every change on evidence, not on how confident it feels.</li>
-          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned contracts instead of a static index, so answers can't silently drift out of sync with the source of truth.</li>
-          <li><strong>Cross-repo LLM system</strong> &mdash; evidence-gated model routing (cheaper model by default, escalate only where an eval proved the lift) cut model cost ~1.7&times; with no quality loss, wired across four services with contract tests and an idempotent async pipeline.</li>
+          <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; built the eval before trusting the model: an LLM-as-judge scored against a hand-labeled gold set caught two changes I'd have shipped on instinct (a &ldquo;cleaner&rdquo; prompt, an unproven retrieval add) that actually regressed accuracy. The product call: gate every change on evidence, not on how confident it feels. <span class="proof">&rarr; <a href="https://sanlee.me/projects/defense-news-classifier.html">sanlee.me/projects/defense-news-classifier</a></span></li>
+          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned contracts instead of a static index, so answers can't silently drift out of sync with the source of truth. <span class="proof">&rarr; <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a></span></li>
+          <li><strong>Cross-repo LLM system</strong> &mdash; evidence-gated model routing (cheaper model by default, escalate only where an eval proved the lift) cut model cost ~1.7&times; with no quality loss, wired across four services with contract tests and an idempotent async pipeline. <span class="proof">&rarr; <a href="https://sanlee.me/projects/the-system.html">sanlee.me/projects/the-system</a></span></li>
         </ul>
       </div>
     </section>
