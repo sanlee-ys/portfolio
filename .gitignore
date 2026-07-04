@@ -1,7 +1,6 @@
-# This is a no-build static site. Playwright is installed ad hoc (locally or in
-# CI) to run the QA scripts; none of that belongs in the repo.
+# This is a no-build static site — no package.json/lockfile at the root.
+# scripts/package.json pins Playwright for the QA tooling only; it's tracked,
+# node_modules/ under it is not.
 node_modules/
-package.json
-package-lock.json
 
 graphify-out/
