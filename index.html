@@ -133,7 +133,7 @@
         <p class="tradeoff"><strong>Tradeoff:</strong> more upfront ceremony, so a renamed field fails a build instead of breaking production in silence.</p>
         <details>
           <summary>Why it mattered</summary>
-          <p>Decoupling without a contract is just hope. The hard part lives in the seams between the pieces, not the pieces themselves. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
+          <p>Decoupling without a contract is just hope. The seams between the pieces are where the real difficulty sits. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
         </details>
       </div>
 
@@ -151,11 +151,11 @@
       <div class="decision" id="decision-grounding">
         <p class="tag">EVAL &middot; BM25 <span class="pill">rejected</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
-        <p>A negative result is still a result. I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
+        <p>I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
         <p class="tradeoff"><strong>The result:</strong> +1.9% on category (a net of one call in 54) and +0.0% on domain, where it fixed as many calls as it broke. It did not earn the jump to embeddings, so it did not ship.</p>
         <details>
           <summary>The discipline</summary>
-          <p>Measure first, escalate only when the eval says it pays. Here it said do not bother. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>My rule is to measure before spending more, and I only move up to something heavier like embeddings if the eval shows it&rsquo;s worth the cost, which here it didn&rsquo;t. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -166,7 +166,7 @@
         <p class="tradeoff"><strong>The result:</strong> category accuracy dropped from 79.0% to 76.7% and industry recall from 0.217 to 0.100. I reverted it.</p>
         <details>
           <summary>Why measurement won</summary>
-          <p>The sharper rule gave the model a cleaner excuse to dump borderline company stories into the wrong bucket. Only the eval could see that. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>The sharper rule gave the model a cleaner excuse to dump borderline company stories into the wrong bucket, which I only caught once I ran the eval. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -195,7 +195,7 @@
       <div class="decision" id="decision-rightsized">
         <p class="tag">ARCH <span class="pill">right-sized</span></p>
         <h3>I built the loop on Kafka, then cut it</h3>
-        <p>The honest move was to right-size it, not defend it. I first built the enrichment loop on Kafka, with the broker semantics that implies: an idempotent consumer, at-least-once delivery, offset management.</p>
+        <p>I built the enrichment loop on Kafka to learn event-driven architecture properly: an idempotent consumer, at-least-once delivery, offset management.</p>
         <p class="tradeoff"><strong>Then I cut it.</strong> A single-user workload with derived, idempotent tags never needed a distributed log, so it is now an in-process FastAPI BackgroundTask.</p>
         <details>
           <summary>What that trades away</summary>
@@ -247,9 +247,9 @@
       <p class="reveal">
         For most of my career, what to build was decided above me. I was close to
         the work: running systems, shipping pieces of them, living with the seams.
-        I had not owned a full-loop system, so I built one in the open to get the
-        reps, with the decisions recorded and the negative results kept in. The
-        system is small; the discipline is real.
+        I had not owned a full-loop system, so I built one myself, in the open, to
+        get that experience &mdash; decisions recorded, failed attempts included.
+        It&rsquo;s a small system, but I took the process seriously.
       </p>
       <p class="reveal">
         I did not get here alone. Most of what I know came from people who were
@@ -257,8 +257,9 @@
         expertise. I try to pass that forward where I can.
       </p>
       <p class="reveal">
-        It is a solo build, so the program layer is simulated. The workstreams and
-        risk reasoning are real; the org around them is not.
+        It is a solo build, so the program layer is simulated &mdash; I lay out what
+        that means on the <a href="projects/product-and-program.html">Product
+        &amp; Program</a> page.
       </p>
       <p class="reveal">
         Outside the work: traveling, hiking, a bit of photography, and a Scottish
