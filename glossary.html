@@ -131,9 +131,9 @@
           stable request/response shape. The point is to make integration
           explicit instead of relying on hidden assumptions.</p>
         <p class="tradeoff"><strong>Here:</strong> I froze three of these
-          (SYS-004, SYS-005, SYS-006) with contract tests in CI, so a
-          renamed field fails a build instead of breaking production in
-          silence. <a href="index.html#decision-contracts">Full decision &rarr;</a></p>
+          (SYS-004, SYS-005, SYS-006) with contract tests in CI. Rename a
+          field and CI catches it before the change ships, so you find out in
+          the pull request instead of from a production incident. <a href="index.html#decision-contracts">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-eval" data-term="eval evaluation eval harness eval-driven development testing">
@@ -156,8 +156,8 @@
           skim. <strong>Precision:</strong> of everything I labeled X, how
           much was actually X. <strong>Recall:</strong> of everything that
           was actually X, how much I caught. <strong>F1:</strong> the balance
-          of the two &mdash; useful exactly when one alone would flatter the
-          model.</p>
+          of precision and recall, so neither one alone can make the model
+          look better than it is.</p>
         <p class="tradeoff"><strong>Here:</strong> see the classifier
           evidence table for the real numbers, synthetic vs. hand-labeled.
           <a href="index.html#work">Full table &rarr;</a></p>

@@ -56,12 +56,11 @@
       between them. I chose discipline and recorded why at each step.
     </p>
     <p>
-      A note up front, because a senior engineer will ask it anyway: at one-person
-      scale this is more rigor than the code strictly needs. That is deliberate. I
-      built it as a practice rep for the seam-level judgment that becomes essential
-      the moment the repos belong to different teams. The point was never that the
-      system is large. It is that the discipline is real and the decisions are
-      written down.
+      This is more process than a one-person project strictly needs. I know
+      &mdash; I built it that way on purpose, as practice for the seam-level
+      judgment that matters once repos belong to different teams. The system is
+      small. I held the discipline anyway, and I wrote down the reasoning for
+      every decision.
     </p>
 
     <h2>What it grew into</h2>
@@ -87,69 +86,6 @@
       </svg>
       <figcaption class="diagram-detail" id="diagram-detail" aria-live="polite" aria-atomic="true">Click a box above to see what each part does.</figcaption>
     </figure>
-
-    <h2>The problem</h2>
-    <p>
-      Once it was four repos, the easy path was to fuse them so they could call
-      each other directly. That buys convenience and pays for it with independence:
-      one release cycle, one blast radius, one thing to break. The goal was the
-      opposite, to let them act as one system while each stays deployable on its
-      own. That problem lives in the contracts between the pieces, not in the
-      pieces themselves.
-    </p>
-
-    <h2>The decisions</h2>
-
-    <div class="decision" id="decision-contracts">
-      <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
-      <h3>Decouple with contracts, not shared code</h3>
-      <p>The repos talk over frozen HTTP contracts with explicit
-        versioning rules. Both sides carry contract tests in CI.</p>
-      <p class="tradeoff"><strong>Why:</strong> decoupling without a contract is
-        just hope. A renamed field breaks the consumer silently at runtime.
-        <strong>Tradeoff:</strong> more upfront ceremony (freeze the wire shape,
-        write the tests) so that drift fails a build instead of production.</p>
-    </div>
-
-    <div class="decision" id="decision-rightsized">
-      <p class="tag">Decision &middot; SYS-005</p>
-      <h3>Make the enrichment loop async and idempotent by design</h3>
-      <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
-        calls the classifier, then writes the returned labels back as namespaced
-        tags (<code>category:</code> / <code>domain:</code>) with replace
-        semantics — notes-api owns the writeback, the classifier stays a pure
-        provider.</p>
-      <p class="tradeoff"><strong>Why:</strong> running classification in a
-        BackgroundTask keeps note creation fast and decouples it from classifier
-        latency, while replace semantics ensure reprocessing converges instead of
-        accumulating duplicate tags. <strong>Tradeoff:</strong> idempotency is real
-        design work (independent retry paths, error handling), not naive
-        fire-and-forget.</p>
-    </div>
-
-    <div class="decision" id="decision-eval">
-      <p class="tag">Decision &middot; SYS-002</p>
-      <h3>Gate model choice on evidence, not vibes</h3>
-      <p>Default to Sonnet across the system. Escalate to Opus only where an eval
-        shows the quality gain pays for itself.</p>
-      <p class="tradeoff"><strong>Why:</strong> the classifier's accuracy ceiling
-        turned out to be label ambiguity, not model horsepower, so paying roughly
-        1.7&times; for a bigger model would have bought nothing.
-        <strong>Tradeoff:</strong> you have to run the eval to justify the tier
-        instead of defaulting to the biggest model.</p>
-    </div>
-
-    <div class="decision">
-      <p class="tag">Decision &middot; SYS-001 / SYS-008</p>
-      <h3>Record decisions, then make the system legible</h3>
-      <p>Cross-repo decisions live as two-tier ADRs (repo-local choices stay local;
-        system-level ones are <code>SYS-NNN</code> in one place). A generated portal
-        aggregates every repo's docs into one browsable view that deep-links to the
-        code. Aggregate, never duplicate.</p>
-      <p class="tradeoff"><strong>Why:</strong> a system you cannot see in one place
-        is narrated, not legible, and a decision that is not written down gets
-        re-argued.</p>
-    </div>
 
     <h2>How it flows</h2>
     <ol class="flow">
@@ -250,19 +186,83 @@ PUT /notes/1/tags
       </li>
     </ol>
 
+    <h2>The problem</h2>
+    <p>
+      Once it was four repos, the easy path was to fuse them so they could call
+      each other directly. That buys convenience and pays for it with independence:
+      one release cycle, one blast radius, one thing to break. The goal was the
+      opposite, to let them act as one system while each stays deployable on its
+      own. The contracts between the pieces are where this problem actually
+      lives.
+    </p>
+
+    <h2>The decisions</h2>
+
+    <div class="decision" id="decision-contracts">
+      <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
+      <h3>Decouple with contracts, not shared code</h3>
+      <p>The repos talk over frozen HTTP contracts with explicit
+        versioning rules. Both sides carry contract tests in CI.</p>
+      <p class="tradeoff"><strong>Why:</strong> decoupling without a contract is
+        just hope. A renamed field breaks the consumer silently at runtime.
+        <strong>Tradeoff:</strong> more upfront ceremony (freeze the wire shape,
+        write the tests) so that drift fails a build instead of production.</p>
+    </div>
+
+    <div class="decision" id="decision-rightsized">
+      <p class="tag">Decision &middot; SYS-005</p>
+      <h3>Make the enrichment loop async and idempotent by design</h3>
+      <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
+        calls the classifier, then writes the returned labels back as namespaced
+        tags (<code>category:</code> / <code>domain:</code>) with replace
+        semantics — notes-api owns the writeback, the classifier stays a pure
+        provider.</p>
+      <p class="tradeoff"><strong>Why:</strong> running classification in a
+        BackgroundTask keeps note creation fast and decouples it from classifier
+        latency, while replace semantics ensure reprocessing converges instead of
+        accumulating duplicate tags. <strong>Tradeoff:</strong> making the loop
+        idempotent took real design work. Each task needs its own retry path and
+        its own error handling, so it's more than firing something off and
+        forgetting it.</p>
+    </div>
+
+    <div class="decision" id="decision-eval">
+      <p class="tag">Decision &middot; SYS-002</p>
+      <h3>Gate model choice on evidence, not vibes</h3>
+      <p>Default to Sonnet across the system. Escalate to Opus only where an eval
+        shows the quality gain pays for itself.</p>
+      <p class="tradeoff"><strong>Why:</strong> the classifier's accuracy ceiling
+        turned out to be label ambiguity, not model horsepower, so paying roughly
+        1.7&times; for a bigger model would have bought nothing.
+        <strong>Tradeoff:</strong> you have to run the eval to justify the tier
+        instead of defaulting to the biggest model.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision &middot; SYS-001 / SYS-008</p>
+      <h3>Record decisions, then make the system legible</h3>
+      <p>Cross-repo decisions live as two-tier ADRs (repo-local choices stay local;
+        system-level ones are <code>SYS-NNN</code> in one place). A generated
+        portal pulls every repo's docs into one browsable view that deep-links
+        back to the code. It links to each doc where it already lives instead of
+        copying it, so there's a single source of truth.</p>
+      <p class="tradeoff"><strong>Why:</strong> a system you cannot see in one place
+        is narrated, not legible, and a decision that is not written down gets
+        re-argued.</p>
+    </div>
+
     <h2>The outcome</h2>
     <ul>
       <li><strong>Create a note and it is automatically classified and tagged</strong>, asynchronously, with no coupling between note creation and classifier availability.</li>
       <li><strong>The four repos stay independently deployable</strong>, and cross-repo drift is caught by a red build rather than a production incident.</li>
       <li><strong>The whole system is browsable in one portal</strong>, with links straight to the real code.</li>
-      <li><strong>It is articulated, not just built:</strong> a skill map (SYS-007) names the AI-era capabilities the system exercises (evals, context engineering, agents, observability) and the honest gap, which is security on the agent's tool seam.</li>
+      <li><strong>A skill map (SYS-007) spells out what the system exercises</strong>: evals, context engineering, agents, and observability. It also names where I'm weak, which is security on the agent's tool seam.</li>
     </ul>
     <p>
-      What this shows is not that I designed a perfect system upfront. Nobody does.
-      It is that as the system grew, I reached for the seam-level discipline
-      (contracts, idempotency, recorded decisions, evidence over intuition) that
-      keeps a multi-repo system from turning into a tangle. The proof is in the
-      ADRs and the contract tests, not just in this paragraph.
+      No one designs a perfect system upfront, including me. What I did do, as it
+      grew, was keep applying the same discipline at every seam: freeze the
+      contract, make it idempotent, write down why, check the evidence instead of
+      guessing. The ADRs and contract tests back this up.
     </p>
   </main>
   <script src="../assets/theme.js"></script>
