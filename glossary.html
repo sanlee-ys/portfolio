@@ -94,9 +94,8 @@
           later.</p>
         <p class="tradeoff"><strong>Here:</strong> notes-api uses FastAPI's
           <code>BackgroundTask</code> to call the classifier and write its
-          labels back as tags. I built this loop on Kafka to retrace how a
-          real system I'd worked on used it, then right-sized it once the
-          workload didn't earn a broker.
+          labels back as tags. I first built this loop on Kafka, then
+          right-sized it once the workload didn't earn a broker.
           <a href="index.html#decision-rightsized">Full decision &rarr;</a></p>
       </div>
 
@@ -108,8 +107,8 @@
           model required.</p>
         <p class="tradeoff"><strong>Here:</strong> I tested it as a
           lightweight grounding layer for the classifier. The measured lift
-          (+1.9% category accuracy, +0.0% domain) didn't justify the added
-          complexity, so it didn't ship.
+          (+1.9% category accuracy, a net of one call in 54, and +0.0% on
+          domain) didn't justify the added complexity, so it didn't ship.
           <a href="index.html#decision-grounding">Full decision &rarr;</a></p>
       </div>
 
