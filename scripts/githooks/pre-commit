@@ -1,0 +1,7 @@
+#!/bin/sh
+# Local pre-commit guard: block a commit that would name or describe a private
+# repo on this public site (Layer C + offline Layer B). Setup + rationale live
+# in scripts/private-name-precommit.cjs. Layer A (slug allowlist) runs in CI,
+# where the network is available. Enable this hook with:
+#   git config core.hooksPath scripts/githooks
+exec node "$(git rev-parse --show-toplevel)/scripts/private-name-precommit.cjs"
