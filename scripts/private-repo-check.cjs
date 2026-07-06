@@ -16,11 +16,11 @@
  *   B. Disclosure phrases — the site must not acknowledge private repos at all
  *      ("private repo", "all my repos", ...). Enforces the CLAUDE.md
  *      "omission, not genericization" bar. These phrases are not secret.
- *   C. (planned) Hashed bare-name denylist — catches a private repo named in
- *      prose with no slug. Needs a committed file of sha256(private-name)
- *      hashes (no cleartext), provisioned like claude-ops' redline terms. The
- *      seam is marked C-HOOK in checkContent(); C is "add the file + hashing",
- *      not a rewrite.
+ *   C. Bare-name denylist — catches a private repo named in prose with no slug.
+ *      Implemented OUT of CI, in the local pre-commit guard
+ *      private-name-precommit.cjs (a machine-local, gitignored name list, never
+ *      committed) — knowing the private names in this public repo's CI would
+ *      itself disclose them.
  *
  * Fail-closed: if the public-repo list can't be fetched, the build fails rather
  * than passing blind — a gate that silently no-ops when its data source is down
@@ -89,8 +89,9 @@ function checkContent(pages, publicRepos) {
         detail: `contains a private-repo disclosure phrase: "${phrase}"`,
       });
     }
-    // C-HOOK: when a committed sha256 private-names file is present, also flag
-    // any token in `text` whose hash is in it. Purely additive — see header.
+    // Layer C (bare private names) is handled OUT of CI, in the local
+    // pre-commit guard scripts/private-name-precommit.cjs — knowing the private
+    // names can't happen in this public repo's CI without disclosing them.
   }
   return violations;
 }

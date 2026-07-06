@@ -18,8 +18,8 @@ jobs:
       - name: Check internal links
         run: node scripts/link-check.cjs
 
-      - name: Private-repo guard (adversarial suite)
-        run: node --test scripts/private-repo-check.test.cjs
+      - name: Private-repo guard (adversarial suites, A+B and C)
+        run: node --test scripts/private-repo-check.test.cjs scripts/private-name-precommit.test.cjs
 
       - name: Private-repo guard (never name/link/describe a private repo)
         run: node scripts/private-repo-check.cjs

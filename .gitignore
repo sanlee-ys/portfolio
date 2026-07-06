@@ -4,3 +4,6 @@
 node_modules/
 
 graphify-out/
+
+# Machine-local private-repo names for the Layer C pre-commit guard.
+scripts/.private-repos.local
