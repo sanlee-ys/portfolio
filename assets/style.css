@@ -446,6 +446,18 @@ body {
   text-align: center;
 }
 
+.last-updated {
+  margin: 28px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  opacity: 0.85;
+  text-align: center;
+}
+
+.footer .wrap .last-updated {
+  margin-top: 6px;
+}
+
 .footer nav {
   display: flex;
   flex-wrap: wrap;
