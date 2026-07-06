@@ -18,6 +18,16 @@ jobs:
       - name: Check internal links
         run: node scripts/link-check.cjs
 
+      - name: Private-repo guard (adversarial suite)
+        run: node --test scripts/private-repo-check.test.cjs
+
+      - name: Private-repo guard (never name/link/describe a private repo)
+        run: node scripts/private-repo-check.cjs
+        env:
+          # Authenticated read raises the API rate limit; the token can't see
+          # other repos' private visibility, and the script filters !private.
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: Install Playwright Chromium
         working-directory: scripts
         run: |
