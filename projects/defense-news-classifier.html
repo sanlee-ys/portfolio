@@ -171,6 +171,43 @@
         full loop.</p>
     </div>
 
+    <h2 id="autonomy-ladder">The ladder it&rsquo;s climbing</h2>
+    <p>
+      This classifier is also the protagonist of the portfolio&rsquo;s roadmap:
+      an autonomy ladder. Each level is the <em>same system</em> handed more
+      self-direction, not a separate demo. The axis is who drives &mdash;
+      reaching for a tool doesn&rsquo;t move you up a level; deciding for
+      yourself does.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Level</th><th>What it gains</th><th>Who drives</th><th>State</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>L1</strong> &middot; Single call</td><td>Prompt, structured output, the eval harness</td><td>A human runs each item</td><td>Shipped (v1)</td></tr>
+        <tr><td><strong>L2</strong> &middot; Augmented</td><td>BM25 retrieval grounds the label in a corpus</td><td>A human runs it; the model reaches for a tool</td><td>Shipped (v2), kept opt-in</td></tr>
+        <tr><td><strong>L3</strong> &middot; Autonomous loop</td><td>Iterates toward an explicit done-signal</td><td>The system decides when it&rsquo;s done</td><td>Spec&rsquo;d</td></tr>
+        <tr><td><strong>L4</strong> &middot; Multi-agent</td><td>Triage, classify, and a critic that can send work backward</td><td>Multiple agents coordinate</td><td>To spec</td></tr>
+      </tbody>
+    </table>
+    <p>
+      The L2 state is deliberate: the retrieval layer shipped in v2 and was
+      measured, and the measurement said the lift didn&rsquo;t pay (that&rsquo;s
+      &ldquo;the grounding that did not pay&rdquo; above), so grounding stays
+      opt-in rather than the default path. L4 has an honesty test of its own: a
+      critic that can bounce a label <em>backward</em> for reclassification,
+      not a linear pipeline with extra steps. That backward edge is where the
+      metric-gaming story will get tested.
+    </p>
+    <p>
+      The unbuilt levels are written down before they&rsquo;re built.
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/006-autonomy-ladder-portfolio-spine.md">ADR-006</a>
+      records the decision to make the ladder the spine, and the
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/docs/specs/autonomy-ladder.md">living roadmap</a>
+      holds the per-level detail &mdash; so when L3 and L4 land, what shipped
+      can be checked against what was promised.
+    </p>
+
     <h2>Stack</h2>
     <p>
       Python, the Anthropic SDK (Sonnet for classification, Opus as the v2 judge),
