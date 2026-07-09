@@ -74,7 +74,12 @@
     <p>
       This is a sample from the actual session transcripts, spanning the whole
       build. Dates and quotes are real, tightened for readability. I didn&rsquo;t
-      filter out the entries that make me look bad.
+      filter out the entries that make either of us look bad &mdash; and since
+      early July the worst of them come with public receipts: the operating
+      layer now keeps its
+      <a href="https://github.com/sanlee-ys/claude-ops">incident log in the open</a>,
+      postmortem-first. The July quotes are lifted straight from those
+      postmortems and the linked records.
     </p>
     <ol class="timeline">
       <li>
@@ -89,18 +94,8 @@
       </li>
       <li>
         <div class="tl-date">Jun 21</div>
-        <div class="tl-title">It undersold itself.</div>
-        <p class="tl-body">It told me I would hand-collect about forty articles; I asked whether it could just fetch them. It could, and auto-pulled most of the corpus. <span class="tl-quote">&ldquo;Are you not able to crawl the Internet&hellip;?&rdquo;</span></p>
-      </li>
-      <li>
-        <div class="tl-date">Jun 21</div>
         <div class="tl-title">And sometimes its case won.</div>
         <p class="tl-body">It pushed back on my docs format, Markdown over RST; I weighed the reasoning and took it. <span class="tl-quote">&ldquo;if you feel it&rsquo;s overkill, so be it.&rdquo;</span></p>
-      </li>
-      <li>
-        <div class="tl-date">Jun 22</div>
-        <div class="tl-title">It almost clobbered a parallel branch.</div>
-        <p class="tl-body">It started editing a repo where another session of mine held unmerged work; I pulled it off before it touched anything. <span class="tl-quote">&ldquo;I&rsquo;ll just have you resume once the learner session&rsquo;s done.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Jun 27</div>
@@ -111,6 +106,36 @@
         <div class="tl-date">Jun 28</div>
         <div class="tl-title">It called a broken page fine.</div>
         <p class="tl-body">It told me the site was fine on mobile; it felt cramped to me, and digging found a real gutter bug. <span class="tl-quote">&ldquo;a bit cramped as I nav through the different pages.&rdquo;</span></p>
+      </li>
+      <li>
+        <div class="tl-date">Jul 1</div>
+        <div class="tl-title">I turned it on this site.</div>
+        <p class="tl-body">An adversarial round against the site&rsquo;s own claims: the homepage and the r&eacute;sum&eacute; disagreed about the present, and a site preaching evals-as-CI had no CI. Both fixed the same day; the round is <a href="https://github.com/sanlee-ys/portfolio/blob/main/ROADMAP.md">logged in the roadmap</a>. <span class="tl-quote">&ldquo;attack the gap between claims and practice.&rdquo;</span></p>
+      </li>
+      <li>
+        <div class="tl-date">Jul 2</div>
+        <div class="tl-title">This time it really burned the tokens.</div>
+        <p class="tl-body">A scoped question set off an uncapped fan-out of thirty-plus agents on the most expensive model tier; it was measured mid-flight and killed, an entire five-hour usage window gone in forty-five minutes. The fix is a hook that mechanically blocks any uncapped run (<a href="https://github.com/sanlee-ys/claude-ops/blob/main/incidents/2026-07-02-uncapped-premium-fanout.md">postmortem</a>). <span class="tl-quote">&ldquo;spend was authorized blind, by default, with no gate.&rdquo;</span></p>
+      </li>
+      <li>
+        <div class="tl-date">Jul 2</div>
+        <div class="tl-title">It printed a live API key, and flagged itself.</div>
+        <p class="tl-body">A debug command masked one credential lookup but not its twin on the next line, so a real key hit the transcript. It called out its own mistake in the same turn; every key was rotated (<a href="https://github.com/sanlee-ys/claude-ops/blob/main/incidents/2026-07-02-plaintext-api-key-exposure.md">postmortem</a>). <span class="tl-quote">&ldquo;A rule applied inconsistently is worse than no rule.&rdquo;</span></p>
+      </li>
+      <li>
+        <div class="tl-date">Jul 3</div>
+        <div class="tl-title">Asked for holes, it found one in its own guard.</div>
+        <p class="tl-body">On an open audit request it bypassed its own credential guard &mdash; the hook built after the leaks &mdash; with an interpreter one-liner, proving the gap safely before a real leak could (<a href="https://github.com/sanlee-ys/claude-ops/blob/main/incidents/2026-07-03-credential-guard-interpreter-bypass.md">postmortem</a>). <span class="tl-quote">&ldquo;any gaps, leaks, vulnerabilities, risks &mdash; I want to know.&rdquo;</span></p>
+      </li>
+      <li>
+        <div class="tl-date">Jul 3</div>
+        <div class="tl-title">Its first fix failed its own dogfood.</div>
+        <p class="tl-body">The rewritten guard was so broad it wouldn&rsquo;t let its own commit message through for quoting the bug in prose. Caught by using the fix, not re-reading it; reverted for the narrower rule the same session. <span class="tl-quote">&ldquo;it blocked its own commit message.&rdquo;</span></p>
+      </li>
+      <li>
+        <div class="tl-date">Jul 4</div>
+        <div class="tl-title">It refused the obvious fix, correctly.</div>
+        <p class="tl-body">The one-word fix that had just worked at one call site would have silently corrupted output at the next, so it measured the difference before touching anything (<a href="https://github.com/sanlee-ys/claude-ops/blob/main/incidents/2026-07-04-graphify-console-flash-three-surfaces.md">postmortem</a>). <span class="tl-quote">&ldquo;same binary swap, opposite correctness.&rdquo;</span></p>
       </li>
     </ol>
   </main>
