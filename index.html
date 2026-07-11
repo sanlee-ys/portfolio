@@ -156,7 +156,7 @@
         <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
         <details>
           <summary>Read the numbers</summary>
-          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled. The July 2026 Sonnet 5 migration later lifted domain to 94.4% on that same set, with category unchanged. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -164,10 +164,10 @@
         <p class="kicker">BM25 rejected<span class="code-ref">EVAL &middot; BM25</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
         <p>I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
-        <p class="tradeoff"><strong>The result:</strong> +1.9% on category (a net of one call in 54) and +0.0% on domain, where it fixed as many calls as it broke. It did not earn the jump to embeddings, so it did not ship.</p>
+        <p class="tradeoff"><strong>The result:</strong> +1.9% on category (a net of one call in 54) and +0.0% on domain, where it fixed as many calls as it broke. It did not earn the jump to embeddings, so it did not ship. Re-measured after the Sonnet 5 migration, grounding actively regressed domain by 9.3 points against the stronger baseline, so the RAG path stays pinned to Sonnet 4.6 while its future is decided.</p>
         <details>
           <summary>The discipline</summary>
-          <p>My rule is to measure before spending more, and I only move up to something heavier like embeddings if the eval shows it&rsquo;s worth the cost, which here it didn&rsquo;t. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>My rule is to measure before spending more, and I only move up to something heavier like embeddings if the eval shows it&rsquo;s worth the cost, which here it didn&rsquo;t. When the baseline model got better, the same measurement showed grounding flipping from useless to harmful. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -189,7 +189,7 @@
         <p class="tradeoff"><strong>Tradeoff:</strong> you have to run the eval to justify the tier instead of reaching for the biggest model.</p>
         <details>
           <summary>What the eval showed</summary>
-          <p>The classifier's ceiling was label ambiguity, not model horsepower, so paying roughly 1.7&times; for a larger model would have bought nothing. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
+          <p>The classifier's ceiling was label ambiguity, not model horsepower, so paying roughly 1.7&times; for a larger model would have bought nothing. The same gate ran the July 2026 Sonnet 5 migration: eval before and after, and the one path that got worse stayed pinned instead of being dragged along. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
         </details>
       </div>
 
@@ -218,20 +218,20 @@
 
     <section class="measure">
       <h2 class="section-title reveal">Classifier evidence</h2>
-      <p class="reveal">The classifier's numbers, with the honest part kept in. Two versions: synthetic self-graded, then real hand-labeled.</p>
+      <p class="reveal">The classifier's numbers, with the honest part kept in. Two versions of the eval &mdash; synthetic self-graded, then real hand-labeled &mdash; and then a model migration measured on the same gold set.</p>
       <table class="metrics">
         <thead>
-          <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real</th><th>v2 grounded (not shipped)</th></tr>
+          <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 grounded (not shipped)</th><th>v2 real (Sonnet 5, current)</th></tr>
         </thead>
         <tbody>
-          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td></tr>
-          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td></tr>
-          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td></tr>
-          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td></tr>
+          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td><td>88.9%</td></tr>
+          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td><td>0.888</td></tr>
+          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td></tr>
+          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td><td>0.947</td></tr>
         </tbody>
       </table>
-      <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. The v2 gold set is 54 snippets, hand-labeled.</p>
-      <p class="reveal">Grounded version scored higher but added retrieval complexity for a marginal gain &mdash; <a href="projects/defense-news-classifier.html#decision-grounding">see Classifier page</a>.</p>
+      <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. The v2 gold set is 54 snippets, hand-labeled. The July 2026 move to Sonnet 5 was eval-gated on that same set: domain rose to 94.4%, category held at 88.9%.</p>
+      <p class="reveal">The grounded version scored marginally higher on Sonnet 4.6 but regressed domain by 9.3 points against the stronger Sonnet 5 baseline, so it stays opt-in and pinned to the older model &mdash; <a href="projects/defense-news-classifier.html#decision-grounding">see Classifier page</a>.</p>
     </section>
 
     <section class="measure">
