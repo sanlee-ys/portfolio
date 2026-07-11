@@ -913,6 +913,51 @@ body {
 .glossary-filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .glossary-list .decision[hidden] { display: none; }
 
+/* Orientation block: the skimmer's read at the top of the record. Quiet on
+   purpose (same border-left-accent family as the decision cards), so it orients
+   without reading as a marketing banner. */
+.orientation {
+  max-width: 720px;
+  margin: 56px 0 8px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.orientation .kicker { margin: 0 0 10px; }
+.orientation-lede { color: var(--text); font-size: 1.05rem; margin: 0 0 14px; }
+.orientation-points { list-style: none; margin: 0 0 14px; padding: 0; }
+.orientation-points li {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 8px;
+  padding-left: 20px;
+  position: relative;
+}
+.orientation-points li:last-child { margin-bottom: 0; }
+.orientation-points li::before {
+  content: "\2192";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+.orientation-routes { margin: 0; font-size: 0.95rem; color: var(--muted); }
+
+/* Decision log: flip the hierarchy so the human kicker leads and the ledger
+   ID (SYS-004, ADR-002, EVAL...) rides behind it as quiet metadata. */
+.measure .decision .kicker { margin: 0 0 6px; }
+.measure .decision .kicker .code-ref {
+  margin-left: 8px;
+  font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  font-size: 0.82em;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0.85;
+}
+
 /* Sango: one small frame, not a gallery. */
 .sango { margin: 24px 0 0; max-width: 320px; }
 .sango img {

@@ -83,6 +83,7 @@
       <a href="projects/product-and-program.html">Product &amp; Program</a>
       <a href="lab/index.html">Lab</a>
       <a href="glossary.html">Glossary</a>
+      <a href="resume.html">R&eacute;sum&eacute;</a>
     </div>
   </nav>
 
@@ -97,6 +98,17 @@
   </div>
 
   <main class="wrap" id="work">
+    <section class="orientation reveal" aria-label="What this record demonstrates">
+      <p class="kicker">Start here</p>
+      <p class="orientation-lede">A working record of how I build and run a small AI system, framed for whoever is reading: what it does for its user, and why every change had to earn its place on evidence.</p>
+      <ul class="orientation-points">
+        <li>The user is a defense-news analyst; the job is to triage a firehose so the day starts from a sorted knowledge base, not a raw feed.</li>
+        <li>Every change is gated on an eval. Two that read better but measured worse, a cleaner prompt and a retrieval add, were reverted and rejected.</li>
+        <li>Model choice is gated the same way: staying on the cheaper model avoided paying about 1.7&times; for accuracy the task could not use.</li>
+      </ul>
+      <p class="orientation-routes">Read it as <a href="projects/product-and-program.html">Product &amp; Program</a>, or go straight to the <a href="projects/defense-news-classifier.html">Classifier</a>.</p>
+    </section>
+
     <h2 class="section-title reveal">The system</h2>
     <p class="section-sub reveal">Three services wired into one loop: an API, an LLM classifier, and a RAG agent. Click a component to jump to the decision behind it.</p>
     <figure class="diagram-wrap reveal">
@@ -127,7 +139,7 @@
       <p class="log-intro reveal">The real calls behind the system. The ones that went the wrong way are here too, set with the same care as the wins, because that is the part worth reading.</p>
 
       <div class="decision" id="decision-contracts">
-        <p class="tag">SYS-004 &middot; SYS-006</p>
+        <p class="kicker">Decoupled by contract<span class="code-ref">SYS-004 &middot; SYS-006</span></p>
         <h3>Decouple with contracts, not shared code</h3>
         <p>The repos talk over frozen HTTP contracts with explicit versioning, and both sides carry contract tests in CI. The system behaves as one thing while each piece stays independently deployable.</p>
         <p class="tradeoff"><strong>Tradeoff:</strong> more upfront ceremony, so a renamed field fails a build instead of breaking production in silence.</p>
@@ -138,7 +150,7 @@
       </div>
 
       <div class="decision" id="decision-eval">
-        <p class="tag">EVAL &middot; v1 &rarr; v2</p>
+        <p class="kicker">Eval rebuilt<span class="code-ref">EVAL &middot; v1 &rarr; v2</span></p>
         <h3>I rebuilt the eval until it could tell me I was wrong</h3>
         <p>v1 graded the model on 300 snippets it generated itself, which measures consistency, not correctness. v2 replaced that with 54 hand-labeled real snippets, cross-checked by an Opus judge.</p>
         <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
@@ -149,7 +161,7 @@
       </div>
 
       <div class="decision" id="decision-grounding">
-        <p class="tag">EVAL &middot; BM25 <span class="pill">rejected</span></p>
+        <p class="kicker">BM25 rejected<span class="code-ref">EVAL &middot; BM25</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
         <p>I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
         <p class="tradeoff"><strong>The result:</strong> +1.9% on category (a net of one call in 54) and +0.0% on domain, where it fixed as many calls as it broke. It did not earn the jump to embeddings, so it did not ship.</p>
@@ -160,7 +172,7 @@
       </div>
 
       <div class="decision" id="decision-prompt">
-        <p class="tag">EVAL &middot; PROMPT <span class="pill">reverted</span></p>
+        <p class="kicker">Prompt reverted<span class="code-ref">EVAL &middot; PROMPT</span></p>
         <h3>A prompt that read better and measured worse, reverted</h3>
         <p>A change that sounds right can move the decision boundary the wrong way, and intuition cannot see that. I sharpened the procurement-versus-industry rule so it read cleaner to a human.</p>
         <p class="tradeoff"><strong>The result:</strong> category accuracy dropped from 79.0% to 76.7% and industry recall from 0.217 to 0.100. I reverted it.</p>
@@ -171,9 +183,9 @@
       </div>
 
       <div class="decision" id="decision-model">
-        <p class="tag">SYS-002</p>
+        <p class="kicker">Model gated on evidence<span class="code-ref">SYS-002</span></p>
         <h3>Gate model choice on evidence, not vibes</h3>
-        <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself.</p>
+        <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself. Here it did not, so staying on Sonnet avoided paying about 1.7&times; for accuracy the task could not use.</p>
         <p class="tradeoff"><strong>Tradeoff:</strong> you have to run the eval to justify the tier instead of reaching for the biggest model.</p>
         <details>
           <summary>What the eval showed</summary>
@@ -182,7 +194,7 @@
       </div>
 
       <div class="decision" id="decision-tooluse">
-        <p class="tag">ADR-002</p>
+        <p class="kicker">Output forced to schema<span class="code-ref">ADR-002</span></p>
         <h3>Force structured output with tool-use, not prompt parsing</h3>
         <p>The model is called with a forced tool schema (both fields required, strict enums), so an invalid label is rejected at the API layer before it reaches application code.</p>
         <p class="tradeoff"><strong>Tradeoff:</strong> a few extra tokens and a more verbose call, in exchange for app code with no defensive parsing.</p>
@@ -193,7 +205,7 @@
       </div>
 
       <div class="decision" id="decision-rightsized">
-        <p class="tag">ARCH <span class="pill">right-sized</span></p>
+        <p class="kicker">Right-sized off Kafka<span class="code-ref">ARCH</span></p>
         <h3>I built the loop on Kafka, then cut it</h3>
         <p>I built the enrichment loop on Kafka to learn event-driven architecture properly: an idempotent consumer, at-least-once delivery, offset management.</p>
         <p class="tradeoff"><strong>Then I cut it.</strong> A single-user workload with derived, idempotent tags never needed a distributed log, so it is now an in-process FastAPI BackgroundTask.</p>
