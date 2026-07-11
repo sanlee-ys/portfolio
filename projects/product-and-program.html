@@ -96,7 +96,7 @@
 
     <h3>AI-quality metrics (can it be measured, not just demoed?)</h3>
     <ul>
-      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On v2 real, human-labeled text, category is 88.9% (macro-F1 0.906) and operational domain 88.9% (macro-F1 0.894). The ceiling is label ambiguity, not model horsepower.</li>
+      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On v2 real, human-labeled text, category is 88.9% (macro-F1 0.888) and operational domain 94.4% (macro-F1 0.947) after the July 2026 Sonnet 5 migration. The category ceiling is label ambiguity, not model horsepower &mdash; it held at 88.9% across the model swap.</li>
       <li><strong>Retrieval quality (RAG):</strong> recall@k, answer groundedness, citation correctness.</li>
       <li><strong>Regression gate:</strong> an eval pass-rate threshold wired into CI, so a change that drops below it does not merge.</li>
     </ul>

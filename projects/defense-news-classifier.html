@@ -83,9 +83,19 @@
         (a net of one correct call in 54) and +0.0% on domain, where grounding
         fixed three calls and broke three. Lexical retrieval doesn&rsquo;t earn
         the cost of moving to embeddings here.</p>
+      <p>The Sonnet 5 migration made the verdict sharper. Against the new,
+        stronger 94.4% ungrounded domain baseline, the same grounding
+        <em>regressed</em> domain accuracy by 9.3 points (reproduced three
+        times): the retrieved neighbors now pull a confident, correct call
+        sideways more often than they help. So the RAG path stays pinned to
+        Sonnet 4.6 while its future is decided, a deliberate transitional split
+        recorded in
+        <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/010-rag-path-model-pin.md">ADR-010</a>
+        rather than dragged along or hidden behind a loosened gate.</p>
       <p class="tradeoff"><strong>The lesson:</strong> measuring first and
         escalating only when the eval says it pays is the discipline, and here
-        it said do not bother.</p>
+        it said do not bother &mdash; then, against a better baseline, it said
+        grounding actively hurts.</p>
     </div>
 
     <h2>Why the numbers can be trusted</h2>
@@ -104,19 +114,27 @@
 
     <table class="metrics">
       <thead>
-        <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real</th><th>v2 grounded (not shipped)</th></tr>
+        <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 grounded (not shipped)</th><th>v2 real (Sonnet 5, current)</th></tr>
       </thead>
       <tbody>
-        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td></tr>
-        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td></tr>
-        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td></tr>
-        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td></tr>
+        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td><td>88.9%</td></tr>
+        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td><td>0.888</td></tr>
+        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td></tr>
+        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td><td>0.947</td></tr>
       </tbody>
     </table>
     <p>
       The domain numbers <em>drop</em> from v1 to v2, which is the expected
       result once the test got harder. Synthetic text the model wrote was easy
       to grade. Real text is harder and the lower number is the trustworthy one.
+    </p>
+    <p>
+      The last column is the migration chapter. In July 2026 the workhorse moved
+      from Sonnet 4.6 to Sonnet 5, and the swap went through the same gate as
+      every other change here: run the eval before and after, on the same 54
+      hand-labeled snippets. Domain accuracy rose to 94.4% and category held at
+      88.9% &mdash; consistent with the ceiling being label ambiguity, which a
+      stronger model can&rsquo;t un-blur.
     </p>
 
     <h2>The decisions</h2>
@@ -210,7 +228,7 @@
 
     <h2>Stack</h2>
     <p>
-      Python, the Anthropic SDK (Sonnet for classification, Opus as the v2 judge),
+      Python, the Anthropic SDK (Sonnet 5 for classification, Opus as the v2 judge),
       pandas for the eval tables, FastAPI for the HTTP endpoint, and rank-bm25 for
       the grounding experiment. Tested with pytest on mocked calls. The repo is
       public: <a href="https://github.com/sanlee-ys/defense-news-classifier">github.com/sanlee-ys/defense-news-classifier</a>
