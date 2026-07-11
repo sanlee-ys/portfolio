@@ -51,10 +51,10 @@
     <p class="lead">
       The other two writeups are about building the system. This one is about
       framing and running it: who it is for, how success is measured, how the work
-      is sequenced, and what could go wrong. This is a solo build, so there&rsquo;s
-      no actual team to coordinate &mdash; the program layer here is simulated.
-      What&rsquo;s underneath it (the workstreams, the dependency map, the risk
-      register) is real work, done as if a team existed.
+      is sequenced, and what could go wrong. This is a solo build, so there is no
+      team to coordinate, and the program layer here is simulated. What sits
+      underneath it (the workstreams, the dependency map, the risk register) is
+      real work, done as if a team existed.
     </p>
 
     <h2>The problem (product framing)</h2>
@@ -71,9 +71,9 @@
     <p>
       <strong>Primary user:</strong> a defense-news analyst who must stay current
       across programs, contracts, geopolitics, and technology, and brief others on
-      what matters. This is a notional persona, and defense is a deliberately chosen
-      vertical, not a claim of domain expertise. <strong>Design partner:</strong> me,
-      dogfooding, as the first user and the early validation loop.
+      what matters. Defense is a deliberately chosen vertical, not a claim of domain
+      expertise. <strong>Design partner:</strong> me, dogfooding, as the first user
+      and the early validation loop.
     </p>
 
     <div class="decision">
@@ -92,6 +92,7 @@
       <li><strong>Coverage (recall):</strong> share of genuinely relevant developments surfaced rather than missed.</li>
       <li><strong>Answer usefulness:</strong> for a query, the agent returns a correct, cited answer, fast.</li>
     </ul>
+    <p class="ex-caption">These outcome metrics are defined, not yet measured. Measuring them honestly needs the analyst in the loop over real use, and this is a solo build. What is measured today is classification quality, below.</p>
 
     <h3>AI-quality metrics (can it be measured, not just demoed?)</h3>
     <ul>
@@ -149,8 +150,8 @@
       The ability to put the product and program hats on over real engineering work:
       to name the user and the job, to measure outcomes in two registers, to sequence
       dependent workstreams, and to track risk honestly, including the risk of the
-      exercise itself. The scale is personal and the program is simulated, and both
-      are named on purpose. The source documents live in the architecture repo:
+      exercise itself. The scale is personal by design, and named as such rather than
+      dressed up. The source documents live in the architecture repo:
       <a href="https://github.com/sanlee-ys/architecture/blob/main/product/one-pager.md">the product one-pager</a>
       and <a href="https://github.com/sanlee-ys/architecture/blob/main/program/README.md">the program view</a>.
     </p>

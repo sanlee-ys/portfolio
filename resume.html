@@ -147,13 +147,13 @@
       <h2 class="sec">Summary</h2>
       <p class="summary">
         Product professional at JPMorganChase, currently owning enterprise
-        collaboration products (SharePoint Online and OneDrive) &mdash; after
-        seven years in infrastructure and platform engineering at the same firm,
-        an MBA, and service as a U.S. Army veteran. I work across the
-        technical/product seam: turning stakeholder needs into sequenced,
-        testable delivery, and trusting evidence over intuition when the two
-        disagree. Increasingly focused on AI systems &mdash; I build and
-        document LLM applications (evals, RAG, agentic tool-use) in the open.
+        collaboration products (SharePoint Online and OneDrive). Behind that seat
+        are seven years in infrastructure and platform engineering at the same
+        firm, an MBA, and service as a U.S. Army veteran. I work across the
+        technical and product seam, turning stakeholder needs into sequenced,
+        testable delivery and trusting evidence over intuition when the two
+        disagree. My focus is increasingly on AI systems: I build and document
+        LLM applications (evals, RAG, agentic tool-use) in the open.
       </p>
     </section>
 
@@ -227,7 +227,7 @@
         <ul>
           <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; built the eval before trusting the model: an LLM-as-judge scored against a hand-labeled gold set caught two changes I'd have shipped on instinct (a &ldquo;cleaner&rdquo; prompt, an unproven retrieval add) that actually regressed accuracy. The product call: gate every change on evidence, not on how confident it feels. <span class="proof">&rarr; <a href="https://sanlee.me/projects/defense-news-classifier.html">sanlee.me/projects/defense-news-classifier</a></span></li>
           <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned contracts instead of a static index, so answers can't silently drift out of sync with the source of truth. <span class="proof">&rarr; <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a></span></li>
-          <li><strong>Cross-repo LLM system</strong> &mdash; evidence-gated model routing (cheaper model by default, escalate only where an eval proved the lift) cut model cost ~1.7&times; with no quality loss, wired across four services with contract tests and an idempotent async pipeline. <span class="proof">&rarr; <a href="https://sanlee.me/projects/the-system.html">sanlee.me/projects/the-system</a></span></li>
+          <li><strong>Cross-repo LLM system</strong> &mdash; evidence-gated model routing (cheaper model by default, escalate only where an eval proves the lift), wired across four services with contract tests and an idempotent async pipeline. The eval showed a bigger model would not clear the label-ambiguity ceiling, so staying on the default avoided paying ~1.7&times; for no quality gain. <span class="proof">&rarr; <a href="https://sanlee.me/projects/the-system.html">sanlee.me/projects/the-system</a></span></li>
         </ul>
       </div>
     </section>
