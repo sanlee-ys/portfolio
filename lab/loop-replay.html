@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loop replay &middot; Lab &middot; San Lee</title>
+  <link rel="canonical" href="https://sanlee.me/lab/loop-replay.html" />
+  <meta property="og:site_name" content="San Lee" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sanlee.me/lab/loop-replay.html" />
+  <meta property="og:title" content="Loop replay &middot; Lab &middot; San Lee" />
+  <meta property="og:description" content="A recorded-replay viewer for a prompt-optimization run log: the A/B/C score progression, the prompt diff each iteration, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
+  <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Loop replay &middot; Lab &middot; San Lee" />
+  <meta name="twitter:description" content="A recorded-replay viewer for a prompt-optimization run log: the A/B/C score progression, the prompt diff each iteration, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
+  <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <meta name="description" content="A recorded-replay viewer for a prompt-optimization run log: the A/B/C score progression, the prompt diff each iteration, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+  <style>
+    /* ----- Page-specific styles only ----- */
+    /* Everything reusable (badge, .decision, .article-body table.metrics, the
+       .diagram frame) already lives in assets/style.css and is reused as-is
+       below. What's here is unique to this viewer: the demo-data banner, the
+       stat tiles, the chart's series colors, and the iteration nav. */
+
+    /* Demo-data banner. Deliberately loud (amber, not the site's blue accent)
+       so it reads as a warning label, not a stylistic choice -- the whole
+       point is that this is not a measured result. */
+    .demo-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--warn);
+      background: var(--warn-soft);
+      color: var(--warn);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin: 0 0 28px;
+    }
+    .demo-badge .dot {
+      flex: 0 0 auto;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--warn);
+    }
+
+    /* Run-summary stat tiles: same card language as the site's .repo-grid,
+       new class because the content (label + big number) is different. */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+    .stat-grid > div {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--panel);
+    }
+    .stat-grid .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .stat-grid .stat-value {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-grid .stat-sub { color: var(--muted); font-size: 0.8rem; }
+    .stat-grid .stat-a .stat-value { color: var(--series-a); }
+    .stat-grid .stat-b .stat-value { color: var(--series-b); }
+    .stat-grid .stat-c .stat-value { color: var(--series-c); }
+
+    /* Chart series colors. Kept separate from --accent since three series
+       need to stay distinguishable at once; tuned per theme for contrast. */
+    :root, html[data-theme="dark"] {
+      --series-a: #6ea8fe; /* A: training split -- what the loop optimizes on */
+      --series-b: #f2b84b; /* B: held-back split -- what drives the stop signal */
+      --series-c: #4ac48a; /* C: gold held-out -- the honest number */
+      --warn: #f2b84b;
+      --warn-soft: rgba(242, 184, 75, 0.12);
+    }
+    html[data-theme="light"] {
+      --series-a: #2563eb;
+      --series-b: #b9790a;
+      --series-c: #16875a;
+      --warn: #b9790a;
+      --warn-soft: rgba(185, 121, 10, 0.10);
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin: 4px 0 14px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .chart-legend .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .chart-legend .swatch.a { background: var(--series-a); }
+    .chart-legend .swatch.b { background: var(--series-b); }
+    .chart-legend .swatch.c { background: var(--series-c); }
+
+    #score-chart .gap-fill { fill: var(--series-c); opacity: 0.08; }
+    #score-chart .series-line { fill: none; stroke-width: 2.5; }
+    #score-chart .series-a { stroke: var(--series-a); }
+    #score-chart .series-b { stroke: var(--series-b); }
+    #score-chart .series-c { stroke: var(--series-c); }
+    #score-chart .series-dot { cursor: pointer; }
+    #score-chart .series-dot.a { fill: var(--series-a); }
+    #score-chart .series-dot.b { fill: var(--series-b); }
+    #score-chart .series-dot.c { fill: var(--series-c); }
+    #score-chart .gridline { stroke: var(--border); stroke-width: 1; }
+    #score-chart .axis-label { fill: var(--muted); font-size: 10px; }
+    #score-chart .cursor-line { stroke: var(--text); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.5; }
+    #score-chart .hit-col { fill: transparent; cursor: pointer; }
+    #score-chart .hit-col:hover { fill: var(--accent-soft); }
+
+    /* Iteration nav: prev/next either side of a centered slider + label,
+       same 44px tap-target rule as the rest of the site. */
+    .iter-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0 6px;
+    }
+    .iter-nav button {
+      flex: 0 0 auto;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+    .iter-nav button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .iter-nav button:disabled { opacity: 0.35; cursor: default; }
+    /* min-width: 0 overrides the flex-item default of min-width: auto, which
+       otherwise refuses to shrink a <input type="range"> below its intrinsic
+       content size -- the thing that was pushing this row past 320px. */
+    .iter-nav input[type="range"] { flex: 1 1 auto; min-width: 0; accent-color: var(--accent); }
+    .iter-nav .iter-label {
+      flex: 0 0 auto;
+      min-width: 92px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .iter-detail h3 { margin: 22px 0 8px; font-size: 1rem; }
+    .iter-baseline-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      border-left: 3px solid var(--border);
+      padding: 6px 12px;
+      margin: 8px 0;
+    }
+
+    /* Diff view: reuse the site's monospace <pre> styling, add per-line color
+       so +/- reads like a diff instead of plain text. */
+    #iter-diff .diff-add { color: var(--series-c); }
+    #iter-diff .diff-del { color: #e5657a; }
+    #iter-diff .diff-hunk { color: var(--muted); }
+    #iter-diff .diff-meta { color: var(--muted); font-weight: 600; }
+
+    .honest-callout {
+      border-left: 3px solid var(--series-c);
+      background: var(--accent-soft);
+      border-radius: 0 10px 10px 0;
+      padding: 12px 16px;
+      margin: 18px 0;
+    }
+    .honest-callout strong { color: var(--series-c); }
+  </style>
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+
+  <main class="wrap article-body">
+    <a class="back" href="index.html">&larr; Back to the lab</a>
+    <h1>Loop replay <span class="badge">Tier 3</span></h1>
+    <p class="subtitle">
+      A recorded-replay viewer for the prompt-optimization loop&rsquo;s run
+      log &mdash; the <a href="../projects/defense-news-classifier.html#autonomy-ladder">L3 step</a>
+      of the classifier&rsquo;s autonomy ladder.
+    </p>
+
+    <p class="lead">
+      The loop reads set <strong>A</strong> (training) after each iteration,
+      proposes a prompt edit, and re-scores. It stops on set <strong>B</strong>
+      (held back from that feedback loop, so it can act as an honest early-stop
+      signal). It never reads set <strong>C</strong> (real gold text) until the
+      run is over &mdash; C is reported, not optimized against. That separation
+      is the whole point: this page replays a run so the gap between
+      &ldquo;improved on A&rdquo; and &ldquo;improved on C&rdquo; is something
+      you can see, not just read as a footnote.
+    </p>
+
+    <div class="demo-badge" id="demo-badge">
+      <span class="dot"></span>
+      <span id="demo-badge-text">Demo data (dry run) &mdash; a deterministic offline backend, zero API calls. Proves the replay mechanics, not a classifier result. See <code>evals/optimize/README.md</code> in the classifier repo.</span>
+    </div>
+
+    <h2>Run summary</h2>
+    <div class="stat-grid" id="summary-stats">
+      <!-- filled by JS -->
+    </div>
+    <div class="honest-callout" id="honest-callout">
+      <!-- filled by JS -->
+    </div>
+
+    <h2>Score progression</h2>
+    <p>
+      Category macro-F1 per split, per iteration. The shaded band is the gap
+      between A and C &mdash; the wider it opens, the more the prompt improved
+      on the set it was tuned against without improving on real gold text.
+    </p>
+    <div class="chart-legend">
+      <span><i class="swatch a"></i>A &middot; training (optimized on)</span>
+      <span><i class="swatch b"></i>B &middot; held-back (stops the loop)</span>
+      <span><i class="swatch c"></i>C &middot; gold held-out (the honest number)</span>
+    </div>
+    <svg id="score-chart" class="diagram" viewBox="0 0 640 280" role="img" aria-label="Line chart of category macro-F1 for splits A, B, and C across iterations"></svg>
+
+    <h2>Iteration replay</h2>
+    <div class="iter-nav">
+      <button id="iter-prev" type="button" aria-label="Previous iteration">&lsaquo;</button>
+      <input type="range" id="iter-slider" min="0" max="0" value="0" step="1" aria-label="Iteration" />
+      <button id="iter-next" type="button" aria-label="Next iteration">&rsaquo;</button>
+      <span class="iter-label" id="iter-label">Iteration 0 / 0</span>
+    </div>
+
+    <div class="iter-detail">
+      <div class="stat-grid" id="iter-stats"><!-- filled by JS --></div>
+
+      <div id="iter-baseline" class="iter-baseline-note" hidden>
+        Iteration 0 is the baseline &mdash; scored before any edit, so there is
+        no diff, rationale, or edit summary yet.
+      </div>
+
+      <div id="iter-edit-block">
+        <h3>Agent rationale</h3>
+        <p id="iter-rationale"></p>
+
+        <h3>Edit summary</h3>
+        <p id="iter-summary"></p>
+
+        <h3>Prompt diff</h3>
+        <pre id="iter-diff"></pre>
+      </div>
+
+      <p class="ex-note" id="iter-meta"></p>
+    </div>
+
+    <h2>The decisions</h2>
+
+    <div class="decision">
+      <p class="tag">Decision</p>
+      <h3>Replay iteration-by-iteration, not just a summary chart</h3>
+      <p>A single before/after number can hide exactly the thing that matters
+        here: <em>when</em> A and C diverge, and what the prompt edit was that
+        caused it. So this page steps through every iteration&rsquo;s scores,
+        diff, and rationale, with the chart and the detail panel moving
+        together.</p>
+      <p class="tradeoff"><strong>Why:</strong> the loop spec&rsquo;s honesty
+        claim is about a trajectory, not an endpoint &mdash; a viewer that only
+        shows the final delta can&rsquo;t show a run that overfit early and
+        recovered, or one that looked fine on B right up until C caught it.
+        <strong>Tradeoff:</strong> more UI than a static chart would need; kept
+        to plain HTML/CSS/JS (no chart library) to match the rest of the
+        site&rsquo;s stack.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Decision</p>
+      <h3>Ship with dry-run mock data, labeled as such</h3>
+      <p>The prompt-optimization loop itself is spec&rsquo;d and implemented in
+        the classifier repo, but a real run costs real tokens and is San&rsquo;s
+        to run. The mock run log (<code>--dry-run</code>, a deterministic
+        offline backend, every rationale field prefixed <code>[dry-run]</code>)
+        gives this viewer a real JSONL artifact to build and test against
+        without waiting on that run or faking numbers.</p>
+      <p class="tradeoff"><strong>Why:</strong> the viewer is the deliverable
+        here, not a claimed result &mdash; and a viewer that only works once
+        real data exists can&rsquo;t be built or reviewed today.
+        <strong>Tradeoff:</strong> every number on this page right now is
+        synthetic. The banner above says so, and the data source is a single
+        swappable file (see below) so a real run drops in without touching this
+        page&rsquo;s code.</p>
+    </div>
+
+    <h2>How this reads a run log</h2>
+    <p>
+      The run log is <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/optimize/README.md">append-only
+      JSONL</a>: a <code>run_metadata</code> line, one <code>iteration</code>
+      line per step, and a trailing <code>run_summary</code>. This page ships
+      the sample log as a plain JS string
+      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/lab/data/loop-replay-dryrun.js"><code>lab/data/loop-replay-dryrun.js</code></a>)
+      rather than fetching a <code>.jsonl</code> file, so it renders the same
+      way whether it&rsquo;s opened straight from disk or served from GitHub
+      Pages &mdash; a <code>fetch()</code> of a local file hits browser CORS
+      restrictions that a plain <code>&lt;script src&gt;</code> doesn&rsquo;t.
+      Swapping in San&rsquo;s real <code>run_&lt;UTC-timestamp&gt;.jsonl</code>
+      is: drop the new file in <code>lab/data/</code>, paste its raw text into
+      that same template literal, point the <code>&lt;script src&gt;</code> in
+      this page at it, and flip one flag (<code>IS_DRY_RUN = false</code>) to
+      swap the demo banner for a real-run label. No other code changes.
+    </p>
+
+    <h2>Stack</h2>
+    <p>
+      Vanilla HTML/CSS/JS, matching the rest of this site &mdash; no chart
+      library, no build step. The chart is a hand-built SVG (same
+      <code>createElementNS</code> pattern as the <a href="../projects/the-system.html">system
+      diagram</a>), and the run log is parsed as plain JSONL with
+      <code>JSON.parse</code> per line.
+    </p>
+  </main>
+
+  <script src="data/loop-replay-dryrun.js"></script>
+  <script src="../assets/theme.js"></script>
+  <script src="../assets/last-updated.js"></script>
+  <script src="loop-replay.js"></script>
+</body>
+</html>
