@@ -226,7 +226,7 @@
         <p class="role" style="margin-top:0">Built and documented in the open &mdash; every claim below links to its writeup and the public code behind it. <a href="https://sanlee.me">sanlee.me</a></p>
         <ul>
           <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; built the eval before trusting the model: an LLM-as-judge scored against a hand-labeled gold set caught two changes I'd have shipped on instinct (a &ldquo;cleaner&rdquo; prompt, an unproven retrieval add) that actually regressed accuracy. The product call: gate every change on evidence, not on how confident it feels. <span class="proof">&rarr; <a href="https://sanlee.me/projects/defense-news-classifier.html">sanlee.me/projects/defense-news-classifier</a></span></li>
-          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned contracts instead of a static index, so answers can't silently drift out of sync with the source of truth. <span class="proof">&rarr; <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a></span></li>
+          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned contracts instead of a static index, so answers can't silently drift out of sync with the source of truth; also ships as an MCP server any MCP host can mount. <span class="proof">&rarr; <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a></span></li>
           <li><strong>Cross-repo LLM system</strong> &mdash; evidence-gated model routing (cheaper model by default, escalate only where an eval proves the lift), wired across four services with contract tests and an idempotent async pipeline. The eval showed a bigger model would not clear the label-ambiguity ceiling, so staying on the default avoided paying ~1.7&times; for no quality gain. <span class="proof">&rarr; <a href="https://sanlee.me/projects/the-system.html">sanlee.me/projects/the-system</a></span></li>
         </ul>
       </div>
@@ -258,9 +258,9 @@
 
     <section class="skills">
       <h2 class="sec">Skills &amp; Certifications</h2>
-      <p><span class="k">AI / LLM:</span> LLM application development &mdash; structured output &amp; tool-use, RAG, agentic tool-use, eval-driven development, LLM-as-judge, model routing; Anthropic Claude API; Claude Code (agentic coding); Microsoft Copilot; prompt engineering</p>
+      <p><span class="k">AI / LLM:</span> LLM application development &mdash; structured output &amp; tool-use, RAG, agentic tool-use, MCP servers, eval-driven development, LLM-as-judge, model routing; Anthropic Claude API; Claude Code (agentic coding); Microsoft Copilot; prompt engineering</p>
       <p><span class="k">Product &amp; Program:</span> cross-functional program management, roadmap planning, stakeholder communication, dependency &amp; incident management, tradeoff evaluation, compliance &amp; audit readiness</p>
-      <p><span class="k">Technical:</span> Python, Java, SQL, AWS, Kubernetes, Docker, Kafka, network device provisioning, Jenkins, CI/CD, OpenTelemetry &nbsp;&middot;&nbsp; <span class="k">Tools:</span> Jira, Jira Align, Confluence</p>
+      <p><span class="k">Technical:</span> Python (FastAPI), Java, SQL, AWS, Kubernetes, Docker, Kafka, network device provisioning, Jenkins, GitHub Actions, CI/CD, OpenTelemetry &nbsp;&middot;&nbsp; <span class="k">Tools:</span> Jira, Jira Align, Confluence</p>
       <p><span class="k">Certifications:</span> AWS Cloud Practitioner (2023) &nbsp;&middot;&nbsp; <span class="k">Languages:</span> Native English, Intermediate Korean</p>
     </section>
 
