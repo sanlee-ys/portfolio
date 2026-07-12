@@ -39,6 +39,23 @@ Before committing any layout / style / markup change:
 which drops the effective width to ~375px or less. Test **down to 320px**, not
 just 430 — a layout that only works at 430 will still clip for a real user.
 
+## AI-use posture: method, not confession (voice rule)
+
+Decided 2026-07-11. Copy that references the AI assist states it as directed
+work, in the colophon's framing (which is canonical): **San sets the
+direction, the contracts, and the bar; Claude does most of the typing; the
+evals and postmortems are the proof.** Two failure modes to avoid:
+
+- **Apologetic** ("full disclosure", "disclaimer", "I have to admit") — the
+  assist is a competency being demonstrated, not a caveat to preempt.
+- **Label-y** ("agentic orchestration" or similar as a self-description) —
+  describe the practice; the skeptical-senior-engineer reader credits
+  artifacts, not vocabulary.
+
+Honesty is unchanged by this rule: Claude is named plainly on every surface
+that makes a "who built this" claim. Surfaces aligned 2026-07-11: GitHub
+bio, profile README intro, this colophon (already canonical).
+
 ## Private repos: never mention, never link
 
 This site is public and indexed. **Never name, link to, or describe the
