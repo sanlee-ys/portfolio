@@ -80,6 +80,7 @@
     <div class="wrap">
       <a href="projects/the-system.html">The System</a>
       <a href="projects/defense-news-classifier.html">Classifier</a>
+      <a href="projects/faithfulness-judge.html">Judge</a>
       <a href="projects/product-and-program.html">Product &amp; Program</a>
       <a href="lab/index.html">Lab</a>
       <a href="glossary.html">Glossary</a>
@@ -106,7 +107,7 @@
         <li>Every change is gated on an eval. Three that read better but measured worse, a cleaner prompt, a retrieval add, and a routing upgrade, were reverted, retired, and declined.</li>
         <li>Model choice is gated the same way: escalating to the premium model was measured at about 1.97&times; the cost for zero rows gained.</li>
       </ul>
-      <p class="orientation-routes">Read it as <a href="projects/product-and-program.html">Product &amp; Program</a>, or go straight to the <a href="projects/defense-news-classifier.html">Classifier</a>.</p>
+      <p class="orientation-routes">Read it as <a href="projects/product-and-program.html">Product &amp; Program</a>, go straight to the <a href="projects/defense-news-classifier.html">Classifier</a>, or see the <a href="projects/faithfulness-judge.html">Judge</a>, where I caught my own measurement lying to me.</p>
     </section>
 
     <h2 class="section-title reveal">The system</h2>
@@ -168,6 +169,17 @@
         <details>
           <summary>The discipline</summary>
           <p>An unfair baseline flatters whatever you were hoping for, and comparing two things means changing exactly one of them. The retrieval code stays in the repo, dormant and reproducible, because the built-it-measured-it-cut-it trail is the artifact. <a href="projects/defense-news-classifier.html#decision-grounding">Full eval &rarr;</a></p>
+        </details>
+      </div>
+
+      <div class="decision" id="decision-truncation">
+        <p class="kicker">False result caught<span class="code-ref">JUDGE &middot; ADR-001</span></p>
+        <h3>I nearly published a finding that was my own bug</h3>
+        <p>Measuring how well an LLM judge catches made-up claims, the first run showed a dramatic gap between the premium and cheap model tiers. It was a great headline and it was false.</p>
+        <p class="tradeoff"><strong>The result:</strong> a <code>max_tokens</code> setting meant to force a one-word verdict truncated the cheaper model before it reached the verdict on 20% of claims, and my scoring counted every one as a disagreement. Fixed, both tiers agree with human labels at about the same rate.</p>
+        <details>
+          <summary>How it surfaced</summary>
+          <p>Reading the failure log before publishing, not after. The failures didn't look like judgment errors, which are scattered and arguable. They were empty. Errors have a shape, and that shape was wrong. <a href="projects/faithfulness-judge.html">Full writeup &rarr;</a></p>
         </details>
       </div>
 
