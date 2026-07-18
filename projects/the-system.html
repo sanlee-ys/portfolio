@@ -91,8 +91,8 @@
     <ol class="flow">
       <li>A note is created in <strong>notes-api</strong> (<code>POST /notes</code>), which enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately; the task runs after the response is sent.</li>
       <li>The <strong>background task</strong> POSTs the note text to the classifier's <code>/classify</code> endpoint.</li>
-      <li>The <strong>classifier</strong> classifies the text (one Sonnet call, structured output forced via tool-use) into a category and an operational domain, and returns them.</li>
-      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags. <code>CLASSIFIER_URL</code> unset makes the whole step a no-op.</li>
+      <li>The <strong>classifier</strong> classifies the text (one Sonnet call, structured output forced via tool-use) into a category, an operational domain, and a region, and returns them.</li>
+      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags. It currently maps the first two; the region field is newer than this consumer. <code>CLASSIFIER_URL</code> unset makes the whole step a no-op.</li>
       <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
     </ol>
 
@@ -103,10 +103,10 @@
       repos, and the classification is a real model prediction, not a mock-up.
     </p>
     <p class="ex-caption">
-      The article text and the two predicted labels are real: gold row
+      The article text and all three predicted labels are real: gold row
       <code>g002</code> from the classifier's eval set, a prediction that matches
-      both the hand label and the LLM judge. The note's title, <code>id</code>, and
-      timestamps are illustrative placeholders.
+      both the hand label and the LLM judge on every axis. The note's title,
+      <code>id</code>, and timestamps are illustrative placeholders.
     </p>
     <ol class="example-run">
       <li>
@@ -126,22 +126,41 @@
           <code>/classify</code> endpoint. One <code>claude-sonnet-5</code> call
           with <code>tool_choice</code> pinned to the <code>classify_article</code>
           tool forces the model to answer only as an enum-validated tool call,
-          which the endpoint returns as <code>{category, operational_domain}</code>.
-          No confidence score, by design.</p>
+          which the endpoint returns as
+          <code>{category, operational_domain, region}</code>. No confidence
+          score, by design.</p>
         <pre><code>// forced tool_use emitted by the model
 {
   "name": "classify_article",
-  "input": { "category": "operations", "operational_domain": "air" }
+  "input": {
+    "category": "operations",
+    "operational_domain": "air",
+    "region": "middle-east"
+  }
 }</code></pre>
       </li>
       <li>
         <p class="ex-step">Labels become namespaced tags</p>
-        <p class="ex-note">notes-api owns the writeback. It maps the two fields to
-          prefixed tags (note the <code>operational_domain</code> &rarr;
-          <code>domain:</code> rename) and PUTs them with replace semantics, so
-          reprocessing converges instead of piling up duplicates. The user's own
-          tags are preserved.</p>
-        <pre><code>classifier_tags({"category": "operations", "operational_domain": "air"})
+        <p class="ex-note">notes-api owns the writeback. It maps the fields it
+          knows to prefixed tags (note the <code>operational_domain</code>
+          &rarr; <code>domain:</code> rename) and PUTs them with replace
+          semantics, so reprocessing converges instead of piling up duplicates.
+          The user's own tags are preserved.</p>
+        <p class="ex-note"><strong>Note what happens to <code>region</code>
+          here: nothing.</strong> The classifier grew a third field in v3;
+          this consumer still reads two and drops the rest on the floor. That
+          is the contract doing its job rather than failing at it. The writeback
+          pulls fields out by name instead of assuming the response shape, so a
+          producer can add an axis without breaking anything downstream, and
+          adopting it becomes a deliberate change on the consumer's own
+          schedule. Wiring <code>region:</code> through is pending work, not a
+          bug &mdash; and until it lands, this page shows two tags because two
+          tags is what actually gets written.</p>
+        <pre><code>classifier_tags({
+    "category": "operations",
+    "operational_domain": "air",
+    "region": "middle-east",   # not mapped yet — ignored, not an error
+})
 # -&gt; ["category:operations", "domain:air"]
 
 PUT /notes/1/tags
@@ -207,6 +226,11 @@ PUT /notes/1/tags
         just hope. A renamed field breaks the consumer silently at runtime.
         <strong>Tradeoff:</strong> more upfront ceremony (freeze the wire shape,
         write the tests) so that drift fails a build instead of production.</p>
+      <p class="tradeoff"><strong>What it bought, concretely:</strong> the
+        classifier added a third output field in v3 and nothing downstream
+        broke. The consumer reads the fields it wants by name rather than
+        assuming the response shape, so the new axis arrived as something to
+        adopt on purpose instead of an outage to discover.</p>
     </div>
 
     <div class="decision" id="decision-rightsized">
@@ -231,14 +255,18 @@ PUT /notes/1/tags
       <h3>Gate model choice on evidence, not vibes</h3>
       <p>Default to Sonnet across the system. Escalate to Opus only where an eval
         shows the quality gain pays for itself. The same gate ran the July 2026
-        migration to Sonnet 5: eval before and after on the same gold set, and
-        the one path the eval said got worse (BM25 grounding) stayed pinned to
-        the older model instead of being dragged along.</p>
-      <p class="tradeoff"><strong>Why:</strong> the classifier's accuracy ceiling
-        turned out to be label ambiguity, not model horsepower, so paying roughly
-        1.7&times; for a bigger model would have bought nothing.
-        <strong>Tradeoff:</strong> you have to run the eval to justify the tier
-        instead of defaulting to the biggest model.</p>
+        migration to Sonnet 5: eval before and after on the same gold set. The
+        one path that measured worse, BM25 grounding, was first pinned to the
+        older model and then retired outright once a fair same-prompt baseline
+        showed it wasn't paying at all.</p>
+      <p class="tradeoff"><strong>Why:</strong> the escalation has now been built
+        and measured three separate times, and declined all three. Tiered routing
+        moved zero rows at about 1.97&times; the cost, sending everything to the
+        premium model scored identically, and a separate
+        <a href="faithfulness-judge.html">judge-reliability study</a> found the
+        cheap tier close enough that the overall agreement number can't justify
+        the upgrade. <strong>Tradeoff:</strong> you have to run the eval to
+        justify the tier instead of defaulting to the biggest model.</p>
     </div>
 
     <div class="decision">

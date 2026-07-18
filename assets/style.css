@@ -489,6 +489,23 @@ body {
     overflow-x: auto;
     max-width: 100%;
   }
+  /* The metrics tables now carry enough version columns to scroll, and once
+     they do, the row label is the thing you lose first — you end up reading a
+     column of bare numbers with no idea which metric they belong to. Pin the
+     first column so the label stays put while the numbers scroll under it.
+     Two details: the background must be opaque (cells are transparent by
+     default, so scrolled content would otherwise show through), and the
+     divider is a box-shadow rather than a border because border-collapse
+     hands borders to the table, not the cell, so a border here doesn't
+     paint reliably once the cell is sticky. */
+  main table.metrics th:first-child,
+  main table.metrics td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg);
+    box-shadow: 1px 0 0 var(--border);
+  }
 }
 
 /* Scroll-reveal (Lesson 1) */
