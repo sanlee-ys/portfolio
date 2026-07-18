@@ -52,11 +52,26 @@ permissions:
   id-token: write
   actions: read
 
-# One in-flight run per PR/issue; a newer trigger cancels the older one so a
-# burst of comments can't stack parallel API-spending jobs.
+# One in-flight run per PR/issue, so a burst of comments can't stack parallel
+# API-spending jobs.
+#
+# `cancel-in-progress` MUST stay false: this workflow triggers on
+# `issue_comment`, and the action posts its own "Claude Code is working..."
+# tracking comment as claude[bot]. That comment is an `issue_comment: created`
+# event on the same PR, so it lands in this same group. With cancelling on, the
+# bot's own progress comment killed the run that posted it, ~16s in, every
+# time -- observed on #82 (run 29649688617 cancelled by 29649695453).
+#
+# The `OWNER` gate below already makes those bot-triggered runs skip both jobs,
+# but a run whose jobs all skip STILL cancels the in-flight run in its group.
+# Queueing instead of cancelling costs a few seconds of runner time for the
+# no-op run and nothing in API spend.
+#
+# Tradeoff: a genuine burst of `@claude` comments now serializes rather than
+# the newest superseding the older ones. Bounded by the OWNER gate.
 concurrency:
   group: claude-review-${{ github.event.pull_request.number || github.event.issue.number }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   # --- Automated review when a PR is opened -------------------------------
