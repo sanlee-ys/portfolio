@@ -26,12 +26,31 @@ on:
     types: [created]
 
 # Least privilege. The review reads code and writes PR/issue comments; it does
-# not push commits, so `contents` stays read-only. No `id-token` — that is only
-# needed for cloud OIDC (Bedrock/Vertex), not the direct Claude API key path.
+# not push commits, so `contents` stays read-only.
+#
+# `id-token: write` IS required here, even on the direct Claude API key path.
+# An earlier version of this comment claimed otherwise and the job failed on
+# every PR with "Could not fetch an OIDC token". The mistake was conflating two
+# independent auth axes:
+#   - GitHub side: the action trades a GitHub OIDC token for a Claude GitHub
+#     App installation token, so it can post comments as the app. This needs
+#     `id-token: write` whenever the GitHub App is used — always, here.
+#   - Anthropic side: API key vs. Bedrock/Vertex/WIF. Separate concern.
+# Docs (action FAQ): "If you're using the default GitHub App authentication,
+# you must add the `id-token: write` permission to your workflow ... The OIDC
+# token is required in order for the Claude GitHub app to function."
+# The only way to avoid it is passing a `github_token` input instead of using
+# the app, which would post comments as github-actions[bot] rather than Claude.
+#
+# `actions: read` lets the review read this PR's other check results (e.g.
+# whether `qa` passed) instead of reviewing blind to CI. Read-only: it cannot
+# trigger, cancel, or rerun workflows. Carried by the action's own example.
 permissions:
   contents: read
   pull-requests: write
   issues: write
+  id-token: write
+  actions: read
 
 # One in-flight run per PR/issue; a newer trigger cancels the older one so a
 # burst of comments can't stack parallel API-spending jobs.
