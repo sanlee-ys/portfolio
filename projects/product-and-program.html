@@ -96,7 +96,8 @@
 
     <h3>AI-quality metrics (can it be measured, not just demoed?)</h3>
     <ul>
-      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On v2 real, human-labeled text, category is 88.9% (macro-F1 0.888) and operational domain 94.4% (macro-F1 0.947) after the July 2026 Sonnet 5 migration. The category ceiling is label ambiguity, not model horsepower &mdash; it held at 88.9% across the model swap.</li>
+      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On real, human-labeled text the current v3 classifier scores category 92.6% (macro-F1 0.911), operational domain 92.6% (0.933), and region 87.0% (0.927). Corroborated at n=300 with confidence intervals half as wide as the 54-snippet set allows.</li>
+      <li><strong>Cost per unit of quality:</strong> escalating to the premium model was built and measured, not assumed. It moved zero rows at about 1.97&times; the cost, so the shipped path stays single-model. That is the second of three independent measurements landing on the same verdict, alongside the retired retrieval layer and the <a href="faithfulness-judge.html">judge-reliability study</a>.</li>
       <li><strong>Retrieval quality (RAG):</strong> recall@k, answer groundedness, citation correctness.</li>
       <li><strong>Regression gate:</strong> an eval pass-rate threshold wired into CI, so a change that drops below it does not merge.</li>
     </ul>
@@ -137,7 +138,7 @@
       </thead>
       <tbody>
         <tr><td>Enrichment lost if the background task fails or the process restarts (no broker redelivery)</td><td>Low</td><td>Tags are derived and reclassification is idempotent (namespaced-tag replace), so enrichment re-runs safely; note creation never fails on classifier errors</td></tr>
-        <tr><td>Classifier accuracy ceiling (label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model; refine the taxonomy or judge boundary cases</td></tr>
+        <tr><td>Classifier accuracy ceiling (residual label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model &mdash; measured at +0 rows for ~1.97&times; cost. Refine the rubric instead: a confusion breakdown found the misses clustered on one boundary and two clauses lifted category 90.7% &rarr; 94.4%</td></tr>
         <tr><td>Breadth creep (verticals without depth)</td><td>Medium</td><td>Deep on one vehicle; other verticals are an explicit non-goal</td></tr>
         <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep artifacts thin and living, tied to real delivery only</td></tr>
         <tr><td>Silent contract drift (separate repos)</td><td>Medium</td><td>Frozen wire contracts plus contract tests on both sides in CI</td></tr>

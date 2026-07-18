@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faithfulness Judge &middot; San Lee</title>
+  <meta name="description" content="Measuring the measurer: can an LLM judge be trusted to catch made-up claims? 193 hand-labeled claims, and the truncation bug that nearly shipped a false result." />
+  <link rel="canonical" href="https://sanlee.me/projects/faithfulness-judge.html" />
+  <meta property="og:site_name" content="San Lee" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://sanlee.me/projects/faithfulness-judge.html" />
+  <meta property="og:title" content="Faithfulness Judge &middot; San Lee" />
+  <meta property="og:description" content="Measuring the measurer: can an LLM judge be trusted to catch made-up claims? 193 hand-labeled claims, and the truncation bug that nearly shipped a false result." />
+  <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Faithfulness Judge &middot; San Lee" />
+  <meta name="twitter:description" content="Measuring the measurer: can an LLM judge be trusted to catch made-up claims? 193 hand-labeled claims, and the truncation bug that nearly shipped a false result." />
+  <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+  <main class="wrap article-body">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <h1>Faithfulness Judge</h1>
+    <p class="subtitle">Measuring the measurer: can an LLM be trusted to tell you when an answer is making things up?</p>
+
+    <p class="lead">
+      Every LLM system I build is graded by another LLM at some point. That
+      raises a question the grading quietly depends on and rarely answers: how
+      good is the grader? This project measures that directly. It takes answers
+      generated over public defense text, breaks them into individual claims,
+      has a person label each one against its cited source, and then asks two
+      model tiers to do the same job blind. The deliverable is not a working
+      product. It is a number for how far the judge can be trusted, and an
+      explicit statement of where it can&rsquo;t.
+    </p>
+
+    <h2>The result</h2>
+    <table class="metrics">
+      <thead>
+        <tr><th>Judge</th><th>Binary &kappa;</th><th>Raw agreement (95% CI)</th><th>Unsupported recall</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Opus</td><td>0.742</td><td>89.0% [83.8, 92.7]</td><td>97.9%</td></tr>
+        <tr><td>Sonnet</td><td>0.696</td><td>87.4% [82.0, 91.4]</td><td>89.6%</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Both tiers land in what the statistics literature calls substantial
+      agreement, which makes either usable as an automated faithfulness check.
+      The tempting headline is that the premium tier wins. I didn&rsquo;t write
+      that headline, because the confidence intervals overlap heavily at this
+      sample size, so the gap in &kappa; isn&rsquo;t resolvable from this data.
+      Reporting it as a win would be a soft number dressed up as a solid one.
+    </p>
+    <p>
+      There is exactly one separation the data does support, and it&rsquo;s the
+      one that matters for the actual job. On the fabrication class, catching
+      claims the source doesn&rsquo;t back, recall is
+      <strong>97.9% versus 89.6%</strong>. The premium judge misses roughly one
+      made-up claim in fifty; the cheap one misses about one in ten. If your
+      reason for running a judge is catching hallucinations, that gap is the
+      defensible reason to pay, and the overall agreement number is not.
+    </p>
+
+    <h2>The result I almost published instead</h2>
+
+    <div class="decision">
+      <p class="tag">A truncation setting that looked like a finding</p>
+      <p>The first scoring run showed Opus at 0.70 and Sonnet at
+        <strong>0.43</strong>. A dramatic, clean tier gap, and a far more
+        satisfying story than the one above: the expensive model is simply
+        better at judging. It was one commit from shipping.</p>
+      <p>It was false. I had set <code>max_tokens=10</code> to force a one-word
+        verdict out of the judge. Opus complied. Sonnet tended to open with a
+        short clause of reasoning first, so on <strong>39 of 191 claims</strong>,
+        a full 20%, it was cut off before it ever reached the verdict word. My
+        scoring counted every unparsed verdict as a disagreement, so a fifth of
+        Sonnet&rsquo;s answers were scored as wrong when they were simply
+        missing. On the 152 claims it actually finished, Sonnet was already at
+        about 0.70, which is where it sits today.</p>
+      <p>What caught it was reading the misjudgment log before publishing rather
+        than after. Sonnet&rsquo;s failures didn&rsquo;t look like judgment
+        errors, which are scattered and arguable. They looked
+        <em>empty</em>. Errors have a shape, and that shape was wrong.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> when a model scores
+        unexpectedly badly, inspect the raw outputs before believing the metric.
+        A number can be perfectly reproducible and still be measuring your own
+        harness. The generalization I actually changed my practice on: constrain
+        a critical output <em>structurally</em>, not with a token budget.</p>
+    </div>
+
+    <p>
+      The fix took two tries, and the failed one is worth recording. Prefilling
+      the assistant&rsquo;s reply, seeding the response so the model continues
+      from a fixed token, is the standard trick for forcing a format, and these
+      models reject it. What works is a forced tool call: a
+      <code>record_verdict</code> tool whose schema constrains the verdict to
+      the label set, with the tool choice pinned so the model has to use it. The
+      model can reason as long as it likes, and the verdict arrives in a
+      structured block that cannot be truncated into ambiguity. That is the same
+      pattern the classifier uses to guarantee valid labels, applied to a second
+      problem.
+    </p>
+    <p>
+      One scoring convention did the real work here, and it was tempting to
+      change it. Counting unparsed verdicts as disagreements is harsh; dropping
+      them would have been defensible and would have quietly discarded 20% of
+      the set, hiding the truncation entirely and shipping the false gap. The
+      strict rule is what made the bug visible. Full decision record in
+      <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/001-both-tiers-substantial.md">ADR-001</a>.
+    </p>
+
+    <h2>Why this is a different problem from the classifier</h2>
+    <p>
+      The <a href="defense-news-classifier.html">classifier</a> is graded
+      against cheap, objective labels: a story is about procurement or it
+      isn&rsquo;t, and two careful people will mostly agree. This project grades
+      against expensive, subjective ones. Deciding whether a specific sentence
+      is supported by a specific cited passage takes real reading, the
+      boundaries are genuinely arguable, and a hedged half-claim is a judgment
+      call rather than a lookup. It reuses the classifier&rsquo;s machinery, the
+      judge harness, the Wilson intervals, the gold-set discipline, and points
+      it at the opposite ground-truth regime.
+    </p>
+    <p>
+      It also produced the third verdict in a row on the same question. The
+      classifier retired BM25 grounding after measuring it, then declined tiered
+      model routing after measuring that. Here the cheap tier is again close
+      enough that escalation is hard to justify on overall agreement. Three
+      independent measurements, all landing on <em>escalation barely pays</em>,
+      is no longer a one-off result. It is the reason the default across this
+      system is the cheaper model until an eval says otherwise.
+    </p>
+
+    <h2>What this number does not establish</h2>
+    <p>
+      The limits are on the repo&rsquo;s front page rather than buried at the
+      bottom, because a floor is only useful if you state where it gives out.
+    </p>
+    <ul>
+      <li><strong>One labeler.</strong> The gold set is my labels alone, with no
+        inter-annotator agreement measured. That makes the ground truth one
+        person&rsquo;s consistent reading of a written rubric, not a validated
+        consensus. A judge agreeing with this gold at 0.742 has not been shown
+        to agree with humans in general at 0.742, and adding a second labeler is
+        the single thing that would upgrade the claim.</li>
+      <li><strong>191 scored claims.</strong> The intervals are about nine points
+        wide. Any difference smaller than that, including the tier gap in
+        &kappa;, is noise.</li>
+      <li><strong>Floor tier by design.</strong> One pass, no judge prompt
+        tuning, no ensembles, no retrieval. This measures the ruler as built,
+        not the best ruler obtainable.</li>
+      <li><strong>Short passages from one domain.</strong> Public defense
+        reporting, skewed toward operations and procurement. Faithfulness
+        judging over long documents or technical specifications is untested
+        here.</li>
+      <li><strong>A floor I&rsquo;ll say out loud:</strong> below about 0.6 I
+        wouldn&rsquo;t trust an automated verdict unreviewed. Both judges clear
+        that. Neither clears the bar for treating a verdict as final without a
+        human in the loop on anything consequential.</li>
+    </ul>
+
+    <h2>Stack</h2>
+    <p>
+      Python, the Anthropic SDK (Sonnet and Opus as the two judges under test),
+      forced tool-use for the verdict schema, Cohen&rsquo;s &kappa; and Wilson
+      intervals computed directly, pytest on mocked calls. Source text is public
+      DVIDS reporting; nothing proprietary or non-public is used anywhere in the
+      project. The repo is public:
+      <a href="https://github.com/sanlee-ys/faithfulness-judge">github.com/sanlee-ys/faithfulness-judge</a>
+      &mdash; the gold set, the labeling guide, the misjudgment log, and the ADR
+      that documents the bug are all checkable.
+    </p>
+
+    <h2>What it demonstrates</h2>
+    <p>
+      Anyone can run an eval and report the number it prints. The transferable
+      skill is knowing when the number is lying to you, and being willing to
+      publish the boring true result after you&rsquo;ve seen the exciting false
+      one.
+    </p>
+  </main>
+  <script src="../assets/theme.js"></script>
+  <script src="../assets/last-updated.js"></script>
+</body>
+</html>

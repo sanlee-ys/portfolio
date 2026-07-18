@@ -49,12 +49,13 @@
     <p class="subtitle">An LLM classifier, and the eval harness that kept me honest about it.</p>
 
     <p class="lead">
-      This labels defense-news text by category (procurement, operations, policy,
-      technology, industry) and operational domain (air, land, sea, cyber, space,
-      multi). That part is a single model call. The eval harness is the
-      interesting part, and it&rsquo;s where data-driven decision making actually
-      gets tested: more than once it caught me being wrong, and I went with what
-      it showed instead of my own instinct.
+      This labels defense-news text on three axes: category (procurement,
+      operations, policy, technology, industry), operational domain (air, land,
+      sea, cyber, space, multi), and region (indo-pacific, europe, middle-east,
+      africa, americas, global). That part is a single model call. The eval
+      harness is the interesting part, and it&rsquo;s where data-driven decision
+      making actually gets tested: more than once it caught me being wrong, and I
+      went with what it showed instead of my own instinct.
     </p>
 
     <h2>What the eval caught</h2>
@@ -83,25 +84,32 @@
         (a net of one correct call in 54) and +0.0% on domain, where grounding
         fixed three calls and broke three. Lexical retrieval doesn&rsquo;t earn
         the cost of moving to embeddings here.</p>
-      <p>The Sonnet 5 migration made the verdict sharper. Against the new,
-        stronger 94.4% ungrounded domain baseline, the same grounding
-        <em>regressed</em> domain accuracy by 9.3 points (reproduced three
-        times): the retrieved neighbors now pull a confident, correct call
-        sideways more often than they help. So the RAG path stays pinned to
-        Sonnet 4.6 while its future is decided, a deliberate transitional split
-        recorded in
-        <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/010-rag-path-model-pin.md">ADR-010</a>
-        rather than dragged along or hidden behind a loosened gate.</p>
-      <p class="tradeoff"><strong>The lesson:</strong> measuring first and
-        escalating only when the eval says it pays is the discipline, and here
-        it said do not bother &mdash; then, against a better baseline, it said
-        grounding actively hurts.</p>
+      <p>Then it got worse for grounding, and the way I found out is the part
+        worth telling. The comparison itself had a bug: I was scoring the
+        <em>new-prompt</em> grounded arm against an <em>old-prompt</em> frozen
+        baseline, which quietly inflated the lift. Rebuilding the baseline so
+        both arms ran the same prompt killed the advantage outright. A
+        three-pass confirm settled it: across 162 grounded classifications,
+        grounding fixed a domain call <strong>zero</strong> times and broke
+        four.</p>
+      <p>So I retired it
+        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>):
+        out of the shipped path, out of the CI gate. The retrieval code, the
+        corpus, and the measurement scripts stay in the repo, dormant and
+        reproducible, because the built-it-measured-it-cut-it trail is the
+        artifact. The verdict hardened from &ldquo;BM25 doesn&rsquo;t justify
+        upgrading to embeddings&rdquo; to &ldquo;BM25 doesn&rsquo;t justify
+        itself.&rdquo;</p>
+      <p class="tradeoff"><strong>The lesson:</strong> an unfair baseline
+        flatters whatever you are hoping for. The first measurement said
+        don&rsquo;t bother; a fair one said cut it. Comparing two things means
+        changing exactly one of them.</p>
     </div>
 
     <h2>Why the numbers can be trusted</h2>
     <p>
-      The eval went through two versions, and the gap between them is the honest
-      part. v1 graded the model on 300 snippets it generated itself. Those numbers
+      The eval has been rebuilt more than once, and the gaps between the versions
+      are the honest part. v1 graded the model on 300 snippets it generated itself. Those numbers
       measure consistency, not correctness, and they hid a real hole:
       <code>industry</code> recall was 0.217, the model catching one in five. v2
       replaced that with 54 hand-labeled real snippets (DoD news wire plus SEC
@@ -114,27 +122,127 @@
 
     <table class="metrics">
       <thead>
-        <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 grounded (not shipped)</th><th>v2 real (Sonnet 5, current)</th></tr>
+        <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 + Sonnet 5</th><th>v2 + prompt fix</th><th>v3 three-axis (current)</th></tr>
       </thead>
       <tbody>
-        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td><td>88.9%</td></tr>
-        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td><td>0.888</td></tr>
-        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td></tr>
-        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td><td>0.947</td></tr>
+        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td></tr>
+        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td>0.911</td></tr>
+        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td>92.6%</td></tr>
+        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td>0.933</td></tr>
+        <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>87.0%</td></tr>
+        <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>0.927</td></tr>
       </tbody>
     </table>
     <p>
-      The domain numbers <em>drop</em> from v1 to v2, which is the expected
-      result once the test got harder. Synthetic text the model wrote was easy
-      to grade. Real text is harder and the lower number is the trustworthy one.
+      Every column after the first is the same 54 hand-labeled snippets, so the
+      numbers are comparable across the whole row. The domain numbers <em>drop</em>
+      from v1 to v2, which is the expected result once the test got harder.
+      Synthetic text the model wrote was easy to grade. Real text is harder and
+      the lower number is the trustworthy one.
     </p>
     <p>
-      The last column is the migration chapter. In July 2026 the workhorse moved
+      The middle column is the migration chapter. In July 2026 the workhorse moved
       from Sonnet 4.6 to Sonnet 5, and the swap went through the same gate as
-      every other change here: run the eval before and after, on the same 54
-      hand-labeled snippets. Domain accuracy rose to 94.4% and category held at
-      88.9% &mdash; consistent with the ceiling being label ambiguity, which a
-      stronger model can&rsquo;t un-blur.
+      every other change here: run the eval before and after, on the same
+      snippets. Domain rose to 94.4%; category didn&rsquo;t move. I read that as a
+      ceiling made of label ambiguity, which a stronger model can&rsquo;t un-blur.
+      I was half right, and the next column is where I found out.
+    </p>
+
+    <div class="decision">
+      <p class="tag">The ceiling that wasn&rsquo;t</p>
+      <p>Calling category a ceiling was a comfortable conclusion, so I went
+        looking for the shape of the misses instead of accepting it. A
+        per-cell confusion breakdown showed they weren&rsquo;t scattered at all:
+        they clustered on one boundary, <code>technology</code> read as
+        <code>operations</code> whenever a new system was tested or demoed in an
+        operational setting, plus a habit of over-assigning <code>land</code>.
+        Two targeted rubric clauses moved category from 90.7% to
+        <strong>94.4%</strong> and domain from 90.7% to 92.6%, with
+        <code>technology</code> recall reaching 1.000 and nothing regressing.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> &ldquo;that&rsquo;s the
+        ceiling&rdquo; is a hypothesis, not a finding, and it happens to be the
+        one that excuses you from more work. It was a prompt problem wearing a
+        ceiling&rsquo;s clothes. Note what it wasn&rsquo;t: a bigger model.</p>
+    </div>
+
+    <h2>Two ways of not fooling myself</h2>
+    <p>
+      Fifty-four hand-labeled snippets is a small set, and a small set has a wide
+      error bar. Two follow-ups exist to keep that honest.
+    </p>
+
+    <div class="decision">
+      <p class="tag">Scaling the eval before trusting it</p>
+      <p>The 54-snippet gold set carries a 95% confidence interval about 13
+        points wide, which is wide enough that a couple of lucky rows look like
+        progress. So I scaled to <strong>300</strong> real snippets graded by the
+        Opus judge, which halves the interval: category
+        <strong>93.3%</strong> [89.9, 95.6], domain <strong>90.3%</strong>
+        [86.5, 93.2]. Those corroborate the hand-graded numbers rather than
+        replacing them.</p>
+      <p class="tradeoff"><strong>The caveat that stays attached:</strong> the
+        judge is the answer key here, so this measures agreement with a model
+        and inherits its roughly 5&ndash;6% disagreement with humans. The source
+        wire is also operations-heavy, which makes the category macro-F1
+        uninformative &mdash; the report says so in the report, not in a footnote
+        I can quietly drop.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">The upgrade that bought nothing</p>
+      <p>The roadmap called for tiered routing: escalate the uncertain cases to
+        the more expensive model. I built the trigger, measured it, and shipped
+        the negative result. Routing moved <strong>+0 rows</strong> on both axes
+        at about <strong>1.97&times;</strong> the cost per article. Of nine
+        escalations on the gold set it fixed zero and broke one, and even
+        sending <em>everything</em> to the premium model scored the same 94.4%
+        category, so there was no headroom for any router to capture.</p>
+      <p class="tradeoff"><strong>Why it&rsquo;s worth the build:</strong> the
+        earlier prompt fix had already taken the ground routing was aimed at.
+        The cheapest fix won, and now that&rsquo;s measured rather than
+        asserted. One more finding stayed in the record because it was
+        inconvenient: adding a field to the schema flipped one benign snippet
+        into a model refusal, so the measurement apparatus itself changed the
+        behavior being measured. Full verdict in
+        <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/013-decline-tiered-routing.md">ADR-013</a>.
+        A separate project, measuring
+        <a href="faithfulness-judge.html">how reliable an LLM judge is</a>,
+        later landed on the same verdict from a different direction &mdash;
+        three independent measurements now say escalation barely pays.</p>
+    </div>
+
+    <h2>The third axis</h2>
+    <p>
+      v3 added <code>region</code>, which breaks the output contract on purpose:
+      callers that expected two fields now get three. Six labels, with
+      <code>global</code> as the single catch-all for stories with no
+      geographic anchor and stories spanning several. That catch-all was the
+      real design decision, and the alternative (splitting &ldquo;no
+      geography&rdquo; from &ldquo;worldwide&rdquo;) would have put the fuzziest
+      boundary on the most common kind of story in the corpus. The label set,
+      the boundary rules, and the scope limits were written down before the
+      build in
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/014-region-field-design.md">ADR-014</a>.
+    </p>
+    <p>
+      Region landed at <strong>87.0%</strong> against fresh hand labels. The
+      more interesting number is that the misses aren&rsquo;t noise:
+      <strong>all seven</strong> are stories whose true label is
+      <code>global</code> that the model pulled to a specific region, usually
+      <code>americas</code>. The rule says label the theater the activity
+      happens in, and only when the text says so. The model keeps seeing a US
+      actor and inferring a US theater, which is the no-guessing rule being hard
+      rather than the model being sloppy. One named failure mode beats a
+      scattered 13%, because a named one can be worked on.
+    </p>
+    <p>
+      Adding the axis cost about one category row (94.4% to 92.6%, inside the
+      noise on a set this size) while domain held. That trade is stated rather
+      than smoothed over. The scaled region eval is gated behind one measured
+      condition, judge-versus-human agreement on region, which came in at
+      <strong>100.0%</strong> &mdash; so the gate is clear and the scaled run is
+      earned, not assumed.
     </p>
 
     <h2>The decisions</h2>
@@ -142,9 +250,10 @@
     <div class="decision">
       <p class="tag">Decision &middot; ADR-002</p>
       <h3>Force structured output with tool-use, not prompt parsing</h3>
-      <p>The model is called with a forced tool schema (both fields required, strict
-        enums), so an invalid label is rejected at the API layer before it reaches
-        application code.</p>
+      <p>The model is called with a forced tool schema (all three fields required,
+        strict enums), so an invalid label is rejected at the API layer before it
+        reaches application code. When v3 added <code>region</code>, it was one
+        more required strict enum &mdash; the schema is where a new axis goes.</p>
       <p class="tradeoff"><strong>Why:</strong> the schema becomes the contract, and
         the app code stays free of defensive parsing. <strong>Tradeoff:</strong>
         tool-use costs a few extra tokens and a more verbose call signature than
@@ -203,16 +312,17 @@
       </thead>
       <tbody>
         <tr><td><strong>L1</strong> &middot; Single call</td><td>Prompt, structured output, the eval harness</td><td>A human runs each item</td><td>Shipped (v1)</td></tr>
-        <tr><td><strong>L2</strong> &middot; Augmented</td><td>BM25 retrieval grounds the label in a corpus</td><td>A human runs it; the model reaches for a tool</td><td>Shipped (v2), kept opt-in</td></tr>
+        <tr><td><strong>L2</strong> &middot; Augmented</td><td>BM25 retrieval grounds the label in a corpus</td><td>A human runs it; the model reaches for a tool</td><td>Shipped (v2), then retired</td></tr>
         <tr><td><strong>L3</strong> &middot; Autonomous loop</td><td>Iterates toward an explicit done-signal</td><td>The system decides when it&rsquo;s done</td><td>Spec&rsquo;d</td></tr>
         <tr><td><strong>L4</strong> &middot; Multi-agent</td><td>Triage, classify, and a critic that can send work backward</td><td>Multiple agents coordinate</td><td>To spec</td></tr>
       </tbody>
     </table>
     <p>
-      The L2 state is deliberate: the retrieval layer shipped in v2 and was
-      measured, and the measurement said the lift didn&rsquo;t pay (that&rsquo;s
-      &ldquo;the grounding that did not pay&rdquo; above), so grounding stays
-      opt-in rather than the default path. L4 has an honesty test of its own: a
+      The L2 state is the honest one: the retrieval layer shipped in v2, was
+      measured, and was then cut when a fair baseline showed it hurting
+      (that&rsquo;s &ldquo;the grounding that did not pay&rdquo; above). A rung
+      that was climbed and then climbed back down is still part of the record,
+      which is why it isn&rsquo;t quietly relabeled. L4 has an honesty test of its own: a
       critic that can bounce a label <em>backward</em> for reclassification,
       not a linear pipeline with extra steps. That backward edge is where the
       metric-gaming story will get tested.
@@ -228,11 +338,13 @@
 
     <h2>Stack</h2>
     <p>
-      Python, the Anthropic SDK (Sonnet 5 for classification, Opus as the v2 judge),
-      pandas for the eval tables, FastAPI for the HTTP endpoint, and rank-bm25 for
-      the grounding experiment. Tested with pytest on mocked calls. The repo is
+      Python, the Anthropic SDK (Sonnet 5 for classification, Opus as the grading
+      judge), pandas for the eval tables, FastAPI for the HTTP endpoint, and
+      rank-bm25 for the retired grounding experiment. Tested with pytest on mocked
+      calls. The repo is
       public: <a href="https://github.com/sanlee-ys/defense-news-classifier">github.com/sanlee-ys/defense-news-classifier</a>
-      &mdash; the eval harness, gold set, and ADRs are all checkable.
+      &mdash; the eval harness, gold set, and ADRs are all checkable, including the
+      experiments that were measured and cut.
     </p>
 
     <h2>What it demonstrates</h2>
