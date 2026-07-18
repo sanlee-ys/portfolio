@@ -103,8 +103,8 @@
       <p class="orientation-lede">A working record of how I build and run a small AI system, framed for whoever is reading: what it does for its user, and why every change had to earn its place on evidence.</p>
       <ul class="orientation-points">
         <li>The user is a defense-news analyst; the job is to triage a firehose so the day starts from a sorted knowledge base, not a raw feed.</li>
-        <li>Every change is gated on an eval. Two that read better but measured worse, a cleaner prompt and a retrieval add, were reverted and rejected.</li>
-        <li>Model choice is gated the same way: staying on the cheaper model avoided paying about 1.7&times; for accuracy the task could not use.</li>
+        <li>Every change is gated on an eval. Three that read better but measured worse, a cleaner prompt, a retrieval add, and a routing upgrade, were reverted, retired, and declined.</li>
+        <li>Model choice is gated the same way: escalating to the premium model was measured at about 1.97&times; the cost for zero rows gained.</li>
       </ul>
       <p class="orientation-routes">Read it as <a href="projects/product-and-program.html">Product &amp; Program</a>, or go straight to the <a href="projects/defense-news-classifier.html">Classifier</a>.</p>
     </section>
@@ -150,24 +150,24 @@
       </div>
 
       <div class="decision" id="decision-eval">
-        <p class="kicker">Eval rebuilt<span class="code-ref">EVAL &middot; v1 &rarr; v2</span></p>
+        <p class="kicker">Eval rebuilt<span class="code-ref">EVAL &middot; v1 &rarr; v3</span></p>
         <h3>I rebuilt the eval until it could tell me I was wrong</h3>
-        <p>v1 graded the model on 300 snippets it generated itself, which measures consistency, not correctness. v2 replaced that with 54 hand-labeled real snippets, cross-checked by an Opus judge.</p>
+        <p>v1 graded the model on 300 snippets it generated itself, which measures consistency, not correctness. v2 replaced that with 54 hand-labeled real snippets, cross-checked by an Opus judge, and it has been catching me ever since.</p>
         <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
         <details>
           <summary>Read the numbers</summary>
-          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled. The July 2026 Sonnet 5 migration later lifted domain to 94.4% on that same set, with category unchanged. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled, later corroborated at n=300 with confidence intervals half as wide. Current three-axis numbers: category 92.6%, domain 92.6%, region 87.0%. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
       <div class="decision" id="decision-grounding">
-        <p class="kicker">BM25 rejected<span class="code-ref">EVAL &middot; BM25</span></p>
+        <p class="kicker">BM25 retired<span class="code-ref">EVAL &middot; BM25</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
-        <p>I added BM25 lexical retrieval to ground each call, expecting a clear win.</p>
-        <p class="tradeoff"><strong>The result:</strong> +1.9% on category (a net of one call in 54) and +0.0% on domain, where it fixed as many calls as it broke. It did not earn the jump to embeddings, so it did not ship. Re-measured after the Sonnet 5 migration, grounding actively regressed domain by 9.3 points against the stronger baseline, so the RAG path stays pinned to Sonnet 4.6 while its future is decided.</p>
+        <p>I added BM25 lexical retrieval to ground each call, expecting a clear win. The first measurement said it barely helped. Then I found the measurement itself was unfair.</p>
+        <p class="tradeoff"><strong>The result:</strong> I had been scoring the grounded arm against a stale baseline built on an older prompt. Rebuilt so both arms ran the same prompt, grounding fixed a domain call zero times and broke four across 162 classifications. It was retired outright, not left on as an option.</p>
         <details>
           <summary>The discipline</summary>
-          <p>My rule is to measure before spending more, and I only move up to something heavier like embeddings if the eval shows it&rsquo;s worth the cost, which here it didn&rsquo;t. When the baseline model got better, the same measurement showed grounding flipping from useless to harmful. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>An unfair baseline flatters whatever you were hoping for, and comparing two things means changing exactly one of them. The retrieval code stays in the repo, dormant and reproducible, because the built-it-measured-it-cut-it trail is the artifact. <a href="projects/defense-news-classifier.html#decision-grounding">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -182,21 +182,32 @@
         </details>
       </div>
 
+      <div class="decision" id="decision-ceiling">
+        <p class="kicker">Ceiling disproved<span class="code-ref">EVAL &middot; PROMPT</span></p>
+        <h3>I called it a ceiling, then went looking anyway</h3>
+        <p>Category accuracy hadn't moved through a model upgrade, so I concluded the limit was label ambiguity rather than model horsepower. That is a comfortable conclusion, because it excuses you from more work.</p>
+        <p class="tradeoff"><strong>The result:</strong> a per-cell confusion breakdown showed the misses weren't scattered, they clustered on one boundary. Two targeted rubric clauses moved category from 90.7% to 94.4% with nothing regressing. It was a prompt problem wearing a ceiling's clothes.</p>
+        <details>
+          <summary>Why it matters</summary>
+          <p>&ldquo;That's the ceiling&rdquo; is a hypothesis, not a finding. The half I got right is that it wasn't model horsepower, which a later routing experiment confirmed by buying nothing at twice the price. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+        </details>
+      </div>
+
       <div class="decision" id="decision-model">
-        <p class="kicker">Model gated on evidence<span class="code-ref">SYS-002</span></p>
+        <p class="kicker">Model gated on evidence<span class="code-ref">SYS-002 &middot; ADR-013</span></p>
         <h3>Gate model choice on evidence, not vibes</h3>
-        <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself. Here it did not, so staying on Sonnet avoided paying about 1.7&times; for accuracy the task could not use.</p>
-        <p class="tradeoff"><strong>Tradeoff:</strong> you have to run the eval to justify the tier instead of reaching for the biggest model.</p>
+        <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself. I built the upgrade, measured it, and declined it.</p>
+        <p class="tradeoff"><strong>The result:</strong> routing the uncertain cases to the premium model moved <strong>zero rows</strong> on both axes at about 1.97&times; the cost per article. Sending everything to the premium model scored identically, so there was no headroom for any router to capture.</p>
         <details>
           <summary>What the eval showed</summary>
-          <p>The classifier's ceiling was label ambiguity, not model horsepower, so paying roughly 1.7&times; for a larger model would have bought nothing. The same gate ran the July 2026 Sonnet 5 migration: eval before and after, and the one path that got worse stayed pinned instead of being dragged along. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
+          <p>A targeted prompt fix had already taken the ground routing was aimed at, so the cheapest fix won and that is now measured rather than asserted. The harness stays in the repo as the record. <a href="projects/defense-news-classifier.html">Full verdict &rarr;</a></p>
         </details>
       </div>
 
       <div class="decision" id="decision-tooluse">
         <p class="kicker">Output forced to schema<span class="code-ref">ADR-002</span></p>
         <h3>Force structured output with tool-use, not prompt parsing</h3>
-        <p>The model is called with a forced tool schema (both fields required, strict enums), so an invalid label is rejected at the API layer before it reaches application code.</p>
+        <p>The model is called with a forced tool schema (all three fields required, strict enums), so an invalid label is rejected at the API layer before it reaches application code.</p>
         <p class="tradeoff"><strong>Tradeoff:</strong> a few extra tokens and a more verbose call, in exchange for app code with no defensive parsing.</p>
         <details>
           <summary>How it held up</summary>
@@ -218,20 +229,22 @@
 
     <section class="measure">
       <h2 class="section-title reveal">Classifier evidence</h2>
-      <p class="reveal">The classifier's numbers, with the honest part kept in. Two versions of the eval &mdash; synthetic self-graded, then real hand-labeled &mdash; and then a model migration measured on the same gold set.</p>
+      <p class="reveal">The classifier's numbers, with the honest part kept in. Synthetic self-graded, then real hand-labeled, then a model migration, a prompt fix, and a third output axis &mdash; every column after the first measured on the same 54 hand-labeled snippets.</p>
       <table class="metrics">
         <thead>
-          <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 grounded (not shipped)</th><th>v2 real (Sonnet 5, current)</th></tr>
+          <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 + Sonnet 5</th><th>v2 + prompt fix</th><th>v3 three-axis (current)</th></tr>
         </thead>
         <tbody>
-          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>90.7%</td><td>88.9%</td></tr>
-          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.914</td><td>0.888</td></tr>
-          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td></tr>
-          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.907</td><td>0.947</td></tr>
+          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td></tr>
+          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td>0.911</td></tr>
+          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td>92.6%</td></tr>
+          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td>0.933</td></tr>
+          <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>87.0%</td></tr>
+          <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>0.927</td></tr>
         </tbody>
       </table>
-      <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. The v2 gold set is 54 snippets, hand-labeled. The July 2026 move to Sonnet 5 was eval-gated on that same set: domain rose to 94.4%, category held at 88.9%.</p>
-      <p class="reveal">The grounded version scored marginally higher on Sonnet 4.6 but regressed domain by 9.3 points against the stronger Sonnet 5 baseline, so it stays opt-in and pinned to the older model &mdash; <a href="projects/defense-news-classifier.html#decision-grounding">see Classifier page</a>.</p>
+      <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. When category then sat still through a model upgrade, I called it a ceiling of label ambiguity. A confusion breakdown proved me wrong: the misses clustered on one boundary, and two rubric clauses took category to 94.4%.</p>
+      <p class="reveal">v3 added a third axis, region, which breaks the output contract on purpose. It costs about one category row and debuts at 87.0% &mdash; where all seven misses are the same named failure, stories with no geographic anchor being pulled to a specific region. <a href="projects/defense-news-classifier.html">See the full eval &rarr;</a></p>
     </section>
 
     <section class="measure">
