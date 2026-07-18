@@ -41,11 +41,16 @@ on:
 # token is required in order for the Claude GitHub app to function."
 # The only way to avoid it is passing a `github_token` input instead of using
 # the app, which would post comments as github-actions[bot] rather than Claude.
+#
+# `actions: read` lets the review read this PR's other check results (e.g.
+# whether `qa` passed) instead of reviewing blind to CI. Read-only: it cannot
+# trigger, cancel, or rerun workflows. Carried by the action's own example.
 permissions:
   contents: read
   pull-requests: write
   issues: write
   id-token: write
+  actions: read
 
 # One in-flight run per PR/issue; a newer trigger cancels the older one so a
 # burst of comments can't stack parallel API-spending jobs.
