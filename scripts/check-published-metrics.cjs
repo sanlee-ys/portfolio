@@ -20,11 +20,12 @@
  * track the latest artifact.
  *
  * FAILURE POLICY (matches the SYS-018 contract checks):
- *   - mismatch          -> exit 1. The real guard.
- *   - fetch failure     -> exit 0 with a loud warning. A GitHub outage must not
- *                          redden an unrelated build.
- *   - unknown metric key-> exit 1. A typo'd key would otherwise be checked
- *                          against nothing and silently pass forever.
+ *   - mismatch           -> exit 1. The real guard.
+ *   - fetch failure      -> exit 0 with a loud warning. A GitHub outage must not
+ *                           redden an unrelated build.
+ *   - zero marked figures-> exit 1. A check that verifies nothing reads as a pass.
+ *   - unknown metric key -> exit 1. A typo'd key would otherwise be checked
+ *                           against nothing and silently pass forever.
  *
  * Run:  node scripts/check-published-metrics.cjs
  */
@@ -36,11 +37,30 @@ const ROOT = process.cwd();
 const ARTIFACT_URL =
   'https://raw.githubusercontent.com/sanlee-ys/defense-news-classifier/main/evals/metrics.json';
 
+/*
+ * Everything logged here is read from somewhere else — an HTTP response, or
+ * markup in a checked-in file. Interpolating that straight into console output
+ * lets a newline forge a log line, which in CI is how a real failure hides under
+ * a convincing fake success. CodeQL flagged this on the file's first run. Low
+ * severity at this blast radius, but the fix is one function.
+ */
+function safe(value, max = 200) {
+  // Code-point filter rather than a regex class: keeping literal control
+  // characters out of this source file means no editor, diff tool or shell
+  // heredoc can silently mangle the guard.
+  return String(value)
+    .replace(/\s+/g, ' ')
+    .split('')
+    .filter((ch) => ch.charCodeAt(0) >= 0x20 && ch.charCodeAt(0) !== 0x7f)
+    .join('')
+    .slice(0, max);
+}
+
 function fetchJson(url) {
   return new Promise((resolve) => {
     const req = https.get(url, { timeout: 15000 }, (res) => {
       if (res.statusCode !== 200) {
-        console.warn(`WARNING: HTTP ${res.statusCode} fetching ${url}`);
+        console.warn(`WARNING: HTTP ${safe(res.statusCode)} fetching the metrics artifact.`);
         res.resume();
         return resolve(null);
       }
@@ -50,7 +70,7 @@ function fetchJson(url) {
         try {
           resolve(JSON.parse(body));
         } catch (e) {
-          console.warn(`WARNING: artifact was not valid JSON: ${e.message}`);
+          console.warn(`WARNING: artifact was not valid JSON: ${safe(e.message)}`);
           resolve(null);
         }
       });
@@ -61,7 +81,7 @@ function fetchJson(url) {
       resolve(null);
     });
     req.on('error', (e) => {
-      console.warn(`WARNING: could not fetch the metrics artifact: ${e.message}`);
+      console.warn(`WARNING: could not fetch the metrics artifact: ${safe(e.message)}`);
       resolve(null);
     });
   });
@@ -79,16 +99,18 @@ function htmlFiles(dir, out = []) {
 }
 
 /*
- * Compare numerically, not as strings. JSON serialises 87.0 as `87`, so a
- * string compare against the page's "87.0%" reports a mismatch that is not one —
- * a false positive here is as corrosive as a miss, because a check that cries
- * wolf gets silenced.
+ * Compare numerically, not as strings. JSON serialises 87.0 as `87`, so a string
+ * compare against the page's "87.0%" reports a mismatch that is not one — and a
+ * false positive here is as corrosive as a miss, because a check that cries wolf
+ * gets silenced.
  */
 function sameValue(shown, published) {
   const a = parseFloat(String(shown).replace(/[%\s]/g, '').replace(/&nbsp;/g, ''));
   const b = parseFloat(String(published));
-  if (Number.isNaN(a) || Number.isNaN(b)) return String(shown).trim() === String(published).trim();
-  // Both sides are rounded to 1dp (accuracies) or 3dp (macro-F1) at generation,
+  if (Number.isNaN(a) || Number.isNaN(b)) {
+    return String(shown).trim() === String(published).trim();
+  }
+  // Both sides are rounded at generation (1dp for accuracies, 3dp for macro-F1),
   // so an exact compare is right; the epsilon only absorbs float representation.
   return Math.abs(a - b) < 1e-9;
 }
@@ -113,7 +135,7 @@ function main() {
         const [, key, shown] = m;
         if (!known.has(key)) {
           problems.push(
-            `${file}: data-metric="${key}" is not a key in the published artifact.\n` +
+            `${safe(file)}: data-metric="${safe(key)}" is not a key in the published artifact.\n` +
               `  Known keys: ${[...known].join(', ')}\n` +
               `  A typo'd key is checked against nothing and passes forever, so this fails.`
           );
@@ -122,8 +144,8 @@ function main() {
         checked++;
         if (!sameValue(shown, published[key])) {
           problems.push(
-            `${file}: ${key} is published as "${shown}" but the classifier measured ` +
-              `${published[key]}.\n` +
+            `${safe(file)}: ${safe(key)} is published as "${safe(shown, 40)}" but the ` +
+              `classifier measured ${safe(published[key], 40)}.\n` +
               `  The artifact is the source of truth. Update the page, not the artifact.`
           );
         }
@@ -150,8 +172,8 @@ function main() {
     }
 
     console.log(
-      `✓ ${checked} published metric(s) match the classifier artifact ` +
-        `(v${artifact.version}).`
+      `OK - ${checked} published metric(s) match the classifier artifact ` +
+        `(v${safe(artifact.version, 20)}).`
     );
     return 0;
   });
