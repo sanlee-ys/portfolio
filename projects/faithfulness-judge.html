@@ -65,8 +65,8 @@
         <tr><th>Judge</th><th>Binary &kappa;</th><th>Raw agreement (95% CI)</th><th>Unsupported recall</th></tr>
       </thead>
       <tbody>
-        <tr><td>Opus</td><td>0.742</td><td>89.0% [83.8, 92.7]</td><td>97.9%</td></tr>
-        <tr><td>Sonnet</td><td>0.696</td><td>87.4% [82.0, 91.4]</td><td>89.6%</td></tr>
+        <tr><td>Opus</td><td>0.751</td><td>89.4% [84.2, 93.0]</td><td>97.9%</td></tr>
+        <tr><td>Sonnet</td><td>0.716</td><td>88.4% [83.0, 92.2]</td><td>89.6%</td></tr>
       </tbody>
     </table>
     <p>
@@ -78,13 +78,24 @@
       Reporting it as a win would be a soft number dressed up as a solid one.
     </p>
     <p>
-      There is exactly one separation the data does support, and it&rsquo;s the
-      one that matters for the actual job. On the fabrication class, catching
-      claims the source doesn&rsquo;t back, recall is
-      <strong>97.9% versus 89.6%</strong>. The premium judge misses roughly one
-      made-up claim in fifty; the cheap one misses about one in ten. If your
-      reason for running a judge is catching hallucinations, that gap is the
-      defensible reason to pay, and the overall agreement number is not.
+      For a week this page claimed there was one separation the data did
+      support: recall on the fabrication class, <strong>97.9% versus
+      89.6%</strong>, framed as the defensible reason to pay. That was wrong,
+      and wrong in a way I should have caught, because it is the same error I
+      had just avoided one paragraph earlier. Those percentages are 47 versus 43
+      catches out of 48. Only the claims where the judges disagree carry any
+      information, and there are four of them, all in the premium judge&rsquo;s
+      favor. McNemar&rsquo;s exact test on those four pairs gives
+      <strong>p&nbsp;=&nbsp;0.125</strong>.
+    </p>
+    <p>
+      So I discounted a &kappa; gap for overlapping intervals and then, three
+      sentences later, promoted a recall gap with a smaller denominator. The
+      direction is at least consistent: no reversals in 48 chances. But four
+      pairs cannot size an effect. The honest read is that
+      <strong>neither axis separates the tiers on this set</strong>. The cheap
+      tier is good enough, and escalation is not evidenced. Showing the recall
+      gap, if it is real, needs a larger fabrication class than 48.
     </p>
 
     <h2>The result I almost published instead</h2>
@@ -97,7 +108,8 @@
         better at judging. It was one commit from shipping.</p>
       <p>It was false. I had set <code>max_tokens=10</code> to force a one-word
         verdict out of the judge. Opus complied. Sonnet tended to open with a
-        short clause of reasoning first, so on <strong>39 of 191 claims</strong>,
+        short clause of reasoning first, so on <strong>39 of the 191 claims
+        then scored</strong>,
         a full 20%, it was cut off before it ever reached the verdict word. My
         scoring counted every unparsed verdict as a disagreement, so a fifth of
         Sonnet&rsquo;s answers were scored as wrong when they were simply
@@ -166,12 +178,20 @@
       <li><strong>One labeler.</strong> The gold set is my labels alone, with no
         inter-annotator agreement measured. That makes the ground truth one
         person&rsquo;s consistent reading of a written rubric, not a validated
-        consensus. A judge agreeing with this gold at 0.742 has not been shown
-        to agree with humans in general at 0.742, and adding a second labeler is
+        consensus. A judge agreeing with this gold at 0.751 has not been shown
+        to agree with humans in general at 0.751, and adding a second labeler is
         the single thing that would upgrade the claim.</li>
-      <li><strong>191 scored claims.</strong> The intervals are about nine points
-        wide. Any difference smaller than that, including the tier gap in
-        &kappa;, is noise.</li>
+      <li><strong>&ldquo;Consistent&rdquo; was doing some work there.</strong>
+        Two claims turned out to be labeled against my own rubric: an offer to
+        help and a suggestion to check the source, both filler with no factual
+        assertion, both labeled as supported when the guide names that exact
+        shape as excluded. Re-labeling and re-scoring moved the numbers on this
+        page. One person applying their own rubric inconsistently is not a
+        hypothetical risk here, it is a thing that happened.</li>
+      <li><strong>189 scored claims</strong> out of 193, with four excluded as
+        non-claims. The intervals are about nine points wide. Any difference
+        smaller than that is noise, and that includes both the tier gap in
+        &kappa; and the fabrication-recall gap.</li>
       <li><strong>Floor tier by design.</strong> One pass, no judge prompt
         tuning, no ensembles, no retrieval. This measures the ruler as built,
         not the best ruler obtainable.</li>
