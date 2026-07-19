@@ -113,9 +113,25 @@ jobs:
           #               tier) for review workflows.
           #   --max-turns caps iterations (docs: "Configure appropriate
           #               --max-turns ... to prevent excessive iterations").
+          #
+          # Raised 8 -> 25 on 2026-07-19. At 8 the action ran out of turns before
+          # reaching a verdict on PR #95 (a ~200-line script plus a README) and
+          # exited 1 with `"subtype": "error_max_turns"`. It had found nothing and
+          # said nothing; the job just went red.
+          #
+          # That is the failure mode worth naming: the ceiling surfaced as a
+          # REVIEW VERDICT. A check that reports red without a finding trains you
+          # to ignore it, and an ignored check is worse than an absent one because
+          # it still reads as coverage. Same lesson as the metrics guards this
+          # repo shipped today, pointed at its own CI.
+          #
+          # 25 is a ceiling, not a target — the action stops when the review is
+          # done, so a clean small PR still costs a handful of turns on a cheap
+          # tier. Deliberately NOT `continue-on-error`: a genuine execution
+          # failure should still be loud.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 8
+            --max-turns 25
 
   # --- @claude mention flow -----------------------------------------------
   # Owner-gated: on a public repo anyone can comment, so restrict to the repo
