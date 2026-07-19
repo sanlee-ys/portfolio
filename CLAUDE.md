@@ -5,6 +5,9 @@ Pages. No build step; every page links `assets/style.css`.
 
 ## Mobile is a contract, not an afterthought
 
+*Reasoning and alternatives: [`decisions/ADR-001`](decisions/ADR-001-mobile-qa-gate.md). This
+section stays canonical for what to **do** — the ADR records why.*
+
 This site is public and most visitors arrive on a phone. **Any change that
 touches HTML, CSS, or layout must be verified at mobile widths before it is
 committed.** The owner should never have to QA the phone layout after the fact.
