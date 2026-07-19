@@ -40,7 +40,9 @@ CI (GitHub Actions) runs on every PR and push to `main`:
   independent repos operate as one system, recorded via a two-tier ADR convention.
 - **Defense News Classifier** (`projects/defense-news-classifier.html`) — an LLM
   classifier that enriches notes via an in-process FastAPI BackgroundTask, scored on a
-  real hand-labeled eval (88.9% category, 94.4% operational domain).
+  real hand-labeled eval (<!-- metric:category_accuracy -->92.6% category,
+  <!-- metric:domain_accuracy -->92.6% operational domain,
+  <!-- metric:region_accuracy -->87.0% region).
 - **Product & Program** (`projects/product-and-program.html`) — the same system read as
   product and program work: scope cuts, risk reasoning, and decision framing.
 - **Lab** (`lab/index.html`) — a front-end sandbox where the experiments live so the
