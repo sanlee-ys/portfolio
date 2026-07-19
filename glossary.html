@@ -131,9 +131,20 @@
           stable request/response shape. The point is to make integration
           explicit instead of relying on hidden assumptions.</p>
         <p class="tradeoff"><strong>Here:</strong> I froze three of these
-          (SYS-004, SYS-005, SYS-006) with contract tests in CI. Rename a
-          field and CI catches it before the change ships, so you find out in
-          the pull request instead of from a production incident. <a href="index.html#decision-contracts">Full decision &rarr;</a></p>
+          (SYS-004, SYS-005, SYS-006) and wrote tests on both sides of each.
+          I described that as &ldquo;contract tests in CI&rdquo; and said a
+          renamed field would fail the build. An audit of my own decision log
+          in July 2026 showed that was wrong, and I&rsquo;d rather correct it
+          here than leave the tidier claim up.</p>
+        <p class="tradeoff"><strong>What was actually true:</strong> each side
+          asserted against its <em>own</em> copy of the shape. When the
+          classifier added a third field, the provider&rsquo;s test fixture was
+          updated in the same commit, and the consumer&rsquo;s test kept
+          passing against a stub it wrote itself. Both suites stayed green
+          through a breaking change. Two unit tests that happen to agree
+          aren&rsquo;t a contract test &mdash; a real one needs a single shared
+          artifact both sides check against, so changing one copy fails the
+          other&rsquo;s build. <a href="index.html#decision-contracts">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-eval" data-term="eval evaluation eval harness eval-driven development testing">

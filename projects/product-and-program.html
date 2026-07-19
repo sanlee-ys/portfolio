@@ -142,7 +142,7 @@
         <tr><td>Classifier accuracy ceiling (residual label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model &mdash; measured at +0 rows for ~1.97&times; cost. Refine the rubric instead: a confusion breakdown found the misses clustered on one boundary and two clauses lifted category 90.7% &rarr; 94.4%</td></tr>
         <tr><td>Breadth creep (verticals without depth)</td><td>Medium</td><td>Deep on one vehicle; other verticals are an explicit non-goal</td></tr>
         <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep artifacts thin and living, tied to real delivery only</td></tr>
-        <tr><td>Silent contract drift (separate repos)</td><td>Medium</td><td>Frozen wire contracts plus contract tests on both sides in CI</td></tr>
+        <tr><td>Silent contract drift (separate repos)</td><td><strong>High &mdash; this one happened</strong></td><td>Frozen wire contracts, but the enforcement was never real: each repo's tests assert against its own copy of the shape, so when the classifier added a field the coordinated consumer update was skipped and both builds stayed green. Open. The fix is one shared artifact both sides check against</td></tr>
         <tr><td>Simulated program (no real cross-team coordination)</td><td>Low (honesty)</td><td>Stated plainly; the reasoning and artifacts are real, the org is not</td></tr>
       </tbody>
     </table>

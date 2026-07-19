@@ -143,19 +143,31 @@
         <p class="ex-step">Labels become namespaced tags</p>
         <p class="ex-note">notes-api owns the writeback. It maps the fields it
           knows to prefixed tags (note the <code>operational_domain</code>
-          &rarr; <code>domain:</code> rename) and PUTs them with replace
+          &rarr; <code>domain:</code> rename) and applies them with replace
           semantics, so reprocessing converges instead of piling up duplicates.
-          The user's own tags are preserved.</p>
+          The user's own tags are preserved. The background task writes through
+          the ORM in-process rather than calling the service's own HTTP
+          endpoint; the equivalent <code>PUT /notes/{id}/tags</code> exists for
+          external callers and carries the same replace semantics.</p>
         <p class="ex-note"><strong>Note what happens to <code>region</code>
           here: nothing.</strong> The classifier grew a third field in v3;
-          this consumer still reads two and drops the rest on the floor. That
-          is the contract doing its job rather than failing at it. The writeback
-          pulls fields out by name instead of assuming the response shape, so a
-          producer can add an axis without breaking anything downstream, and
-          adopting it becomes a deliberate change on the consumer's own
-          schedule. Wiring <code>region:</code> through is pending work, not a
-          bug &mdash; and until it lands, this page shows two tags because two
+          this consumer still reads two and drops the rest on the floor. It
+          doesn't break, because the writeback pulls fields out by name instead
+          of assuming the response shape. Wiring <code>region:</code> through is
+          pending work, and until it lands this page shows two tags because two
           tags is what actually gets written.</p>
+        <p class="ex-note"><strong>I originally wrote that this was the
+          contract doing its job. That was too generous to me.</strong> Tolerating
+          an unknown field is good consumer hygiene, but it isn't a guard, and
+          the guard I implied turned out not to exist. The frozen contract for
+          this seam requires a provider change to land with a coordinated
+          consumer update, and when the classifier shipped <code>region</code>
+          that update didn't happen and no build went red &mdash; because each
+          repo's &ldquo;contract test&rdquo; asserts against its own copy of the
+          shape rather than a shared one. Nothing broke here, and nothing would
+          have noticed if it had. That's written up honestly in the
+          <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-004-classify-http-contract.md">SYS-004 amendment</a>
+          rather than quietly fixed.</p>
         <pre><code>classifier_tags({
     "category": "operations",
     "operational_domain": "air",
@@ -163,7 +175,7 @@
 })
 # -&gt; ["category:operations", "domain:air"]
 
-PUT /notes/1/tags
+# written in-process; note.tags = merge_tags(note.tags, new_tags)
 { "tags": ["category:operations", "domain:air"] }</code></pre>
       </li>
       <li>
@@ -221,16 +233,29 @@ PUT /notes/1/tags
       <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
       <h3>Decouple with contracts, not shared code</h3>
       <p>The repos talk over frozen HTTP contracts with explicit
-        versioning rules. Both sides carry contract tests in CI.</p>
+        versioning rules, and each side carries tests pinning the shape.</p>
       <p class="tradeoff"><strong>Why:</strong> decoupling without a contract is
         just hope. A renamed field breaks the consumer silently at runtime.
         <strong>Tradeoff:</strong> more upfront ceremony (freeze the wire shape,
         write the tests) so that drift fails a build instead of production.</p>
-      <p class="tradeoff"><strong>What it bought, concretely:</strong> the
-        classifier added a third output field in v3 and nothing downstream
-        broke. The consumer reads the fields it wants by name rather than
-        assuming the response shape, so the new axis arrived as something to
-        adopt on purpose instead of an outage to discover.</p>
+      <p class="tradeoff"><strong>Then it drifted anyway, and I want that on the
+        page.</strong> I audited my own decision log in July 2026 and found this
+        seam broken. The classifier shipped a third field; the frozen contract
+        required a coordinated consumer update; that update never happened and
+        both repos' CI stayed green. The reason is the part worth keeping: each
+        side's &ldquo;contract test&rdquo; asserted against its <em>own</em> copy
+        of the shape. The provider's fixture was updated in the same commit that
+        changed the provider. The consumer checked itself against a stub it
+        wrote. Neither could see the other, so the two suites agreed right up
+        until they were both describing different systems.</p>
+      <p class="tradeoff"><strong>What I actually learned:</strong> two unit
+        tests that happen to agree are not a contract test, and calling them one
+        bought me months of false confidence. A real one needs a single shared
+        artifact both sides assert against, so changing one copy fails the
+        other's build. The ceremony I'd paid for was the documentation half; the
+        enforcement half was never wired. Amended in the open at
+        <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-004-classify-http-contract.md">SYS-004</a>,
+        with the falsified consequences struck through rather than deleted.</p>
     </div>
 
     <div class="decision" id="decision-rightsized">
@@ -285,7 +310,7 @@ PUT /notes/1/tags
     <h2>The outcome</h2>
     <ul>
       <li><strong>Create a note and it is automatically classified and tagged</strong>, asynchronously, with no coupling between note creation and classifier availability.</li>
-      <li><strong>The four repos stay independently deployable</strong>, and cross-repo drift is caught by a red build rather than a production incident.</li>
+      <li><strong>The four repos stay independently deployable</strong> &mdash; though cross-repo drift is <em>not</em> yet caught by a red build. I thought it was; an audit proved otherwise, and closing that gap needs one shared contract artifact both sides assert against.</li>
       <li><strong>The whole system is browsable in one portal</strong>, with links straight to the real code.</li>
       <li><strong>A skill map (SYS-007) spells out what the system exercises</strong>: evals, context engineering, agents, and observability. It also names where I'm weak, which is security on the agent's tool seam.</li>
     </ul>
