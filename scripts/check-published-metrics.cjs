@@ -13,11 +13,20 @@
  * still match it. A figure that is checked cannot quietly go stale; a figure that
  * is only proofread eventually does.
  *
- * HOW A NUMBER OPTS IN. Wrap it:
+ * HOW A NUMBER OPTS IN. In HTML, wrap it:
  *     <span data-metric="category_accuracy">92.6%</span>
+ * In Markdown, precede it with an invisible comment (same convention as the
+ * architecture repo's check_program_metrics.py, so one habit covers both):
+ *     category <!-- metric:category_accuracy -->92.6%
  * Only current figures are marked. Historical columns (v1 synthetic, v2 real...)
  * are deliberately NOT marked — they are frozen records of past runs and must not
  * track the latest artifact.
+ *
+ * WHY MARKDOWN IS SCANNED AT ALL. This script originally walked only .html, so
+ * README.md sat two versions stale — "88.9% category, 94.4% operational domain" —
+ * while this very check reported green. A guard whose scope is narrower than the
+ * claim surface it protects reads as coverage it does not have. Found 2026-07-19,
+ * by grep, not by the guard.
  *
  * FAILURE POLICY (matches the SYS-018 contract checks):
  *   - mismatch           -> exit 1. The real guard.
@@ -87,15 +96,31 @@ function fetchJson(url) {
   });
 }
 
-function htmlFiles(dir, out = []) {
+function claimFiles(dir, out = []) {
   for (const name of fs.readdirSync(path.join(ROOT, dir))) {
     if (name.startsWith('.') || name === 'node_modules' || name === 'scripts') continue;
     const rel = dir === '.' ? name : `${dir}/${name}`;
     const stat = fs.statSync(path.join(ROOT, rel));
-    if (stat.isDirectory()) htmlFiles(rel, out);
-    else if (name.endsWith('.html')) out.push(rel);
+    if (stat.isDirectory()) claimFiles(rel, out);
+    else if (name.endsWith('.html') || name.endsWith('.md')) out.push(rel);
   }
   return out;
+}
+
+/*
+ * Two marker syntaxes for two file types, one meaning. The Markdown form matches
+ * the architecture repo's checker exactly, so a number is marked the same way
+ * wherever it is written — a convention that differs per repo is one nobody
+ * remembers under pressure.
+ */
+function markersIn(text, file) {
+  const found = [];
+  const html = /<span data-metric="([^"]+)">([^<]+)<\/span>/g;
+  const md = /<!--\s*metric:([A-Za-z0-9_]+)\s*-->\s*\**\s*(\d+(?:\.\d+)?%?)/g;
+  const re = file.endsWith('.md') ? md : html;
+  let m;
+  while ((m = re.exec(text)) !== null) found.push([m[1], m[2]]);
+  return found;
 }
 
 /*
@@ -127,15 +152,12 @@ function main() {
     const problems = [];
     let checked = 0;
 
-    for (const file of htmlFiles('.')) {
-      const html = fs.readFileSync(path.join(ROOT, file), 'utf8');
-      const re = /<span data-metric="([^"]+)">([^<]+)<\/span>/g;
-      let m;
-      while ((m = re.exec(html)) !== null) {
-        const [, key, shown] = m;
+    for (const file of claimFiles('.')) {
+      const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
+      for (const [key, shown] of markersIn(text, file)) {
         if (!known.has(key)) {
           problems.push(
-            `${safe(file)}: data-metric="${safe(key)}" is not a key in the published artifact.\n` +
+            `${safe(file)}: metric key "${safe(key)}" is not in the published artifact.\n` +
               `  Known keys: ${[...known].join(', ')}\n` +
               `  A typo'd key is checked against nothing and passes forever, so this fails.`
           );
