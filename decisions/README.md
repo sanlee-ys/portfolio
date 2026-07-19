@@ -6,6 +6,8 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | # | Title | Status |
 |---|-------|--------|
 | [ADR-001](ADR-001-mobile-qa-gate.md) | The mobile QA gate is a contract, enforced in CI | Accepted |
+| [ADR-002](ADR-002-ai-use-posture.md) | State the AI assist as method, not confession | Accepted |
+| [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
 
 ## Why this tier was missing
 
@@ -38,22 +40,18 @@ Nothing is deleted from `CLAUDE.md` by adding a record here.
 
 ## Still to record
 
-Both are real decisions currently living only as `CLAUDE.md` prose, with dates and rationale
-already written:
+Nothing pending. The two decisions listed here when this tier was created — the AI-use
+posture and the private-repo boundary — were recorded on 2026-07-18 as
+[`ADR-002`](ADR-002-ai-use-posture.md) and [`ADR-003`](ADR-003-private-repo-boundary.md). Per
+the split above, both remain in `CLAUDE.md` as operative instruction; the ADRs carry the why.
 
-- **AI-use posture: method, not confession** — `CLAUDE.md`, opens *"Decided 2026-07-11"*,
-  names two rejected failure modes (apologetic, label-y). Commit `04f2ca7`.
-- **Private repos: never mention, never link** — `CLAUDE.md`. Has the most interesting
-  history in the repo: first codified 2026-07-01 as a `ROADMAP.md` checkbox, promoted to a
-  standing rule 2026-07-03 *after the same leak recurred* in a cross-repo write-up. That
-  escalation is exactly what a status lifecycle is for, and it is currently recorded only in
-  a commit message (`14b924b`).
-
-Also inbound, once this tier exists to receive it: `classifier/ADR-006` (adopt the autonomy
-ladder as the portfolio spine) is a portfolio decision filed under the classifier because the
-classifier is its protagonist. The protagonist of a decision is not its owner, and the
-mis-filing already caused a live defect — `ADR-006` still lists BM25 grounding as the shipped
-L2 rung after `ADR-012` retired it.
+`classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
+this tier and **deliberately not moved**. Its inbound citations and its living spec
+(`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record
+would break those links without moving the thing they describe. The defect cited as the
+argument for moving it — `ADR-006` listing BM25 grounding as the shipped L2 rung after
+`ADR-012` retired it — has since been fixed in place by an amendment to `ADR-006`. The
+mechanism here is the cross-tier citation (`classifier/ADR-006`), not relocation.
 
 ## Conventions
 
