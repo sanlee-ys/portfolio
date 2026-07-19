@@ -96,7 +96,7 @@
 
     <h3>AI-quality metrics (can it be measured, not just demoed?)</h3>
     <ul>
-      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On real, human-labeled text the current v3 classifier scores category 92.6% (macro-F1 0.911), operational domain 92.6% (0.933), and region 87.0% (0.927). Corroborated at n=300 with confidence intervals half as wide as the 54-snippet set allows.</li>
+      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On real, human-labeled text the current v3 classifier scores category <span data-metric="category_accuracy">92.6%</span> (macro-F1 <span data-metric="category_macro_f1">0.911</span>), operational domain <span data-metric="domain_accuracy">92.6%</span> (<span data-metric="domain_macro_f1">0.933</span>), and region <span data-metric="region_accuracy">87.0%</span> (<span data-metric="region_macro_f1">0.927</span>). Corroborated at n=300 with confidence intervals half as wide as the 54-snippet set allows.</li>
       <li><strong>Cost per unit of quality:</strong> escalating to the premium model was built and measured, not assumed. It moved zero rows at about 1.97&times; the cost, so the shipped path stays single-model. That is the second of three independent measurements landing on the same verdict, alongside the retired retrieval layer and the <a href="faithfulness-judge.html">judge-reliability study</a>.</li>
       <li><strong>Retrieval quality (RAG):</strong> recall@k, answer groundedness, citation correctness.</li>
       <li><strong>Regression gate:</strong> an eval pass-rate threshold wired into CI, so a change that drops below it does not merge.</li>

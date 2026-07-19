@@ -28,6 +28,14 @@ jobs:
           # other repos' private visibility, and the script filters !private.
           GITHUB_TOKEN: ${{ github.token }}
 
+      # Published figures are quoted from the classifier's eval runs. They used to
+      # be retyped by hand, and in July 2026 that put two-prompt-changes-stale
+      # numbers on this site and on the résumé. This asserts every marked figure
+      # against the producer's generated artifact. A mismatch fails; a fetch
+      # failure warns and passes, so an outage cannot redden the build.
+      - name: Published metrics match the classifier artifact
+        run: node scripts/check-published-metrics.cjs
+
       - name: Install Playwright Chromium
         working-directory: scripts
         run: |

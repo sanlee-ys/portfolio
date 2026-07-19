@@ -157,7 +157,7 @@
         <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
         <details>
           <summary>Read the numbers</summary>
-          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled, later corroborated at n=300 with confidence intervals half as wide. Current three-axis numbers: category 92.6%, domain 92.6%, region 87.0%. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled, later corroborated at n=300 with confidence intervals half as wide. Current three-axis numbers: category <span data-metric="category_accuracy">92.6%</span>, domain <span data-metric="domain_accuracy">92.6%</span>, region <span data-metric="region_accuracy">87.0%</span>. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
         </details>
       </div>
 
@@ -247,12 +247,12 @@
           <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 + Sonnet 5</th><th>v2 + prompt fix</th><th>v3 three-axis (current)</th></tr>
         </thead>
         <tbody>
-          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td></tr>
-          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td>0.911</td></tr>
-          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td>92.6%</td></tr>
-          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td>0.933</td></tr>
-          <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>87.0%</td></tr>
-          <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>0.927</td></tr>
+          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td><span data-metric="category_accuracy">92.6%</span></td></tr>
+          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td><span data-metric="category_macro_f1">0.911</span></td></tr>
+          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td><span data-metric="domain_accuracy">92.6%</span></td></tr>
+          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td><span data-metric="domain_macro_f1">0.933</span></td></tr>
+          <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_accuracy">87.0%</span></td></tr>
+          <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_macro_f1">0.927</span></td></tr>
         </tbody>
       </table>
       <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. When category then sat still through a model upgrade, I called it a ceiling of label ambiguity. A confusion breakdown proved me wrong: the misses clustered on one boundary, and two rubric clauses took category to 94.4%.</p>
