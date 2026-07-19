@@ -119,10 +119,21 @@ async function fetchPublicRepos() {
   return repos;
 }
 
+/*
+ * Directories that are generated, vendored, or otherwise not part of the published
+ * site. `graphify-out/` is gitignored knowledge-graph output whose own report text
+ * contains the phrase "Private repos" — so scanning it produced a violation on a file
+ * that is never committed, never deployed, and never seen by anyone. CI passes on a
+ * fresh checkout (no graphify-out/ exists there), so the false positive only ever hit
+ * the person running the guard locally. A guard that cries wolf gets silenced, which
+ * for THIS guard would be the expensive kind of silence.
+ */
+const SKIP_DIRS = new Set(['node_modules', 'scripts', 'graphify-out']);
+
 function findHtml(dir) {
   const out = [];
   for (const name of fs.readdirSync(path.join(ROOT, dir))) {
-    if (name.startsWith('.') || name === 'node_modules' || name === 'scripts') continue;
+    if (name.startsWith('.') || SKIP_DIRS.has(name)) continue;
     const rel = dir === '.' ? name : `${dir}/${name}`;
     if (fs.statSync(path.join(ROOT, rel)).isDirectory()) out.push(...findHtml(rel));
     else if (name.endsWith('.html')) out.push(rel);
