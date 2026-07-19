@@ -125,12 +125,12 @@
         <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 + Sonnet 5</th><th>v2 + prompt fix</th><th>v3 three-axis (current)</th></tr>
       </thead>
       <tbody>
-        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td></tr>
-        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td>0.911</td></tr>
-        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td>92.6%</td></tr>
-        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td>0.933</td></tr>
-        <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>87.0%</td></tr>
-        <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>0.927</td></tr>
+        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td><span data-metric="category_accuracy">92.6%</span></td></tr>
+        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td><span data-metric="category_macro_f1">0.911</span></td></tr>
+        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td><span data-metric="domain_accuracy">92.6%</span></td></tr>
+        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td><span data-metric="domain_macro_f1">0.933</span></td></tr>
+        <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_accuracy">87.0%</span></td></tr>
+        <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_macro_f1">0.927</span></td></tr>
       </tbody>
     </table>
     <p>
@@ -226,7 +226,7 @@
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/014-region-field-design.md">ADR-014</a>.
     </p>
     <p>
-      Region landed at <strong>87.0%</strong> against fresh hand labels. The
+      Region landed at <strong><span data-metric="region_accuracy">87.0%</span></strong> against fresh hand labels. The
       more interesting number is that the misses aren&rsquo;t noise:
       <strong>all seven</strong> are stories whose true label is
       <code>global</code> that the model pulled to a specific region, usually
