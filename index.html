@@ -142,11 +142,11 @@
       <div class="decision" id="decision-contracts">
         <p class="kicker">Decoupled by contract<span class="code-ref">SYS-004 &middot; SYS-006</span></p>
         <h3>Decouple with contracts, not shared code</h3>
-        <p>The repos talk over frozen HTTP contracts with explicit versioning, and both sides carry contract tests in CI. The system behaves as one thing while each piece stays independently deployable.</p>
-        <p class="tradeoff"><strong>Tradeoff:</strong> more upfront ceremony, so a renamed field fails a build instead of breaking production in silence.</p>
+        <p>The repos talk over frozen HTTP contracts with explicit versioning, and each side carries tests pinning the shape. The system behaves as one thing while each piece stays independently deployable.</p>
+        <p class="tradeoff"><strong>Then I audited it and found the seam broken.</strong> The classifier added a field, the coordinated consumer update never landed, and both repos' CI stayed green &mdash; because each side asserted against its own copy of the shape rather than a shared one.</p>
         <details>
-          <summary>Why it mattered</summary>
-          <p>Decoupling without a contract is just hope. The seams between the pieces are where the real difficulty sits. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
+          <summary>What that taught me</summary>
+          <p>Two unit tests that happen to agree are not a contract test, and calling them one bought months of false confidence. The ceremony I'd paid for was the documentation half; the enforcement half was never wired. Corrected in the open rather than quietly fixed. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
         </details>
       </div>
 
