@@ -36,6 +36,15 @@ jobs:
       - name: Published metrics match the classifier artifact
         run: node scripts/check-published-metrics.cjs
 
+      # Ports the architecture repo's 'Downstream surfaces' rule down to this repo's
+      # ADR tier. Stdlib Python, no venv — this is a static site with no Python
+      # toolchain, and a doc linter is not a reason to grow one. All 3 ADRs comply,
+      # so it is enforced with zero exceptions.
+      # `python3`, not `python`: this job sets up Node, not Python, and only python3
+      # is guaranteed on the ubuntu runner image.
+      - name: ADRs list their downstream surfaces
+        run: python3 scripts/lint_decisions.py
+
       - name: Install Playwright Chromium
         working-directory: scripts
         run: |
