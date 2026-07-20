@@ -1,7 +1,7 @@
 // Render engine for the loop-replay viewer (lab/loop-replay.html).
 //
 // The page ships the run log as a plain JS string (window.LOOP_REPLAY_JSONL,
-// set by data/loop-replay-dryrun.js) so it renders the same over file:// and
+// set by data/loop-replay-real.js) so it renders the same over file:// and
 // https:// -- a fetch() of a local .jsonl file hits Chromium's CORS
 // restriction on local files, a plain <script src> doesn't. This file:
 //   1. parses that string as JSONL into { metadata, iterations, summary },
@@ -19,7 +19,7 @@
   // ---- The one flag San flips for a real run (see loop-replay.html's "How
   // this reads a run log" section). true = amber "demo data" banner, false =
   // a plain "real run" label. Nothing else in this file changes. ----
-  var IS_DRY_RUN = true;
+  var IS_DRY_RUN = false;
 
   var SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -158,13 +158,25 @@
     statsEl.innerHTML = tiles;
 
     if (calloutEl) {
+      // The gap is a delta-of-deltas: how much A MOVED from baseline to the
+      // best iteration, minus how much C moved over the same span. It is not
+      // the distance between A's and C's final scores -- those can sit far
+      // apart on a run that generalized perfectly, and close together on one
+      // that didn't. Say "improved more than", never "finished ahead of".
       var gap = summary.overfitting_gap_a_vs_c;
       var gapAbs = Math.abs(gap * 100).toFixed(1);
+      var deltas = summary.delta_macro_f1 || {};
+      var spans =
+        deltas.A != null && deltas.C != null
+          ? " (A " + fmtDelta(deltas.A) + ", C " + fmtDelta(deltas.C) + ")"
+          : "";
       var direction = gap > 0
-        ? "A finished " + gapAbs + " pts ahead of C — some of that A gain didn't transfer."
-        : "C finished " + gapAbs + " pts ahead of A — no sign of overfitting to the training split.";
+        ? "A improved " + gapAbs + " pts more than C did" + spans +
+          " — some of that A gain didn't transfer to real gold text."
+        : "C improved " + gapAbs + " pts more than A did" + spans +
+          " — no sign of overfitting to the training split.";
       calloutEl.innerHTML =
-        "Overfitting gap (A − C) at the best iteration: <strong>" +
+        "Overfitting gap (A gain − C gain), baseline to best iteration: <strong>" +
         fmtDelta(gap) + "</strong>. " + direction;
     }
   }

@@ -60,6 +60,17 @@
       border-radius: 50%;
       background: var(--warn);
     }
+    /* Real-run variant: same badge, drained of the warning colour. The amber
+       above means "do not read these numbers as a result"; once a measured run
+       is loaded that warning would be a lie, so the badge steps back to the
+       site's normal accent and just states what's loaded. Applied by
+       loop-replay.js when IS_DRY_RUN is false. */
+    .demo-badge.real-run {
+      border-color: var(--border);
+      background: var(--panel);
+      color: var(--muted);
+    }
+    .demo-badge.real-run .dot { background: var(--accent); }
 
     /* Run-summary stat tiles: same card language as the site's .repo-grid,
        new class because the content (label + big number) is different. */
@@ -233,7 +244,7 @@
 
     <div class="demo-badge" id="demo-badge">
       <span class="dot"></span>
-      <span id="demo-badge-text">Demo data (dry run) &mdash; a deterministic offline backend, zero API calls. Proves the replay mechanics, not a classifier result. See <code>evals/optimize/README.md</code> in the classifier repo.</span>
+      <span id="demo-badge-text">Real run &mdash; claude-sonnet-5, 1,524,937 tokens, stopped on the <code>threshold</code> done-signal. Numbers below are a measured result, not a demo.</span>
     </div>
 
     <h2>Run summary</h2>
@@ -308,20 +319,23 @@
 
     <div class="decision">
       <p class="tag">Decision</p>
-      <h3>Ship with dry-run mock data, labeled as such</h3>
-      <p>The prompt-optimization loop itself is spec&rsquo;d and implemented in
-        the classifier repo, but a real run costs real tokens and is San&rsquo;s
-        to run. The mock run log (<code>--dry-run</code>, a deterministic
-        offline backend, every rationale field prefixed <code>[dry-run]</code>)
-        gives this viewer a real JSONL artifact to build and test against
-        without waiting on that run or faking numbers.</p>
-      <p class="tradeoff"><strong>Why:</strong> the viewer is the deliverable
-        here, not a claimed result &mdash; and a viewer that only works once
-        real data exists can&rsquo;t be built or reviewed today.
-        <strong>Tradeoff:</strong> every number on this page right now is
-        synthetic. The banner above says so, and the data source is a single
-        swappable file (see below) so a real run drops in without touching this
-        page&rsquo;s code.</p>
+      <h3>Built against a labeled mock, then swapped for the real run</h3>
+      <p>This viewer shipped first against a <code>--dry-run</code> mock &mdash;
+        a deterministic offline backend, zero API calls, every rationale field
+        prefixed <code>[dry-run]</code> &mdash; because the viewer was the
+        deliverable and a real run costs real money. The mock was labeled as a
+        mock in a loud amber banner rather than quietly presented as a result.
+        The real run landed the next day, and the page now loads it: 1.5M
+        tokens, <code>threshold</code> stop at iteration 2.</p>
+      <p class="tradeoff"><strong>Why:</strong> a viewer that can only be built
+        once real data exists can&rsquo;t be reviewed today &mdash; but a mock
+        left in place after real data arrives is just a stale claim. The design
+        that made both true is the single swappable data file.
+        <strong>Tradeoff:</strong> the swap took a CSS fix the original plan
+        missed &mdash; the &ldquo;real run&rdquo; state had a class but no style,
+        so the banner would have kept its warning colour while claiming a
+        measured result. Cheap to fix, and a good argument for actually
+        exercising a swap path before calling it done.</p>
     </div>
 
     <h2>How this reads a run log</h2>
@@ -329,17 +343,18 @@
       The run log is <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/optimize/README.md">append-only
       JSONL</a>: a <code>run_metadata</code> line, one <code>iteration</code>
       line per step, and a trailing <code>run_summary</code>. This page ships
-      the sample log as a plain JS string
-      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/lab/data/loop-replay-dryrun.js"><code>lab/data/loop-replay-dryrun.js</code></a>)
+      the run log as a plain JS string
+      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/lab/data/loop-replay-real.js"><code>lab/data/loop-replay-real.js</code></a>)
       rather than fetching a <code>.jsonl</code> file, so it renders the same
       way whether it&rsquo;s opened straight from disk or served from GitHub
       Pages &mdash; a <code>fetch()</code> of a local file hits browser CORS
       restrictions that a plain <code>&lt;script src&gt;</code> doesn&rsquo;t.
-      Swapping in San&rsquo;s real <code>run_&lt;UTC-timestamp&gt;.jsonl</code>
-      is: drop the new file in <code>lab/data/</code>, paste its raw text into
-      that same template literal, point the <code>&lt;script src&gt;</code> in
-      this page at it, and flip one flag (<code>IS_DRY_RUN = false</code>) to
-      swap the demo banner for a real-run label. No other code changes.
+      Swapping in a different <code>run_&lt;UTC-timestamp&gt;.jsonl</code> is:
+      drop the new file in <code>lab/data/</code>, regenerate that template
+      literal from its raw text, and point the <code>&lt;script src&gt;</code>
+      in this page at it. The <code>IS_DRY_RUN</code> flag in
+      <code>loop-replay.js</code> stays <code>false</code> for any real run;
+      it exists so a mock can never be shown without its warning banner.
     </p>
 
     <h2>Stack</h2>
@@ -352,7 +367,7 @@
     </p>
   </main>
 
-  <script src="data/loop-replay-dryrun.js"></script>
+  <script src="data/loop-replay-real.js"></script>
   <script src="../assets/theme.js"></script>
   <script src="../assets/last-updated.js"></script>
   <script src="loop-replay.js"></script>
