@@ -8,6 +8,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-001](ADR-001-mobile-qa-gate.md) | The mobile QA gate is a contract, enforced in CI | Accepted |
 | [ADR-002](ADR-002-ai-use-posture.md) | State the AI assist as method, not confession | Accepted |
 | [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
+| [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Accepted |
 
 ## Why this tier was missing
 
@@ -44,6 +45,12 @@ Nothing pending. The two decisions listed here when this tier was created — th
 posture and the private-repo boundary — were recorded on 2026-07-18 as
 [`ADR-002`](ADR-002-ai-use-posture.md) and [`ADR-003`](ADR-003-private-repo-boundary.md). Per
 the split above, both remain in `CLAUDE.md` as operative instruction; the ADRs carry the why.
+
+**Open execution, not an open decision:** [`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md)
+is Accepted, but its migration has **not** been carried out — `/lab` is still live and
+`lab/loop-replay.html` has not moved. The ADR's *Downstream surfaces* section is the checklist
+for that work. Written before the migration on purpose: it reverses two previously written
+rules, so the reversal wanted a reviewable record rather than a diff.
 
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec

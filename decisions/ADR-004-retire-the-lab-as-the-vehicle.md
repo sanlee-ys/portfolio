@@ -1,0 +1,155 @@
+# ADR-004: Retire the lab as the vehicle; interactive work belongs wherever it argues best
+
+**Status:** Accepted (decision recorded; migration not yet executed)
+**Date:** 2026-07-19
+**Deciders:** San Lee
+
+---
+
+## Context
+
+The site has carried a two-surface split since 2026-06-26: the front page stays
+"tasteful and sales-ready," and a labeled `/lab` sandbox holds the front-end
+experiments, so curiosity never compromises the showcase. The lab climbed a tier
+progression on purpose — Tier 1 CSS craft, Tier 2 Canvas, Tier 3 SVG/dataviz,
+Tier 4 WebGL — and was sharpened on 2026-07-04 into **front-end craft only**:
+project demos were explicitly barred from it, because the craft sandbox and the
+systems showcase were meant to stay distinct.
+
+That split was right for its moment and it is wrong now, for two reasons that
+arrived from different directions.
+
+**1. The lab stopped being fed, and a stalled sandbox is worse than no sandbox.**
+The lab only pays off if experiments keep landing. Against a full-time schedule
+there is not enough time to *learn* and *build* in parallel; something gives, and
+it has been the lab. A learning sandbox that stops updating does not read as
+neutral — it timestamps the month the author stopped.
+
+**2. The framing was actively discounting the site's strongest evidence.**
+`lab/loop-replay.html` is a recorded-replay viewer for the prompt-optimization
+loop's run log. It is the **only interactive proof of the L3 rung** of the
+autonomy ladder (`classifier/ADR-006`), and it is where the Goodhart argument —
+that the loop improves against the split it can see while giving back ground on
+held-out gold — becomes something a reader can *watch* rather than take on
+faith. Both project pages now link into it as supporting evidence.
+
+It was filed under a section whose own index says *"expect rough edges; that's
+the point."* A skeptical senior engineer is being told, on arrival, to grade the
+site's best artifact on a curve. When a lab experiment becomes load-bearing for
+two project pages, it is not an experiment.
+
+The deeper defect is in the tier framing itself. Sorting work into "fancy UI =
+learning exercise" and "prose = real work" was never true, and loop-replay is the
+counterexample: the interactive artifact turned out to carry the argument better
+than the paragraphs around it.
+
+There is a related failure this record should name, because it is the same
+mistake in a different costume. The project pages have grown dense with prose,
+and some of that prose is doing a job a picture does better — a four-row table
+describing a state machine, confidence intervals written out as numbers, a
+paragraph explaining a three-way data split. That text is not load-bearing; it is
+a visual that was never drawn, because drawing it would have meant "lab work."
+
+## Decision
+
+**Retire `/lab` as a section, and stop confining interactive work to it.**
+
+1. **The lab is retired as the vehicle.** Front-end learning as a *goal*
+   survives; the separate wing that has to be fed does not. Learning happens
+   inside real work from here.
+2. **The tier progression is dropped.** Tier 1–4 as a ladder to climb, and the
+   Tier badges on lab pages, are retired with it. This reverses the "climb the
+   tiers deliberately" approach and the 2026-07-04 "craft ONLY" sharpening.
+   Both are superseded, not deleted — see *Alternatives Considered*.
+3. **Interactive work lives wherever it argues best.** There is no surface where
+   a visual is off-limits because it would be "too fancy for the showcase," and
+   none where a project demo is barred for being a demo.
+4. **Pages that earn their place move into the portfolio proper.**
+   `lab/loop-replay.html` is the first and clearest case: it is evidence for the
+   classifier's L3 claim and should sit where that claim is made.
+5. **The uplift trims prose doing a visual's job — and nothing else.** Text that
+   *is* the substance (ADR reasoning, negative results, what was measured and did
+   not pay) is what makes these pages survive a skeptical read per
+   [`ADR-002`](ADR-002-ai-use-posture.md)'s "artifacts, not vocabulary" standard.
+   It is not trimmed for visual breathing room. **A prettier site that argues
+   less well is a net loss.**
+
+Named candidates for visual treatment, as scope for the migration that follows:
+
+| Currently | Wants to be |
+|---|---|
+| The autonomy-ladder four-row table | A state diagram — the rungs are a progression, drawn as a list |
+| Scaled-eval accuracy + Wilson CIs in prose | A plot; the whole point of a CI is that it is a *width* |
+| The A/B/C split explained in a paragraph | One diagram; it is three boxes and two arrows |
+
+## Downstream surfaces
+
+Nothing below is changed by this record — this ADR is the contract the migration
+follows, per `system/SYS-009`.
+
+- **`lab/loop-replay.html`** — the page that forced this decision. Moves into the
+  portfolio proper; drops its Tier 3 badge and lab framing. Its decision blocks
+  and "How this reads a run log" section are portfolio-voice writing and survive
+  the move intact.
+- **`lab/index.html`, `lab/gallery.html`, `lab/scroll-storytelling.html`** — the
+  remaining lab pages. Their disposition (fold in, keep at a stable URL, or
+  retire) is migration scope, not settled here.
+- **`index.html`** — the `doors` nav (line ~85) and the footer nav (line ~321)
+  both link `lab/index.html`; the About section (line ~304) links
+  `lab/gallery.html` for photos. All three need a decision at migration time.
+- **`projects/defense-news-classifier.html`, `projects/the-system.html`** — both
+  deep-link into `lab/loop-replay.html` as evidence. These links must not break;
+  they are the reason the page is being promoted.
+- **`README.md`, `ROADMAP.md`, `learning/README.md`,
+  `learning/05-scroll-driven-storytelling.md`** — describe the lab and/or the
+  tier progression as live structure.
+- **`404.html`** — links the lab.
+- **`decisions/ADR-002`** — references the lab; check the reference still reads
+  true after migration.
+- **`CLAUDE.md`** — carries no lab or tier rule today, so nothing to amend there.
+  The mobile QA gate ([`ADR-001`](ADR-001-mobile-qa-gate.md)) applies to every
+  page the migration touches, and any promoted page must pass it at 320–430px.
+- **Not governed here:** `classifier/ADR-006` and its living spec own the
+  autonomy ladder itself. This record moves where the *evidence* is displayed; it
+  makes no claim about the ladder's rungs or their state.
+
+## Consequences
+
+- **The site loses its designated place to be scrappy.** The lab existed so
+  experiments had somewhere to fail publicly without denting the showcase. That
+  pressure valve is gone: from here, anything shipped is on a page that sells.
+  Accepted, because in practice the valve stopped being used.
+- **The Tier 1→3 progression, which was itself a story, ends.** "Watch someone
+  with no front-end background climb from CSS to data-driven SVG" was a real
+  narrative, and loop-replay was its capstone. Pulling it leaves the lab topping
+  out at a photo gallery, which is why the lab is retired rather than left
+  standing with its best page removed.
+- **Front-end learning loses its explicit container and must be defended
+  elsewhere,** or it quietly stops. This is the honest risk of the decision:
+  "learning happens inside real work" is exactly what someone says right before
+  it stops happening. The mitigation is that the work itself now demands visual
+  technique, rather than routing it to a sandbox.
+- **The migration is a link-integrity problem before it is a design problem.**
+  Two project pages cite the lab as evidence, and `sanlee.me` is linked publicly
+  (LinkedIn, Instagram). Moved pages need their inbound links updated in the same
+  change, and the QA gate's internal-link check is the backstop.
+- **Trimming has a stated floor, and it is enforceable by reading.** "Prose doing
+  a visual's job" is a narrower target than "too much text." If a proposed trim
+  removes reasoning, a negative result, or a measured caveat, it is out of scope
+  by this record regardless of how much cleaner the page gets.
+- **Decision and execution are deliberately split.** This ADR was written before
+  the migration precisely because the 2026-07-04 sharpening it reverses was made
+  the other way around — as a rule, then applied — and the reversal deserves a
+  reviewable record rather than a diff.
+
+## Alternatives Considered
+
+| Option | Reason Not Chosen |
+|--------|-------------------|
+| Keep the lab; promote only `loop-replay.html` out of it | Fixes the immediate misfiling but leaves the tier story ending on a photo gallery, and leaves the rule that caused the misfiling ("craft ONLY, no project demos") in force to misfile the next one |
+| Keep the lab and relax the craft-only rule | Preserves the section that is not being fed. The capacity problem is the primary driver; a rule change does not create time |
+| Leave `loop-replay.html` where it is and link harder from the project pages | Already the status quo, and it is what exposed the problem: both project pages cite it, and the reader still lands on a page framed as a rough-edged experiment |
+| Embed the viewer inline in `projects/defense-news-classifier.html` | Strongest narrative — claim then immediate evidence — but the page's decision blocks and run-log walkthrough are good standalone writing that would have to be cut to embed cleanly. Left open as a migration-time choice rather than foreclosed here |
+| Delete the lab pages outright | Loses real work with no benefit. Retirement is about the *section* and its framing, not the artifacts |
+| Do the migration now and record the decision after | Rejected on the same grounds as `ADR-003`'s history: a decision that lives only in a diff is not reviewable as a decision. This one reverses two written rules, so it needed the record first |
+| Trim prose generally to make room for visuals | Rejected explicitly in Decision 5. The dense reasoning is the credibility; a site that reads faster and argues worse is the wrong trade for a portfolio whose pitch is measured honesty |
