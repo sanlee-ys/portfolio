@@ -20,10 +20,10 @@ That split was right for its moment and it is wrong now, for two reasons that
 arrived from different directions.
 
 **1. The lab stopped being fed, and a stalled sandbox is worse than no sandbox.**
-The lab only pays off if experiments keep landing. With the job search live and a
-full work schedule, there is not enough time to *learn* and *build* in parallel;
-something gives, and it has been the lab. A learning sandbox that stops updating
-does not read as neutral — it timestamps the month the author stopped.
+The lab only pays off if experiments keep landing. Against a full-time schedule
+there is not enough time to *learn* and *build* in parallel; something gives, and
+it has been the lab. A learning sandbox that stops updating does not read as
+neutral — it timestamps the month the author stopped.
 
 **2. The framing was actively discounting the site's strongest evidence.**
 `lab/loop-replay.html` is a recorded-replay viewer for the prompt-optimization
