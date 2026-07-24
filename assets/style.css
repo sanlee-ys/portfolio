@@ -826,6 +826,141 @@ body {
 .tl-body { color: var(--muted); font-size: 0.95rem; margin: 4px 0 0; }
 .tl-quote { color: var(--text); font-style: italic; }
 
+/* ---- The autonomy ladder, drawn as a climb ----------------------------
+   Replaces a four-row table (portfolio/ADR-004). Same spine construction as
+   .timeline above: one absolutely positioned rail, each rung drawing its own
+   marker centered on it. Vertical is not a mobile concession here, it is the
+   subject -- a ladder is climbed, and the table rendered four levels as equal
+   peers sitting side by side.
+
+   State is encoded three ways on purpose -- marker SHAPE, marker fill, and the
+   chip's TEXT -- so the reader never depends on color alone to tell shipped
+   from retired from half-done. */
+.ladder { list-style: none; padding: 0; margin: 22px 0 0; position: relative; }
+.ladder::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--border);
+}
+.rung { position: relative; padding: 0 0 26px 30px; }
+.rung:last-child { padding-bottom: 0; }
+.rung::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+}
+/* Shipped: solid. The rung is filled in because the work is in. */
+.rung[data-state="shipped"]::before { background: var(--accent); }
+/* Retired: filled, then struck through. Drawn as climbed-and-stepped-back
+   rather than blanked, because the record keeps rungs that were climbed down
+   from -- the ::after bar is the "climbed back down" mark. */
+.rung[data-state="retired"]::before { background: var(--muted); border-color: var(--muted); }
+.rung[data-state="retired"]::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 11px;
+  width: 12px;
+  height: 2px;
+  background: var(--bg);
+}
+/* Partly shipped: literally half-filled. L3 is one level delivered in two
+   sub-rungs and exactly one of them is in, which a prose cell cannot show. */
+.rung[data-state="partial"]::before {
+  background: linear-gradient(to top, var(--accent) 50%, var(--bg) 50%);
+}
+/* To spec: hollow and dashed -- written down, not built. */
+.rung[data-state="spec"]::before { border-style: dashed; border-color: var(--muted); }
+
+.rung-head {
+  display: flex;
+  flex-wrap: wrap;      /* the chip drops to its own line before it can overflow */
+  align-items: baseline;
+  gap: 6px 10px;
+  margin: 0;
+}
+.rung-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.rung[data-state="retired"] .rung-id,
+.rung[data-state="spec"] .rung-id { color: var(--muted); }
+.rung-name { font-weight: 600; }
+.rung-state {
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.rung[data-state="shipped"] .rung-state,
+.rung[data-state="partial"] .rung-state { color: var(--accent); border-color: var(--accent); }
+.rung-gain { margin: 6px 0 0; font-size: 0.95rem; }
+.rung-driver { margin: 4px 0 0; font-size: 0.95rem; color: var(--muted); }
+.rung-driver .lbl {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  opacity: 0.8;
+  margin-right: 6px;
+}
+/* L3's two sub-rungs. Lowercase "rung" is the spec's own word for a sub-step
+   inside a Level; the markers keep the two numbering schemes visually distinct
+   from the L1-L4 markers on the spine. */
+.subrungs { list-style: none; margin: 8px 0 0; padding: 0; }
+.subrungs li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.subrungs li::before {
+  position: absolute;
+  left: 0;
+  font-size: 0.85rem;
+}
+.subrungs li[data-done="yes"]::before { content: "\2713"; color: var(--accent); }
+.subrungs li[data-done="no"]::before { content: "\25CB"; color: var(--muted); }
+.subrungs li span { color: var(--muted); opacity: 0.85; }
+
+/* L4's backward edge. Small enough to sit inline in the rung; max-width keeps
+   it at natural size on desktop while it scales down on a phone. */
+.backedge {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  margin: 10px 0 0;
+}
+.backedge .be-box { fill: var(--bg); stroke: var(--border); stroke-width: 1.5; }
+.backedge .be-label { fill: var(--text); font-size: 13px; font-weight: 600; }
+.backedge .be-edge { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+/* The one edge the table could not draw, so it gets the accent. */
+.backedge .be-back { stroke: var(--accent); stroke-dasharray: 4 3; }
+/* 12px in viewBox units, not 11: at 320px the SVG scales to ~0.93, so 11px
+   landed at 10.2px rendered. 12 keeps the annotation above 11px on a phone. */
+.backedge .be-note { fill: var(--muted); font-size: 12px; }
+.backedge marker path { fill: var(--muted); }
+.backedge marker path.be-head-back { fill: var(--accent); }
+
 /* Inline links inside prose. Without this they fall back to the browser's
    default deep blue, which is nearly unreadable on the dark background. Accent
    color + a soft underline that firms up on hover reads clearly as a link. */

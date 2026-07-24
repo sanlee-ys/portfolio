@@ -193,7 +193,26 @@ hole. Also swept, beyond the original list: `decisions/README.md` (carried a
 `loop-replay.js`. `decisions/ADR-002` was checked and needed no change; its apparent
 "lab" hits were the word *label*.
 
-**Not done here:** the visual-treatment candidates in the Decision section (the
-autonomy-ladder state diagram, the Wilson-CI plot, the A/B/C split diagram) are
-untouched. This migration was structural — moving pages and fixing links — and every
-one of those is a design change to a project page. They remain open scope.
+**Not done in the structural migration:** the visual-treatment candidates in the
+Decision section were left untouched by it — that pass moved pages and fixed links,
+and every candidate is a design change to a project page.
+
+**Candidate 1 landed 2026-07-23.** The autonomy-ladder four-row table on
+`projects/defense-news-classifier.html` is now a vertical spine, built on the same
+CSS construction as the colophon's `.timeline` rather than a new SVG vocabulary.
+Vertical is the composition, not a mobile concession: a ladder is climbed, and the
+table rendered four levels as equal peers side by side. Two things the table
+structurally could not draw are now visible — L2's climbed-then-retired arc (a
+struck spine marker plus a "then retired" chip) and L4's backward critic edge (a
+small inline SVG of triage → classify → critic with the return edge drawn). L3's
+half-ness is literal: a half-filled marker and two sub-rung entries, one checked.
+State is encoded three ways — marker shape, marker fill, and chip text — so no
+reading depends on color alone.
+
+Decision 5's floor held and cost something: a `.rung-note` restating L2's measured
+numbers was written and then cut, because those numbers already appear twice on the
+page ("The grounding that did not pay", and the paragraph below the ladder). The
+visual carries the shape; the prose keeps the reasoning. Nothing the table said was
+lost — every level still carries gains, who-drives, and state.
+
+**Still open:** the Wilson-CI plot and the A/B/C split diagram.
