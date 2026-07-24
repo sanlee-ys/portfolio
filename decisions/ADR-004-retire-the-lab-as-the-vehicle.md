@@ -82,6 +82,12 @@ Named candidates for visual treatment, as scope for the migration that follows:
 | Scaled-eval accuracy + Wilson CIs in prose | A plot; the whole point of a CI is that it is a *width* |
 | The A/B/C split explained in a paragraph | One diagram; it is three boxes and two arrows |
 
+The wants-to-be column is scope-setting from before any of these were designed,
+and it is left as written. What actually shipped for candidate 3 is six boxes and
+four edges, not three and two — the extra edge is A's return, which turned out to
+be the entire argument. Noted rather than corrected in place: the row records what
+was expected, and the *Migration record* below records what landed.
+
 ## Downstream surfaces
 
 Nothing below is changed by this record — this ADR is the contract the migration
