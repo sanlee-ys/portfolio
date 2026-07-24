@@ -122,6 +122,38 @@
       --warn-soft: rgba(185, 121, 10, 0.10);
     }
 
+    /* The A/B/C split map (portfolio ADR-004's third visual candidate). Lives
+       here rather than in assets/style.css because it borrows --series-a/b/c,
+       which are page-scoped above -- and that borrowing is the point: the
+       reader learns the colour code from this diagram and carries it into the
+       score chart further down. */
+    .split-map {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 10px;
+    }
+    /* Set boxes take the series colour; what they feed stays neutral, so the
+       eye tracks the three sets rather than the six shapes. */
+    .split-map .sm-set { fill: var(--bg); stroke-width: 2; }
+    .split-map .sm-a { stroke: var(--series-a); }
+    .split-map .sm-b { stroke: var(--series-b); }
+    .split-map .sm-c { stroke: var(--series-c); }
+    .split-map .sm-box { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; }
+    .split-map .sm-id { fill: var(--text); font-size: 16px; font-weight: 700; }
+    .split-map .sm-role { fill: var(--text); font-size: 12.5px; }
+    /* max-width caps the SVG at 260px, which is under the content column even
+       at a 320px viewport (272px inside the gutters) -- so it renders 1:1 at
+       every width the gate tests and these viewBox units ARE CSS pixels.
+       Measured, not assumed: scale came back 1.000 at 320, 390 and 900. */
+    .split-map .sm-note { fill: var(--muted); font-size: 12px; }
+    .split-map .sm-edge { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+    .split-map .sm-edge-a { stroke: var(--series-a); }
+    .split-map marker path { fill: var(--muted); }
+    .split-map marker path.sm-head-a { fill: var(--series-a); }
+    .split-caption { color: var(--muted); font-size: 0.92rem; margin: 0 0 28px; }
+
     .chart-legend {
       display: flex;
       flex-wrap: wrap;
@@ -232,14 +264,61 @@
     </p>
 
     <p class="lead">
-      The loop reads set <strong>A</strong> (training) after each iteration,
-      proposes a prompt edit, and re-scores. It stops on set <strong>B</strong>
-      (held back from that feedback loop, so it can act as an honest early-stop
-      signal). It never reads set <strong>C</strong> (real gold text) until the
-      run is over &mdash; C is reported, not optimized against. That separation
-      is the whole point: this page replays a run so the gap between
-      &ldquo;improved on A&rdquo; and &ldquo;improved on C&rdquo; is something
-      you can see, not just read as a footnote.
+      The loop optimizes against one set and is graded on two it never gets to
+      touch. That separation is the whole point: this page replays a run so the
+      gap between &ldquo;improved on A&rdquo; and &ldquo;improved on C&rdquo; is
+      something you can see, not just read as a footnote.
+    </p>
+
+    <!-- The three-way split, drawn. All three sets are scored every iteration;
+         what differs is what each one is allowed to influence, and only A's
+         arrow comes back. That asymmetry IS the overfitting guard, and it was
+         previously three sentences of topology the reader had to assemble. The
+         set colours match the chart's series colours below, so the code is
+         learned here and carried down the page. -->
+    <svg class="split-map" viewBox="0 0 260 184" role="img"
+         aria-label="Set A feeds the agent's prompt rewrite and is re-scored each iteration, a closed loop. Set B is scored and stops the run. Set C is scored and reported only. Neither B nor C feeds back into the prompt.">
+      <defs>
+        <marker id="split-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <!-- A's return edge gets its own marker so the head takes the series-a
+             colour with the line; markers don't inherit the path's stroke. -->
+        <marker id="split-arrow-a" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path class="sm-head-a" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <rect class="sm-set sm-a" x="4" y="10" width="44" height="36" rx="8" />
+      <text class="sm-id" x="26" y="34" text-anchor="middle">A</text>
+      <path class="sm-edge sm-edge-a" d="M 48 28 L 70 28" marker-end="url(#split-arrow-a)" />
+      <rect class="sm-box" x="74" y="10" width="182" height="36" rx="8" />
+      <text class="sm-role" x="165" y="33" text-anchor="middle">rewrites the prompt</text>
+      <!-- The one edge that comes back. Its absence on B and C is the argument. -->
+      <path class="sm-edge sm-edge-a" d="M 165 46 C 165 76, 26 76, 26 50"
+            marker-end="url(#split-arrow-a)" />
+      <text class="sm-note" x="96" y="90" text-anchor="middle">re-scored every iteration</text>
+
+      <rect class="sm-set sm-b" x="4" y="104" width="44" height="32" rx="8" />
+      <text class="sm-id" x="26" y="126" text-anchor="middle">B</text>
+      <path class="sm-edge" d="M 48 120 L 70 120" marker-end="url(#split-arrow)" />
+      <rect class="sm-box" x="74" y="104" width="182" height="32" rx="8" />
+      <text class="sm-role" x="165" y="125" text-anchor="middle">stops the run</text>
+
+      <rect class="sm-set sm-c" x="4" y="146" width="44" height="32" rx="8" />
+      <text class="sm-id" x="26" y="168" text-anchor="middle">C</text>
+      <path class="sm-edge" d="M 48 162 L 70 162" marker-end="url(#split-arrow)" />
+      <rect class="sm-box" x="74" y="146" width="182" height="32" rx="8" />
+      <text class="sm-role" x="165" y="167" text-anchor="middle">reported only</text>
+    </svg>
+
+    <p class="split-caption">
+      Only <strong>A</strong>&rsquo;s arrow comes back. <strong>B</strong> is
+      held out of that feedback loop so stop-detection stays honest, and
+      <strong>C</strong> &mdash; real gold text &mdash; never enters the
+      agent&rsquo;s context at all.
     </p>
 
     <div class="demo-badge" id="demo-badge">
