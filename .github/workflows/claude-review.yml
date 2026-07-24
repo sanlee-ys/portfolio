@@ -154,18 +154,29 @@ jobs:
           #              to give up. Tool list mirrors the action's own
           #              examples/pr-review-comprehensive.yml.
           #
-          # max-turns stays at 25 ON PURPOSE. It was raised 8 -> 25 in #96 to
-          # buy headroom and PR #101 blew through it anyway, which is the
-          # evidence that the ceiling was never the binding constraint: of the
-          # 26 turns that run spent, 11 were denied tool calls that returned
-          # nothing. Measured productive turns across runs were 13-15, and the
-          # denials this line removes are the headroom for the comment-posting
-          # turns the prompt now asks for. If 25 still exhausts, the classify
-          # step below says so honestly and we tune against real numbers
-          # instead of guessing again.
+          # max-turns 25 -> 40, and this one is measured rather than guessed.
+          #
+          # #103 argued 25 should stay, on the grounds that observed runs used
+          # 13-15 productive turns. That number was junk: it came from runs
+          # where the agent was flailing against denied tools, so it measured
+          # what GIVING UP costs, not what REVIEWING costs. The first working
+          # run (#104, run 30061618828) settled it — `turns=22 denials=0` on a
+          # ONE-PARAGRAPH markdown diff, the smallest reviewable change this
+          # repo can produce. Reviewing is turn-expensive because it is real
+          # work: read the diff, read the ADR it cites, read CLAUDE.md, verify
+          # the claims, post. 22/25 on the floor case leaves no room for a PR
+          # with several files and actual HTML.
+          #
+          # This is NOT the #96 move. #96 raised the ceiling as a substitute
+          # for a diagnosis and had no measurement behind it; the constraint
+          # there was permission, and 11 of #101's 26 turns were denied calls.
+          # That is fixed and denials are now 0. 40 is ~2x the measured floor,
+          # chosen against a real number, and the classify step reports turns
+          # and cost on EVERY run — so the next adjustment gets data too.
+          # Cost stays bounded by the cheap tier and one run per PR-open.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 25
+            --max-turns 40
             --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
 
       # Turn "the action exited non-zero" into a signal that distinguishes
