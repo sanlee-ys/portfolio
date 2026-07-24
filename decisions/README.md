@@ -53,13 +53,26 @@ learning log moved to the colophon. The ADR was written before the migration on 
 reverses two previously written rules, so the reversal wanted a reviewable record rather than
 a diff — and its *Downstream surfaces* section served as the checklist.
 
-[`ADR-005`](ADR-005-review-check-signal.md) shipped on 2026-07-23 and carries **one open
-verification item**, recorded here because the record itself says it cannot be closed by
-its own PR. Editing `.github/workflows/claude-review.yml` makes the Claude App skip the
-review on that same PR, so the change landed green without ever running. It is proven when
-a PR gets a **posted comment** from the review job — not when the check goes green, which
-is exactly what the broken version produced for ten days. Until then the fix is untested in
-the only environment that matters.
+[`ADR-005`](ADR-005-review-check-signal.md) shipped on 2026-07-23 with one open
+verification item — the record could not be closed by its own PR, because editing
+`.github/workflows/claude-review.yml` makes the Claude App skip the review on that same
+PR, so the change landed green without ever running. **Closed the same day:** the next PR
+(#104) got a posted comment from the review job at `turns=22 denials=0` — the first review
+comment the job has produced since the 2026-07-13 pilot. The proof was the comment, not
+the green check; a green check is what the broken version produced for ten days.
+
+That first measurement immediately amended the record. Decision 4 had argued the turn
+ceiling should stay at 25, reasoning from runs that used 13–15 turns — but those runs were
+the *broken* ones, so the number measured what giving up costs rather than what reviewing
+costs. A working review of a one-paragraph diff spent 22. The ceiling went to 40 and the
+ADR carries an *Amendment* section saying so, kept rather than edited away because the
+shape of the error — careful reasoning from a baseline that did not exist — is the part
+worth remembering.
+
+The same amendment caught a second defect the ceiling had been hiding: ADR-005 made
+`@claude` the documented way to recover an inconclusive review, but that path ran at 8
+turns — one third of the job it was supposed to rescue. A remediation routed to a smaller
+budget than the thing it remediates is not a remediation; both are now 40.
 
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec

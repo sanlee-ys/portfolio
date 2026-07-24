@@ -1,6 +1,7 @@
 # ADR-005: A red review check means the tooling broke, not that the PR is bad
 
-**Status:** Accepted
+**Status:** Accepted; amended 2026-07-24 on first measurement — Decision 4 reversed,
+Decision 3's remediation path resized (see *Amendment*)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -94,13 +95,16 @@ permissions it needs to produce either one.**
    is not the author's fault. A red X the author is expected to merge past is
    worse than no check at all, because it still reads as coverage.
 
-4. **The ceiling stays at 25.** Deliberately not raised. Of #101's 26 turns, 11
-   were denials; productive turns across observed runs were 13–15. Removing the
-   denials returns more headroom than any plausible bump, and it is the headroom
-   the comment-posting turns in the new prompt will spend. If 25 still exhausts,
-   Decision 3 now says so honestly and the next adjustment can be made against a
-   measured number instead of a guess. **The ceiling was never the binding
-   constraint, and one more bump would have hidden that for a third time.**
+4. **The ceiling stays at 25.** *(Reversed 2026-07-24 — it is now 40; see the
+   Amendment at the end. The reasoning below was wrong, and it is left standing
+   unedited because how it was wrong is the useful part.)* Deliberately not
+   raised. Of #101's 26 turns, 11 were denials; productive turns across observed
+   runs were 13–15. Removing the denials returns more headroom than any plausible
+   bump, and it is the headroom the comment-posting turns in the new prompt will
+   spend. If 25 still exhausts, Decision 3 now says so honestly and the next
+   adjustment can be made against a measured number instead of a guess. **The
+   ceiling was never the binding constraint, and one more bump would have hidden
+   that for a third time.**
 
 5. **A permission denial is a defect in this workflow, and it is reported as
    one.** Any run with `permission_denials_count > 0` raises a warning
@@ -141,7 +145,12 @@ to see their diffs.
 - **`scripts/link-check.cjs`, `scripts/mobile-qa.cjs`** — unchanged, and now
   named in the review prompt as the checks the agent should not duplicate. If
   either is renamed or retired, the prompt's scoping paragraph goes stale.
-- **`decisions/README.md`** — index row.
+- **`decisions/README.md`** — index row, and the open-verification note added by
+  #104. That note is now **closed**: #104's own review posted a comment
+  (`turns=22 denials=0`), which is the proof the note was waiting for.
+- **The Amendment below touches both `--max-turns` values.** It reverses Decision
+  4 (review job 25 → 40) and resizes the mention job (8 → 40) that Decision 3
+  names as the remediation path. Decisions 1, 2, 5 and 6 stand as written.
 - **Commit `3b1c8e3` (#96)** — its rationale comment is superseded by this
   record and was removed from the workflow. Its *diagnosis* was right and is
   quoted in *Context*; only its fix is reversed.
@@ -183,7 +192,7 @@ to see their diffs.
 
 | Option | Reason Not Chosen |
 |--------|-------------------|
-| Raise `--max-turns` again (25 → 40) | The third time would be the second time it did not work. 11 of #101's 26 turns were denials; the budget was not the constraint. Fixing the ceiling without fixing permission just moves the exhaustion point |
+| Raise `--max-turns` again (25 → 40) *at the same time as the permission fix* | The third time would be the second time it did not work. 11 of #101's 26 turns were denials; the budget was not the constraint, and raising the ceiling alongside the real fix would have made it impossible to tell which one worked. **Chosen a day later, once measured** — see *Amendment* |
 | Keep turn exhaustion red, only fix the tools | Fixing the tools makes exhaustion *rarer*, not impossible — a large PR will still hit it, and the red X would still be a non-verdict the author is expected to merge past. The training effect is the harm, and it survives a lower failure rate |
 | Emit a genuine `neutral` check conclusion via the Checks API | The honest representation, and GitHub Actions cannot set a job to neutral from a step. It needs `checks: write` and a separately created check run — real machinery, a wider token, and a second check in the list — to encode what one sentence in a comment already says. Revisit if the review ever becomes a required check |
 | Make the review a required status check | Would make the red X mean something. It would also block merges on a probabilistic reviewer that had just been demonstrated to produce nothing for ten days. Earn it first: this decision is what makes the check trustworthy enough to have that conversation later |
@@ -201,15 +210,47 @@ This record's *Alternatives Considered* rejected "Raise `--max-turns` again (25 
 sound on the evidence it had — 11 of PR #101's 26 turns were denials — and it
 invited its own test. The test ran and came back the other way.
 
-**What was observed.** PR #105 was the first PR to exercise the fixed workflow. It
-is a 2-file, 123-line diff, far smaller than #101. The review job hit
-`error_max_turns` at 26 turns with **`permission_denials_count: 0`**. Decision 1's
-tool grant worked exactly as intended; the run still ran out of road.
+**Why the original number was junk.** Decision 4 argued from "productive turns
+across observed runs were 13–15." **Those runs were not reviews.** Every one of
+them was an agent that could not see the diff and had no channel to report on, so
+13–15 measured *what giving up costs*, not what reviewing costs. The number was
+real; it was a measurement of the broken system, used to predict the fixed one.
+Decision 4 reasoned carefully from a baseline that did not exist — which is a
+subtler failure than the one this ADR was written to fix, and the reason Decision
+4 is left standing unedited above.
 
-So both halves were constraints, not one. With permission fixed, a *small* diff
-still exceeds 25 turns to read, judge, and publish. `--max-turns` is now **40** on
-the review job, sized from that measurement rather than guessed at, and the
-classify step still reports honestly if 40 exhausts.
+**What was observed.** Two runs bracket it, and they agree:
+
+- **The floor.** #104 (run `30061618828`) was the first working review — a
+  **one-paragraph markdown diff**, the smallest reviewable change this repo can
+  produce. It spent `turns=22 denials=0` for $0.45: 88% of the ceiling on the
+  cheapest possible case. Reviewing is turn-expensive because it is real work —
+  read the diff, read the ADR it cites, read `CLAUDE.md`, verify each claim, post.
+- **The exhaustion.** PR #105 is a 2-file, 123-line diff, far smaller than #101.
+  The review job hit `error_max_turns` at 26 turns with
+  **`permission_denials_count: 0`**. Decision 1's tool grant worked exactly as
+  intended; the run still ran out of road.
+
+So both halves were constraints, not one. With permission fixed, even a *small*
+diff exceeds 25 turns to read, judge, and publish — and a PR with several files
+and actual HTML has nowhere to go. `--max-turns` is now **40** on the review job,
+sized from those measurements rather than guessed at, and the classify step still
+reports honestly if 40 exhausts.
+
+**What makes this different from #96's bump, which this record criticises at
+length:**
+
+- **#96 raised the ceiling instead of diagnosing.** The binding constraint was
+  permission, and no measurement was taken. This raise comes *after* the
+  diagnosis, with denials confirmed at 0.
+- **#96 had no number.** 40 is ~2x a measured floor of 22.
+- **#96 could not tell whether it worked.** Decision 5's classify step now
+  reports `turns`, `denials` and `cost` on every run, green ones included, so the
+  next adjustment is another measurement rather than another guess.
+
+Raising it in the same change as the permission fix was rejected deliberately —
+it would have confounded the two, and that confounding is exactly why the #96
+lesson took two attempts to learn. Fix one thing, measure, then tune.
 
 **The more serious defect: the documented remediation could not work.** Decision 3
 tells the reader to re-run an inconclusive review by commenting `@claude`, and
@@ -241,3 +282,13 @@ budget that was sized for its old job.
   editing the workflow makes the review job self-skip. First real exercise is the
   PR after this merges, and it must be judged by a posted comment, not a green
   check.
+- `decisions/README.md` — the open verification item #104 recorded there is now
+  **closed**. #104's own review posted a comment (`turns=22 denials=0`), which is
+  the proof that note was waiting for.
+
+Unchanged by this amendment: turn exhaustion still posts *"nothing in this PR was
+reviewed"* and still does not go red. A higher ceiling makes that path rarer; it
+does not make it wrong. If 40 exhausts on a real PR, the comment will say so with
+the numbers attached, and the answer may be a narrower review scope rather than a
+third raise — **a ceiling that keeps climbing is a scope problem wearing a budget
+costume.**
