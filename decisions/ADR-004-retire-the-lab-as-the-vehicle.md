@@ -1,6 +1,6 @@
 # ADR-004: Retire the lab as the vehicle; interactive work belongs wherever it argues best
 
-**Status:** Accepted (decision recorded; migration not yet executed)
+**Status:** Accepted; migration executed 2026-07-23 (see *Migration record*)
 **Date:** 2026-07-19
 **Deciders:** San Lee
 
@@ -153,3 +153,47 @@ follows, per `system/SYS-009`.
 | Delete the lab pages outright | Loses real work with no benefit. Retirement is about the *section* and its framing, not the artifacts |
 | Do the migration now and record the decision after | Rejected on the same grounds as `ADR-003`'s history: a decision that lives only in a diff is not reviewable as a decision. This one reverses two written rules, so it needed the record first |
 | Trim prose generally to make room for visuals | Rejected explicitly in Decision 5. The dense reasoning is the credibility; a site that reads faster and argues worse is the wrong trade for a portfolio whose pitch is measured honesty |
+
+## Migration record
+
+Executed 2026-07-23. Everything above is the decision as written on 2026-07-19 and is
+left unedited; this section records the calls that section deliberately left open.
+
+**1. `loop-replay.html` was promoted standalone, not embedded.** It moves to
+`projects/loop-replay.html` (with `loop-replay.js` and `data/` alongside it), keeping
+its decision blocks and "How this reads a run log" section intact. The inline-embed
+alternative was left open in *Alternatives Considered* and is now closed: embedding
+would have cost that standalone writing, which is the thing worth keeping. It is
+reached from the two project pages that cite it, not from the top-level nav — the
+evidence sits where the claim is made rather than competing with the projects.
+
+**2. The two remaining lab pages keep their URLs; the section does not.**
+`lab/gallery.html` and `lab/scroll-storytelling.html` stay where they are — both are
+indexed and publicly linked, and GitHub Pages has no redirect mechanism, so moving
+them would break live URLs to no benefit. What goes is the framing: `lab/index.html`
+is deleted, the Tier badges and "Back to the lab" links are gone, and the Lab door is
+removed from the homepage nav, the footer, and `404.html`. The gallery keeps its
+inbound link from About (reworded "the lab" → "the gallery"); the storytelling demo is
+now reached from the learning log. This is the "retirement is about the *section* and
+its framing, not the artifacts" line applied literally.
+
+**3. The learning log moved to `colophon.html`.** It lived on `lab/index.html`, which
+is deleted. The colophon already owns the how-this-was-built story, so the seven
+lesson links land where a reader already goes, and the section states plainly that
+the lab is retired and why. `learning/README.md` drops the tier ladder and the Tier
+column per Decision 2, keeping a short note that records the retirement rather than
+silently erasing it.
+
+**4. `sitemap.xml` was missing from *Downstream surfaces*.** It listed all three lab
+URLs. Corrected during the migration (dropped `lab/index.html`, added
+`projects/loop-replay.html`), and noted here because the omission is the exact failure
+mode `system/SYS-009` exists to catch — the checklist was the contract, and it had a
+hole. Also swept, beyond the original list: `decisions/README.md` (carried a
+"migration has not been carried out" note) and the header comment in
+`loop-replay.js`. `decisions/ADR-002` was checked and needed no change; its apparent
+"lab" hits were the word *label*.
+
+**Not done here:** the visual-treatment candidates in the Decision section (the
+autonomy-ladder state diagram, the Wilson-CI plot, the A/B/C split diagram) are
+untouched. This migration was structural — moving pages and fixing links — and every
+one of those is a design change to a project page. They remain open scope.

@@ -146,7 +146,12 @@ These have no tradeoffs worth debating. None were previously planned.
 - [ ] **Live GitHub-API repo cards** (from the README). Surfaces the real repos
       on the site — partial support for breadth by proving the four repos exist,
       but still depth on the same system, not a new artifact.
-- [ ] **Lab experiments** (`lab/`, marked WIP). Ongoing front-end sandbox.
+- [x] ~~**Lab experiments** (`lab/`, marked WIP). Ongoing front-end sandbox.~~
+      *Retired 2026-07-23 by [`ADR-004`](decisions/ADR-004-retire-the-lab-as-the-vehicle.md):
+      the sandbox stopped being fed, and its framing was discounting the site's
+      strongest artifact. `loop-replay.html` was promoted to `projects/`; the
+      gallery and scroll-storytelling pages stay at their URLs; the learning log
+      moved to the colophon.*
 - [ ] **Defense-news system roadmap** — lives on `projects/product-and-program.html`
       as Now/Next/Later. That's product content for the *system*, not the site,
       but the "Later" items (containerize/deploy, OpenTelemetry) would each
