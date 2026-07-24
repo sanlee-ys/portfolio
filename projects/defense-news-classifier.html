@@ -306,17 +306,98 @@
       reaching for a tool doesn&rsquo;t move you up a level; deciding for
       yourself does.
     </p>
-    <table>
-      <thead>
-        <tr><th>Level</th><th>What it gains</th><th>Who drives</th><th>State</th></tr>
-      </thead>
-      <tbody>
-        <tr><td><strong>L1</strong> &middot; Single call</td><td>Prompt, structured output, the eval harness</td><td>A human runs each item</td><td>Shipped (v1)</td></tr>
-        <tr><td><strong>L2</strong> &middot; Augmented</td><td>BM25 retrieval grounds the label in a corpus</td><td>A human runs it; the model reaches for a tool</td><td>Shipped (v2), then retired</td></tr>
-        <tr><td><strong>L3</strong> &middot; Autonomous loop</td><td>Iterates toward an explicit done-signal</td><td>The system decides when it&rsquo;s done</td><td>Rung 1 shipped; rung 2 spec&rsquo;d</td></tr>
-        <tr><td><strong>L4</strong> &middot; Multi-agent</td><td>Triage, classify, and a critic that can send work backward</td><td>Multiple agents coordinate</td><td>To spec</td></tr>
-      </tbody>
-    </table>
+    <!-- The ladder as a climb rather than a table. Same payload the four-row
+         table carried (what it gains / who drives / state), but two things a
+         table structurally cannot draw are now visible: L2's climbed-then-
+         retired arc, and L4's backward critic edge. Vertical by design -- it is
+         a ladder, and vertical is what survives 320px. -->
+    <p class="flow-line">
+      L1 a human runs it <span class="flow-arrow">&rarr;</span> L2 + a tool
+      <span class="flow-arrow">&rarr;</span> L3 it decides it&rsquo;s done
+      <span class="flow-arrow">&rarr;</span> L4 agents coordinate
+    </p>
+
+    <ol class="ladder">
+      <li class="rung" data-state="shipped">
+        <p class="rung-head">
+          <span class="rung-id">L1</span>
+          <span class="rung-name">Single call</span>
+          <span class="rung-state">Shipped &middot; v1</span>
+        </p>
+        <p class="rung-gain">Prompt, structured output, the eval harness.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> A human runs each item.</p>
+      </li>
+
+      <li class="rung" data-state="retired">
+        <p class="rung-head">
+          <span class="rung-id">L2</span>
+          <span class="rung-name">Augmented</span>
+          <span class="rung-state">Shipped v2.0.0, then retired</span>
+        </p>
+        <p class="rung-gain">BM25 retrieval grounds the label in a corpus.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> A human runs it; the model reaches for a tool.</p>
+        <!-- No explanatory note here on purpose. The struck marker and the
+             "then retired" chip carry the climb-down; the paragraph below the
+             ladder already carries the reasoning, and the measured numbers live
+             in "The grounding that did not pay" above. Saying it a third time
+             would be the visual doing prose's job badly. -->
+      </li>
+
+      <li class="rung" data-state="partial">
+        <p class="rung-head">
+          <span class="rung-id">L3</span>
+          <span class="rung-name">Autonomous loop</span>
+          <span class="rung-state">Half climbed</span>
+        </p>
+        <p class="rung-gain">Wrapped in a loop that iterates to an explicit done-signal.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> The system decides when it&rsquo;s done.</p>
+        <!-- One level, two sub-rungs. The table flattened this to a prose
+             string; drawn, it shows L3 is literally half-finished. -->
+        <ul class="subrungs">
+          <li data-done="yes">rung 1 &mdash; prompt-optimization loop <span>shipped, rode the v2.1.0 tag</span></li>
+          <li data-done="no">rung 2 &mdash; agent-driven ML loop <span>spec&rsquo;d, unbuilt</span></li>
+        </ul>
+      </li>
+
+      <li class="rung" data-state="spec">
+        <p class="rung-head">
+          <span class="rung-id">L4</span>
+          <span class="rung-name">Multi-agent</span>
+          <span class="rung-state">To spec</span>
+        </p>
+        <p class="rung-gain">Decomposed: triage, classify, and a critic that can hand work <em>backward</em>.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> Multiple agents coordinate.</p>
+        <!-- L4's honesty test drawn rather than described: the backward edge is
+             what separates a critic from a linear pipeline with extra steps. -->
+        <svg class="backedge" viewBox="0 0 260 104" role="img"
+             aria-label="Triage passes to classify, classify passes to critic, and the critic hands work backward to triage.">
+          <defs>
+            <marker id="be-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+            <!-- Separate marker so the backward edge's head picks up the accent
+                 with the line; markers don't inherit the referencing path's stroke. -->
+            <marker id="be-arrow-back" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+              <path class="be-head-back" d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+          </defs>
+          <rect class="be-box" x="4" y="14" width="72" height="34" rx="8" />
+          <text class="be-label" x="40" y="36" text-anchor="middle">Triage</text>
+          <rect class="be-box" x="86" y="14" width="72" height="34" rx="8" />
+          <text class="be-label" x="122" y="36" text-anchor="middle">Classify</text>
+          <rect class="be-box" x="168" y="14" width="72" height="34" rx="8" />
+          <text class="be-label" x="204" y="36" text-anchor="middle">Critic</text>
+          <path class="be-edge" d="M 76 31 L 84 31" marker-end="url(#be-arrow)" />
+          <path class="be-edge" d="M 158 31 L 166 31" marker-end="url(#be-arrow)" />
+          <!-- The one edge that matters: critic back to triage. -->
+          <path class="be-edge be-back" d="M 204 48 C 204 84, 40 84, 40 50"
+                marker-end="url(#be-arrow-back)" />
+          <text class="be-note" x="122" y="99" text-anchor="middle">hands work backward</text>
+        </svg>
+      </li>
+    </ol>
     <p>
       The L2 state is the honest one: the retrieval layer shipped in v2, was
       measured, and was then cut when a fair baseline showed it hurting
