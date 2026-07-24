@@ -77,6 +77,31 @@ First codified as a standing rule 2026-07-01 (adversarial round,
 `ROADMAP.md`); promoted here 2026-07-03 after the same leak recurred in a
 cross-repo write-up in the `architecture` repo.
 
+## Reading the Claude Review check
+
+*Reasoning: [`decisions/ADR-005`](decisions/ADR-005-review-check-signal.md). This
+section is the operative rule.*
+
+The `Claude Review` check reports **tooling health, not a verdict**. The verdict
+is whatever the review posted as a PR comment.
+
+- **Red** — the job could not do its work (auth, crash). Fix CI; it says nothing
+  about the PR.
+- **Green + a comment** — the review ran. The comment is the result. Read it.
+- **Green + "review inconclusive"** — it hit the turn ceiling and reviewed
+  **nothing**. Treat the check as absent. Re-run with `@claude`; if the comment
+  reports denied tool calls, fix `--allowedTools` first, or it will exhaust the
+  same way.
+- **Green + no comment at all** — either a genuinely clean review or the
+  self-skip below. Check the job log before assuming the first.
+
+**Editing `.github/workflows/claude-review.yml` disables the review on that
+same PR.** The Claude App refuses to run when the workflow file differs from the
+copy on `main`, so the job skips itself and goes green. A workflow change is
+therefore never validated by its own PR — verify it on the next one, and verify
+by *a posted comment*, not by a green check. Shipping unverified on a green
+check is how the workflow stayed broken from 2026-07-13 to 2026-07-23.
+
 ## Deploy note
 
 After merging, GitHub Pages + its CDN can serve **cached** CSS for a few

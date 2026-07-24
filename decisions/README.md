@@ -9,6 +9,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-002](ADR-002-ai-use-posture.md) | State the AI assist as method, not confession | Accepted |
 | [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
 | [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Accepted |
+| [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad | Accepted |
 
 ## Why this tier was missing
 

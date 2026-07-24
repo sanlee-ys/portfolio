@@ -86,18 +86,40 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      # Base ref by default (no `ref:`) — the security-doc "preferred" pattern.
-      # Gives Claude the repo files + CLAUDE.md for context.
+      # No `ref:` — the security-doc "preferred" pattern: never check out the
+      # PR's head branch by name. On a `pull_request` event the default is the
+      # MERGE ref (`refs/remotes/pull/N/merge`), so the tree Claude reads is the
+      # PR merged into base — its outcome, not its diff. That distinction is
+      # load-bearing: reading a file here cannot tell you what the PR changed,
+      # which is why the review is told to start from `gh pr diff`. (An earlier
+      # version of this comment said "base ref by default", which is wrong and
+      # would have had the review reading pre-PR content.)
       - uses: actions/checkout@v7
 
+      # `continue-on-error` so the NEXT step decides this job's colour. The
+      # action exits 1 for every non-success subtype, which collapses two very
+      # different signals — "the review found problems" and "the review ran out
+      # of road" — into the same red X. See ADR-005 and the classify step below.
+      # Genuine failures still go red there; nothing is being swallowed.
       - uses: anthropics/claude-code-action@v1
+        id: claude
+        continue-on-error: true
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             Review this pull request for a public front-end learning repo
             (static HTML/CSS/JS, no build step, served on GitHub Pages).
 
-            Focus on:
+            Start with `gh pr diff --name-only`, then `gh pr diff` for the
+            content. The checkout is the MERGE RESULT, so reading a file shows
+            you its final state, not what this PR did to it — the diff is the
+            only thing that tells you what changed.
+
+            Scope, in priority order:
+            - Skip pure moves. A file whose diff is a rename with no content
+              change needs no read. Internal-link integrity across a move is
+              already enforced by `scripts/link-check.cjs` in the QA job; do
+              not re-derive it by hand. Spend the budget on content diffs.
             - Correctness: broken internal links, invalid HTML/CSS/JS, logic
               bugs, accessibility regressions, and the mobile no-horizontal-
               overflow contract described in CLAUDE.md.
@@ -105,33 +127,129 @@ jobs:
               content, risky external resources, and any leaked secret or
               private-repo name (this repo must never name a private repo).
 
-            Be honest and specific: cite file + line, skip nitpicks that don't
-            affect correctness, security, or the mobile contract, and if the PR
-            looks clean say so plainly.
-          # Cost bounds, both documented CLI passthrough args:
-          #   --model     the docs' own examples use `claude-sonnet-5` (a cheap
-          #               tier) for review workflows.
-          #   --max-turns caps iterations (docs: "Configure appropriate
-          #               --max-turns ... to prevent excessive iterations").
+            Post as you go rather than saving it all for the end: use
+            `mcp__github_inline_comment__create_inline_comment` for anything
+            you can pin to a file and line, and close with ONE summary comment
+            via `gh pr comment`. If you are running short on turns, post the
+            summary immediately — a partial review that is posted beats a
+            thorough one that never lands.
+
+            Be honest and specific: skip nitpicks that don't affect
+            correctness, security, or the mobile contract, and if the PR looks
+            clean say so plainly.
+          # --model      the docs' own examples use `claude-sonnet-5` (a cheap
+          #              tier) for review workflows.
+          # --max-turns  caps iterations (docs: "Configure appropriate
+          #              --max-turns ... to prevent excessive iterations").
+          # --allowedTools  THE FIX. Agent mode grants no Bash and installs no
+          #              GitHub comment MCP server unless the tools are named
+          #              here (see src/modes/agent/index.ts + src/mcp/
+          #              install-mcp-server.ts: `shouldIncludeCommentServer =
+          #              !isAgentMode || hasGitHubCommentTools`). Without this
+          #              line the review agent could not read the diff and had
+          #              no channel to publish a finding on. From #81 (the
+          #              2026-07-13 pilot) to #101 it never posted one comment
+          #              on one PR: every green check was a silent no-op, and
+          #              every red one was the same no-op that took more turns
+          #              to give up. Tool list mirrors the action's own
+          #              examples/pr-review-comprehensive.yml.
           #
-          # Raised 8 -> 25 on 2026-07-19. At 8 the action ran out of turns before
-          # reaching a verdict on PR #95 (a ~200-line script plus a README) and
-          # exited 1 with `"subtype": "error_max_turns"`. It had found nothing and
-          # said nothing; the job just went red.
-          #
-          # That is the failure mode worth naming: the ceiling surfaced as a
-          # REVIEW VERDICT. A check that reports red without a finding trains you
-          # to ignore it, and an ignored check is worse than an absent one because
-          # it still reads as coverage. Same lesson as the metrics guards this
-          # repo shipped today, pointed at its own CI.
-          #
-          # 25 is a ceiling, not a target — the action stops when the review is
-          # done, so a clean small PR still costs a handful of turns on a cheap
-          # tier. Deliberately NOT `continue-on-error`: a genuine execution
-          # failure should still be loud.
+          # max-turns stays at 25 ON PURPOSE. It was raised 8 -> 25 in #96 to
+          # buy headroom and PR #101 blew through it anyway, which is the
+          # evidence that the ceiling was never the binding constraint: of the
+          # 26 turns that run spent, 11 were denied tool calls that returned
+          # nothing. Measured productive turns across runs were 13-15, and the
+          # denials this line removes are the headroom for the comment-posting
+          # turns the prompt now asks for. If 25 still exhausts, the classify
+          # step below says so honestly and we tune against real numbers
+          # instead of guessing again.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 25
+            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
+
+      # Turn "the action exited non-zero" into a signal that distinguishes
+      # I-found-problems from I-ran-out-of-road. See ADR-005 for the reasoning.
+      #
+      # Inline rather than a `.github/scripts/` file on purpose: the Claude App
+      # refuses to run when the workflow file differs from the copy on the
+      # default branch, and that validation covers THIS file only. A separate
+      # script would be an unvalidated input to a job holding a
+      # `pull-requests: write` token.
+      - name: Classify the review outcome
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
+          STEP_OUTCOME: ${{ steps.claude.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          # No execution file means Claude never ran. The common cause is the
+          # workflow-validation skip that fires on any PR editing this file —
+          # that is a legitimate skip, not a failure.
+          if [ -z "${EXEC_FILE:-}" ] || [ ! -f "$EXEC_FILE" ]; then
+            if [ "$STEP_OUTCOME" = "success" ]; then
+              echo "No execution file; the action skipped itself (workflow validation). Nothing to classify."
+              exit 0
+            fi
+            echo "::error::Claude review failed before it produced an execution file."
+            exit 1
+          fi
+
+          # The file is the SDK message log; the terminal `result` message
+          # carries the verdict. Tolerate a bare object in case that changes.
+          RESULT=$(jq -c 'if type == "array" then (map(select(.type == "result")) | last) else . end' "$EXEC_FILE")
+          SUBTYPE=$(jq -r '.subtype // "unknown"' <<<"$RESULT")
+          TURNS=$(jq -r '.num_turns // 0' <<<"$RESULT")
+          DENIALS=$(jq -r '.permission_denials_count // 0' <<<"$RESULT")
+          COST=$(jq -r '(.total_cost_usd // 0) * 10000 | round / 10000' <<<"$RESULT")
+
+          echo "subtype=$SUBTYPE turns=$TURNS denials=$DENIALS cost_usd=$COST"
+
+          # A denial is a bug in the --allowedTools line above, not a finding
+          # about the PR. Denied calls burn turns and return nothing, which is
+          # exactly how this gate looked busy while doing nothing. Surface them:
+          # `show_full_output` stays off (the transcript is public and may carry
+          # secrets), so this count is the only view we get into the denials.
+          if [ "$DENIALS" -gt 0 ]; then
+            echo "::warning::The review agent was denied $DENIALS tool call(s). Widen --allowedTools in this workflow — denied calls burn turns and produce nothing."
+          fi
+
+          case "$SUBTYPE" in
+            success)
+              echo "Review completed in $TURNS turns."
+              ;;
+            error_max_turns)
+              gh pr comment "$PR" --body "$(cat <<EOF
+          ### Automated review inconclusive — this is not a verdict on the PR
+
+          The review agent hit its turn ceiling after **$TURNS turns** and stopped
+          before finishing. **Nothing in this PR has been reviewed.** Treat this
+          check as *absent* — not as passed, and not as failed.
+
+          | | |
+          |---|---|
+          | turns used | $TURNS |
+          | tool calls denied | $DENIALS |
+          | cost | \$$COST |
+          | run | [$GITHUB_RUN_ID]($RUN_URL) |
+
+          Re-run it by commenting \`@claude\` on this PR. If \`tool calls denied\`
+          above is non-zero, fix \`--allowedTools\` in
+          \`.github/workflows/claude-review.yml\` first — that is where the budget
+          went, and re-running without fixing it will exhaust the same way.
+          EOF
+          )"
+              echo "::warning::Review inconclusive: hit the turn ceiling at $TURNS turns. Posted an inconclusive comment on the PR; not failing the job — an unreviewed PR is not a rejected PR."
+              ;;
+            *)
+              echo "::error::Claude review failed with subtype '$SUBTYPE' after $TURNS turns. This is an execution failure, not a review verdict."
+              exit 1
+              ;;
+          esac
 
   # --- @claude mention flow -----------------------------------------------
   # Owner-gated: on a public repo anyone can comment, so restrict to the repo
@@ -155,6 +273,18 @@ jobs:
           # No `prompt`: for comment events the action responds to the @claude
           # mention itself (docs: "when omitted for issue/PR comments, Claude
           # responds to trigger phrase").
+          #
+          # This job posts fine without `--allowedTools` — tag mode installs the
+          # comment server unconditionally, which is why the only claude[bot]
+          # comments this repo has ever received came from here and not from the
+          # review job. But it shares the review job's blind spot: no Bash means
+          # no diff, so it was answering "review this PR" from the merged file
+          # tree with no idea what the PR changed. Same grant, read-only subset;
+          # it does not need `gh pr comment` because the comment server is its
+          # channel. 8 turns is a deliberate hard cap on an owner-triggered,
+          # conversational flow — turn exhaustion here is visible in the reply
+          # thread, so it needs no classify step.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 8
+            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*)"
