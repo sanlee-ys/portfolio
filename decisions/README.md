@@ -69,6 +69,11 @@ ADR carries an *Amendment* section saying so, kept rather than edited away becau
 shape of the error — careful reasoning from a baseline that did not exist — is the part
 worth remembering.
 
+The same amendment caught a second defect the ceiling had been hiding: ADR-005 made
+`@claude` the documented way to recover an inconclusive review, but that path ran at 8
+turns — one third of the job it was supposed to rescue. A remediation routed to a smaller
+budget than the thing it remediates is not a remediation; both are now 40.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record

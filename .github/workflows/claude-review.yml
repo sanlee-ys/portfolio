@@ -154,26 +154,23 @@ jobs:
           #              to give up. Tool list mirrors the action's own
           #              examples/pr-review-comprehensive.yml.
           #
-          # max-turns 25 -> 40, and this one is measured rather than guessed.
+          # max-turns was 25, on the theory that denied tool calls -- not the
+          # ceiling -- were the binding constraint: of the 26 turns PR #101
+          # spent, 11 were denials returning nothing. That line invited its own
+          # test ("if 25 still exhausts, the classify step says so honestly and
+          # we tune against real numbers instead of guessing again").
           #
-          # #103 argued 25 should stay, on the grounds that observed runs used
-          # 13-15 productive turns. That number was junk: it came from runs
-          # where the agent was flailing against denied tools, so it measured
-          # what GIVING UP costs, not what REVIEWING costs. The first working
-          # run (#104, run 30061618828) settled it — `turns=22 denials=0` on a
-          # ONE-PARAGRAPH markdown diff, the smallest reviewable change this
-          # repo can produce. Reviewing is turn-expensive because it is real
-          # work: read the diff, read the ADR it cites, read CLAUDE.md, verify
-          # the claims, post. 22/25 on the floor case leaves no room for a PR
-          # with several files and actual HTML.
+          # It exhausted. PR #105 was a 2-file, 123-line diff -- far smaller
+          # than #101 -- and hit the ceiling at 26 turns with **0 denials**.
+          # That is the real number the old comment asked for, and it falsifies
+          # the denials-only hypothesis: with the tool grant fixed, a small diff
+          # still needs more than 25 turns to read, judge, and publish.
           #
-          # This is NOT the #96 move. #96 raised the ceiling as a substitute
-          # for a diagnosis and had no measurement behind it; the constraint
-          # there was permission, and 11 of #101's 26 turns were denied calls.
-          # That is fixed and denials are now 0. 40 is ~2x the measured floor,
-          # chosen against a real number, and the classify step reports turns
-          # and cost on EVERY run — so the next adjustment gets data too.
-          # Cost stays bounded by the cheap tier and one run per PR-open.
+          # 40 is sized from that measurement, not guessed: ~26 turns bought
+          # context-gathering on a small diff, so a large one plus the
+          # comment-posting turns needs roughly half again. The classify step
+          # still reports honestly if 40 exhausts, so this stays tunable
+          # against evidence rather than becoming a number nobody may touch.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 40
@@ -292,10 +289,24 @@ jobs:
           # no diff, so it was answering "review this PR" from the merged file
           # tree with no idea what the PR changed. Same grant, read-only subset;
           # it does not need `gh pr comment` because the comment server is its
-          # channel. 8 turns is a deliberate hard cap on an owner-triggered,
-          # conversational flow — turn exhaustion here is visible in the reply
-          # thread, so it needs no classify step.
+          # channel.
+          #
+          # max-turns was 8, reasoned as "a deliberate hard cap on an
+          # owner-triggered, CONVERSATIONAL flow." That reasoning was right for
+          # the flow it described and wrong for the one that actually arrived.
+          # ADR-005 made `@claude` the documented remediation for an
+          # inconclusive review — both CLAUDE.md and the review job's own
+          # failure message say to re-run that way — which points a full-review
+          # workload at a ceiling one third the size of the job that just
+          # exhausted doing it. Observed on PR #105: the re-run died at 8 turns
+          # having posted only a checklist of what it intended to review. The
+          # documented escape hatch failed harder than the thing it escapes.
+          #
+          # Matched to the review job's 40. A mention is still owner-only and
+          # human-rate-limited, so the cost guard here is the trigger, not the
+          # turn count. If this ever needs to stay small, the fix is to change
+          # the remediation ADR-005 documents — not to leave the two out of sync.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 8
+            --max-turns 40
             --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*)"
