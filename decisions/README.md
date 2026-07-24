@@ -53,6 +53,14 @@ learning log moved to the colophon. The ADR was written before the migration on 
 reverses two previously written rules, so the reversal wanted a reviewable record rather than
 a diff — and its *Downstream surfaces* section served as the checklist.
 
+[`ADR-005`](ADR-005-review-check-signal.md) shipped on 2026-07-23 and carries **one open
+verification item**, recorded here because the record itself says it cannot be closed by
+its own PR. Editing `.github/workflows/claude-review.yml` makes the Claude App skip the
+review on that same PR, so the change landed green without ever running. It is proven when
+a PR gets a **posted comment** from the review job — not when the check goes green, which
+is exactly what the broken version produced for ten days. Until then the fix is untested in
+the only environment that matters.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record
