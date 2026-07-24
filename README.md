@@ -19,7 +19,7 @@ systems / product language.
 | `colophon.html` | How the site was built (directing an AI agent), with the ledger. |
 | `404.html` | On-brand not-found page (GitHub Pages serves it automatically). |
 | `projects/` | One HTML writeup per featured project — problem, decisions, outcome. |
-| `lab/` | Front-end experiments, plus the learning-log index. |
+| `lab/` | Two front-end experiments kept at stable URLs; the section itself is retired (`ADR-004`). |
 | `learning/` | The learning log — one Markdown lesson per technique. |
 | `assets/` | Stylesheet, JS (theme, reveal, diagram, events), share card, favicons. |
 | `scripts/` | QA gates: `mobile-qa.cjs` (overflow) and `link-check.cjs` (dead links). |
@@ -45,8 +45,9 @@ CI (GitHub Actions) runs on every PR and push to `main`:
   <!-- metric:region_accuracy -->87.0% region).
 - **Product & Program** (`projects/product-and-program.html`) — the same system read as
   product and program work: scope cuts, risk reasoning, and decision framing.
-- **Lab** (`lab/index.html`) — a front-end sandbox where the experiments live so the
-  front page stays clean.
+- **Loop replay** (`projects/loop-replay.html`) — a recorded-replay viewer for the
+  prompt-optimization loop's run log; the interactive evidence for the classifier's
+  L3 rung and the Goodhart argument.
 
 ## Analytics
 

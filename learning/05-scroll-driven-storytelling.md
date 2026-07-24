@@ -36,7 +36,7 @@ A 3px bar that fills as you scroll the whole page:
   bound to scroll, not seconds.
 - We animate `transform: scaleX` (cheap — see Lesson 2), not `width`.
 
-### Lab — sticky panel + scrubbed reveals (`view()` timeline)
+### The demo page — sticky panel + scrubbed reveals (`view()` timeline)
 
 In `/lab/scroll-storytelling.html`:
 
@@ -96,4 +96,4 @@ both demos are wrapped in `@supports (animation-timeline: ...)`:
 
 - `index.html` + `assets/style.css` — the `.scroll-progress` bar
 - `lab/scroll-storytelling.html` — sticky panel + `view()` scrubbed reveals (self-contained)
-- `lab/index.html` — links the experiment
+- `colophon.html` — links the demo from the learning log

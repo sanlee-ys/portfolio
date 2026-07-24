@@ -1,4 +1,4 @@
-// Render engine for the loop-replay viewer (lab/loop-replay.html).
+// Render engine for the loop-replay viewer (projects/loop-replay.html).
 //
 // The page ships the run log as a plain JS string (window.LOOP_REPLAY_JSONL,
 // set by data/loop-replay-real.js) so it renders the same over file:// and

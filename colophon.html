@@ -123,6 +123,34 @@
         <p class="tl-body">On an open audit request it bypassed its own credential guard &mdash; the hook built after real leaks &mdash; with an interpreter one-liner, proving the gap safely before a live one could. The prompt that mattered was mine; the finding was real (<a href="https://github.com/sanlee-ys/claude-ops/blob/main/incidents/2026-07-03-credential-guard-interpreter-bypass.md">postmortem</a>). <span class="tl-quote">&ldquo;any gaps, leaks, vulnerabilities, risks &mdash; I want to know.&rdquo;</span></p>
       </li>
     </ol>
+
+    <h2>The front-end learning log</h2>
+    <p>
+      I came from infra and backend, where the output is invisible by design, so
+      every technique on this site was new ground. Each lesson below captures the
+      concept, the why, and the files that changed. They render on GitHub:
+    </p>
+    <ul>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/01-scroll-reveal.md">Scroll-reveal</a>: <code>IntersectionObserver</code>, CSS transitions, <code>prefers-reduced-motion</code>.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/02-hover-and-gradient.md">Hover micro-interactions + animated gradient</a>: <code>@keyframes</code>, pseudo-elements, z-index stacking.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/03-layout-flexbox-grid.md">Layout: Flexbox &amp; Grid</a>: 1D vs 2D, <code>auto-fit</code>/<code>minmax</code>, <code>fr</code> units.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/04-robust-and-fluid.md">Robust &amp; fluid</a>: <code>:focus-visible</code>, <code>clamp()</code>, container queries (<a href="lab/gallery.html">gallery</a>).</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/05-scroll-driven-storytelling.md">Scroll-driven storytelling</a>: scroll/view timelines, <code>position: sticky</code>, progressive enhancement (<a href="lab/scroll-storytelling.html">demo</a>).</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/06-svg-data-driven-diagram.md">Data-driven SVG diagram</a>: <code>viewBox</code>, <code>createElementNS</code>, keyboard-operable SVG.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/learning/07-domain-dns-email.md">The domain: DNS, CNAMEs &amp; email</a>: <code>A</code> vs <code>CNAME</code>, apex rules, <code>MX</code>, receive-only forwarding.</li>
+    </ul>
+    <p>
+      These used to live in a separate <em>lab</em> section, walled off so the
+      experiments couldn&rsquo;t dent the showcase. That split is
+      <a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-004-retire-the-lab-as-the-vehicle.md">retired</a>:
+      the sandbox stopped being fed, and the framing was quietly discounting the
+      site&rsquo;s strongest artifact &mdash; the
+      <a href="projects/loop-replay.html">loop replay</a> was filed under
+      &ldquo;expect rough edges&rdquo; while two project pages cited it as
+      evidence. The learning continues inside the work instead of in a wing that
+      needs feeding.
+    </p>
+    <p class="muted-line"><a href="https://github.com/sanlee-ys/portfolio/tree/main/learning">The full log &rarr;</a></p>
   </main>
   <script src="assets/theme.js"></script>
   <script src="assets/last-updated.js"></script>
