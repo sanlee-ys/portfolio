@@ -215,4 +215,39 @@ page ("The grounding that did not pay", and the paragraph below the ladder). The
 visual carries the shape; the prose keeps the reasoning. Nothing the table said was
 lost — every level still carries gains, who-drives, and state.
 
-**Still open:** the Wilson-CI plot and the A/B/C split diagram.
+**Candidate 3 landed 2026-07-24.** The three-sentence description of the A/B/C
+split on `projects/loop-replay.html` is now a small inline SVG. The composition
+turns on one asymmetry: all three sets are scored every iteration, but only A's
+arrow comes back. A feeds the prompt rewrite and is re-scored; B stops the run; C
+is reported only. **The absence of a return edge on B and C is the argument** —
+that separation is the overfitting guard, and prose made the reader assemble it.
+
+The set boxes borrow `--series-a/b/c` from the score chart further down the same
+page, so the reader learns the colour code here and carries it into the chart.
+That is why the CSS is page-scoped rather than in `assets/style.css`: the
+variables it depends on are page-scoped, and the coupling is deliberate.
+
+Scope discipline, applied twice:
+
+- **Only the topology prose was replaced.** The lead's closing sentence — "that
+  separation is the whole point… so the gap between improved on A and improved on
+  C is something you can see" — is the argument, not a description, and stays
+  verbatim per Decision 5. The three sentences the diagram replaced were pure
+  topology.
+- **The sizes and sources were left out.** `classifier/docs/specs/prompt-optimization-loop.md`
+  §5.2 gives ~210/~90/n≈54 and names the source files, and it was tempting to put
+  them in the diagram. The page never stated them. Adding them would have been the
+  same defect as Candidate 1's cut `.rung-note`, in the opposite direction —
+  inflating a visual with detail its prose never carried.
+
+One correctness fix rode along: the old lead said the loop "never reads set C
+until the run is over." Per §5.2, C is *scored* every iteration; it is the **agent**
+that never sees it, and C is never used for any decision. The new caption says
+that precisely.
+
+**Accepted overlap:** the chart legend below still names each set's role in one
+clause, because it is load-bearing for reading the chart's three lines. The map
+shows the feedback topology, which the legend cannot. Judged complementary rather
+than duplicated — but named here so the next reader knows it was weighed.
+
+**Still open:** the Wilson-CI plot.
