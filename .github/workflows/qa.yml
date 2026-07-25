@@ -38,8 +38,9 @@ jobs:
 
       # Ports the architecture repo's 'Downstream surfaces' rule down to this repo's
       # ADR tier. Stdlib Python, no venv — this is a static site with no Python
-      # toolchain, and a doc linter is not a reason to grow one. All 3 ADRs comply,
-      # so it is enforced with zero exceptions.
+      # toolchain, and a doc linter is not a reason to grow one. Every ADR complies,
+      # so it is enforced with zero exceptions (LEGACY_NO_DOWNSTREAM is empty). No
+      # count here on purpose — the linter prints the live one, and prose goes stale.
       # `python3`, not `python`: this job sets up Node, not Python, and only python3
       # is guaranteed on the ubuntu runner image.
       - name: ADRs list their downstream surfaces
