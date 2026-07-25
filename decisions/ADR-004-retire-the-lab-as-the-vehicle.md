@@ -256,4 +256,39 @@ clause, because it is load-bearing for reading the chart's three lines. The map
 shows the feedback topology, which the legend cannot. Judged complementary rather
 than duplicated — but named here so the next reader knows it was weighed.
 
-**Still open:** the Wilson-CI plot.
+**Candidate 2 landed 2026-07-24, and it closes the set.** The scaled-eval Wilson
+CIs on `projects/defense-news-classifier.html` were prose enumerating brackets
+(`category 93.3% [89.9, 95.6], domain 90.3% [86.5, 93.2]`). They are now a plot
+that draws each interval as what it is — a width. For each metric, the small
+`n=54` human-graded interval sits above the `n=300` judge-graded one, and the
+second is visibly about half as wide: the noise-floor shrink the prose asserted
+is now something you see. The two intervals are told apart three ways at once —
+stroke weight, colour, and the literal `n=54 / n=300` label — so no reading leans
+on colour alone.
+
+Scope discipline, the same shape as the other two:
+
+- **The point estimates stayed in prose** (`category to 93.3%, domain to 90.3%`) —
+  they are the result. Only the interval *brackets* moved into the plot, because a
+  bracket in text is the thing a width draws better.
+- **The exact bounds were preserved, not dropped.** They moved to the plot's
+  caption (`[84.9, 98.1]` … `[86.5, 93.2]`), so no precision was lost — the plot
+  carries the shape, the caption keeps the numbers.
+- **The whole caveat paragraph is untouched** (the judge is the answer key, the
+  ~5–6% human-disagreement ceiling, the operations-heavy macro-F1). That is the
+  substance Decision 5 protects.
+
+Two honesty details this one forced. The `n=54` baseline drawn here is the
+*two-axis* gold the scaled run was measured against (`category 94.4%`), which reads
+higher than the page's current v3 headline (`92.6%`); the caption names it so the
+gap reads as two measurements against different keys, not a contradiction. And the
+axis is zoomed to 80–100% — stated in the caption — because a 0-based axis would
+crush every interval to an invisible sliver and defeat the plot's only job.
+
+The geometry was **generated from `evals/scale_eval.txt`, not hand-placed**, and
+verified by rendering the page and reverse-mapping each dot's pixel position back
+to its accuracy (94.4 / 93.3 / 92.6 / 90.3, exact). A first pass used a 280-unit
+viewBox that rendered at 232px inside the `.decision` box and dropped the axis text
+to ~10px; the viewBox was resized to 232 so it renders 1:1 on a phone.
+
+**All three named candidates have now landed.** Nothing from this record is open.

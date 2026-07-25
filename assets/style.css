@@ -961,6 +961,35 @@ body {
 .backedge marker path { fill: var(--muted); }
 .backedge marker path.be-head-back { fill: var(--accent); }
 
+/* ---- Wilson confidence-interval comparison (portfolio ADR-004 candidate 2) --
+   The argument is "a CI is a WIDTH": each metric shows the small n=54 human-
+   graded interval (wide) above the n=300 judge-graded one (narrow), so the
+   reader watches the interval halve. The two are told apart three ways at once
+   -- stroke weight, colour, and the literal "n=54 / n=300" label -- so no
+   reading depends on colour alone. viewBox is 232 wide -- the .decision box's
+   inner content width at a 320px viewport -- and the SVG is capped there, so it
+   renders ~1:1 on a phone and the 12px tick text stays 12px instead of scaling
+   down (an earlier 280-wide viewBox rendered at 232 and dropped ticks to
+   ~10px). */
+.ci-plot {
+  display: block;
+  width: 100%;
+  max-width: 232px;
+  height: auto;
+  margin: 14px 0 6px;
+}
+.ci-plot .ci-grid { stroke: var(--border); stroke-width: 1; }
+.ci-plot .ci-tick { fill: var(--muted); font-size: 12px; }
+.ci-plot .ci-metric { fill: var(--text); font-size: 13px; font-weight: 600; }
+.ci-plot .ci-n { fill: var(--muted); font-size: 12px; }
+/* The n=54 gold-set interval: muted and thin -- the noisy "before". */
+.ci-plot .ci-gold { stroke: var(--muted); stroke-width: 1.5; }
+.ci-plot .ci-dot-gold { fill: var(--bg); stroke: var(--muted); stroke-width: 1.5; }
+/* The n=300 scaled interval: accent and heavier -- the tightened result. */
+.ci-plot .ci-scaled { stroke: var(--accent); stroke-width: 3; }
+.ci-plot .ci-dot-scaled { fill: var(--accent); }
+.ci-caption { color: var(--muted); font-size: 0.9rem; margin: 0 0 4px; }
+
 /* Inline links inside prose. Without this they fall back to the browser's
    default deep blue, which is nearly unreadable on the dark background. Accent
    color + a soft underline that firms up on hover reads clearly as a link. */
