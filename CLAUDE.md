@@ -23,6 +23,25 @@ Before committing any layout / style / markup change:
    It renders every page at **320 / 360 / 390 / 430 px** and **fails on any
    horizontal overflow**. It must be green before you commit.
 
+   **Prerequisite — a Chromium matching the pinned Playwright.** `node_modules/`
+   isn't tracked, and each Playwright version maps to one browser revision, so
+   the gate is unrunnable on a fresh clone *and* after every Playwright bump
+   (the old revision is stranded, not upgraded). Run both, from the repo root:
+
+   ```
+   npm --prefix scripts ci
+   npm --prefix scripts exec -- playwright install chromium
+   ```
+
+   Use `--prefix scripts`, not a bare `npx` — that's what resolves the version
+   pinned in `scripts/package.json`, and therefore the revision CI uses. A bare
+   `npx playwright install` from the root fetches whatever Playwright is newest
+   and can install a revision the pin doesn't want.
+
+   **If the gate can't launch a browser, it is not green — it is unrun.** The
+   failure is loud (`Executable doesn't exist at …`) and Playwright's own message
+   names the fix; do not read it as a pass and commit anyway.
+
 2. **Hard rules** (the gate enforces overflow; you uphold the rest):
    - **No horizontal overflow at any width.** The page must never scroll
      sideways. Wide elements — tables, `pre`/code blocks, images, embeds — stay
@@ -33,8 +52,14 @@ Before committing any layout / style / markup change:
    - If you change colors, check **both** light and dark themes.
 
 3. **Actually look at it.** For anything visual, screenshot the affected page at
-   ~390px (Playwright + Chromium at `/opt/pw-browsers/chromium`) and inspect it —
-   don't assume from the code.
+   ~390px with Playwright and inspect it — don't assume from the code. Use the
+   same Chromium the gate uses: whatever `npm --prefix scripts exec -- playwright
+   install chromium` put in place. Don't hard-code a browser path in new work —
+   `/opt/pw-browsers/chromium` only ever described one Linux sandbox and exists
+   on no other machine. `mobile-qa.cjs` picks its browser in that order:
+   `PW_CHROMIUM` if set, else that legacy path *if it happens to exist*, else
+   Playwright's own. So on any normal host you get Playwright's; on a host that
+   ships a prebuilt Chromium, `PW_CHROMIUM` is the way to point at it.
 
 ## Why 320px matters
 
