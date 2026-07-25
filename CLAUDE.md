@@ -55,11 +55,13 @@ Before committing any layout / style / markup change:
    ~390px with Playwright and inspect it — don't assume from the code. Use the
    same Chromium the gate uses: whatever `npm --prefix scripts exec -- playwright
    install chromium` put in place. Don't hard-code a browser path in new work —
-   `/opt/pw-browsers/chromium` only ever described one Linux sandbox and exists
-   on no other machine. `mobile-qa.cjs` picks its browser in that order:
-   `PW_CHROMIUM` if set, else that legacy path *if it happens to exist*, else
-   Playwright's own. So on any normal host you get Playwright's; on a host that
-   ships a prebuilt Chromium, `PW_CHROMIUM` is the way to point at it.
+   `mobile-qa.cjs` used to default to `/opt/pw-browsers/chromium`, which only
+   ever described one Linux sandbox, and on a host that still had it that stale
+   revision silently outranked the pinned one. It now picks its browser in two
+   steps and no others: `PW_CHROMIUM` if set, else Playwright's own. So on any
+   normal host you get Playwright's; on a host that ships a prebuilt Chromium,
+   `PW_CHROMIUM` is the way to point at it — and if it's set to a path that
+   doesn't exist the gate fails rather than quietly using a different browser.
 
 ## Why 320px matters
 
@@ -112,11 +114,17 @@ is whatever the review posted as a PR comment.
 
 - **Red** — the job could not do its work: auth, a crash, or the review was
   **denied a tool it needed and posted no verdict** (a `--allowedTools` gap —
-  the comment names the denied tools). Fix CI; it says nothing about the PR.
+  the comment lists the denied calls verbatim). Fix CI; it says nothing about
+  the PR.
 - **Green + a comment** — the review ran; the comment is the result, read it. If
   the Actions log also carries a "denied N tool call(s)" warning, the verdict
   still stands — the agent reached for an ungranted tool, completed anyway, and
-  the denied tools are named so you can widen the grant to quiet it.
+  the warning names the calls so you can widen the grant to quiet it.
+
+Both denial paths print the **command**, not just the tool name — `Bash: node
+scripts/link-check.cjs`, not `Bash`. Not every denied call deserves a grant: the
+agent reaches speculatively, so a call it never needed is a prompt problem, not
+a permissions one.
 - **Green + "review inconclusive"** — it hit the turn ceiling and reviewed
   **nothing**. Treat the check as absent. Re-run with `@claude`.
 - **Green + no comment at all** — either a genuinely clean review or the
