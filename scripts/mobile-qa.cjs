@@ -36,8 +36,16 @@ function findHtml(dir) {
 
 (async () => {
   const pages = findHtml('.').sort();
-  const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium';
-  const browser = await chromium.launch(fs.existsSync(exe) ? { executablePath: exe } : {});
+  // Browser resolution is PW_CHROMIUM or Playwright's own — nothing in between.
+  // A hardcoded default would silently outrank the pinned revision on any host
+  // that happened to have that path, which is the one case nobody would notice.
+  const exe = process.env.PW_CHROMIUM;
+  if (exe && !fs.existsSync(exe)) {
+    console.error(`mobile-qa error: PW_CHROMIUM is set to "${exe}" but nothing exists there.`);
+    console.error('Unset it to use the Chromium from `npm --prefix scripts exec -- playwright install chromium`.');
+    process.exit(1);
+  }
+  const browser = await chromium.launch(exe ? { executablePath: exe } : {});
   const page = await browser.newPage();
   // Block external requests (analytics/fonts) so pages load fast and offline.
   await page.route('**/*', r => (r.request().url().startsWith('file:') ? r.continue() : r.abort()));

@@ -55,11 +55,13 @@ Before committing any layout / style / markup change:
    ~390px with Playwright and inspect it — don't assume from the code. Use the
    same Chromium the gate uses: whatever `npm --prefix scripts exec -- playwright
    install chromium` put in place. Don't hard-code a browser path in new work —
-   `/opt/pw-browsers/chromium` only ever described one Linux sandbox and exists
-   on no other machine. `mobile-qa.cjs` picks its browser in that order:
-   `PW_CHROMIUM` if set, else that legacy path *if it happens to exist*, else
-   Playwright's own. So on any normal host you get Playwright's; on a host that
-   ships a prebuilt Chromium, `PW_CHROMIUM` is the way to point at it.
+   `mobile-qa.cjs` used to default to `/opt/pw-browsers/chromium`, which only
+   ever described one Linux sandbox, and on a host that still had it that stale
+   revision silently outranked the pinned one. It now picks its browser in two
+   steps and no others: `PW_CHROMIUM` if set, else Playwright's own. So on any
+   normal host you get Playwright's; on a host that ships a prebuilt Chromium,
+   `PW_CHROMIUM` is the way to point at it — and if it's set to a path that
+   doesn't exist the gate fails rather than quietly using a different browser.
 
 ## Why 320px matters
 
