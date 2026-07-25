@@ -1,35 +1,67 @@
 // Render engine for the loop-replay viewer (projects/loop-replay.html).
 //
-// The page ships the run log as a plain JS string (window.LOOP_REPLAY_JSONL,
-// set by data/loop-replay-real.js) so it renders the same over file:// and
-// https:// -- a fetch() of a local .jsonl file hits Chromium's CORS
-// restriction on local files, a plain <script src> doesn't. This file:
-//   1. parses that string as JSONL into { metadata, iterations, summary },
+// The page ships each run log as a plain JS string (window.LOOP_REPLAY_JSONL
+// for rung 1, window.LOOP_REPLAY_RUN2_JSONL for rung 2, set by the files in
+// projects/data/) so it renders the same over file:// and https:// -- a
+// fetch() of a local .jsonl file hits Chromium's CORS restriction on local
+// files, a plain <script src> doesn't. This file:
+//   1. registers the available runs and normalizes their two log dialects
+//      (rung 1 tags records with `type` and ships unified prompt diffs;
+//      rung 2 tags with `record` and ships one-line experiment diffs) into
+//      one shape: { metadata, iterations, summary },
 //   2. draws the score chart as a hand-built SVG (same createElementNS
 //      pattern as assets/diagram.js -- no chart library),
-//   3. wires the iteration nav (prev/next/slider) to a detail panel that
-//      shows that iteration's scores, rationale, edit summary, and colored
-//      prompt diff.
+//   3. wires the run tabs + iteration nav (prev/next/slider) to a detail
+//      panel showing that iteration's scores, rationale, edit summary, and
+//      colored diff.
 //
 // Vanilla JS, no framework, no build step -- matches the rest of the site.
 
 (function () {
   "use strict";
 
-  // ---- The one flag San flips for a real run (see loop-replay.html's "How
-  // this reads a run log" section). true = amber "demo data" banner, false =
-  // a plain "real run" label. Nothing else in this file changes. ----
-  var IS_DRY_RUN = false;
-
   var SVG_NS = "http://www.w3.org/2000/svg";
 
   // ---------------------------------------------------------------------
-  // 1. Parse the run log
+  // 1. The run registry
+  // ---------------------------------------------------------------------
+  // Each entry: which global holds the JSONL, how to label the edit pane,
+  // and the one-line intro under the tabs. isDryRun mirrors the old
+  // IS_DRY_RUN flag per run: true = amber "demo data" banner. Both shipped
+  // runs are real, so both are false; the flag exists so a mock can never
+  // be shown without its warning banner.
+  var RUNS = [
+    {
+      label: "Rung 1 · prompt loop",
+      raw: window.LOOP_REPLAY_JSONL,
+      isDryRun: false,
+      diffHeading: "Prompt diff",
+      metricLine: "Category macro-F1 per split, per iteration.",
+      intro:
+        "The agent rewrites the classifier prompt each iteration. " +
+        "Stopped on the threshold done-signal; its scar is the A–C gap.",
+    },
+    {
+      label: "Rung 2 · ML loop",
+      raw: window.LOOP_REPLAY_RUN2_JSONL,
+      isDryRun: false,
+      diffHeading: "Experiment change",
+      metricLine:
+        "Mean macro-F1 across both axes (category + domain) per split, per iteration.",
+      intro:
+        "The agent does error-driven feature engineering on a trained TF-IDF " +
+        "baseline. Stopped on plateau; B rose +6.0 while held-out C fell 8.6 " +
+        "— the negative transfer recorded in ADR-018’s amendment.",
+    },
+  ].filter(function (r) { return typeof r.raw === "string"; });
+
+  // ---------------------------------------------------------------------
+  // 2. Parse + normalize a run log
   // ---------------------------------------------------------------------
 
-  // The run log is append-only JSONL: one JSON object per line, no wrapping
-  // array. Split on newlines and JSON.parse each non-empty one, then bucket
-  // by `.type` -- exactly how a real run_<timestamp>.jsonl reads.
+  // Append-only JSONL: one JSON object per line, no wrapping array. Rung 1
+  // buckets by `.type`, rung 2 by `.record` -- accept either, then fill the
+  // summary fields the older viewer relied on when a dialect lacks them.
   function parseRunLog(raw) {
     var metadata = null;
     var iterations = [];
@@ -39,20 +71,57 @@
       var trimmed = line.trim();
       if (!trimmed) return;
       var record = JSON.parse(trimmed);
-      if (record.type === "run_metadata") metadata = record;
-      else if (record.type === "iteration") iterations.push(record);
-      else if (record.type === "run_summary") summary = record;
+      var kind = record.type || record.record;
+      if (kind === "run_metadata") metadata = record;
+      else if (kind === "iteration") iterations.push(record);
+      else if (kind === "run_summary") summary = record;
     });
 
     // Iterations should already be in order, but sort defensively -- the
     // chart and nav both assume iteration N is at index N.
     iterations.sort(function (a, b) { return a.iteration - b.iteration; });
 
+    // Normalize the per-iteration edit text: rung 1 ships a unified
+    // prompt_diff; rung 2 ships a comma-joined experiment_diff one-liner,
+    // which reads best one change per line (and its "+group" lines pick up
+    // the diff-add coloring for free).
+    iterations.forEach(function (it) {
+      it._diff = it.prompt_diff ||
+        (it.experiment_diff && it.experiment_diff !== "(baseline)"
+          ? it.experiment_diff.split(", ").join("\n")
+          : "");
+    });
+
+    // Normalize the summary: rung 2's trailer has no final_iteration,
+    // delta_macro_f1, or overfitting gap -- derive them from the records so
+    // the honesty callout works identically for both dialects.
+    if (summary && iterations.length) {
+      if (summary.final_iteration == null) {
+        summary.final_iteration = iterations[iterations.length - 1].iteration;
+      }
+      if (summary.total_tokens_spent == null && summary.tokens_spent != null) {
+        summary.total_tokens_spent = summary.tokens_spent;
+      }
+      var best = iterations[summary.best_iteration] || iterations[0];
+      var base = iterations[0];
+      if (!summary.delta_macro_f1) {
+        summary.delta_macro_f1 = {
+          A: best.scores.A.macro_f1 - base.scores.A.macro_f1,
+          B: best.scores.B.macro_f1 - base.scores.B.macro_f1,
+          C: best.scores.C.macro_f1 - base.scores.C.macro_f1,
+        };
+      }
+      if (summary.overfitting_gap_a_vs_c == null) {
+        summary.overfitting_gap_a_vs_c =
+          summary.delta_macro_f1.A - summary.delta_macro_f1.C;
+      }
+    }
+
     return { metadata: metadata, iterations: iterations, summary: summary };
   }
 
   // ---------------------------------------------------------------------
-  // 2. Small helpers
+  // 3. Small helpers
   // ---------------------------------------------------------------------
 
   function el(name, attrs) {
@@ -70,9 +139,9 @@
     return sign + (v * 100).toFixed(1) + " pt";
   }
 
-  // Prompt diffs are untrusted-shaped content (they're just text pulled
-  // from a run log San could point at any file), so escape before wrapping
-  // lines in coloring spans -- never trust it as HTML.
+  // Diffs are untrusted-shaped content (they're just text pulled from a run
+  // log San could point at any file), so escape before wrapping lines in
+  // coloring spans -- never trust it as HTML.
   function escapeHtml(s) {
     return s
       .replace(/&/g, "&amp;")
@@ -83,7 +152,9 @@
   }
 
   // Unified-diff line -> a span with the class that colors it in CSS
-  // (#iter-diff .diff-add/.diff-del/.diff-hunk/.diff-meta).
+  // (#iter-diff .diff-add/.diff-del/.diff-hunk/.diff-meta). Rung 2's
+  // "+keyword_features.x" / "-keyword_features.x" lines match the same
+  // prefixes, so added/removed feature groups color like a diff too.
   function diffLineClass(line) {
     if (line.indexOf("@@") === 0) return "diff-hunk";
     if (line.indexOf("---") === 0 || line.indexOf("+++") === 0) return "diff-meta";
@@ -102,36 +173,64 @@
   }
 
   // ---------------------------------------------------------------------
-  // 3. Boot: read the data, bail loudly if it's missing
+  // 4. Boot: bail loudly if there's nothing to show
   // ---------------------------------------------------------------------
 
   var svg = document.getElementById("score-chart");
-  if (!svg || typeof window.LOOP_REPLAY_JSONL !== "string") return;
+  if (!svg || !RUNS.length) return;
 
-  var log = parseRunLog(window.LOOP_REPLAY_JSONL);
-  var iterations = log.iterations;
-  var summary = log.summary;
-  var bestIteration = summary ? summary.best_iteration : null;
-
-  var selected = bestIteration != null ? bestIteration : 0;
+  // Per-run state, reassigned by loadRun().
+  var activeRun = 0;
+  var log, iterations, summary, bestIteration, selected;
 
   // ---------------------------------------------------------------------
-  // 4. Demo banner
+  // 5. Run tabs + banner + per-run copy
   // ---------------------------------------------------------------------
 
-  (function renderBanner() {
+  function renderTabs() {
+    var tabsEl = document.getElementById("run-tabs");
+    if (!tabsEl) return;
+    tabsEl.querySelectorAll("button").forEach(function (btn, i) {
+      if (i >= RUNS.length) { btn.hidden = true; return; }
+      btn.textContent = RUNS[i].label;
+      btn.setAttribute("aria-pressed", i === activeRun ? "true" : "false");
+    });
+  }
+
+  function renderRunCopy() {
+    var run = RUNS[activeRun];
+    var introEl = document.getElementById("run-intro");
+    if (introEl) introEl.textContent = run.intro;
+    var metricEl = document.getElementById("chart-metric-line");
+    if (metricEl) metricEl.textContent = run.metricLine;
+    var diffHeadingEl = document.getElementById("iter-diff-heading");
+    if (diffHeadingEl) diffHeadingEl.textContent = run.diffHeading;
+  }
+
+  function renderBanner() {
     var badge = document.getElementById("demo-badge");
     var text = document.getElementById("demo-badge-text");
     if (!badge || !text) return;
-    if (IS_DRY_RUN) return; // HTML already ships the dry-run copy as the default.
+    var run = RUNS[activeRun];
+    if (run.isDryRun) {
+      badge.classList.remove("real-run");
+      text.textContent =
+        "Demo data — a labeled dry-run mock, not a measured result.";
+      return;
+    }
     badge.classList.add("real-run");
-    text.textContent =
-      "Real run — " + (log.metadata ? log.metadata.model : "live backend") +
-      ". Numbers below are a measured result, not a demo.";
-  })();
+    var bits = ["Real run — " + (log.metadata ? log.metadata.model : "live backend")];
+    if (summary && summary.total_tokens_spent != null) {
+      bits.push(summary.total_tokens_spent.toLocaleString() + " tokens");
+    }
+    if (summary && summary.done_signal) {
+      bits.push("stopped on the " + summary.done_signal + " done-signal");
+    }
+    text.textContent = bits.join(", ") + ". Numbers below are a measured result, not a demo.";
+  }
 
   // ---------------------------------------------------------------------
-  // 5. Run summary tiles + honesty callout
+  // 6. Run summary tiles + honesty callout
   // ---------------------------------------------------------------------
 
   function statTile(cls, label, value, sub) {
@@ -182,7 +281,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // 6. Score chart (SVG, hand-built)
+  // 7. Score chart (SVG, hand-built)
   // ---------------------------------------------------------------------
 
   // Layout constants for the 640x280 viewBox declared in the HTML. Padding
@@ -323,7 +422,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // 7. Iteration nav (prev/next/slider) + detail panel
+  // 8. Iteration nav (prev/next/slider) + detail panel
   // ---------------------------------------------------------------------
 
   var prevBtn = document.getElementById("iter-prev");
@@ -365,7 +464,7 @@
     if (!isBaseline) {
       if (rationaleEl) rationaleEl.textContent = it.agent_rationale || "";
       if (summaryEl) summaryEl.textContent = it.edit_summary || "";
-      if (diffEl) diffEl.innerHTML = renderDiff(it.prompt_diff || "");
+      if (diffEl) diffEl.innerHTML = renderDiff(it._diff || "");
     }
 
     if (metaEl) {
@@ -385,10 +484,33 @@
   if (slider) slider.addEventListener("input", function () { notifySelect(parseInt(slider.value, 10)); });
 
   // ---------------------------------------------------------------------
-  // 8. Go
+  // 9. Load a run and render everything
   // ---------------------------------------------------------------------
 
-  renderSummary();
-  renderChart();
-  renderIterDetail();
+  function loadRun(i) {
+    activeRun = i;
+    log = parseRunLog(RUNS[i].raw);
+    iterations = log.iterations;
+    summary = log.summary;
+    bestIteration = summary ? summary.best_iteration : null;
+    selected = bestIteration != null ? bestIteration : 0;
+
+    renderTabs();
+    renderRunCopy();
+    renderBanner();
+    renderSummary();
+    renderChart();
+    renderIterDetail();
+  }
+
+  var tabsEl = document.getElementById("run-tabs");
+  if (tabsEl) {
+    tabsEl.querySelectorAll("button").forEach(function (btn, i) {
+      btn.addEventListener("click", function () {
+        if (i !== activeRun && i < RUNS.length) loadRun(i);
+      });
+    });
+  }
+
+  loadRun(0);
 })();
