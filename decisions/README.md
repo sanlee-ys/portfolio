@@ -97,20 +97,39 @@ posted **no verdict** (true silence); a denial a completed review survived stays
 with a warning that now **names** the denied tools, so the grant can be tuned against
 data instead of guessed at.
 
-A fourth amendment (2026-07-25) found that naming the *tool* was one level too coarse
-to act on, and that the thing it was pointing at was not a permissions bug at all.
-Every review from #113 to #118 was denied Bash calls and **half were denied into
-silence** — #118 was merged four minutes after its red check, the merge-past reflex
-this record exists to stop. Reproducing the review locally against the same PR gave
-the answer the runner threw away: the merge-ref checkout is **detached**, so `gh`
-cannot infer a PR from a branch, so `gh pr diff` — the prompt's own first instruction
-— fails; the agent then tries to look the number up, gets denied, and **asks for
-approval and waits**, which in CI is silence. The workflow had known the PR number all
-along and never passed it. So the fix is in the prompt, not the grant: pass the
-number, and tell the agent no human can approve anything. `--allowedTools` is
-deliberately **not** widened — granting the discovery call would have bought a
-workaround for a prompt defect on a job holding `pull-requests: write`. The classify
-step now names the denied **command prefix** rather than the class.
+A fourth amendment (2026-07-25) is what happened when someone tried to do that. Six
+reviews landed within hours of the third, every one of them with denials and three
+silenced outright — and all six named the same thing: `Bash`. That is the tool *class*
+every shell command reports under, so the instrument built to make the grant tunable
+could not distinguish `node scripts/link-check.cjs` from `ls`, and the execution log
+that holds the real answer is destroyed with the runner. Amendment 3's own prescribed
+verification (#113) had already come back **red** and gone unrecorded, which is the
+same failure in process form. The fix names the denied **call**, not the class; tells
+the review what toolset it actually holds, since the three silenced runs were all short
+and denial-saturated and look like an agent discovering its permissions by hitting
+walls; and pointedly **does not widen the grant**, because doing so on this evidence
+would have been the fourth guess in a record whose first three each cost a cycle.
+
+The thread running through all four: a counter that could not count, then a name that
+could not distinguish. Both were the right kind of fix and both stopped one field short
+of being usable, and neither shortfall showed until someone tried to make a decision
+from the output. **An instrument is validated by someone acting on what it said, not by
+it firing.**
+
+A fifth amendment (2026-07-25) answered the question the fourth had declared
+unanswerable. Amendment 4 concluded there was "no path to confirming any hypothesis
+about these six runs" — but every input to the review is committed to this repo, so it
+can just be **run again locally** against the same PR with the denials captured
+directly. Doing that for #118 took minutes and produced the cause: the job checks out
+the **merge ref**, which is detached, so `gh` cannot infer a PR from a branch and
+`gh pr diff` — the prompt's own first instruction — fails outright. The agent then goes
+looking for the PR number, is denied, and **asks for approval and waits**, which in an
+unattended run is silence. So it was never a permissions defect: the agent was blocked
+on a *reply*, not a capability, and no widening would have fixed it. The prompt now
+passes the number the workflow has known all along, and tells the agent that nothing
+can approve a denied call. The grant stays unchanged for the third amendment running.
+**When the instrument is blind, reproduce the system rather than wait for better
+telemetry** — a CI job whose inputs are all in the repo is a reproducible experiment.
 
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec

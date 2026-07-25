@@ -114,11 +114,17 @@ is whatever the review posted as a PR comment.
 
 - **Red** — the job could not do its work: auth, a crash, or the review was
   **denied a tool it needed and posted no verdict** (a `--allowedTools` gap —
-  the comment names the denied tools). Fix CI; it says nothing about the PR.
+  the comment lists the denied calls verbatim). Fix CI; it says nothing about
+  the PR.
 - **Green + a comment** — the review ran; the comment is the result, read it. If
   the Actions log also carries a "denied N tool call(s)" warning, the verdict
   still stands — the agent reached for an ungranted tool, completed anyway, and
-  the denied tools are named so you can widen the grant to quiet it.
+  the warning names the calls so you can widen the grant to quiet it.
+
+Both denial paths print the **command**, not just the tool name — `Bash: node
+scripts/link-check.cjs`, not `Bash`. Not every denied call deserves a grant: the
+agent reaches speculatively, so a call it never needed is a prompt problem, not
+a permissions one.
 - **Green + "review inconclusive"** — it hit the turn ceiling and reviewed
   **nothing**. Treat the check as absent. Re-run with `@claude`.
 - **Green + no comment at all** — either a genuinely clean review or the
