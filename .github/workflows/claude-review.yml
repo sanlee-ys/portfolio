@@ -338,12 +338,28 @@ jobs:
           # Extracted once as JSON and rendered twice, rather than sharing one
           # program string across two jq calls -- sharing means double-quoting it
           # in the shell, and that eats jq variables (`$n`) before jq sees them.
-          # `|| echo []` keeps a shape change from taking the step down: this is
-          # the diagnostic, not the verdict.
+          #
+          # Guarded at TWO levels, and the inner one is the load-bearing half.
+          # `|| echo []` alone (all this had until 2026-07-25) is whole-program:
+          # `.tool_input.command` raises "Cannot index string with string" if any
+          # ONE element's `tool_input` is not an object, jq exits non-zero, and
+          # the fallback discards the commands for every OTHER denial too. The
+          # comment then renders "(could not be extracted)" and points the reader
+          # at the job log, where `show_full_output: false` means they are not
+          # either -- a dead end on the red path, which is the one path where the
+          # commands are the only thing there is to act on. `try ... catch null`
+          # per field costs one line its detail instead of costing all of them:
+          # a bad `tool_input` still yields `Bash`, a bad element still yields
+          # `unknown`. `|| echo []` stays as the outer net for a shape change
+          # that breaks the program itself. Same defensiveness as the
+          # `.tool_name // .name // .tool` chain above, for the same reason
+          # Amendment 2 exists -- the SDK moved a field once already.
           DENIED_LIST=$(jq -c '[.permission_denials[]?
-            | {n: ((.tool_name // .name // .tool // "unknown") | tostring),
-               i: ((.tool_input.command // .tool_input.file_path
-                    // .tool_input.pattern // .tool_input.url // "") | tostring
+            | {n: ((try (.tool_name // .name // .tool) catch null)
+                   // "unknown" | tostring),
+               i: ((try (.tool_input.command // .tool_input.file_path
+                         // .tool_input.pattern // .tool_input.url) catch null)
+                   // "" | tostring
                    | gsub("[\n\r\t]"; " "))}
             | if .i == "" then .n
               elif (.i | length) > 160 then .n + ": " + .i[0:160] + "..."

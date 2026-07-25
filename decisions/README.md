@@ -144,6 +144,22 @@ back **red**, and left no mark on the record until Amendment 4 went looking — 
 same unread-instrument failure in process clothing. A verification whose result nobody
 records is not a verification.
 
+A sixth amendment (2026-07-25) took the fifth's lesson one layer out. All five of the
+others close with *"this change cannot test itself"* — true of the **review**, which
+self-skips when this workflow is edited, and quietly extended to the **classify
+step**, which is ordinary bash reading a JSON file and was testable the whole time. It
+now has a suite that runs the step's real text, extracted from the workflow so it
+cannot drift, against synthetic execution logs with `gh` stubbed — the same
+reproduce-it move Amendment 5 made against the review, applied to the thing that
+reports on it. Thirteen of its fourteen fixtures passed against the merged code, which
+is what makes the fourteenth worth reading: the denied-command extraction was guarded
+at the whole-program level, so a single malformed element discarded the commands for
+**all** of them and the comment fell back to *"see the job log"*, where
+`show_full_output: false` means they are not there either. A dead end, on the one path
+where those commands are the only thing to act on. The guard is now per-field. The
+defect is minor and was never observed in production; the five amendments that shipped
+with no way to find one are the finding.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record
