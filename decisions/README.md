@@ -116,6 +116,19 @@ of being usable, and neither shortfall showed until someone tried to make a deci
 from the output. **An instrument is validated by someone acting on what it said, not by
 it firing.**
 
+Amendment 4 **was** verified, on a disposable PR (#124) opened the moment it merged —
+and the result is the best argument in the whole record for building the instrument
+before arguing about the fix. The review posted a verdict, the check went green with a
+warning, and the warning finally named commands. All four were the agent trying to
+discover *which PR it was reviewing*: `env`, `env | grep -i pr`, an `echo` of
+`$PR_NUMBER`, and `gh pr list`. Nothing touched `scripts/`, `cat`, `ls`, or `git`. The
+gate-running theory that shaped three amendments was simply wrong, and no amount of
+reading the diff would have found that out — an agent that cannot name its PR cannot
+call `gh pr comment <N>`, which is also the missing mechanism for the runs that died
+silent. The fix was to interpolate the PR number into the prompt. **`--allowedTools`
+has now survived four amendments unwidened**, every failure blamed on it having turned
+out to be something else.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record

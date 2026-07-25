@@ -106,9 +106,24 @@ jobs:
         continue-on-error: true
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # The PR number is interpolated because the review kept going looking
+          # for it. #124 -- the first run whose denial log named real commands --
+          # denied four calls and ALL FOUR were context-hunting: `env`, `env |
+          # grep -i pr`, an `echo` of `$PR_NUMBER`, and `gh pr list` as a
+          # fallback. Nothing about gates or files; the agent simply did not know
+          # which PR it was on. That is a prompt gap, not a permissions one, and
+          # it is the likeliest cause of the three silenced runs too: an agent
+          # that cannot name its PR cannot call `gh pr comment <N>`, so it has no
+          # channel and stops. Telling it costs nothing and grants nothing.
+          #
+          # `.number` ONLY. Never interpolate `.title`, `.body`, or a branch name
+          # into a prompt or a `run:` block -- those are attacker-controlled text
+          # and the classic Actions script-injection vector. An integer is safe.
           prompt: |
-            Review this pull request for a public front-end learning repo
-            (static HTML/CSS/JS, no build step, served on GitHub Pages).
+            Review pull request #${{ github.event.pull_request.number }} for a
+            public front-end learning repo (static HTML/CSS/JS, no build step,
+            served on GitHub Pages). That number is the PR you are reviewing —
+            use it directly in `gh` commands and never go looking for it.
 
             Start with `gh pr diff --name-only`, then `gh pr diff` for the
             content. The checkout is the MERGE RESULT, so reading a file shows
@@ -137,6 +152,12 @@ jobs:
             - `gh pr comment` and
               `mcp__github_inline_comment__create_inline_comment` to publish.
               These two are your only way to say anything to anyone.
+
+            You already have every piece of context you will get: the PR number
+            is above and the diff is one command away. There is no `env`, no
+            `gh pr list`, and nothing to discover about which PR this is — those
+            calls are denied, and hunting for context is what has burned the
+            most turns on past runs.
 
             Do not run this repo's QA gates (`scripts/*.cjs`, `scripts/*.py`)
             or any other program. The `qa` workflow already ran all of them

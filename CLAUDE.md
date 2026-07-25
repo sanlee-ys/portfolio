@@ -122,16 +122,19 @@ is whatever the review posted as a PR comment.
   still stands — the agent reached for an ungranted tool, completed anyway, and
   the warning names the calls so you can widen the grant to quiet it.
 
-Both denial paths print the **command**, not just the tool name — `Bash: node
-scripts/link-check.cjs`, not `Bash`. Not every denied call deserves a grant: the
-agent reaches speculatively, so a call it never needed is a prompt problem, not
-a permissions one.
 - **Green + "review inconclusive"** — it hit the turn ceiling and reviewed
   **nothing**. Treat the check as absent. Re-run with `@claude`.
 - **Green + no comment at all** — either a genuinely clean review or the
   self-skip below. (A denial that *silenced* the review goes **red**; one the
   review *survived* stays green with the warning above — neither lands here.)
   Check the job log before assuming the first.
+
+Both denial paths print the **command**, not just the tool name — `Bash: env`,
+not `Bash`. Not every denied call deserves a grant: the agent reaches
+speculatively, so a call it never needed is a prompt problem, not a permissions
+one. The first run to carry real commands (#124) denied four, and all four were
+the agent hunting for its own PR number — a prompt gap, and `env` is one you
+want denied on a public runner.
 
 **Editing `.github/workflows/claude-review.yml` disables the review on that
 same PR.** The Claude App refuses to run when the workflow file differs from the

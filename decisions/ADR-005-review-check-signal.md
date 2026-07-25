@@ -8,7 +8,10 @@ survived denial, after a smoke test falsified Amendment 2's "rare" assumption on
 first real review (2026-07-25, *Amendment 3*); the denial signal made actionable —
 naming the *tool* named nothing, because every shell command is called `Bash` — and
 the review finally told what toolset it holds, after six consecutive reviews hit
-denials and three of them died silent (2026-07-25, *Amendment 4*)
+denials and three of them died silent (2026-07-25, *Amendment 4*; **verified on
+#124**, whose four named denials were all the agent hunting for its own PR number
+— not the gate-running everyone had assumed — so the fix was a prompt variable and
+`--allowedTools` still stands unwidened)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -670,3 +673,78 @@ opening anything else."
 the redden-on-silence calibration from Amendment 3 is untouched, turn exhaustion is
 still inconclusive and non-red, and Decision 2's two-channel colour model is what
 this amendment is serving rather than revising.
+
+### Verified — 2026-07-25, PR #124: it was never about the gates
+
+Amendment 4 shipped in #122 and, for the fifth time, self-skipped its own review
+(*"No execution file; the action skipped itself"*, 16 seconds, green — the green
+that means nothing). Disposable PR #124 was opened immediately after the merge to
+run it for real. **Unlike Amendment 3's verification, this one is written down.**
+
+```
+subtype=success turns=13 denials=4 cost_usd=0.2337 denied_tools=[Bash]
+denied_calls: Bash: echo "PR_NUMBER=$PR_NUMBER GITHUB_REF=$GITHUB_REF"
+            | Bash: env
+            | Bash: env | grep -i pr; env | grep -i github
+            | Bash: gh pr list --state open --limit 20
+```
+
+Both fixes work. The review posted a substantive verdict, the check went **green
+with a warning** (Amendment 3's calibration, correct), and the warning named
+commands rather than the class `Bash` (Amendment 4's fix, the first denial log in
+this repo's history that anyone could act on).
+
+**And the commands say something nobody guessed.** All four denials are the agent
+trying to find out *which PR it is reviewing* — an `echo` of `$PR_NUMBER`, `env`,
+`env` grepped twice, and `gh pr list` as a fallback. Not one call touched
+`scripts/`, `cat`, `ls`, or `git`.
+
+That kills the hypothesis this amendment was written under. #116's denials looked
+like a reviewer trying to *run* the gates it had just been asked to describe, and
+Amendment 4 declined to grant `Bash(node scripts/:*)` on security grounds while
+treating the hypothesis as live. It was not live. **The reviewer never wanted to
+run anything.** It wanted an integer.
+
+It also supplies the missing mechanism for the silent runs Amendment 4 could only
+describe. An agent that cannot determine its PR number cannot call `gh pr comment
+<N>` — it has no publishing channel at all, so it spends turns hunting for context
+and stops without a verdict. That fits the three silenced runs exactly (7 turns/4
+denials, 11/8, 7/4: short, denial-saturated, ending `subtype=success` because
+giving up *is* finishing).
+
+**The fix is a prompt variable, not a permission.** The review job now interpolates
+`${{ github.event.pull_request.number }}` and states the number in the first
+sentence. `--allowedTools` is *still* unchanged — four amendments in, the grant
+that shipped on 2026-07-24 has needed no widening, and every failure attributed to
+it has turned out to be something else.
+
+Two details worth keeping:
+
+- **The narrow grant earned its keep, concretely.** `env` on an Actions runner
+  would have dumped the job's environment into a public log. Every previous defence
+  of narrow prefixes in this record was an argument; this is the first
+  demonstration.
+- **Two of the four could never have been granted.** `env | grep -i pr; env | grep
+  -i github` is a compound command, and prefix rules do not match those. A grant
+  aimed at silencing this counter would have failed at it anyway.
+
+**The general lesson, and it is the sharpest one here.** Every hypothesis about
+these denials was formed by reading the *diff* and asking what a reviewer would
+want — a plausible, careful, entirely wrong method, sustained across three
+amendments because the instrument could not contradict it. The answer was not
+diff-shaped and no amount of reasoning about PR content would have reached it.
+**Four denials of real data beat three amendments of good reasoning**, and the
+only change that mattered was making the instrument say something falsifiable.
+
+**Downstream surfaces for this verification:**
+- `.github/workflows/claude-review.yml` — the `prompt` gains the interpolated PR
+  number, a rationale comment (including why `.number` and never `.title`/`.body`,
+  which are the Actions script-injection vector), and a line in the toolset
+  paragraph naming `env`/`gh pr list` as denied and context-hunting as the waste.
+- `CLAUDE.md` — the denial-naming paragraph moves below the bullet list it was
+  splitting, and cites #124's real commands.
+- `decisions/README.md` — the ADR-005 narrative records the verification and what
+  it overturned.
+- **This change edits the workflow, so it self-skips its own review a sixth time.**
+  Judge it on the PR after it merges: the denial count should fall from four toward
+  zero, and if it does not, the log now says why.
