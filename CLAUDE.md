@@ -86,14 +86,18 @@ The `Claude Review` check reports **tooling health, not a verdict**. The verdict
 is whatever the review posted as a PR comment.
 
 - **Red** — the job could not do its work: auth, a crash, or the review was
-  **denied tool calls it needed** (a `--allowedTools` gap — it posts a comment
-  naming the count). Fix CI; it says nothing about the PR.
-- **Green + a comment** — the review ran. The comment is the result. Read it.
+  **denied a tool it needed and posted no verdict** (a `--allowedTools` gap —
+  the comment names the denied tools). Fix CI; it says nothing about the PR.
+- **Green + a comment** — the review ran; the comment is the result, read it. If
+  the Actions log also carries a "denied N tool call(s)" warning, the verdict
+  still stands — the agent reached for an ungranted tool, completed anyway, and
+  the denied tools are named so you can widen the grant to quiet it.
 - **Green + "review inconclusive"** — it hit the turn ceiling and reviewed
   **nothing**. Treat the check as absent. Re-run with `@claude`.
 - **Green + no comment at all** — either a genuinely clean review or the
-  self-skip below (a review denied its tools now goes **red**, not green, so it
-  is no longer a cause here). Check the job log before assuming the first.
+  self-skip below. (A denial that *silenced* the review goes **red**; one the
+  review *survived* stays green with the warning above — neither lands here.)
+  Check the job log before assuming the first.
 
 **Editing `.github/workflows/claude-review.yml` disables the review on that
 same PR.** The Claude App refuses to run when the workflow file differs from the

@@ -1,9 +1,11 @@
 # ADR-005: A red review check means the tooling broke, not that the PR is bad
 
-**Status:** Accepted; amended twice on 2026-07-24 — Decision 4 reversed and the
-remediation path resized on first measurement (see *Amendment*); then Decision 1's
-tool grant completed and Decision 5's denial signal fixed and escalated to red
-(see *Amendment 2*)
+**Status:** Accepted; amended three times — Decision 4 reversed and the remediation
+path resized on first measurement (2026-07-24, *Amendment*); Decision 1's tool grant
+completed and Decision 5's denial signal fixed and escalated to red (2026-07-24,
+*Amendment 2*); the redden calibrated to fire only on a *silenced* review, not a
+survived denial, after a smoke test falsified Amendment 2's "rare" assumption on the
+first real review (2026-07-25, *Amendment 3*)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -159,6 +161,12 @@ to see their diffs.
   absent `.permission_denials_count`, and escalates any denial from a warning to
   a red job failure that pre-empts the subtype case. Decision 1 is extended and
   Decision 5 is amended (warning → red); Decisions 2, 4 and 6 are untouched.
+- **Amendment 3 below** calibrates Amendment 2's escalation: a denial reddens only
+  when the review posted no verdict (the #108 silence); a denial a completed review
+  survived (#111) stays green with a warning that names the denied tools. It also
+  makes the classify step extract those names. Amendment 2's "redden on any denial"
+  is narrowed, not reverted; the core grant and counter fix are confirmed, not
+  changed.
 - **Commit `3b1c8e3` (#96)** — its rationale comment is superseded by this
   record and was removed from the workflow. Its *diagnosis* was right and is
   quoted in *Context*; only its fix is reversed.
@@ -430,3 +438,99 @@ for a day as "no denials seen" when it was structurally incapable of seeing any.
 **Unchanged by Amendment 2:** Decisions 2 and 6 stand as written; Decision 4's
 ceiling (40) is untouched; turn exhaustion still posts *"nothing was reviewed"* and
 still does not go red. Only Decision 1 is extended and Decision 5 is amended.
+
+---
+
+## Amendment 3 — 2026-07-25: the smoke test falsified "rare," on the first real review
+
+Amendment 2 escalated any tool denial to a red check and named the cost honestly:
+it would also redden a PR whose review *was* posted but that hit a stray denial. It
+"accepted" that edge by reasoning denials would be "near zero" after the grant, and
+it deferred the precise rule — redden only when a denial coincides with no verdict —
+as too fragile to be worth the classify-step complexity.
+
+Because Amendment 2 edits the workflow, it could not test itself (the self-skip, for
+the third time). The verification was a deliberate throwaway PR — #111, a nine-line
+markdown file whose only purpose was to trigger a real review once the fix was live.
+It falsified the "rare" assumption immediately.
+
+**What #111 showed.** The core fix worked exactly as intended: the review read the
+diff, checked the one internal link by hand, and posted a substantive verdict — the
+thing #108 could never do. `subtype=success, turns=11`. The counter read `denials=3`
+(Amendment 2's fix working; the old code would have read 0). And Amendment 2's
+escalation fired: the check went **red**.
+
+But the three denials had silenced nothing. The agent posted a complete, correct
+verdict; the denials were speculative reaches for tools it did not need and did not
+miss. So the red was exactly the failure this record was written to prevent: **a red
+check that is not a verdict on the PR, on a PR that was reviewed fine.** Amendment 2
+reintroduced the meaningless red it set out to kill — narrowed to the denial case,
+but the same disease. On a trivial diff, on the first real review, "rare" was every
+run.
+
+A second, quieter defect surfaced with it: the classify step *counted* the denials
+but did not *name* them, and `show_full_output` is off, so "widen `--allowedTools`"
+was not actionable — you could see that three tools were denied and had no way to
+learn which three. Tool *names* are safe to surface even when tool *outputs* are not;
+Amendment 2 conflated the two and logged neither.
+
+**The decision.** Calibrate the redden by the one thing that separates a fatal denial
+from a survivable one: **did the review post a verdict?**
+
+- **Denial + no verdict → red.** This is #108 — denied into silence, the job could
+  not do its work. Unchanged in spirit from Amendment 2.
+- **Denial + a verdict → green,** with a workflow warning naming the denied tools.
+  This is #111 — the review worked; the denial is a grant to tune, not a failure to
+  report. The verdict comment carries the review; the warning carries the tooling
+  note. Two channels, as Decision 2 intended.
+
+"Did it post a verdict?" is read from the PR: did `claude` author an issue comment.
+The review runs once, on open, so at classify time the only such comment is this
+review's summary (its prompt mandates one); the classify step's own comment is
+authored by `github-actions`, so it is never miscounted. The step now names the
+denied tools in both the log line and the red comment, so the grant can be widened
+without guessing.
+
+This is not a reversal of Amendment 2 — it is the narrower rule Amendment 2 *named as
+the next step* and declined to build. What changed is the evidence: Amendment 2
+judged the precise rule not worth its complexity because it expected the sharp edge
+to be rare; #111 measured it at 100% of reviews, which is the "measure, then tune"
+the first Amendment preached. The complexity is worth it now because the alternative
+— a check that is red on every good review — is the thing that trains people to
+ignore checks.
+
+**What is left unfixed, deliberately.** Denials are now *visible* (named) but not
+*eliminated*: the agent will keep reaching for tools it lacks, and each such review
+is green-with-a-warning rather than silent. Whether to also *grant* those tools (so
+denials reach zero and the warning stops) is left to observation — the warning now
+names them, so the next few reviews will say what they are, and the grant can be
+widened against data instead of guessed at. A green check with a named-tool warning
+is an honest resting state; pre-granting tools the review does not need, just to zero
+a counter, is not.
+
+**The general lesson.** Amendment 2 accepted a sharp edge by reasoning about how
+often it would fire. One disposable PR measured it in three minutes and the reasoning
+was wrong by two orders of magnitude. A verification PR is cheap; a decision defended
+by "this will rarely happen" is not — and for a workflow that self-skips its own
+review, the throwaway smoke PR is now the standard way to check any change to this
+file before trusting it.
+
+**Downstream surfaces for this amendment:**
+- `.github/workflows/claude-review.yml` — the classify step gains a `DENIED_TOOLS`
+  extraction, a `POSTED` verdict-check via `gh pr view`, and a split of the denial
+  branch into red-on-silence vs green-with-warning. The subtype case is unchanged.
+- `CLAUDE.md`'s "Reading the Claude Review check" section — the **Red** bullet now
+  says *denied into silence*, and **green + a comment** notes the possible tooling
+  warning.
+- `decisions/README.md` — the ADR-005 open-verification item is now **closed**: #111
+  was the first real review and it posted a verdict (the proof), as #104 closed the
+  previous one. A note records the calibration.
+- **This change cannot test itself** either — a fourth time; editing the workflow
+  self-skips its review. Verify with another throwaway PR after this merges, judged
+  by: a good review that posts a verdict goes **green with a named-tool warning**,
+  not red.
+
+**Unchanged by Amendment 3:** the core grant (`Read,Grep,Glob`) and the counter fix
+stand — #111 confirmed both. Turn exhaustion is still inconclusive and non-red.
+Decisions 2, 4, 6 stand; Decision 5, already amended once, is calibrated further
+here.

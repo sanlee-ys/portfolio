@@ -236,42 +236,60 @@ jobs:
           # Count the array. `// 0` covers a result with no denials at all.
           DENIALS=$(jq -r '(.permission_denials | length) // 0' <<<"$RESULT")
           COST=$(jq -r '(.total_cost_usd // 0) * 10000 | round / 10000' <<<"$RESULT")
+          # Name the denied tools so "widen --allowedTools" is actionable. Tool
+          # NAMES are safe to log; only tool OUTPUTS carry secrets, which is why
+          # show_full_output stays off. Defensive field chain -- the SDK denial
+          # element is `tool_name`, but fall back rather than print nothing if the
+          # shape shifts. `[]?` tolerates a result with no denials.
+          DENIED_TOOLS=$(jq -r '[.permission_denials[]? | (.tool_name // .name // .tool // "unknown")] | unique | join(", ")' <<<"$RESULT" 2>/dev/null)
 
-          echo "subtype=$SUBTYPE turns=$TURNS denials=$DENIALS cost_usd=$COST"
+          echo "subtype=$SUBTYPE turns=$TURNS denials=$DENIALS cost_usd=$COST denied_tools=[$DENIED_TOOLS]"
 
-          # A permission denial is a defect in this workflow's --allowedTools,
-          # not a finding about the PR (ADR-005 Decision 5). Under this file's
-          # colour model -- colour = tooling health, the posted comment = the
-          # verdict -- that is the RED category ("the job could not do its work;
-          # fix CI"), and Amendment 2 escalates it from a warning to a failure.
-          # It runs BEFORE the subtype case and takes precedence: a run blocked
-          # from tools it needed produced an untrustworthy outcome however it
-          # terminated. This is the exact hole #108 fell through -- 5 denied file
-          # reads, subtype=success, zero comments, GREEN. Distinct from
-          # error_max_turns below, which is genuinely inconclusive (ran out of
-          # road, not a fixable config bug) and deliberately stays non-red. A
-          # warning-only signal is what hid here; post to the PR, not just a log.
+          # Denials, calibrated by whether the review actually produced a verdict
+          # (ADR-005 Amendment 3). Amendment 2 reddened on ANY denial; #111 proved
+          # that fires on a GOOD review -- the agent speculatively reaches for
+          # ungranted-but-harmless tools it does not need (cat/ls/git/etc.), posts
+          # a real verdict anyway, and those stray denials would redden a clean
+          # review, which is the meaningless-red disease this whole record treats.
+          # So a denial is RED only when it actually SILENCED the review; when a
+          # verdict was posted it is an FYI to tune the grant, and the check stays
+          # green. #108 (denied into silence) still reddens; #111 (verdict despite
+          # denials) does not.
+          #
+          # "Did it post a verdict?" = did `claude` author an issue comment on this
+          # PR. The review runs once, on open, so at classify time the only claude
+          # comment is this review's summary (its prompt mandates one via `gh pr
+          # comment`); the classify step's own comment is authored by
+          # github-actions, not claude, so it is never self-counted. An inline-only
+          # review with no summary counts as no-verdict -- it violates the prompt,
+          # and reddening it is acceptable.
           if [ "$DENIALS" -gt 0 ]; then
-            gh pr comment "$PR" --body "$(cat <<EOF
+            POSTED=$(gh pr view "$PR" --json comments --jq '[.comments[] | select(.author.login | ascii_downcase | contains("claude"))] | length' 2>/dev/null || echo 0)
+            if [ "${POSTED:-0}" -gt 0 ]; then
+              echo "::warning::Review posted a verdict but was denied $DENIALS tool call(s): ${DENIED_TOOLS:-unknown}. Not failing -- the review completed. Grant these in --allowedTools to silence the noise."
+            else
+              gh pr comment "$PR" --body "$(cat <<EOF
           ### Automated review blocked by a tooling gap — not a verdict on the PR
 
-          The review agent was denied **$DENIALS tool call(s)** it requested, so
-          its review may be incomplete or missing. This is a \`--allowedTools\`
+          The review agent was denied **$DENIALS tool call(s)** and posted **no
+          verdict**, so nothing here was reviewed. This is a \`--allowedTools\`
           gap in \`.github/workflows/claude-review.yml\`, not a finding about your
           change — treat this check as *absent*, not passed and not failed.
 
           | | |
           |---|---|
           | tool calls denied | $DENIALS |
+          | denied tools | ${DENIED_TOOLS:-unknown} |
           | turns used | $TURNS |
           | cost | \$$COST |
           | run | [$GITHUB_RUN_ID]($RUN_URL) |
 
-          Widen the tool grant in the workflow, then re-run with \`@claude\`.
+          Grant the denied tool(s) in the workflow, then re-run with \`@claude\`.
           EOF
           )"
-            echo "::error::Review blocked: $DENIALS tool call(s) denied — a --allowedTools defect in this workflow, not a PR verdict. Failing so the check reads as 'fix CI' (ADR-005 colour model)."
-            exit 1
+              echo "::error::Review blocked into silence: $DENIALS tool call(s) denied (${DENIED_TOOLS:-unknown}), no verdict posted — a --allowedTools defect, not a PR verdict. Failing so the check reads as 'fix CI'."
+              exit 1
+            fi
           fi
 
           case "$SUBTYPE" in

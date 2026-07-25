@@ -84,6 +84,19 @@ carries the array `permission_denials` — so Decision 5's warning had been read
 every run. Both are fixed; a denial now **reddens** the check ("fix CI") rather than
 warning into a log nobody reads.
 
+A third amendment (2026-07-25) closed the loop and corrected the second. The tool-grant
+change could not test itself (editing the workflow self-skips its review), so a
+disposable smoke PR (#111) was opened to trigger a real review. It **confirmed the core
+fix** — the review read the diff, validated an internal link, and posted a real verdict,
+the first the automated job has produced end-to-end — which closes the open verification
+item the same way #104 closed the last one. But it also falsified Amendment 2's bet that
+reddening on *any* denial would rarely bite: the agent posted a good verdict yet made 3
+speculative denied calls, so a clean review went red on turn one — the meaningless-red
+disease, reintroduced. Amendment 3 calibrates it: a denial reddens only when the review
+posted **no verdict** (true silence); a denial a completed review survived stays green
+with a warning that now **names** the denied tools, so the grant can be tuned against
+data instead of guessed at.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record
