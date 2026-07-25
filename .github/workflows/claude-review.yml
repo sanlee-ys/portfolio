@@ -311,6 +311,7 @@ jobs:
           # element is `tool_name`, but fall back rather than print nothing if the
           # shape shifts. `[]?` tolerates a result with no denials.
           DENIED_TOOLS=$(jq -r '[.permission_denials[]? | (.tool_name // .name // .tool // "unknown")] | unique | join(", ")' <<<"$RESULT" 2>/dev/null)
+
           # Name the denied CALL, not just the tool (ADR-005 Amendment 4). The
           # tool name alone is useless for the case that actually matters: every
           # shell command denies as "Bash", so six runs of denial data named the
