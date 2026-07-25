@@ -131,6 +131,19 @@ can approve a denied call. The grant stays unchanged for the third amendment run
 **When the instrument is blind, reproduce the system rather than wait for better
 telemetry** — a CI job whose inputs are all in the repo is a reproducible experiment.
 
+**Verified, and recorded this time.** Amendments 4 and 5 both shipped unexercised, for the
+sixth time — editing the workflow self-skips its own review. The disposable smoke PR (#125)
+ran on 2026-07-25 and came back:
+`subtype=success turns=5 denials=0 cost_usd=0.1207 denied_tools=[]`, with a posted verdict
+comment. **Zero denials — the first review in this repo's history to record any**, against
+4, 10, 2, 8, 11 and 4 on the six runs before it, and at roughly a seventh the turns and the
+cost of the worst of them (#114, 34 turns / $0.9117). That closes the verification item
+Amendment 5 opened, and it is
+written down here deliberately: Amendment 3's prescribed verification (#113) *also* ran, came
+back **red**, and left no mark on the record until Amendment 4 went looking — which is the
+same unread-instrument failure in process clothing. A verification whose result nobody
+records is not a verification.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record
