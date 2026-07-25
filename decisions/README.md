@@ -116,6 +116,21 @@ of being usable, and neither shortfall showed until someone tried to make a deci
 from the output. **An instrument is validated by someone acting on what it said, not by
 it firing.**
 
+A fifth amendment (2026-07-25) answered the question the fourth had declared
+unanswerable. Amendment 4 concluded there was "no path to confirming any hypothesis
+about these six runs" — but every input to the review is committed to this repo, so it
+can just be **run again locally** against the same PR with the denials captured
+directly. Doing that for #118 took minutes and produced the cause: the job checks out
+the **merge ref**, which is detached, so `gh` cannot infer a PR from a branch and
+`gh pr diff` — the prompt's own first instruction — fails outright. The agent then goes
+looking for the PR number, is denied, and **asks for approval and waits**, which in an
+unattended run is silence. So it was never a permissions defect: the agent was blocked
+on a *reply*, not a capability, and no widening would have fixed it. The prompt now
+passes the number the workflow has known all along, and tells the agent that nothing
+can approve a denied call. The grant stays unchanged for the third amendment running.
+**When the instrument is blind, reproduce the system rather than wait for better
+telemetry** — a CI job whose inputs are all in the repo is a reproducible experiment.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record

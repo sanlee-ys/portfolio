@@ -110,7 +110,16 @@ jobs:
             Review this pull request for a public front-end learning repo
             (static HTML/CSS/JS, no build step, served on GitHub Pages).
 
-            Start with `gh pr diff --name-only`, then `gh pr diff` for the
+            You are reviewing PR #${{ github.event.pull_request.number }} of
+            ${{ github.repository }}. Pass that number explicitly to every `gh`
+            call. The checkout is a DETACHED merge ref, so `gh` cannot infer the
+            PR from a branch — a bare `gh pr diff` fails with "could not
+            determine current branch", and every way of looking the number up
+            for yourself is outside your tool grant.
+
+            Start with `gh pr diff ${{ github.event.pull_request.number }}
+            --name-only`, then
+            `gh pr diff ${{ github.event.pull_request.number }}` for the
             content. The checkout is the MERGE RESULT, so reading a file shows
             you its final state, not what this PR did to it — the diff is the
             only thing that tells you what changed.
@@ -144,6 +153,12 @@ jobs:
             for shell you do not have is the single most common way this
             review fails — on three PRs it spent most of its turns on denied
             commands and then stopped without saying anything at all.
+
+            If a call is denied, NOTHING CAN APPROVE IT. This is an unattended
+            run: there is no human on the other end, and asking for permission
+            ends the review in silence rather than pausing it. Never ask for
+            approval and never wait for one — reach for a granted tool instead,
+            and post your summary with what you already have.
 
             Post as you go rather than saving it all for the end: use
             `mcp__github_inline_comment__create_inline_comment` for anything
@@ -205,6 +220,21 @@ jobs:
           #              but no `Bash(gh pr checks:*)` makes it reachable. Folded
           #              into the same data-driven widening rather than guessed at
           #              alongside everything else.
+          #
+          #              CAUSE FOUND 2026-07-25 (Amendment 5), and it was never a
+          #              missing grant. This job checks out the MERGE REF, which is
+          #              DETACHED, so `gh` cannot infer a PR from a branch and the
+          #              `gh pr diff` this prompt opened with failed outright with
+          #              "could not determine current branch". The agent then went
+          #              looking for the number (`gh pr list`), was denied, and
+          #              ASKED FOR APPROVAL AND WAITED -- which in an unattended run
+          #              is silence. Reproduced against #118 with this exact grant:
+          #              on a checked-out branch, 0 denials and a clean review;
+          #              detached, the failure. The prompt now passes the number
+          #              this workflow has known all along, so the discovery call is
+          #              never made. Still not widened -- granting it would buy the
+          #              agent a workaround for a prompt defect on a job holding
+          #              `pull-requests: write`.
           #
           # max-turns was 25, on the theory that denied tool calls -- not the
           # ceiling -- were the binding constraint: of the 26 turns PR #101

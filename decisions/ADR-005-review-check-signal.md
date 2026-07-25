@@ -1,6 +1,6 @@
 # ADR-005: A red review check means the tooling broke, not that the PR is bad
 
-**Status:** Accepted; amended four times — Decision 4 reversed and the remediation
+**Status:** Accepted; amended five times — Decision 4 reversed and the remediation
 path resized on first measurement (2026-07-24, *Amendment*); Decision 1's tool grant
 completed and Decision 5's denial signal fixed and escalated to red (2026-07-24,
 *Amendment 2*); the redden calibrated to fire only on a *silenced* review, not a
@@ -8,7 +8,10 @@ survived denial, after a smoke test falsified Amendment 2's "rare" assumption on
 first real review (2026-07-25, *Amendment 3*); the denial signal made actionable —
 naming the *tool* named nothing, because every shell command is called `Bash` — and
 the review finally told what toolset it holds, after six consecutive reviews hit
-denials and three of them died silent (2026-07-25, *Amendment 4*)
+denials and three of them died silent (2026-07-25, *Amendment 4*); the cause of those
+six recovered by local reproduction and found to be no permissions defect at all —
+a detached merge-ref checkout broke the prompt's own first command, and the agent
+*asked a human for approval* and waited (2026-07-25, *Amendment 5*)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -670,3 +673,108 @@ opening anything else."
 the redden-on-silence calibration from Amendment 3 is untouched, turn exhaustion is
 still inconclusive and non-red, and Decision 2's two-channel colour model is what
 this amendment is serving rather than revising.
+
+---
+
+## Amendment 5 — 2026-07-25: the denials were real and the diagnosis was still wrong
+
+Amendment 4 was right about its instrument and wrong about one sentence, and the
+sentence is the interesting part:
+
+> There was no path to confirming any hypothesis about these six runs, and there
+> would have been none for the seventh.
+
+There was a path. The review is a `claude` invocation with a known prompt, model,
+ceiling and tool grant — every input is in this file. It can simply be **run again,
+locally, against the same PR**, with `permission_denials` captured directly instead
+of hoping a future run reports it. That was done for #118, with `gh` shimmed so no
+write could reach the live PR, and it produced the answer the runner had thrown away
+in about two minutes.
+
+**What the reproduction showed.** With the checkout on a **branch**: a clean review,
+**0 denials**. With the checkout **detached** — which is what CI actually has — the
+failure reproduced immediately, and the agent's own final message was the whole bug:
+
+> The `gh pr list` call needs your approval to run — go ahead and approve it (or let
+> me know the PR number directly) so I can start the review.
+
+**The mechanism.** This job checks out the **merge ref**, deliberately and correctly,
+and the comment on that step explains why. A merge-ref checkout is **detached**. `gh`
+infers a PR from the current branch, so `gh pr diff` — *the first instruction of the
+review prompt* — fails with `could not determine current branch`. The agent then
+tries to discover the PR number, and every route to it (`gh pr list`, `gh api`,
+`git log`) sits outside the grant. It gets denied, and then it does the thing an
+interactive assistant is built to do: **it asks for permission and waits.** In an
+unattended run nobody answers, so it terminates `subtype: success` — *finished*, not
+out of road — having reviewed nothing. That is exactly the `turns=7 denials=4`
+no-verdict signature of #113 and #118.
+
+**So four amendments in a row asked the wrong question.** Each one asked *which tool
+is missing?* and none asked *why did it stop?* The framing was set by Decision 1,
+which was correct at the time — the pilot really was a permissions failure — and it
+outlived its evidence. No widening of `--allowedTools` would have fixed this: the
+agent was never blocked on a capability, it was blocked on **a reply**. Granting
+`gh pr list` would have removed this trigger and left the shape intact, so the next
+ungranted call stops the review dead the same way.
+
+Two details make it sharper. The workflow has known the PR number the entire time —
+`github.event.pull_request.number` is already interpolated into the classify step a
+few lines below the prompt that goes looking for it. And the answer was sitting in
+the result payload in plain English on all six runs: the classify step reads
+`.permission_denials` and has never once looked at `.result`.
+
+**The decision.**
+
+1. **Pass the PR number into the prompt** and require it on every `gh` call, naming
+   the detached-merge-ref reason so the constraint is legible rather than a rule to
+   obey. The discovery call is not granted; it is made **unnecessary**. Verified in
+   reproduction: same detached HEAD, **0 denials**.
+
+2. **Forbid waiting for approval.** The prompt now states that nothing can approve a
+   denied call, that asking *ends* the review rather than pausing it, and that the
+   response to a denial is to reach for a granted tool and post what it has. (1)
+   removes the observed trigger; this removes the shape. Amendment 4's toolset
+   paragraph tells the agent what it holds; this tells it what to do when it reaches
+   past that anyway.
+
+3. **`--allowedTools` stays unchanged**, for the third amendment running and now for
+   a stronger reason than "not yet enough data": the denial that mattered was caused
+   by a defect in the prompt, and granting it would buy the agent a workaround for
+   that defect on a job holding `pull-requests: write`. Amendment 4's `actions: read`
+   gap is untouched and still open.
+
+**What this does not settle.** The reproduction recovered `gh pr list` and nothing
+else. CI logged 4–11 denials where the local run logged 2, and the local environment
+differs in OS, in Claude Code build (2.1.215 vs CI's 2.1.220), and in having no
+`mcp__github_inline_comment__*` server. The remaining commands are **not guessed at
+here** — Amendment 4's `DENIED_CALLS` is what will name them on the next run, and
+this amendment expects to be partially superseded by that data. Both halves are
+needed: Amendment 4 made the next failure legible, Amendment 5 removed the cause of
+the last six.
+
+**The general lesson.** Amendment 4 concluded that an instrument is validated by
+someone acting on its output, which is right. This one adds the step before it:
+**when the instrument is blind, reproduce the system instead of waiting for better
+telemetry.** Six runs of unusable data were collected across two days and treated as
+the only available evidence, because the evidence was framed as *something the
+pipeline must report* rather than *something that can be re-created on demand*. A
+CI job whose inputs are all committed to the repo is a reproducible experiment, and
+the record now says so.
+
+**Downstream surfaces for this amendment:**
+- `.github/workflows/claude-review.yml` — the `prompt` gains the PR-number
+  interpolation with its detached-merge-ref explanation, and a never-wait-for-approval
+  paragraph appended to Amendment 4's toolset block; the `--allowedTools` rationale
+  comment records the reproduced cause. `--allowedTools` itself, `--max-turns`, the
+  classify step and the mention job are **unchanged**.
+- `CLAUDE.md` — **unchanged, and verified so.** This removes a *cause* of the
+  denied-into-silence red; it does not change what any colour means, and Amendment 4
+  already updated the bullets that name the denied calls.
+- `decisions/README.md` — the ADR-005 narrative gains this fifth amendment.
+- **This change cannot test itself** — a sixth time, same mechanism. Verify on the
+  next PR by **a posted verdict comment**, with `denials=0` in the classify line. If
+  denials persist, they now arrive as named commands, which is the point.
+
+**Unchanged by Amendment 5:** every decision above stands, including all of
+Amendment 4. The grant is untouched, Amendment 3's redden-on-silence calibration is
+untouched, and turn exhaustion is still inconclusive and non-red.
