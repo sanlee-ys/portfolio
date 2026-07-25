@@ -12,9 +12,18 @@
 const fs = require('fs');
 const path = require('path');
 
+// Playwright lives in scripts/node_modules, which this file resolves against on
+// its own. If it isn't there the answer is always "install it" — so say that,
+// rather than dying at module load with whatever require threw.
 let chromium;
 try { ({ chromium } = require('playwright')); }
-catch { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
+catch (e) {
+  if (e.code !== 'MODULE_NOT_FOUND') throw e;
+  console.error('resume-pdf error: Playwright is not installed. From the repo root, run:');
+  console.error('  npm --prefix scripts ci');
+  console.error('  npm --prefix scripts exec -- playwright install chromium');
+  process.exit(1);
+}
 
 const ROOT = process.cwd();
 
