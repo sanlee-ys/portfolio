@@ -22,14 +22,31 @@ systems / product language.
 | `lab/` | Two front-end experiments kept at stable URLs; the section itself is retired (`ADR-004`). |
 | `learning/` | The learning log — one Markdown lesson per technique. |
 | `assets/` | Stylesheet, JS (theme, reveal, diagram, events), share card, favicons. |
-| `scripts/` | QA gates: `mobile-qa.cjs` (overflow) and `link-check.cjs` (dead links). |
+| `scripts/` | The QA gates CI runs (see **QA** below), plus the local pre-commit guard and the résumé PDF build. |
 | `ROADMAP.md` | The site's own tracked backlog. |
 
 ## QA
 
-CI (GitHub Actions) runs on every PR and push to `main`:
+CI (GitHub Actions) runs six gates on every PR and push to `main`, in this
+order:
 
 - **`scripts/link-check.cjs`** — no broken internal links.
+- **`node --test scripts/private-repo-check.test.cjs
+  scripts/private-name-precommit.test.cjs`** — the adversarial suites for the
+  reference guard below, covering both the layers that run in CI and the local
+  pre-commit layer that CI can't run itself.
+- **`scripts/private-repo-check.cjs`** — every `sanlee-ys/<repo>` reference on
+  every published page resolves to a repo that is actually **public**, checked
+  live against the GitHub API. Built on a public allowlist rather than a
+  denylist, and it fails closed: if the list can't be fetched the build fails
+  rather than passing blind.
+- **`scripts/check-published-metrics.cjs`** — every figure marked up as a
+  published metric still matches the classifier's generated artifact, so a
+  number quoted here can't quietly go stale. A mismatch fails; an upstream
+  fetch failure warns and passes, so an outage can't redden the build.
+- **`scripts/lint_decisions.py`** — every ADR in `decisions/` carries a
+  `## Downstream surfaces` section, so a decision can't ship without naming
+  what it touches. Stdlib Python, no venv.
 - **`scripts/mobile-qa.cjs`** — renders every page at 320/360/390/430 px and
   fails on any horizontal overflow. Mobile is a contract here, not an
   afterthought (see `CLAUDE.md`).
