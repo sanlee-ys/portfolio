@@ -1,11 +1,14 @@
 # ADR-005: A red review check means the tooling broke, not that the PR is bad
 
-**Status:** Accepted; amended three times — Decision 4 reversed and the remediation
+**Status:** Accepted; amended four times — Decision 4 reversed and the remediation
 path resized on first measurement (2026-07-24, *Amendment*); Decision 1's tool grant
 completed and Decision 5's denial signal fixed and escalated to red (2026-07-24,
 *Amendment 2*); the redden calibrated to fire only on a *silenced* review, not a
 survived denial, after a smoke test falsified Amendment 2's "rare" assumption on the
-first real review (2026-07-25, *Amendment 3*)
+first real review (2026-07-25, *Amendment 3*); the denial signal made actionable —
+naming the *tool* named nothing, because every shell command is called `Bash` — and
+the review finally told what toolset it holds, after six consecutive reviews hit
+denials and three of them died silent (2026-07-25, *Amendment 4*)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -534,3 +537,136 @@ file before trusting it.
 stand — #111 confirmed both. Turn exhaustion is still inconclusive and non-red.
 Decisions 2, 4, 6 stand; Decision 5, already amended once, is calibrated further
 here.
+
+---
+
+## Amendment 4 — 2026-07-25: "Bash" is not the name of a command
+
+Amendment 3 closed by declining to widen the grant, on an explicit promise: the
+classify step now **names** the denied tools, so "the next few reviews will say
+what they are, and the grant can be widened against data instead of guessed at."
+
+Six reviews of data arrived within hours. Every one of them named the same four
+letters.
+
+| Run | PR | Turns | Denials | Named | Outcome |
+|---|---|---|---|---|---|
+| `30159316257` | #113 | 7 | 4 | `Bash` | **red — silenced** |
+| `30164085590` | #114 | 34 | 10 | `Bash` | green, verdict posted |
+| `30164267464` | #115 | 16 | 2 | `Bash` | green, verdict posted |
+| `30164546592` | #116 | 11 | 8 | `Bash` | **red — silenced** |
+| `30164667372` | #117 | 24 | 11 | `Bash` | green, verdict posted |
+| `30164713372` | #118 | 7 | 4 | `Bash` | **red — silenced** |
+
+`Bash` is not a command. It is the tool *class* every shell invocation reports
+under, so a denial of `node scripts/link-check.cjs` and a denial of `ls` are
+indistinguishable in the only record that survives the run. Amendment 3 built an
+instrument, read it six times, and learned nothing from it — which is Amendment
+2's own lesson (*"a green light on an unread meter is not the same as a green
+light"*) recurring one layer further down. This one was read. It just had nothing
+to say.
+
+**The data is not recoverable after the fact.** `execution_file` is written to the
+runner's filesystem and nothing uploads it as an artifact, so it is destroyed with
+the runner. The classify step is the only thing that ever reads it, and it extracts
+`.tool_name`. Re-running the review does not help: a re-run produces a *new* denial
+set under the same uninformative label. There was no path to confirming any
+hypothesis about these six runs, and there would have been none for the seventh.
+
+**Amendment 3's own verification came back red, and nobody wrote it down.** Its
+downstream list prescribed a throwaway PR judged by "a good review that posts a
+verdict goes **green** with a named-tool warning, not red." That PR was #113. It
+went **red at 7 turns with 4 denials, having posted nothing.** The prescribed
+verification ran, failed, and left no mark on the record — the check was performed
+and its result was not read, which is the same failure as the unread meter wearing
+process clothes instead of code.
+
+**The tempting fix, and why it is wrong.** The obvious reading of #116 is
+PR-specific: it rewrote the README to describe what each of six CI gates enforces,
+so a reviewer verifying those claims would try to *run* them, and `node
+scripts/*.cjs` is not granted. Plausible, and the table falsifies it. #114 was a
+sitemap and JSON-LD change; #115 was a `CLAUDE.md` paragraph about a browser
+prerequisite; #118 was a browser-path fix. None of them describe gate behaviour and
+every one of them hit Bash denials. **The denials are not about what the PR
+contains.** They are constant, which points at the agent's standing model of its own
+capabilities, not at any diff.
+
+Widening the grant against that reading would have been the fourth guess in this
+record's history, and the first three each cost a cycle. Worse, the specific widening
+suggested — `Bash(node scripts/:*)` — grants a PR the ability to execute its *own*
+modified `scripts/*.cjs` inside a job holding `pull-requests: write`, because the
+checkout is the merge ref. The same-repo gate bounds the blast radius to the owner;
+the *Alternatives* table's reasoning against broad Bash still applies, and the
+review does not need it anyway — the `qa` job runs all six gates on the same PR.
+
+### The decision
+
+**Make the denial legible and stop causing denials, before granting anything.**
+
+1. **Log the denied CALL, not the tool class.** The classify step now renders each
+   denial as `Bash: node scripts/link-check.cjs` — the tool name plus its
+   `tool_input` (`.command` for Bash, `.file_path` for Read, `.pattern`, `.url`),
+   collapsed to one line and capped at 160 characters. It goes in the log line, in
+   the green-with-warning annotation, and as an indented code block in the red PR
+   comment. This is what Amendment 3 meant to build.
+
+2. **Tell the agent what it holds.** The prompt never stated the toolset, so the
+   agent discovered its grant by hitting walls — which is exactly the shape of the
+   three silenced runs (7 turns/4 denials, 11/8, 7/4: short, denial-saturated, and
+   ended `subtype=success`, meaning it decided it was *finished*, not that it ran
+   out of road). The prompt now names the six tools, says there is no general shell,
+   says the `qa` gates have already run and are not the review's to reproduce, and
+   says never to end a run without posting the summary. This grants nothing and
+   costs nothing.
+
+3. **Do not widen `--allowedTools`.** Deliberate, and the point of the amendment.
+   The next review's denials will name actual commands; the grant gets tuned then,
+   on evidence. Fixes 1 and 2 are upstream of the grant question and one of them may
+   dissolve it.
+
+**Why logging a tool input is not `show_full_output`.** The *Alternatives* table
+rejected `show_full_output` because it dumps tool **results** — repo content, API
+responses, whatever a command read — and the action's own input description warns
+they "may contain secrets." A denied call has no result: it never executed and read
+nothing. What is logged is a string the agent composed from a public diff, in a
+public repo, for a command that did not run. The distinction is between what a tool
+*returned* and what the agent *asked for*, and only the first is the hazard that
+rule was written about.
+
+**Known gap, left open on purpose.** `actions: read` is granted so the review can
+see whether `qa` passed instead of reviewing blind to CI, but no `Bash(gh pr
+checks:*)` makes it reachable — a permission granted and unusable since it was
+added. It is a real gap and a confirmed one, unlike the rest. It is still folded into
+the same data-driven widening rather than fixed alone here, because the whole point
+of this amendment is to stop changing the grant on reasoning and start changing it on
+denial logs.
+
+**The general lesson.** Amendment 2 shipped a counter that could not count.
+Amendment 3 replaced it with a name that could not distinguish. Both were the
+correct *category* of fix and both stopped one field short of being actionable, and
+in each case the shortfall was invisible until someone tried to *use* the output for
+the decision it was built to inform. **An instrument is not validated by firing. It
+is validated by someone acting on what it said** — so the test for the next one is
+not "did the warning appear" but "could a maintainer widen the grant from it without
+opening anything else."
+
+**Downstream surfaces for this amendment:**
+- `.github/workflows/claude-review.yml` — the classify step gains `DENIED_LIST` /
+  `DENIED_CALLS` / `DENIED_CALLS_MD` and threads them through the warning and the red
+  comment; the `prompt` gains a toolset paragraph and a never-end-without-posting
+  instruction; the `--allowedTools` rationale comment records the deliberate
+  non-widening and the `actions: read` gap. `--allowedTools` itself is **unchanged**,
+  as are `--max-turns`, the mention job, and the denial classification logic.
+- `CLAUDE.md`'s "Reading the Claude Review check" — the **Red** and **green + a
+  comment** bullets now say the denied *calls* are named, not just the tools.
+- `decisions/README.md` — the ADR-005 narrative gains this amendment, including that
+  Amendment 3's verification (#113) failed unrecorded.
+- **This change cannot test itself** — a fifth time, and #112 confirmed the mechanism
+  again three hours ago: it edited this workflow and its review self-skipped with no
+  execution file at all. Verify on the next PR, judged by **a posted comment or a
+  denial log naming real commands** — never by a green check.
+
+**Unchanged by Amendment 4:** every decision above stands. The grant is untouched,
+the redden-on-silence calibration from Amendment 3 is untouched, turn exhaustion is
+still inconclusive and non-red, and Decision 2's two-channel colour model is what
+this amendment is serving rather than revising.
