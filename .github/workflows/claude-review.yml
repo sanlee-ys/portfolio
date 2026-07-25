@@ -110,7 +110,16 @@ jobs:
             Review this pull request for a public front-end learning repo
             (static HTML/CSS/JS, no build step, served on GitHub Pages).
 
-            Start with `gh pr diff --name-only`, then `gh pr diff` for the
+            You are reviewing PR #${{ github.event.pull_request.number }} of
+            ${{ github.repository }}. Pass that number explicitly to every `gh`
+            call. The checkout is a DETACHED merge ref, so `gh` cannot infer the
+            PR from a branch — a bare `gh pr diff` fails with "could not
+            determine current branch", and every way of looking the number up
+            for yourself is outside your tool grant.
+
+            Start with `gh pr diff ${{ github.event.pull_request.number }}
+            --name-only`, then
+            `gh pr diff ${{ github.event.pull_request.number }}` for the
             content. The checkout is the MERGE RESULT, so reading a file shows
             you its final state, not what this PR did to it — the diff is the
             only thing that tells you what changed.
@@ -137,6 +146,15 @@ jobs:
             Be honest and specific: skip nitpicks that don't affect
             correctness, security, or the mobile contract, and if the PR looks
             clean say so plainly.
+
+            Your shell is restricted to `gh pr diff`, `gh pr view` and
+            `gh pr comment`; use Read/Grep/Glob for file contents. Any other
+            command is denied, and NOTHING CAN APPROVE A DENIED CALL — this is
+            an unattended CI run with no human on the other end. If a call is
+            denied, do not ask for approval and do not stop: reach for a granted
+            tool instead, and post your summary with what you already have. A
+            review that ends without a posted comment has failed, however good
+            its reasoning was.
           # --model      the docs' own examples use `claude-sonnet-5` (a cheap
           #              tier) for review workflows.
           # --max-turns  caps iterations (docs: "Configure appropriate
@@ -167,6 +185,21 @@ jobs:
           #              Read either, but it runs `track_progress` mode; this is
           #              plain agent mode, and #108's denials are the measurement.
           #
+          #              NOT widened on 2026-07-25 (Amendment 4), on purpose.
+          #              Every review from #113 to #118 was denied 2-11 Bash
+          #              calls and half of them were denied into SILENCE. The
+          #              reproduced cause is not a missing grant: the checkout is
+          #              a detached merge ref, so the `gh pr diff` this prompt
+          #              opened with could not resolve a PR, and the agent went
+          #              looking for the number with `gh pr list` -- denied, at
+          #              which point it ASKED FOR APPROVAL and stopped. Nobody
+          #              answers in CI. The prompt now passes the number the
+          #              workflow has known all along, so the discovery call is
+          #              never made; granting `gh pr list` would have bought the
+          #              agent a way to work around a defect in this prompt, on a
+          #              job holding `pull-requests: write`. Denials are now named
+          #              by COMMAND in the classify step, so anything still being
+          #              reached for shows up by name on the next run.
           # max-turns was 25, on the theory that denied tool calls -- not the
           # ceiling -- were the binding constraint: of the 26 turns PR #101
           # spent, 11 were denials returning nothing. That line invited its own
@@ -242,8 +275,35 @@ jobs:
           # element is `tool_name`, but fall back rather than print nothing if the
           # shape shifts. `[]?` tolerates a result with no denials.
           DENIED_TOOLS=$(jq -r '[.permission_denials[]? | (.tool_name // .name // .tool // "unknown")] | unique | join(", ")' <<<"$RESULT" 2>/dev/null)
+          # ...and, for Bash denials, the COMMAND PREFIX. `Bash` alone is not
+          # actionable: --allowedTools is keyed on command prefixes, so knowing
+          # the class tells you nothing about which rule to add. #118 cost a
+          # local reproduction to learn the answer was `gh pr list`.
+          #
+          # A PREFIX, deliberately, not the command. Tool NAMES are safe and tool
+          # OUTPUTS are not (which is why show_full_output stays off); an
+          # agent-composed command string sits between the two, so it is
+          # truncated to the part --allowedTools actually matches: the first
+          # token (capped at 32 chars), then at most two more, and only while
+          # they look like bare subcommands (`^[a-z][a-z0-9-]{0,23}$`). It STOPS
+          # at the first token that doesn't -- a flag, a path, a URL, an `=` or
+          # `:` -- rather than skipping it, so argument VALUES are never printed.
+          # `gh pr list --limit 5` -> `gh pr list`; `curl -H Auth:Bearer=sk-...`
+          # -> `curl`. Enough to write the grant, not enough to carry a payload.
+          DENIED_CMDS=$(jq -r '
+            [ .permission_denials[]?
+              | select(.tool_input.command)
+              | [.tool_input.command | splits("[[:space:]]+")]
+              | reduce .[] as $w ({n:0, stop:false, out:[]};
+                  if .stop or (.n >= 3) then .stop = true
+                  elif .n == 0 then {n:1, stop:false, out:[($w[0:32])]}
+                  elif ($w | test("^[a-z][a-z0-9-]{0,23}$"))
+                    then {n:(.n+1), stop:false, out:(.out + [$w])}
+                  else .stop = true end)
+              | .out | join(" ") | select(length > 0)
+            ] | unique | join("; ")' <<<"$RESULT" 2>/dev/null)
 
-          echo "subtype=$SUBTYPE turns=$TURNS denials=$DENIALS cost_usd=$COST denied_tools=[$DENIED_TOOLS]"
+          echo "subtype=$SUBTYPE turns=$TURNS denials=$DENIALS cost_usd=$COST denied_tools=[$DENIED_TOOLS] denied_cmds=[$DENIED_CMDS]"
 
           # Denials, calibrated by whether the review actually produced a verdict
           # (ADR-005 Amendment 3). Amendment 2 reddened on ANY denial; #111 proved
@@ -266,7 +326,7 @@ jobs:
           if [ "$DENIALS" -gt 0 ]; then
             POSTED=$(gh pr view "$PR" --json comments --jq '[.comments[] | select(.author.login | ascii_downcase | contains("claude"))] | length' 2>/dev/null || echo 0)
             if [ "${POSTED:-0}" -gt 0 ]; then
-              echo "::warning::Review posted a verdict but was denied $DENIALS tool call(s): ${DENIED_TOOLS:-unknown}. Not failing -- the review completed. Grant these in --allowedTools to silence the noise."
+              echo "::warning::Review posted a verdict but was denied $DENIALS tool call(s): ${DENIED_TOOLS:-unknown} [${DENIED_CMDS:-n/a}]. Not failing -- the review completed. Grant these in --allowedTools to silence the noise."
             else
               gh pr comment "$PR" --body "$(cat <<EOF
           ### Automated review blocked by a tooling gap — not a verdict on the PR
@@ -280,6 +340,7 @@ jobs:
           |---|---|
           | tool calls denied | $DENIALS |
           | denied tools | ${DENIED_TOOLS:-unknown} |
+          | denied commands | \`${DENIED_CMDS:-n/a}\` |
           | turns used | $TURNS |
           | cost | \$$COST |
           | run | [$GITHUB_RUN_ID]($RUN_URL) |
@@ -287,7 +348,7 @@ jobs:
           Grant the denied tool(s) in the workflow, then re-run with \`@claude\`.
           EOF
           )"
-              echo "::error::Review blocked into silence: $DENIALS tool call(s) denied (${DENIED_TOOLS:-unknown}), no verdict posted — a --allowedTools defect, not a PR verdict. Failing so the check reads as 'fix CI'."
+              echo "::error::Review blocked into silence: $DENIALS tool call(s) denied (${DENIED_TOOLS:-unknown}: ${DENIED_CMDS:-n/a}), no verdict posted — a --allowedTools defect, not a PR verdict. Failing so the check reads as 'fix CI'."
               exit 1
             fi
           fi

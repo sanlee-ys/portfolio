@@ -97,6 +97,21 @@ posted **no verdict** (true silence); a denial a completed review survived stays
 with a warning that now **names** the denied tools, so the grant can be tuned against
 data instead of guessed at.
 
+A fourth amendment (2026-07-25) found that naming the *tool* was one level too coarse
+to act on, and that the thing it was pointing at was not a permissions bug at all.
+Every review from #113 to #118 was denied Bash calls and **half were denied into
+silence** — #118 was merged four minutes after its red check, the merge-past reflex
+this record exists to stop. Reproducing the review locally against the same PR gave
+the answer the runner threw away: the merge-ref checkout is **detached**, so `gh`
+cannot infer a PR from a branch, so `gh pr diff` — the prompt's own first instruction
+— fails; the agent then tries to look the number up, gets denied, and **asks for
+approval and waits**, which in CI is silence. The workflow had known the PR number all
+along and never passed it. So the fix is in the prompt, not the grant: pass the
+number, and tell the agent no human can approve anything. `--allowedTools` is
+deliberately **not** widened — granting the discovery call would have bought a
+workaround for a prompt defect on a job holding `pull-requests: write`. The classify
+step now names the denied **command prefix** rather than the class.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record
