@@ -74,6 +74,16 @@ The same amendment caught a second defect the ceiling had been hiding: ADR-005 m
 turns — one third of the job it was supposed to rescue. A remediation routed to a smaller
 budget than the thing it remediates is not a remediation; both are now 40.
 
+A second amendment landed the same day, off PR #108 — an inline-SVG diff you cannot
+review without reading the file. It surfaced that the review job still granted no
+`Read`/`Grep`/`Glob` (agent mode grants only what is listed, so the diff was reachable
+but the files were not), and the agent burned five denied file-reads and posted nothing,
+green. That same run proved the denial counter had never worked: it read
+`.permission_denials_count`, a field absent from the execution log — the raw SDK message
+carries the array `permission_denials` — so Decision 5's warning had been reading 0 on
+every run. Both are fixed; a denial now **reddens** the check ("fix CI") rather than
+warning into a log nobody reads.
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record

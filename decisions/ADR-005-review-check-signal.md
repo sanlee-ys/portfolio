@@ -1,7 +1,9 @@
 # ADR-005: A red review check means the tooling broke, not that the PR is bad
 
-**Status:** Accepted; amended 2026-07-24 on first measurement — Decision 4 reversed,
-Decision 3's remediation path resized (see *Amendment*)
+**Status:** Accepted; amended twice on 2026-07-24 — Decision 4 reversed and the
+remediation path resized on first measurement (see *Amendment*); then Decision 1's
+tool grant completed and Decision 5's denial signal fixed and escalated to red
+(see *Amendment 2*)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -151,6 +153,12 @@ to see their diffs.
 - **The Amendment below touches both `--max-turns` values.** It reverses Decision
   4 (review job 25 → 40) and resizes the mention job (8 → 40) that Decision 3
   names as the remediation path. Decisions 1, 2, 5 and 6 stand as written.
+- **Amendment 2 below** adds `Read,Grep,Glob` to the review job's `--allowedTools`
+  (Decision 1's grant was one capability short) and rewrites the classify step's
+  denial handling: it counts `(.permission_denials | length)` instead of the
+  absent `.permission_denials_count`, and escalates any denial from a warning to
+  a red job failure that pre-empts the subtype case. Decision 1 is extended and
+  Decision 5 is amended (warning → red); Decisions 2, 4 and 6 are untouched.
 - **Commit `3b1c8e3` (#96)** — its rationale comment is superseded by this
   record and was removed from the workflow. Its *diagnosis* was right and is
   quoted in *Context*; only its fix is reversed.
@@ -292,3 +300,133 @@ does not make it wrong. If 40 exhausts on a real PR, the comment will say so wit
 the numbers attached, and the answer may be a narrower review scope rather than a
 third raise — **a ceiling that keeps climbing is a scope problem wearing a budget
 costume.**
+
+---
+
+## Amendment 2 — 2026-07-24: an ungranted tool and an unread instrument hid each other
+
+Decision 1 fixed two of the review's three missing capabilities and stopped one
+short. It correctly diagnosed that plain agent mode grants *nothing* on its own —
+no Bash to read the diff, no MCP server to publish a finding — and it granted
+both. It did not grant the third: **the ability to read the code being reviewed.**
+`Read`, `Grep`, and `Glob` were never in the list, so the review could fetch
+`gh pr diff` but could not open a changed file for full context, grep for a leaked
+private-repo name, or glob to find one.
+
+The tool list was copied from the action's `examples/pr-review-comprehensive.yml`,
+which grants no `Read` either — but that example runs in `track_progress` mode,
+which installs tools this plain-agent-mode job never receives. Copying a tool list
+across a mode boundary carried a wrong assumption about what was already provided.
+The `@claude` mention job never showed the gap because tag mode installs the
+default toolset (including `Read`), which is why the mention reviews on #105 and
+#108 could open files and verify geometry by hand while the automated job on the
+same PRs could not.
+
+**What #108 did.** #108 was an inline-SVG + CSS change — exactly the kind of diff
+you cannot review without reading the file, because the geometry is in the markup.
+The review agent tried five file reads, all were denied, it burned most of its
+eight turns discovering that, and it posted nothing. `subtype: success`,
+`permission_denials_count: 5`, zero comments — **green.** The same non-event this
+ADR was written to end, in a new costume: last time the agent could not see the
+diff *or* publish; this time it could see the diff and publish but could not read
+the files, and the observable outcome — a green check with no review — was
+identical.
+
+**The instrument that should have caught it was blind.** Decision 5 promised that
+any run with denials raises a warning "on green runs too." It never has — on any
+run. The classify step read `.permission_denials_count`, but that key does not
+exist in the execution log. The saved log is the raw SDK message stream, whose
+result message carries the **array** `permission_denials`;
+`permission_denials_count` is a field the action derives only for its own stdout
+summary (`base-action/src/run-claude-sdk.ts`:
+`permission_denials_count: resultMsg.permission_denials?.length ?? 0`). Reading the
+absent key returned 0 every time, defaulted by `// 0`. On #108 the proof is
+unambiguous: the classify step logged `denials=0` while `turns` (8) and `cost`
+(0.1447) matched the action's summary to the digit — the same result object, one
+field silently misread. Decision 5's `turns` and `cost` were right because those
+fields are in the log; its denial count was structurally always zero.
+
+So the two defects concealed each other. The ungranted tool produced denials; the
+instrument meant to surface denials was reading a field that was never there. Each
+made the other invisible, which is why a review that did nothing looked exactly
+like a review that found nothing — the precise failure this record exists to
+prevent, reconstituted one layer down.
+
+**The fixes.**
+
+1. **Grant the third capability.** `--allowedTools` on the review job now leads
+   with `Read,Grep,Glob` before the four `gh`/inline tools. Still no broad `Bash`
+   — the Alternatives table's reasoning ("the job holds `pull-requests: write`;
+   narrow prefixes cost nothing") is unchanged, and file-read tools are read-only,
+   so the blast radius does not widen. This is Decision 1 finished, not reversed.
+
+2. **Count the array.** The classify step reads `(.permission_denials | length)`.
+   The `turns` and `cost` extractions were correct and are untouched; only the
+   denial field was wrong.
+
+3. **A denial reddens the check.** This is the one reversal. Decision 5 made
+   denials a *warning* that did not change colour; Amendment 2 makes them a job
+   **failure**. The reasoning is Decision 2's own colour model taken literally:
+   colour reports tooling health, the posted comment carries the verdict. A
+   permission denial is, in Decision 5's exact words, "a bug in the
+   `--allowedTools` line, not a finding about the PR" — which is the **red**
+   category ("the job could not do its work; fix CI"), not the inconclusive one.
+   Turn exhaustion stays non-red because it is genuinely inconclusive — the review
+   ran out of road and there is no config to fix. A denial is a config defect with
+   a concrete fix, so it gets the colour that means "fix the config." The denial
+   check now runs *before* the subtype case and takes precedence over it: a run
+   blocked from tools it needed produced an untrustworthy outcome however it
+   terminated. It also posts a PR comment, because the #108 lesson is that a signal
+   living only in the Actions log is invisible — the warning it replaces was proof
+   of exactly that.
+
+**Why red, when Decision 3 argued against a red X the author merges past.** The two
+are different categories, and the difference is whether there is anything to fix.
+Turn exhaustion is not the author's fault and has no config remedy, so a red X
+there is a dead end that only trains merge-past behaviour. A denial *is* a fixable
+workflow defect, and its red is **self-extinguishing**: widen the grant and it goes
+green and stays green. After this amendment's own grant, denials should be near
+zero, so the red is a tripwire that is normally silent and fires only when the
+agent reaches for a tool the workflow genuinely withholds — which is exactly when a
+maintainer should look.
+
+**The accepted sharp edge.** "Any denial reddens" also reddens a PR whose review
+*was* posted but that hit one stray denial — a real review, now wearing a red X.
+Accepted, for three reasons: it is rare after the grant; the posted verdict comment
+is right there on the PR, so the two-channel model still reads correctly (comment =
+the review, red = a tooling nit to fix); and the precise alternative — redden only
+when denials coincide with *no verdict posted* — requires the classify step to
+parse the SDK message log for a successful comment-posting tool call, which is
+fragile across action versions and is exactly the kind of logic this record kept
+out of a `pull-requests: write` step on purpose. If the sharp edge ever bites, that
+narrower rule is the documented next step; until then, simple-and-slightly-eager
+beats fragile-and-precise. (One visible side effect: with denials now pre-empting
+the subtype case, the `error_max_turns` comment's "if tool calls denied is
+non-zero, fix `--allowedTools`" line is unreachable — a denied run never reaches
+it. Left in place rather than widen the diff into a well-tuned comment.)
+
+**The general lesson.** Decision 1 treated "can it review" as one capability, and it
+is three — see the diff, read the code, publish the finding — so a fix that grants
+two of three leaves a hole shaped exactly like the one it closed. And an instrument
+you never watch fire is not evidence of health: Decision 5's warning was trusted
+for a day as "no denials seen" when it was structurally incapable of seeing any.
+**A green light on an unread meter is not the same as a green light.**
+
+**Downstream surfaces for this amendment:**
+- `.github/workflows/claude-review.yml` — the review job's `--allowedTools` (adds
+  `Read,Grep,Glob`) and its rationale comment; the classify step's denial
+  extraction (`.permission_denials | length`) and its escalation from a
+  `::warning::` to a PR comment + `::error::` + `exit 1`, moved ahead of the
+  subtype case. The mention job is untouched (tag mode already grants `Read`).
+- `CLAUDE.md`'s "Reading the Claude Review check" section — the **Red** bullet now
+  names the denial cause, and "green + no comment" is narrowed: a denied-into-
+  silence review reddens now, so it is no longer one of the green-no-comment cases.
+- `decisions/README.md` — the ADR-005 narrative gains a line recording this second
+  amendment.
+- **This change cannot test itself**, for the third time and the same reason:
+  editing the workflow makes the review job self-skip. First real exercise is the
+  PR after this merges, judged by a posted comment, not a green check.
+
+**Unchanged by Amendment 2:** Decisions 2 and 6 stand as written; Decision 4's
+ceiling (40) is untouched; turn exhaustion still posts *"nothing was reviewed"* and
+still does not go red. Only Decision 1 is extended and Decision 5 is amended.
