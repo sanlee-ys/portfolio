@@ -21,6 +21,15 @@ jobs:
       - name: Private-repo guard (adversarial suites, A+B and C)
         run: node --test scripts/private-repo-check.test.cjs scripts/private-name-precommit.test.cjs
 
+      # The review workflow's classify step, run against synthetic execution
+      # logs with `gh` stubbed. ADR-005 has been amended four times and each
+      # amendment closes with "this change cannot test itself" — editing
+      # claude-review.yml makes the Claude App self-skip the review on that PR.
+      # That is still true of the review; it is no longer true of the step that
+      # classifies it. Needs bash and jq, both on this runner.
+      - name: Review classify step (synthetic execution logs)
+        run: node --test scripts/classify-review-outcome.test.cjs
+
       - name: Private-repo guard (never name/link/describe a private repo)
         run: node scripts/private-repo-check.cjs
         env:

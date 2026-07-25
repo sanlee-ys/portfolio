@@ -1,6 +1,6 @@
 # ADR-005: A red review check means the tooling broke, not that the PR is bad
 
-**Status:** Accepted; amended five times — Decision 4 reversed and the remediation
+**Status:** Accepted; amended six times — Decision 4 reversed and the remediation
 path resized on first measurement (2026-07-24, *Amendment*); Decision 1's tool grant
 completed and Decision 5's denial signal fixed and escalated to red (2026-07-24,
 *Amendment 2*); the redden calibrated to fire only on a *silenced* review, not a
@@ -11,7 +11,10 @@ the review finally told what toolset it holds, after six consecutive reviews hit
 denials and three of them died silent (2026-07-25, *Amendment 4*); the cause of those
 six recovered by local reproduction and found to be no permissions defect at all —
 a detached merge-ref checkout broke the prompt's own first command, and the agent
-*asked a human for approval* and waited (2026-07-25, *Amendment 5*)
+*asked a human for approval* and waited (2026-07-25, *Amendment 5*); Amendment 5's
+reproduce-it lesson carried to the classify step, which was never the part that could
+not test itself, immediately finding a whole-program guard that discarded every
+denied command whenever one element was malformed (2026-07-25, *Amendment 6*)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -778,3 +781,98 @@ the record now says so.
 **Unchanged by Amendment 5:** every decision above stands, including all of
 Amendment 4. The grant is untouched, Amendment 3's redden-on-silence calibration is
 untouched, and turn exhaustion is still inconclusive and non-red.
+
+---
+
+## Amendment 6 — 2026-07-25: the same lesson, applied to the step that reports the failure
+
+Amendment 5 landed hours before this one and its closing lesson is the premise of
+this one: *when the instrument is blind, reproduce the system instead of waiting for
+better telemetry.* It applied that to the **review**, and recovered in two minutes a
+cause that six CI runs across two days had failed to name. This applies it one layer
+out, to the **classify step** — the thing that reports what the review did.
+
+Every amendment above closes with the same sentence — *"this change cannot test
+itself"*, five times, most recently in Amendment 5's own downstream list. It is true
+of the **review**, which self-skips whenever this workflow is edited. It was never
+true of the **classify step**, which is ordinary bash reading a JSON file off disk
+and is testable by anyone who cares to write a fixture. Treating the two as one thing
+is why five amendments in a row shipped on reasoning and were checked afterwards by a
+throwaway PR that exercised whichever single path that one run happened to take.
+
+`scripts/classify-review-outcome.test.cjs` extracts the step's `run:` block from the
+workflow and runs it under bash against synthetic execution logs with `gh` stubbed.
+It asserts the three things the step owns: its exit code, what it logged, and what it
+posted. It runs the **real text**, not a copy — a copied script drifts, and a suite
+that passes against a stale copy is another unread meter.
+
+**What it found on its first run, against the merged Amendment 4 code.** Thirteen of
+fourteen fixtures passed, which is the evidence that the harness models the step
+faithfully rather than testing itself. The fourteenth: `DENIED_LIST` was guarded at
+the whole-program level (`|| echo '[]'`), so **one** malformed denial element took
+down the extraction for **all** of them. `.tool_input.command` raises *"Cannot index
+string with string"* if any single element's `tool_input` is not an object; jq exits
+non-zero; the fallback discards every command, including the ones that parsed fine.
+The comment then renders *"(could not be extracted — see the job log)"* — and
+`show_full_output` is off, so they are not in the job log either. **The reader is
+pointed at a place where the information does not exist, on the red path, which is
+the only path where the commands are the entire actionable content.**
+
+The fix is a `try ... catch null` per field, so a bad element costs one line its
+detail instead of costing all of them: a malformed `tool_input` still yields `Bash`,
+a malformed element still yields `unknown`, and everything beside it still names its
+command. `|| echo '[]'` stays as the outer net. This is the same defensiveness as the
+`.tool_name // .name // .tool` chain immediately above it, and Amendment 2 is the
+reason that chain exists — the SDK has already moved a field once, and the guard that
+mattered was written at the wrong granularity.
+
+**Severity, stated honestly.** Low. It degrades rather than crashes, and every
+classification the step makes — exit code, comment, annotation — is correct on this
+path. Nothing observed in production hit it; it is a robustness edge found by a
+fixture, not a live breakage. It is worth the amendment because of *how* it was
+found, not what it cost.
+
+**The general lesson, completing a set.** Amendment 4: an instrument is validated by
+someone acting on what it said, not by it firing. Amendment 5: when the instrument is
+blind, reproduce the system rather than wait for better telemetry. This one is the
+step before both — **a claim that something cannot be tested deserves to be checked
+as carefully as the thing it excuses.** "This change cannot test itself" was accurate
+about the review and got extended, unexamined, to cover a bash script that was
+testable the whole time. Amendment 5 found the same blind spot in the same file from
+the other direction, and its phrasing is the general form: *a CI job whose inputs are
+all committed to the repo is a reproducible experiment.* That is even more true of a
+step that takes a JSON file and returns an exit code. The defect this found is minor;
+the five amendments that shipped with no way to find one are the finding.
+
+**Downstream surfaces for this amendment:**
+- `.github/workflows/claude-review.yml` — the `DENIED_LIST` jq program gains
+  per-field `try ... catch null` guards, and its rationale comment records why the
+  whole-program guard was insufficient. Nothing else in the step changes: the
+  classification logic, the redden-on-silence calibration, `--allowedTools`,
+  `--max-turns`, the prompt, and the mention job are all untouched.
+- `scripts/classify-review-outcome.test.cjs` — new. Fourteen fixtures covering
+  self-skip, clean, denied-into-silence, denial-survived, non-Bash denials, turn
+  exhaustion, unknown subtype, truncation, backtick and newline handling, and the
+  malformed-element regression above. No new dependency: the `run:` block is
+  extracted by a line scan rather than a YAML parse, because `qa.yml` already
+  refuses to grow a Python toolchain for a doc linter and a test harness is not a
+  better reason than that was. Verified byte-identical to a real PyYAML parse of
+  the same block.
+- `.github/workflows/qa.yml` — a seventh gate runs the suite. It needs `bash` and
+  `jq`; both are on the ubuntu runner, and the suite **skips rather than passes**
+  if either is missing, per `CLAUDE.md`'s rule that an unrun gate is not a green one.
+- `README.md` — the QA list is now seven gates, with the new one described.
+- `decisions/README.md` — the ADR-005 narrative gains this amendment.
+- **The "cannot test itself" note, narrowed rather than repeated.** It still holds
+  for the **review** — this PR edits the workflow, so that check self-skips for the
+  seventh time and means nothing here. It no longer holds for the **classify step**,
+  which this PR's own `qa` run exercises across fourteen paths. Amendment 5's own
+  verification is already closed by the #125 smoke run
+  (`turns=5 denials=0`, verdict posted); this amendment does not reopen it, because
+  it changes nothing the review agent can observe.
+
+**Unchanged by Amendment 6:** every decision and every prior amendment stands,
+including all of Amendment 5 — its prompt changes, its PR-number interpolation, and
+its untouched `--allowedTools` are not revisited here. This changes no behaviour
+anyone was relying on; it changes what happens when the SDK hands the step something
+it did not expect, and it changes how the next change here gets verified.

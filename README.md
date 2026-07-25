@@ -28,7 +28,7 @@ systems / product language.
 
 ## QA
 
-CI (GitHub Actions) runs six gates on every PR and push to `main`, in this
+CI (GitHub Actions) runs seven gates on every PR and push to `main`, in this
 order:
 
 - **`scripts/link-check.cjs`** — no broken internal links.
@@ -36,6 +36,13 @@ order:
   scripts/private-name-precommit.test.cjs`** — the adversarial suites for the
   reference guard below, covering both the layers that run in CI and the local
   pre-commit layer that CI can't run itself.
+- **`node --test scripts/classify-review-outcome.test.cjs`** — drives the
+  `Classify the review outcome` step of `.github/workflows/claude-review.yml`
+  against synthetic execution logs, with `gh` stubbed so nothing touches a PR.
+  It runs the step's real text, extracted from the workflow rather than copied,
+  so the suite can't drift from what CI executes. That step decides whether a
+  failed review reads as *the PR is bad* or *the tooling broke* (`ADR-005`), and
+  until now it could only be exercised by merging it and opening a throwaway PR.
 - **`scripts/private-repo-check.cjs`** — every `sanlee-ys/<repo>` reference on
   every published page resolves to a repo that is actually **public**, checked
   live against the GitHub API. Built on a public allowlist rather than a
