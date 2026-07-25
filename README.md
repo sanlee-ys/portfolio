@@ -34,6 +34,19 @@ CI (GitHub Actions) runs on every PR and push to `main`:
   fails on any horizontal overflow. Mobile is a contract here, not an
   afterthought (see `CLAUDE.md`).
 
+The mobile gate is also meant to run **before** you commit, and it needs a
+Chromium matching the pinned Playwright. `node_modules/` isn't tracked and a
+Playwright bump strands the old browser revision, so run this on a fresh clone
+and after any bump — from the repo root, on any OS:
+
+```bash
+npm --prefix scripts ci
+npm --prefix scripts exec -- playwright install chromium
+```
+
+Then `node scripts/mobile-qa.cjs`. Without it the gate can't launch a browser
+and gets skipped, leaving CI as the only thing catching mobile regressions.
+
 ## Featured work
 
 - **The System** (`projects/the-system.html`) — cross-repo architecture: how four
