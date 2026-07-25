@@ -127,12 +127,32 @@ jobs:
               content, risky external resources, and any leaked secret or
               private-repo name (this repo must never name a private repo).
 
+            Your tools are exactly the following. There is no general shell:
+            every command outside these prefixes is denied before it runs, and
+            the denial returns nothing but costs you the turn.
+            - `Read`, `Grep`, `Glob` for anything in the working tree. Use
+              these — not `cat`, `ls`, `head`, `find`, or `grep`.
+            - `gh pr diff` and `gh pr view` to see the change. There is no
+              `git`, so the diff is the only history you get.
+            - `gh pr comment` and
+              `mcp__github_inline_comment__create_inline_comment` to publish.
+              These two are your only way to say anything to anyone.
+
+            Do not run this repo's QA gates (`scripts/*.cjs`, `scripts/*.py`)
+            or any other program. The `qa` workflow already ran all of them
+            against this PR; their result is not yours to reproduce. Reaching
+            for shell you do not have is the single most common way this
+            review fails — on three PRs it spent most of its turns on denied
+            commands and then stopped without saying anything at all.
+
             Post as you go rather than saving it all for the end: use
             `mcp__github_inline_comment__create_inline_comment` for anything
             you can pin to a file and line, and close with ONE summary comment
-            via `gh pr comment`. If you are running short on turns, post the
-            summary immediately — a partial review that is posted beats a
-            thorough one that never lands.
+            via `gh pr comment`. Never end your run without that summary — a
+            review that reached a conclusion and did not post it is
+            indistinguishable from no review at all. If you are running short
+            on turns, post the summary immediately — a partial review that is
+            posted beats a thorough one that never lands.
 
             Be honest and specific: skip nitpicks that don't affect
             correctness, security, or the mobile contract, and if the PR looks
@@ -166,6 +186,25 @@ jobs:
           #              examples/pr-review-comprehensive.yml -- that grants no
           #              Read either, but it runs `track_progress` mode; this is
           #              plain agent mode, and #108's denials are the measurement.
+          #
+          #              DELIBERATELY NOT WIDENED on 2026-07-25 (Amendment 4),
+          #              though every review since Amendment 3's naming landed has
+          #              hit Bash denials -- 4, 10, 2, 8, 11, 4 across six runs
+          #              (#113-#118), three of which died silent. Widening was the
+          #              obvious move and it
+          #              would have been the fourth guess in this record: the
+          #              classify step names the denied TOOL, and for every shell
+          #              command that name is the string "Bash", so nobody has ever
+          #              seen which command was denied. The fix is upstream of the
+          #              grant -- log the denied command (below) and tell the agent
+          #              what it actually has (the prompt's tool paragraph) -- and
+          #              the grant gets tuned on the next run's real data.
+          #
+          #              KNOWN GAP, left open on purpose: `actions: read` is
+          #              granted above so the review can see whether `qa` passed,
+          #              but no `Bash(gh pr checks:*)` makes it reachable. Folded
+          #              into the same data-driven widening rather than guessed at
+          #              alongside everything else.
           #
           # max-turns was 25, on the theory that denied tool calls -- not the
           # ceiling -- were the binding constraint: of the 26 turns PR #101
@@ -243,7 +282,53 @@ jobs:
           # shape shifts. `[]?` tolerates a result with no denials.
           DENIED_TOOLS=$(jq -r '[.permission_denials[]? | (.tool_name // .name // .tool // "unknown")] | unique | join(", ")' <<<"$RESULT" 2>/dev/null)
 
+          # Name the denied CALL, not just the tool (ADR-005 Amendment 4). The
+          # tool name alone is useless for the case that actually matters: every
+          # shell command denies as "Bash", so six runs of denial data named the
+          # same four letters and told nobody which command to grant. The
+          # SDK denial element carries `tool_input`; for Bash that is `.command`.
+          #
+          # Why this does not reopen the show_full_output question the
+          # Alternatives table settled: that input dumps tool RESULTS -- repo
+          # content, API responses, anything a command read -- and the action's
+          # own docs warn it "may contain secrets." This prints a tool INPUT for
+          # a call that was DENIED, so it never executed and read nothing. It is
+          # a string the agent composed from a public diff.
+          #
+          # Rendered into the PR comment as an INDENTED code block (four spaces),
+          # not an inline code span. A span would have to be delimited by
+          # backticks, and an agent-composed command containing one would break
+          # out of it -- so the span would need the command sanitised, and the
+          # sanitiser would need a literal apostrophe inside the shell
+          # single-quotes around the jq program, which closes them. The indented
+          # block needs no delimiter, so none of that exists. Newlines and tabs
+          # still collapse to spaces (one denial, one line) and 160 chars is the
+          # cap.
+          #
+          # Extracted once as JSON and rendered twice, rather than sharing one
+          # program string across two jq calls -- sharing means double-quoting it
+          # in the shell, and that eats jq variables (`$n`) before jq sees them.
+          # `|| echo []` keeps a shape change from taking the step down: this is
+          # the diagnostic, not the verdict.
+          DENIED_LIST=$(jq -c '[.permission_denials[]?
+            | {n: ((.tool_name // .name // .tool // "unknown") | tostring),
+               i: ((.tool_input.command // .tool_input.file_path
+                    // .tool_input.pattern // .tool_input.url // "") | tostring
+                   | gsub("[\n\r\t]"; " "))}
+            | if .i == "" then .n
+              elif (.i | length) > 160 then .n + ": " + .i[0:160] + "..."
+              else .n + ": " + .i end]
+            | unique' <<<"$RESULT" 2>/dev/null || echo '[]')
+          DENIED_CALLS=$(jq -r 'join(" | ")' <<<"$DENIED_LIST" 2>/dev/null || true)
+          DENIED_CALLS_MD=$(jq -r 'map("    " + .) | join("\n")' <<<"$DENIED_LIST" 2>/dev/null || true)
+          # Only reachable if the extraction above degraded; without it the
+          # comment would show an empty code block and read as "denied nothing."
+          DENIED_CALLS_MD="${DENIED_CALLS_MD:-    (could not be extracted -- see the job log)}"
+
           echo "subtype=$SUBTYPE turns=$TURNS denials=$DENIALS cost_usd=$COST denied_tools=[$DENIED_TOOLS]"
+          if [ -n "${DENIED_CALLS:-}" ]; then
+            echo "denied_calls: $DENIED_CALLS"
+          fi
 
           # Denials, calibrated by whether the review actually produced a verdict
           # (ADR-005 Amendment 3). Amendment 2 reddened on ANY denial; #111 proved
@@ -266,7 +351,7 @@ jobs:
           if [ "$DENIALS" -gt 0 ]; then
             POSTED=$(gh pr view "$PR" --json comments --jq '[.comments[] | select(.author.login | ascii_downcase | contains("claude"))] | length' 2>/dev/null || echo 0)
             if [ "${POSTED:-0}" -gt 0 ]; then
-              echo "::warning::Review posted a verdict but was denied $DENIALS tool call(s): ${DENIED_TOOLS:-unknown}. Not failing -- the review completed. Grant these in --allowedTools to silence the noise."
+              echo "::warning::Review posted a verdict but was denied $DENIALS tool call(s): ${DENIED_CALLS:-${DENIED_TOOLS:-unknown}}. Not failing -- the review completed. Grant these in --allowedTools to silence the noise."
             else
               gh pr comment "$PR" --body "$(cat <<EOF
           ### Automated review blocked by a tooling gap — not a verdict on the PR
@@ -284,10 +369,17 @@ jobs:
           | cost | \$$COST |
           | run | [$GITHUB_RUN_ID]($RUN_URL) |
 
-          Grant the denied tool(s) in the workflow, then re-run with \`@claude\`.
+          The calls it was denied — composed by the agent, none of them executed:
+
+          $DENIED_CALLS_MD
+
+          Grant what the review genuinely needs in \`--allowedTools\`, then
+          re-run with \`@claude\`. Not everything listed deserves a grant: the
+          agent reaches speculatively, and a call it did not need is a prompt
+          problem, not a permissions one.
           EOF
           )"
-              echo "::error::Review blocked into silence: $DENIALS tool call(s) denied (${DENIED_TOOLS:-unknown}), no verdict posted — a --allowedTools defect, not a PR verdict. Failing so the check reads as 'fix CI'."
+              echo "::error::Review blocked into silence: $DENIALS tool call(s) denied (${DENIED_CALLS:-${DENIED_TOOLS:-unknown}}), no verdict posted — a --allowedTools defect, not a PR verdict. Failing so the check reads as 'fix CI'."
               exit 1
             fi
           fi

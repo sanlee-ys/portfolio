@@ -97,6 +97,25 @@ posted **no verdict** (true silence); a denial a completed review survived stays
 with a warning that now **names** the denied tools, so the grant can be tuned against
 data instead of guessed at.
 
+A fourth amendment (2026-07-25) is what happened when someone tried to do that. Six
+reviews landed within hours of the third, every one of them with denials and three
+silenced outright — and all six named the same thing: `Bash`. That is the tool *class*
+every shell command reports under, so the instrument built to make the grant tunable
+could not distinguish `node scripts/link-check.cjs` from `ls`, and the execution log
+that holds the real answer is destroyed with the runner. Amendment 3's own prescribed
+verification (#113) had already come back **red** and gone unrecorded, which is the
+same failure in process form. The fix names the denied **call**, not the class; tells
+the review what toolset it actually holds, since the three silenced runs were all short
+and denial-saturated and look like an agent discovering its permissions by hitting
+walls; and pointedly **does not widen the grant**, because doing so on this evidence
+would have been the fourth guess in a record whose first three each cost a cycle.
+
+The thread running through all four: a counter that could not count, then a name that
+could not distinguish. Both were the right kind of fix and both stopped one field short
+of being usable, and neither shortfall showed until someone tried to make a decision
+from the output. **An instrument is validated by someone acting on what it said, not by
+it firing.**
+
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
 (`docs/specs/autonomy-ladder.md`) both live in the classifier repo, so relocating the record
