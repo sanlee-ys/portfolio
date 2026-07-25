@@ -9,18 +9,18 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://sanlee.me/projects/loop-replay.html" />
   <meta property="og:title" content="Loop replay &middot; San Lee" />
-  <meta property="og:description" content="A recorded-replay viewer for a prompt-optimization run log: the A/B/C score progression, the prompt diff each iteration, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
+  <meta property="og:description" content="A recorded-replay viewer for the autonomy ladder&#39;s two L3 loop runs: the A/B/C score progression, each iteration&#39;s edit, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
   <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Loop replay &middot; San Lee" />
-  <meta name="twitter:description" content="A recorded-replay viewer for a prompt-optimization run log: the A/B/C score progression, the prompt diff each iteration, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
+  <meta name="twitter:description" content="A recorded-replay viewer for the autonomy ladder&#39;s two L3 loop runs: the A/B/C score progression, each iteration&#39;s edit, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
   <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
   <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
-  <meta name="description" content="A recorded-replay viewer for a prompt-optimization run log: the A/B/C score progression, the prompt diff each iteration, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
+  <meta name="description" content="A recorded-replay viewer for the autonomy ladder&#39;s two L3 loop runs: the A/B/C score progression, each iteration&#39;s edit, and the A-vs-C overfitting gap that makes the Goodhart guard legible." />
   <link rel="stylesheet" href="../assets/style.css" />
   <script>
     (function () {
@@ -71,6 +71,34 @@
       color: var(--muted);
     }
     .demo-badge.real-run .dot { background: var(--accent); }
+
+    /* Run tabs: segmented control choosing which recorded run plays. Same
+       44px tap-target rule as the iteration nav; wraps rather than clips at
+       320px. aria-pressed carries the state for CSS and screen readers. */
+    .run-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 10px;
+    }
+    .run-tabs button {
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .run-tabs button:hover { border-color: var(--accent); color: var(--accent); }
+    .run-tabs button[aria-pressed="true"] {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .run-intro { color: var(--muted); font-size: 0.92rem; margin: 0 0 18px; }
 
     /* Run-summary stat tiles: same card language as the site's .repo-grid,
        new class because the content (label + big number) is different. */
@@ -258,9 +286,11 @@
     <a class="back" href="defense-news-classifier.html">&larr; Back to the classifier</a>
     <h1>Loop replay</h1>
     <p class="subtitle">
-      A recorded-replay viewer for the prompt-optimization loop&rsquo;s run
-      log &mdash; the <a href="defense-news-classifier.html#autonomy-ladder">L3 step</a>
-      of the classifier&rsquo;s autonomy ladder.
+      A recorded-replay viewer for the autonomous loop&rsquo;s run logs &mdash;
+      both rungs of the
+      <a href="defense-news-classifier.html#autonomy-ladder">L3 step</a>
+      of the classifier&rsquo;s autonomy ladder: the prompt-optimization loop
+      and the agent-driven ML loop.
     </p>
 
     <p class="lead">
@@ -295,7 +325,7 @@
       <text class="sm-id" x="26" y="34" text-anchor="middle">A</text>
       <path class="sm-edge sm-edge-a" d="M 48 28 L 70 28" marker-end="url(#split-arrow-a)" />
       <rect class="sm-box" x="74" y="10" width="182" height="36" rx="8" />
-      <text class="sm-role" x="165" y="33" text-anchor="middle">rewrites the prompt</text>
+      <text class="sm-role" x="165" y="33" text-anchor="middle">drives the next edit</text>
       <!-- The one edge that comes back. Its absence on B and C is the argument. -->
       <path class="sm-edge sm-edge-a" d="M 165 46 C 165 76, 26 76, 26 50"
             marker-end="url(#split-arrow-a)" />
@@ -321,6 +351,12 @@
       agent&rsquo;s context at all.
     </p>
 
+    <div class="run-tabs" id="run-tabs" aria-label="Choose a recorded run">
+      <button type="button" aria-pressed="true">Rung 1 &middot; prompt loop</button>
+      <button type="button" aria-pressed="false">Rung 2 &middot; ML loop</button>
+    </div>
+    <p class="run-intro" id="run-intro"><!-- filled by JS --></p>
+
     <div class="demo-badge" id="demo-badge">
       <span class="dot"></span>
       <span id="demo-badge-text">Real run &mdash; claude-sonnet-5, 1,524,937 tokens, stopped on the <code>threshold</code> done-signal. Numbers below are a measured result, not a demo.</span>
@@ -336,9 +372,10 @@
 
     <h2>Score progression</h2>
     <p>
-      Category macro-F1 per split, per iteration. The shaded band is the gap
-      between A and C &mdash; the wider it opens, the more the prompt improved
-      on the set it was tuned against without improving on real gold text.
+      <span id="chart-metric-line">Category macro-F1 per split, per iteration.</span>
+      The shaded band is the gap between A and C &mdash; the wider it opens,
+      the more the loop improved on the set it was tuned against without
+      improving on real gold text.
     </p>
     <div class="chart-legend">
       <span><i class="swatch a"></i>A &middot; training (optimized on)</span>
@@ -370,7 +407,7 @@
         <h3>Edit summary</h3>
         <p id="iter-summary"></p>
 
-        <h3>Prompt diff</h3>
+        <h3 id="iter-diff-heading">Prompt diff</h3>
         <pre id="iter-diff"></pre>
       </div>
 
@@ -428,12 +465,30 @@
       way whether it&rsquo;s opened straight from disk or served from GitHub
       Pages &mdash; a <code>fetch()</code> of a local file hits browser CORS
       restrictions that a plain <code>&lt;script src&gt;</code> doesn&rsquo;t.
-      Swapping in a different <code>run_&lt;UTC-timestamp&gt;.jsonl</code> is:
-      drop the new file in <code>projects/data/</code>, regenerate that template
-      literal from its raw text, and point the <code>&lt;script src&gt;</code>
-      in this page at it. The <code>IS_DRY_RUN</code> flag in
-      <code>loop-replay.js</code> stays <code>false</code> for any real run;
-      it exists so a mock can never be shown without its warning banner.
+      Rung 2&rsquo;s run ships the same way in a second file
+      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/projects/data/loop-replay-run2-real.js"><code>loop-replay-run2-real.js</code></a>)
+      &mdash; its source log is gitignored in the classifier repo, so the embed
+      here is the published record. The two rungs&rsquo; logs speak slightly
+      different dialects (rung 1 tags records with <code>type</code> and ships
+      unified prompt diffs; rung 2 tags with <code>record</code> and ships
+      one-line experiment diffs), and the viewer normalizes both at parse time
+      rather than editing either log &mdash; a recorded run is a record.
+      Adding another run is: drop the file in <code>projects/data/</code>,
+      regenerate a template literal from its raw text, and register it in
+      <code>loop-replay.js</code>&rsquo;s run list. Each run carries its own
+      dry-run flag so a mock can never be shown without its warning banner.
+    </p>
+
+    <p>
+      What is deliberately <em>not</em> here: L4&rsquo;s multi-agent audit
+      trail. That log is event-shaped &mdash; triage evidence, a challenge, a
+      backward bounce, a verdict, per row &mdash; not an iteration-by-iteration
+      score curve, and replaying it through this player&rsquo;s chart would
+      flatten exactly the structure that makes it interesting. Its measured
+      result lives in the classifier repo
+      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/l4_eval.txt"><code>evals/l4_eval.txt</code></a>,
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/020-l4-multi-agent-pipeline.md">ADR-020</a>);
+      if it earns a viewer, it earns its own.
     </p>
 
     <h2>Stack</h2>
@@ -447,6 +502,7 @@
   </main>
 
   <script src="data/loop-replay-real.js"></script>
+  <script src="data/loop-replay-run2-real.js"></script>
   <script src="../assets/theme.js"></script>
   <script src="../assets/last-updated.js"></script>
   <script src="loop-replay.js"></script>
