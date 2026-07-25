@@ -151,8 +151,21 @@ jobs:
           #              2026-07-13 pilot) to #101 it never posted one comment
           #              on one PR: every green check was a silent no-op, and
           #              every red one was the same no-op that took more turns
-          #              to give up. Tool list mirrors the action's own
-          #              examples/pr-review-comprehensive.yml.
+          #              to give up.
+          #
+          #              Read/Grep/Glob added 2026-07-24 (Amendment 2). Agent
+          #              mode grants ONLY what is listed here, so before them the
+          #              review could fetch the DIFF (`gh pr diff`) but could not
+          #              open a changed file for full context, grep for a leaked
+          #              private-repo name, or glob to find one. On #108 (an
+          #              inline-SVG + CSS diff, unreviewable without reading the
+          #              file) it tried 5 file reads, all denied, and posted
+          #              nothing -- GREEN. The `@claude` job never hit this: tag
+          #              mode installs the default toolset (incl. Read), the
+          #              asymmetry #108 exposed. NOT copied from the action's
+          #              examples/pr-review-comprehensive.yml -- that grants no
+          #              Read either, but it runs `track_progress` mode; this is
+          #              plain agent mode, and #108's denials are the measurement.
           #
           # max-turns was 25, on the theory that denied tool calls -- not the
           # ceiling -- were the binding constraint: of the 26 turns PR #101
@@ -174,7 +187,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-5
             --max-turns 40
-            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
+            --allowedTools "Read,Grep,Glob,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
 
       # Turn "the action exited non-zero" into a signal that distinguishes
       # I-found-problems from I-ran-out-of-road. See ADR-005 for the reasoning.
@@ -212,18 +225,53 @@ jobs:
           RESULT=$(jq -c 'if type == "array" then (map(select(.type == "result")) | last) else . end' "$EXEC_FILE")
           SUBTYPE=$(jq -r '.subtype // "unknown"' <<<"$RESULT")
           TURNS=$(jq -r '.num_turns // 0' <<<"$RESULT")
-          DENIALS=$(jq -r '.permission_denials_count // 0' <<<"$RESULT")
+          # The raw SDK result carries the ARRAY `permission_denials`;
+          # `permission_denials_count` (which this line read until 2026-07-24) is
+          # a synthetic field the action prints only in its stdout summary
+          # (base-action/src/run-claude-sdk.ts: `permission_denials_count:
+          # resultMsg.permission_denials?.length ?? 0`) and is ABSENT from the
+          # saved execution log. Reading the missing key returned 0 on every run
+          # -- which is why Decision 5's warning never once fired and why #108's
+          # 5 denials read as 0 here while turns and cost matched to the digit.
+          # Count the array. `// 0` covers a result with no denials at all.
+          DENIALS=$(jq -r '(.permission_denials | length) // 0' <<<"$RESULT")
           COST=$(jq -r '(.total_cost_usd // 0) * 10000 | round / 10000' <<<"$RESULT")
 
           echo "subtype=$SUBTYPE turns=$TURNS denials=$DENIALS cost_usd=$COST"
 
-          # A denial is a bug in the --allowedTools line above, not a finding
-          # about the PR. Denied calls burn turns and return nothing, which is
-          # exactly how this gate looked busy while doing nothing. Surface them:
-          # `show_full_output` stays off (the transcript is public and may carry
-          # secrets), so this count is the only view we get into the denials.
+          # A permission denial is a defect in this workflow's --allowedTools,
+          # not a finding about the PR (ADR-005 Decision 5). Under this file's
+          # colour model -- colour = tooling health, the posted comment = the
+          # verdict -- that is the RED category ("the job could not do its work;
+          # fix CI"), and Amendment 2 escalates it from a warning to a failure.
+          # It runs BEFORE the subtype case and takes precedence: a run blocked
+          # from tools it needed produced an untrustworthy outcome however it
+          # terminated. This is the exact hole #108 fell through -- 5 denied file
+          # reads, subtype=success, zero comments, GREEN. Distinct from
+          # error_max_turns below, which is genuinely inconclusive (ran out of
+          # road, not a fixable config bug) and deliberately stays non-red. A
+          # warning-only signal is what hid here; post to the PR, not just a log.
           if [ "$DENIALS" -gt 0 ]; then
-            echo "::warning::The review agent was denied $DENIALS tool call(s). Widen --allowedTools in this workflow — denied calls burn turns and produce nothing."
+            gh pr comment "$PR" --body "$(cat <<EOF
+          ### Automated review blocked by a tooling gap — not a verdict on the PR
+
+          The review agent was denied **$DENIALS tool call(s)** it requested, so
+          its review may be incomplete or missing. This is a \`--allowedTools\`
+          gap in \`.github/workflows/claude-review.yml\`, not a finding about your
+          change — treat this check as *absent*, not passed and not failed.
+
+          | | |
+          |---|---|
+          | tool calls denied | $DENIALS |
+          | turns used | $TURNS |
+          | cost | \$$COST |
+          | run | [$GITHUB_RUN_ID]($RUN_URL) |
+
+          Widen the tool grant in the workflow, then re-run with \`@claude\`.
+          EOF
+          )"
+            echo "::error::Review blocked: $DENIALS tool call(s) denied — a --allowedTools defect in this workflow, not a PR verdict. Failing so the check reads as 'fix CI' (ADR-005 colour model)."
+            exit 1
           fi
 
           case "$SUBTYPE" in

@@ -85,15 +85,15 @@ section is the operative rule.*
 The `Claude Review` check reports **tooling health, not a verdict**. The verdict
 is whatever the review posted as a PR comment.
 
-- **Red** — the job could not do its work (auth, crash). Fix CI; it says nothing
-  about the PR.
+- **Red** — the job could not do its work: auth, a crash, or the review was
+  **denied tool calls it needed** (a `--allowedTools` gap — it posts a comment
+  naming the count). Fix CI; it says nothing about the PR.
 - **Green + a comment** — the review ran. The comment is the result. Read it.
 - **Green + "review inconclusive"** — it hit the turn ceiling and reviewed
-  **nothing**. Treat the check as absent. Re-run with `@claude`; if the comment
-  reports denied tool calls, fix `--allowedTools` first, or it will exhaust the
-  same way.
+  **nothing**. Treat the check as absent. Re-run with `@claude`.
 - **Green + no comment at all** — either a genuinely clean review or the
-  self-skip below. Check the job log before assuming the first.
+  self-skip below (a review denied its tools now goes **red**, not green, so it
+  is no longer a cause here). Check the job log before assuming the first.
 
 **Editing `.github/workflows/claude-review.yml` disables the review on that
 same PR.** The Claude App refuses to run when the workflow file differs from the
