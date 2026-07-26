@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zero-Touch Provisioning &middot; San Lee</title>
+  <meta name="description" content="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device." />
+  <link rel="canonical" href="https://sanlee.me/projects/netops-lab.html" />
+  <meta property="og:site_name" content="San Lee" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://sanlee.me/projects/netops-lab.html" />
+  <meta property="og:title" content="Zero-Touch Provisioning &middot; San Lee" />
+  <meta property="og:description" content="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device." />
+  <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Zero-Touch Provisioning &middot; San Lee" />
+  <meta name="twitter:description" content="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device." />
+  <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+  <main class="wrap article-body">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <h1>Zero-Touch Provisioning</h1>
+    <p class="subtitle">A factory-blank router configures itself on one power cycle. The hard part wasn&rsquo;t the router.</p>
+
+    <p class="lead">
+      This is a physical lab: one MikroTik router, one Raspberry Pi, on a desk.
+      The goal was a reliable wipe-to-provisioned cycle &mdash; power on a blank
+      device, touch nothing, and have it come up fully configured. Not because
+      provisioning is interesting on its own, but because it is the apparatus
+      for a later experiment about an agent severing its own management access.
+      Without a cheap way back, every failed run is a manual rebuild, and
+      experiments that are expensive to repeat stop getting repeated.
+    </p>
+    <p>
+      It works. It also produced a finding I did not expect, and would not have
+      found by reading about it.
+    </p>
+
+    <h2>The result</h2>
+    <p>
+      One command on the Pi, then pull the router&rsquo;s power and plug it back
+      in. About ninety seconds later the router has a fresh OS, a management
+      address, a firewall, an SSH key it has never seen before, and it has
+      re-armed itself so the next cycle works the same way. No console cable, no
+      serial adapter, no reset-button timing.
+    </p>
+    <p>
+      The provisioning host is the Pi rather than my desktop, which matters more
+      than it sounds: the whole cycle is scriptable from the box that is already
+      always-on. MikroTik&rsquo;s Netinstall tool ships as a 32-bit x86 binary,
+      and the Pi is ARM, so it runs under user-mode QEMU. That sounds worse than
+      it is &mdash; the binary is statically linked, so there is no 32-bit
+      sysroot to assemble, which is normally the expensive part of that trick.
+    </p>
+
+    <h2>The finding: the barriers were on the host, not the device</h2>
+    <p>
+      I expected the router to be the obstacle. Embedded network gear is where
+      you expect the hostile surprises: locked-down defaults, firmware quirks,
+      a management plane that fights automation.
+    </p>
+    <p>
+      The router did have one. After a fresh install, RouterOS leaves the admin
+      account with a blank password and demands you change it interactively
+      before doing anything. That looks like it kills unattended provisioning
+      outright, and I had already started designing around it &mdash; which
+      would have meant putting a credential into a public repository or building
+      machinery to inject one at provision time.
+    </p>
+
+    <div class="decision">
+      <p class="tag">The fix was to test the assumption instead of designing around it</p>
+      <p>Before building anything, I ran the one command that would tell me
+        whether the problem was real in the case I cared about: a
+        <em>non-interactive</em> SSH, the way a script would actually connect.</p>
+      <p>It printed its output and exited. The forced password change is a
+        property of interactive logins only. A script never meets it. The
+        provisioning script needed no changes at all, and the credential problem
+        I was about to solve did not exist.</p>
+      <p class="tradeoff"><strong>What did block automation</strong> showed up in
+        the output of that same test, in two lines I had been typing past all
+        evening: an SSH host-key confirmation prompt, and a passphrase prompt on
+        my own key. Neither stops a human. Both stop a script dead.</p>
+    </div>
+
+    <p>
+      The host-key prompt is not incidental, and it does not go away. Netinstall
+      regenerates the router&rsquo;s SSH host keys on every cycle, so the
+      device&rsquo;s identity legitimately changes every single time by design.
+      The lazy fix is to disable host-key checking, which throws away a real
+      protection to silence a prompt. What it actually wants is a
+      <em>separate</em> known-hosts file for the lab, so a provisioning script
+      can discard one file per cycle without touching anything else, and
+      still refuse a <em>changed</em> key mid-cycle &mdash; which is the case
+      that would genuinely mean something is wrong.
+    </p>
+    <p>
+      So &ldquo;zero-touch&rdquo; did not get achieved so much as <em>relocated</em>.
+      The device end is genuinely unattended. What remains is host-side
+      automation hygiene on the machine driving it, which is a more honest place
+      for the problem to live, and the class of thing that would otherwise have
+      ambushed every later piece of automation in this lab.
+    </p>
+
+    <h2>Three back doors, one shape</h2>
+    <p>
+      The eventual experiment asks whether an agent working on a live router can
+      avoid locking itself out. That question is only meaningful if being locked
+      out is actually possible, so the provisioning config has to be deliberate
+      about every path into the device &mdash; not just the obvious one.
+    </p>
+    <p>
+      The Pi reaches the router through exactly one firewall rule: SSH, from one
+      address, on one interface, sitting above a deny-everything-else rule. That
+      rule is the surface the experiment is meant to attack. Three other ways in
+      turned up, and they are all the same shape: a management path that
+      survives the failure being studied.
+    </p>
+    <ul>
+      <li><strong>MAC-Winbox.</strong> MikroTik&rsquo;s layer-2 management,
+        which works with no IP configured anywhere. Left restricted to the LAN
+        side, so the Pi has no layer-2 fallback and can genuinely lock itself
+        out &mdash; while my desktop, on the other side, keeps it and stays the
+        recovery post.</li>
+      <li><strong>IPv6 link-local.</strong> The one I nearly missed. RouterOS
+        brings up link-local IPv6 automatically, and my config had no IPv6
+        firewall rules at all, which means IPv6 input was allowed by default. An
+        agent could have destroyed every IPv4 path I had carefully narrowed and
+        the Pi would still have connected over IPv6. That failure would not have
+        looked like a broken experiment; it would have quietly produced a wrong
+        answer.</li>
+      <li><strong>RoMON.</strong> Another layer-2 overlay, found while reading an
+        unrelated diagnostic. Off by default on this device &mdash; a restrictive
+        shipping mode doing me a favour I hadn&rsquo;t asked for.</li>
+    </ul>
+    <p>
+      The transferable part isn&rsquo;t the list. It&rsquo;s that I only found
+      the second one by applying the question from the first, and the third by
+      accident. <strong>&ldquo;Locked out&rdquo; only means something once you
+      have enumerated every independent path in</strong>, and there is no
+      obvious point at which that enumeration is finished. It is now a question I
+      ask of every new surface this configuration grows.
+    </p>
+
+    <h2>A deferred item that turned out not to be deferrable</h2>
+    <p>
+      RouterOS has a feature called device-mode that gates whole categories of
+      functionality, and changing it requires physical confirmation &mdash; a
+      power cycle within a five-minute window. You cannot do it over SSH alone,
+      which is precisely the point of it.
+    </p>
+    <p>
+      I had noted device-mode as relevant to the <em>later</em> experiment and
+      filed it accordingly. It then blocked the current one: the command that
+      arms the router for its next wipe cycle is gated behind a device-mode flag,
+      and a factory board ships with it off. So the provisioning script&rsquo;s
+      final line could not run on a fresh device, and no amount of scripting
+      could fix that, because the resolution requires someone to physically pull
+      a plug.
+    </p>
+    <p>
+      The filing error is the interesting part rather than the fix.
+      &ldquo;This only affects a later phase&rdquo; was an assumption I recorded
+      as though it were a finding, and I made it about the one subsystem whose
+      entire purpose is to block things. The decision record now carries the
+      correction in place rather than a tidy rewrite, because the mistake is more
+      useful than the conclusion.
+    </p>
+    <p>
+      It resolved well: the flag survives a reinstall, so enabling it is a
+      one-time cost per device rather than a tax on every cycle. That answer also
+      kept a RouterOS version upgrade off the critical path, which is where it
+      would have gone if the flag had reset.
+    </p>
+
+    <h2>What this does not establish</h2>
+    <p>
+      Stating this up front rather than at the bottom, because a working demo is
+      only useful if you say where it stops.
+    </p>
+    <ul>
+      <li><strong>This is not standards-based ZTP.</strong> Real zero-touch
+        provisioning has a trust story &mdash; RFC 8572, BRSKI, a certificate
+        authority, a device proving what it is before accepting configuration.
+        This has none of that. The trust model is that I plugged in the cable
+        myself. It is the operational mechanics of unattended provisioning
+        without the security substrate that makes it safe at scale.</li>
+      <li><strong>One device, one model, one OS version.</strong> A handful of
+        cycles on a single board. Nothing here is a claim about how MikroTik
+        hardware behaves in general, let alone anyone else&rsquo;s.</li>
+      <li><strong>Unattended within a session, not across a reboot.</strong> The
+        provisioning host holds its SSH key in an agent that a human has to
+        unlock after the Pi restarts. That is a deliberate trade I made against
+        a passphrase-free key, and it lands squarely on the experiment this lab
+        exists for, since an unattended lab is exactly the scenario where a
+        reboot is most likely.</li>
+      <li><strong>One thing is genuinely unresolved.</strong> The setting that
+        re-arms the router lives in the bootloader, not the OS, so it may have
+        survived the reinstall on its own rather than being re-applied by my
+        script. Both produce identical output. This board is armed either way; a
+        truly factory board might not be, and I have not yet run the test that
+        distinguishes them.</li>
+      <li><strong>The actual experiment is not built.</strong> The self-lockout
+        question is the reason this lab exists, and everything above is the
+        apparatus for it. Apparatus that works is not a result.</li>
+    </ul>
+
+    <h2>Stack</h2>
+    <p>
+      MikroTik hEX (RouterOS 7, ARM), Raspberry Pi 5 running Raspberry Pi OS
+      from NVMe, MikroTik Netinstall under <code>qemu-user-static</code>, BOOTP
+      and TFTP served on an isolated point-to-point link, RouterOS scripting for
+      the provisioning configuration, and a shell wrapper so a full cycle is one
+      command. The repo is public:
+      <a href="https://github.com/sanlee-ys/netops-lab">github.com/sanlee-ys/netops-lab</a>
+      &mdash; the provisioning script, the decision records, and a field log of
+      what broke and what the symptoms actually meant are all checkable.
+    </p>
+    <p>
+      The field log is deliberately as detailed as the design docs. The two
+      things that cost the most time in this build were an Ethernet link that
+      would not come up until I disabled a power-saving feature on the host
+      network card, and an interface that reported a perfectly correct IP address
+      while no cable was attached to it. Neither is clever. Both are the kind of
+      thing that is only cheap the second time.
+    </p>
+
+    <h2>What it demonstrates</h2>
+    <p>
+      Building the recovery mechanism before the experiment that needs it, and
+      being willing to test an assumption rather than design around it. The
+      forced-password-change problem would have taken a day to solve properly and
+      did not exist; one command established that. The IPv6 hole would have taken
+      no time at all to leave in place, and would have invalidated the results
+      quietly rather than loudly.
+    </p>
+    <p>
+      Most of what I do professionally is measured on software I can re-run
+      until it is right. Hardware is less forgiving about that, and a management
+      plane you are reaching through is less forgiving still &mdash; every change
+      is potentially the change that ends the session. That constraint is the
+      reason for the lab.
+    </p>
+  </main>
+  <script src="../assets/theme.js"></script>
+  <script src="../assets/last-updated.js"></script>
+</body>
+</html>
