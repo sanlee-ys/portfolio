@@ -267,22 +267,59 @@ body {
 .hero-links a:hover { color: var(--accent); transform: translateY(-1px); }
 .hero-links a svg { width: 22px; height: 22px; display: block; }
 
-/* "What the record shows": a quiet legend, not a banner. The page below is the
-   proof; this is just the map legend a rushed reader can read in one glance.
-   Kept deliberately muted and small so it reads under the lede, never over it. */
+/* "What the record shows" — the 60-second layer.
+
+   This slot used to hold five keywords: eval-driven development, contract-first
+   integration, AI product judgment, scope discipline, RAG / tool-use. Measured,
+   the entire first screen was identity and abstraction: name, arc, employer,
+   thesis, nav, and those five labels. A reader who gives the site 60 seconds
+   (which is most of them — the full site is 12,150 words, about 55 minutes) left
+   with nothing they could check.
+
+   Now it carries three claims that are falsifiable, each with a number, each
+   linking to the decision block that proves it. It also fixes a voice problem:
+   "AI product judgment" is exactly the self-description the colophon's own rule
+   warns against, since the skeptical reader credits artifacts, not vocabulary.
+   "Fixed 0, broke 4" is an artifact.
+
+   Note this does NOT make the page shorter — it is still ~7.5 screens. It makes
+   the FIRST screen sufficient, which is the part that was actually broken. */
+/* Stacked, not an inline row. The old middot separators worked when these were
+   five short keywords that flowed together; three full claims each take their
+   own line, which left a dangling "·" at the end of every line but the last. */
 .proof {
   list-style: none;
   padding: 0;
-  margin: 16px 0;
+  margin: 18px 0 6px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  font-size: 0.75rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  line-height: 1.45;
   letter-spacing: 0.01em;
   color: var(--muted);
+  text-align: center;
 }
-.proof li::after { content: "\00b7"; margin: 0 8px; opacity: 0.45; }
-.proof li:last-child::after { content: none; }
+
+/* Quiet by default so three claims read as a legend rather than a banner; the
+   numbers carry the weight, and the accent only appears on hover/focus. */
+.proof a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--muted) 35%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.proof a:hover { color: var(--text); text-decoration-color: var(--accent); }
+.proof a strong { color: var(--text); font-weight: 600; }
+.proof a em { font-style: italic; }
+.proof a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 
 /* The doors: a clean link row between the hero and the work, so every reader can
    reach the project pages without first reading the whole homepage. The doors are
