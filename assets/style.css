@@ -606,6 +606,72 @@ body {
 /* ---- Project writeup components ---- */
 .article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
 
+/* "On this page" — an in-page map for the long writeups. Measured: the
+   classifier is 3,194 words, 14.5 minutes, 10.1 screens at 900px tall. A ToC
+   does not remove one word of that; what it does is convert linear scrolling
+   into targeted reading, which is the actual complaint. Only pages over ~1,500
+   words carry one — below that the ToC costs more screen than it saves.
+
+   Sits AFTER the lead paragraph, not before it: the reader gets the hook, then
+   the map. A ToC above the first sentence asks someone to choose a section
+   before they know what the page is.
+
+   `columns: 300px` rather than a column count, so the list is intrinsically
+   responsive — two columns in the 720px content column, one on a phone, with
+   no breakpoint. */
+.toc {
+  margin: 28px 0 8px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.toc-heading {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: toc;
+  columns: 300px;
+  column-gap: 28px;
+}
+
+.toc li {
+  counter-increment: toc;
+  margin: 0 0 7px;
+  font-size: 0.95rem;
+  break-inside: avoid;
+}
+
+.toc li::before {
+  content: counter(toc) ".";
+  margin-right: 8px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scoped through .article-body to outrank `.article-body li a`, which styles
+   prose links accent + underlined. Inheriting that turned the ToC into nine
+   competing blue underlines; a map should be quiet and let the headings it
+   points at do the talking. */
+.article-body .toc a { color: var(--text); text-decoration: none; }
+.article-body .toc a:hover { color: var(--accent); text-decoration: underline; }
+.article-body .toc a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 /* Repo cards (the pieces of the system) */
 .repo-grid {
   display: grid;
