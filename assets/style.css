@@ -44,12 +44,15 @@
   --btn-text: #0b0e13;
   --shadow: rgba(0, 0, 0, 0.35);
   --radius: 14px;
-  --maxw: 880px;
-  /* Prose measure. See the "Prose measure" block below for how 48ch was
-     derived and why it is not "48 characters". Named so the bordered prose
-     blocks can hug it (measure + their own padding) instead of each carrying
-     a hand-tuned pixel width that drifts the next time padding changes. */
-  --measure: 48ch;
+  /* The content column. ONE width for every block on the page: hero copy,
+     prose, tables, diagrams, bordered blocks. See the "One content column"
+     block below for why this beats capping prose separately.
+     --maxw is the column plus .wrap's two 24px gutters, so every .wrap on the
+     site — hero, doors, main, footer — lands its content on the same two
+     vertical lines. The full-bleed bands still span the viewport; it is only
+     their inner .wrap that is column-width. */
+  --col: 720px;
+  --maxw: calc(var(--col) + 48px);
   --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -340,46 +343,37 @@ body {
    whether or not it carries an intro class. */
 .section-title + p { margin-top: 0; }
 
-/* ---- Prose measure ----------------------------------------------------
-   Measured, not guessed. Rendered at 1440px, the reading column ran 99
-   characters per line (.measure), 116 (.section-sub, which sat outside any
-   reading column at the full .wrap width), and 91 (.article-body). The
-   comfortable band for continuous prose is roughly 65-75; past that the eye
-   loses the line it is returning to and re-reads the one it just finished.
+/* ---- One content column -----------------------------------------------
+   Everything inside <main> shares ONE width, so the page has exactly one left
+   edge and one right edge.
 
-   Two deliberate choices:
+   The previous attempt capped prose to a ~70-character measure and left tables
+   and diagrams at the container width. Better line length, but it gave the page
+   two right edges 86px apart, and measuring found the homepage had grown SIX
+   distinct right edges (1053 / 1091 / 1099 / 1264 / 1376 / 1400 at a 1920
+   viewport) — three of which predated that change, since .section-sub, the
+   system diagram and the section headings sat at the full .wrap width while
+   .measure sat at 720. A ragged stack of near-miss edges reads as sloppiness
+   long before anyone notices the line length is comfortable.
 
-   1. The cap goes on the PROSE, not on the container. Narrowing .measure
-      itself would have dragged the six-column metrics table, the system
-      diagram, and the decision boxes in with it — none of which are prose and
-      all of which want the room. Paragraphs and list items get the cap; their
-      containers stay 720px.
+   So: alignment wins over optimal measure here. This site's content is prose
+   INTERLEAVED with six-column metrics tables and diagrams — the tables are the
+   argument, not decoration, and they need ~672px to keep their headers on two
+   lines. Squeezing them into a 509px prose measure wrapped every header onto
+   three. When the widest necessary object and the ideal measure disagree, and
+   they alternate down the page, one honest column beats two competing ones.
 
-   2. The unit is `ch`, so the cap tracks font-size (.article-body runs at
-      16.8px, .decision .tradeoff at 15.2px) instead of pinning one pixel
-      width across three type scales. Beware the arithmetic: 1ch is the width
-      of "0", and in Geist "0" is ~1.46x the average prose character. 48ch is
-      therefore ~70 characters, not 48 — reading `ch` as "characters" is how
-      you end up specifying a cap that changes nothing. */
-.section-sub,
-.measure p,
-.measure li,
-.orientation p,
-.orientation li,
-.article-body p,
-.article-body li { max-width: var(--measure); }
+   Prose therefore runs ~91 characters. That is above the comfortable 65-75
+   band, and it is a deliberate trade, not an oversight. The way to buy the
+   measure back is to make the tables narrower (shorter column headers), not to
+   re-introduce a second edge.
 
-/* Bordered prose blocks hug the measure instead of the container. Capping the
-   text alone left these boxes at their old 720px with the prose stopping ~210px
-   short of the border — inside a visible frame that reads as a mistake, not as
-   breathing room. Each is the measure plus its OWN horizontal padding and
-   borders, so the frame lands just past the last character. Grids, tables, and
-   the diagrams are deliberately not in this list: they are not prose and they
-   want the full column. */
-.orientation    { max-width: calc(var(--measure) + 46px); } /* 22px padding x2 + 1px border x2 */
-.decision       { max-width: calc(var(--measure) + 38px); } /* 18px padding x2 + 1px border x2 */
-.diagram-detail { max-width: calc(var(--measure) + 36px); } /* 16px padding x2 + 1px + 3px rule */
-.ex-caption     { max-width: calc(var(--measure) + 31px); } /* 14px padding x2 + 3px rule */
+   The hero and doors are still full-bleed BANDS — their backgrounds and border
+   rules span the viewport — but their inner .wrap is the same column, so the
+   hero copy starts on the same vertical line as the decision log below it.
+   Aligning only <main> would have swapped a right-edge mismatch for a 56px
+   left-edge one between the hero and the content. */
+.measure { max-width: var(--col); }
 
 /* The project-card grid (.cards / .card / .tags / @container card) was removed
    in the 2026-07-26 design pass. The homepage stopped being a card grid when it
@@ -548,10 +542,12 @@ body {
 .article-body {
   /* Keep the same 24px side gutter as .wrap. The old `0` here zeroed the
      horizontal padding (shorthand overrides .wrap), so on a phone the body
-     text ran edge-to-edge. On desktop this just insets the 720px column a
-     touch; on mobile it gives the content room to breathe. */
+     text ran edge-to-edge. On desktop this just insets the column a touch;
+     on mobile it gives the content room to breathe. The width itself comes
+     from the one-column rule near the top — these pages used to sit at a
+     672px content width while the homepage sat at 720, which is one of the
+     stray edges that rule exists to remove. */
   padding: 72px 24px 96px;
-  max-width: 720px;
 }
 
 .article-body .back {
@@ -580,7 +576,7 @@ body {
    one width and tone. The drift came from tagging only two of the four <p>s with
    a class (620px + muted) and leaving the other two at full width + default
    color. Styling the section's children once keeps them uniform. */
-.about p { max-width: var(--measure); color: var(--muted); margin: 0 0 16px; }
+.about p { color: var(--muted); margin: 0 0 16px; }
 
 /* ---- Project writeup components ---- */
 .article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
@@ -1026,9 +1022,10 @@ body {
 
 /* ===== Decision Log homepage ===== */
 
-/* Narrow, left-aligned reading column for the log and prose. The diagram
-   masthead above stays at the full .wrap width. */
-.measure { max-width: 720px; }
+/* .measure's width is set by the one-column rule near the top. It used to be
+   the NARROW column, with the diagram masthead above it left at the full .wrap
+   width — that mismatch was one of the homepage's stray right edges. Both are
+   now --col, so the class is a semantic grouping rather than a width. */
 
 .log-intro { color: var(--muted); margin: 0 0 24px; }
 
@@ -1111,7 +1108,7 @@ body {
    purpose (same border-left-accent family as the decision cards), so it orients
    without reading as a marketing banner. */
 .orientation {
-  /* width comes from the measure rule above, not a pixel literal */
+  /* full column width, like every other block in <main> */
   margin: 56px 0 8px;
   padding: 20px 22px;
   border: 1px solid var(--border);
