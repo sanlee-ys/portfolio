@@ -1,10 +1,10 @@
 # ADR-006: Hand-written HTML, or a static site generator?
 
-**Status:** **Proposed — no decision made.** This is a stub, written to hold the
-evidence and the question so the next session does not re-derive either. Nothing
-here commits the site to anything. The deciding session must fill in *Decision*
-and *Consequences* and move the status to Accepted or Rejected.
-**Date:** 2026-07-26 (question opened)
+**Status:** **Accepted 2026-07-26 — migrate to Astro.** Decided in a scoped
+session the same day the question was opened. Migration is **planned, not
+executed**; no file has moved. See *Decision*, *Consequences*, and *Migration
+plan*.
+**Date:** 2026-07-26 (question opened); 2026-07-26 (decided)
 **Deciders:** San Lee
 
 ---
@@ -88,25 +88,91 @@ things that would collapse into components under a generator.
 
 ## Decision
 
-**Not yet made.** See *Status*.
+**Migrate to Astro.** As a lift-and-shift: no design change, no content change,
+not one word added or removed, and no Markdown conversion in the same pass. The
+migration plan and its acceptance bar are below.
 
-The deciding session should treat these as the two live options, and should reach
-a verdict rather than deferring again:
+### First, the crux: a generator does not undercut ADR-004
 
-1. **Stay hand-written static.** Free. Keeps the no-build property. Accepts N-file
-   edits for any shared-chrome change and no search across 12k words.
-2. **Migrate to Astro (or Eleventy).** Still ships static HTML with zero JS by
-   default. Buys layouts/components, Markdown content, and a drop-in static search
-   (Pagefind). Costs a build step, a toolchain, and a migration of 13 pages plus a
-   1,296-line stylesheet.
+The stub was right to make this gate everything else, so it is answered first and
+on evidence rather than on taste.
 
-The genuine crux — and the reason this is an ADR rather than a ticket — is
-[`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md), which establishes the
-portfolio as a **front-end learning vehicle**. Hand-writing the HTML and CSS is
-partly the point. Whether a generator undercuts that, or simply moves the learning
-up a layer to components and content modelling, is a real question and not a
-rhetorical one. **Answer it explicitly before weighing anything else**; every other
-argument here is downstream of it.
+[`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md) retired `/lab` and moved
+front-end learning *inside real work*, naming the honest risk: learning "must be
+defended elsewhere, or it quietly stops." The test for this decision is therefore
+narrow — **does a generator remove learning surface?**
+
+The learning track's actual contents are enumerable, not hypothetical. The log
+that survived ADR-004 lives in `colophon.html` and is seven notes: scroll-reveal
+with `IntersectionObserver`; `@keyframes`, pseudo-elements and z-index stacking;
+Flexbox vs Grid with `auto-fit`/`minmax`; `:focus-visible`, `clamp()` and
+container queries; scroll-driven storytelling with sticky positioning and
+progressive enhancement; data-driven SVG with `viewBox` and `createElementNS`;
+and DNS/apex/`MX` records.
+
+**Astro subtracts none of the seven.** It ships zero JS by default, imports a
+global stylesheet unchanged, and leaves every hand-authored inline SVG — including
+all three ADR-004 visual candidates — exactly as hand-authored. What it removes is
+transcribing a 38-line `<head>` a thirteenth time, which is not on the list and
+teaches nothing.
+
+What it adds is a second axis — layouts, props, slots, a build — which is a
+front-end skill the log does not currently cover. Note also that the log's seventh
+entry is DNS and email, so the track had already broadened past CSS craft without
+anyone calling that a violation.
+
+So the honest framing is not *generator vs. learning*. It is **which** front-end
+skill, and hand-copying boilerplate is not one. ADR-004's premise survives; it
+gains a layer rather than losing one.
+
+### Then the case, and one argument deliberately not used
+
+The case rests on defects that have already happened, not on convenience:
+
+- **12 of 13 pages carried no navigation at all** until 2026-07-26, because the
+  fix was 11 hand edits. Fixed by generating them (#141), whose own commit message
+  calls the script "deliberately throwaway plumbing if that migration happens."
+- **#138** found `resume.html` naming Geist in `--font` while loading no font at
+  all, so the rendered PDF's typeface depended on which machine produced it.
+- **#142's ToC is new hand-sync debt, three commits old.** It is baked-in HTML that
+  must be re-synced by hand every time a heading changes. Under a layout it derives
+  from the headings and cannot drift.
+
+All three are the same failure: shared chrome maintained by copying. Verified
+today, all 13 pages carry their own duplicate of the theme bootstrap *and* the
+Plausible snippet, and a representative interior page
+(`projects/netops-lab.html`) is ~55 lines of shell around its content — 38 head,
+4 toggle, 11 nav, 2 trailing scripts. That is **~660 hand-maintained duplicate
+lines** across the site.
+
+**The density argument is explicitly not part of this decision.** The stub's
+finding stands: no option here removes a word. The reasoning chain "adding a page
+is expensive, therefore content accretes into monoliths" is *not* established, and
+this record declines to lean on it — `projects/loop-replay.html` and
+`projects/netops-lab.html` both landed fine, which is direct evidence that
+page-adding was not in fact prohibitive. The density complaint is answered by
+information architecture, in its own session, either way. **A migration that took
+credit for it would be the category error the stub warned about.**
+
+### Why now, and why Astro specifically
+
+**Now, because the cost only grows.** Thirteen pages is the smallest N this
+migration will ever have; page-adding is ongoing and confirmed. Every shared-chrome
+edit made between the decision and the execution is work that gets ported or thrown
+away — #141 and #142 are already two of those.
+
+**Astro over Eleventy** because it ships static HTML with zero JS by default (which
+preserves the property `CLAUDE.md` protects), its component model is the more
+transferable of the two, and `@astrojs/sitemap` retires a hand-maintained file that
+ADR-004 §4 already caught a hole in. Eleventy would also work; this is not a close
+enough call to spend the session on.
+
+**On the 2026-07-19 "no fourth front" direction:** a migration is a fourth front,
+and the stub correctly required that be said out loud rather than smuggled. It is
+said: the autonomy-ladder spine that direction protected is now finished and
+released (v3.1.0, 2026-07-25), so the constraint has been satisfied rather than
+overridden. The migration is sequenced as its own scoped work, not run alongside
+anything.
 
 ## Downstream surfaces
 
@@ -158,10 +224,131 @@ constraints below are load-bearing and easy to discover too late.*
   word, and the density complaint is answered by information architecture, not by
   tooling.
 
+### Verified at decision time, 2026-07-26
+
+The list above was written from reading. Four items were then checked against the
+source, and two of them moved substantially — one cheaper, one more expensive.
+
+- **The gate redirection is a one-line change per script, not a rewrite.** All five
+  page-touching scripts derive their root from the same expression,
+  `const ROOT = process.cwd()` — `mobile-qa.cjs:31`, `link-check.cjs:12`,
+  `resume-pdf.cjs:28`, `check-published-metrics.cjs:45`,
+  `private-repo-check.cjs:35`. Each becomes an env-var override with `process.cwd()`
+  as the fallback, so every gate still runs unchanged from the repo root.
+- **The silent-failure risk the stub named is real and unguarded.** None of the four
+  walking gates asserts it found any pages; each would pass against an empty
+  directory. That is the exact shape of a migration that reports green while
+  checking nothing, so **the guard is a required deliverable of the migration, not
+  a nicety** — every gate must fail on a zero-page walk.
+- **`mobile-qa.cjs` cannot keep using `file://`, and this is the largest gate
+  change.** It loads pages with `page.goto('file://' + ...)` at line 66. A single
+  shared layout cannot emit per-depth relative asset paths — one file serves
+  `index.html` and `projects/*.html` both — so paths become absolute
+  (`/assets/style.css`), and absolute paths do not resolve over `file://`. The gate
+  must serve the build over HTTP instead. **This follows from having a layout at
+  all; it is not incidental and cannot be avoided by configuration.**
+- **`resume.html` needs no code change, and its constraint becomes structural.**
+  `resume-pdf.cjs:44` also uses `file://`, but the page is standalone with inline
+  styles and its own `@font-face` rules, so it survives as a verbatim file in
+  `public/` with only the script's root repointed. The migration therefore makes the
+  standalone requirement **enforced by where the file lives** rather than by
+  remembering it — a strict improvement over today, where nothing stops a future
+  edit from linking the shared stylesheet.
+- **`CLAUDE.md` is deliberately not edited by this record.** Its opening line
+  ("no build step") is *still true today* — the migration is planned, not executed —
+  and writing a build step into the operative instructions before one exists would
+  make the file lie to the next agent that reads it. Per this tier's *ADR records
+  the why, `CLAUDE.md` keeps the rule* split, `CLAUDE.md` changes **in the migration
+  PR**, in the same commit that makes it true.
+
 ## Consequences
 
-**To be filled in by the deciding session.** Whichever way this goes, record what
-is given up — that is the half of an ADR that is useful in six months.
+What is given up, stated plainly, because this is the half worth reading later.
+
+- **The site stops being the thing that is served.** Today the file edited is the
+  file GitHub Pages ships, and view-source matches the repo. After this, a build
+  sits between them, and every debugging session gains a layer: "is this wrong in my
+  source, or in what the build emitted?" This is the single real loss and no part of
+  the decision cancels it. The mitigation is that the acceptance bar below is a diff
+  of the *output*, so the first thing the migration proves is that the layer is
+  faithful.
+- **A zero-dependency site acquires a dependency treadmill.** The site itself
+  currently has no runtime or build dependencies at all — Playwright is dev-only,
+  under `scripts/`. Astro brings Astro, Vite, and a Node floor, which means majors,
+  deprecations, and a site that can fail to build for reasons that have nothing to
+  do with the site. A hand-written page still builds in five years by doing nothing.
+- **`CLAUDE.md`'s stated no-build property is reversed.** It was deliberate and it
+  is being given up knowingly, which is why this reversal got an ADR rather than a
+  commit message. The property it was protecting — static output, zero JS by
+  default — survives; the mechanism does not.
+- **The QA gates get harder to reason about, in exchange for being harder to fool.**
+  Four of them stop reading the repo and start reading a build artifact, which
+  introduces the failure mode where a gate passes because it found nothing. The
+  required zero-page guard is a net gain in rigour, but it is new machinery that did
+  not need to exist before.
+- **`assets/style.css` is at risk from tooling defaults, and is protected by
+  saying so.** Astro's idiom is per-component scoped styles, and following it would
+  scatter 1,296 lines of deliberately commented CSS across a dozen files. The
+  migration keeps the stylesheet whole and global. If it is ever split, that is its
+  own decision with its own record — not a side effect of adopting a framework.
+- **This is a fourth front, opened on purpose.** It competes with the netops-lab
+  pillar for the same hours. The 2026-07-19 direction is satisfied rather than
+  ignored (the spine shipped), but the honest accounting is that a session spent
+  here is a session not spent on the lab.
+- **A migration is the classic host for scope creep**, and the plan below is written
+  to make that structurally hard rather than to warn against it: content changes,
+  design changes, Markdown conversion, stylesheet splitting and search are each
+  named as out of scope, because every one of them would destroy the output-diff
+  acceptance bar that makes a 13-page port verifiable at all.
+
+## Migration plan
+
+Not executed. This is the contract the migration session follows, in the same
+before-the-diff spirit as [`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md).
+
+**Phase 0 — spike one page, throw it away.** Take the simplest non-trivial interior
+page (`projects/faithfulness-judge.html`, 239 lines) through Astro end to end and
+diff its normalized output against today's. If Astro's emitted markup cannot be made
+semantically identical, that is known on day one instead of after twelve ports. This
+phase is allowed to fail and end the migration.
+
+**Phase 1 — scaffold, zero pages.** Minimal Astro template. `public/` receives
+`assets/`, `data/`, `resume.html`, `robots.txt`, `CNAME`, the favicons and the
+IndexNow key, **verbatim and unedited**. `astro.config.mjs` sets
+`site: 'https://sanlee.me'` and adds `@astrojs/sitemap`. Nothing in `src/pages/`
+yet: the build must emit a `dist/` that is exactly today's static assets, proving
+the passthrough before any templating exists.
+
+**Phase 2 — two layouts, and nothing else.** `Base.astro` owns head, theme
+bootstrap, analytics, theme toggle, the `.doors` nav and the trailing scripts;
+props are `title`, `description`, `canonical`, `ogType`, `navCurrent`.
+`Article.astro` wraps it and adds `.article-body`, the back link, and the ToC
+derived from headings. The nav becomes one array in one file. Asset paths become
+absolute here — see *Verified at decision time*.
+
+**Phase 3 — port 12 pages, bodies verbatim.** HTML stays HTML. Every `data-metric`
+span, every inline SVG, every `<details>` is moved unchanged; the only edits are
+removing the shell that the layout now supplies. `resume.html` does not move to
+`src/` — it stays a file in `public/`. `sitemap.xml` becomes generated; `404.html`
+becomes a page.
+
+**Phase 4 — the gates, which is the risky half.** Each of the five scripts takes a
+root override defaulting to `process.cwd()`. Each walking gate gains a zero-page
+assertion. `mobile-qa.cjs` serves `dist/` over HTTP instead of `file://`.
+`resume-pdf.cjs` keeps `file://`, repointed at `dist/resume.html`. `qa.yml` builds
+before it checks; `deploy-pages.yml` uploads `dist` instead of `.`.
+
+**Phase 5 — acceptance, and it is falsifiable.** The migration is done when the
+normalized rendered output of every page matches its pre-migration counterpart —
+whitespace and attribute order normalized, anything else a regression to explain or
+fix — **and** all seven gates are green **and** one interior page is screenshotted
+at 390px per [`ADR-001`](ADR-001-mobile-qa-gate.md). Capture the pre-migration HTML
+at the start of Phase 0, before anything moves; after Phase 3 the comparison target
+no longer exists.
+
+**Out of scope, and folding any of them in breaks Phase 5:** design changes,
+content changes, Markdown conversion, splitting `assets/style.css`, and Pagefind
+search. Each is its own decision.
 
 ## Alternatives Considered
 
@@ -175,3 +362,12 @@ evidence, not with fresh enthusiasm.*
 | **Next.js / React** | The option that feels most like progress and delivers least here. The site already does progressive disclosure with `<details>` (nine on the homepage alone); this adds a build, a hydration cost and a dependency tree to reimplement it. The site's own commissioned design review explicitly warned against React-for-presentation, and `CLAUDE.md` treats zero-JS-by-default as a property |
 | **Do nothing and treat the complaint as a content problem only** | Half right, and it is the half this stub agrees with — the density fix *is* IA work. Rejected as a complete answer because it ignores the substrate's shaping effect: 12 of 13 pages went without navigation for months specifically because the fix was N hand edits |
 | **Migrate now, inside the design-review session** | Rejected on scope discipline. Folding a fourth front into a session about a design review is how scope creep launders itself as consent. The decision gets its own scoped session, which is what this record exists to enable |
+
+### Weighed in the deciding session, 2026-07-26
+
+| Option | Reason Not Chosen |
+|--------|-------------------|
+| **Stay hand-written; close the question** | The genuine competitor, and its appeal is real: zero dependencies, view-source matches source, and a site that still builds untouched in five years. Rejected because the cost is not hypothetical — three defects have already shipped from hand-copied chrome (no nav on 12 of 13 pages, `resume.html`'s phantom font, #142's hand-synced ToC), and the substrate keeps producing them faster than they get found |
+| **Formalize the shell generator instead** — promote #141's throwaway script into a committed `scripts/render-shell.cjs` owning head, nav, footer and ToC | Genuinely tempting: it kills the N-edit problem while keeping zero dependencies and view-source fidelity. Rejected because it is a build step wearing a disguise — the emitted HTML would still not be the authored HTML — and it buys that at the price of a bespoke templating engine with one maintainer, no ecosystem, and no answer for the next need after this one. If a build step is being accepted either way, accept the one other people maintain |
+| **Migrate, but sequence it behind the netops-lab pillar** | The disciplined-sounding option, rejected on arithmetic. The port's cost scales with page count, page-adding is confirmed ongoing, and every shared-chrome edit in the interim is work that gets ported or discarded — #141 and #142 already are. Deferring makes the same migration strictly more expensive to buy a delay with no expiry date attached |
+| **Convert content to Markdown in the same pass** | Rejected as the specific move that turns a verifiable port into an unverifiable rewrite. The pages carry hand-tuned inline SVG, `data-metric` spans that a CI gate asserts against, and nine `<details>` blocks on the homepage alone; round-tripping those through Markdown would break the output-diff acceptance bar, which is the only thing making a 13-page migration checkable. Available as a follow-on decision once the port is proven |

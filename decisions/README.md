@@ -10,7 +10,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
 | [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Accepted |
 | [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad — **on-demand via `@claude` only** since 2026-07-26 (Amendment 7) | Accepted |
-| [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? | **Proposed — open** |
+| [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? — **migrate to Astro**; planned, not executed | Accepted |
 
 ## Why this tier was missing
 
@@ -43,16 +43,29 @@ Nothing is deleted from `CLAUDE.md` by adding a record here.
 
 ## Still to record
 
-**One open question: [`ADR-006`](ADR-006-hand-written-html-or-a-generator.md).** It is a
-deliberate **stub** — status *Proposed*, with *Decision* and *Consequences* left empty. It
-holds the evidence from the 2026-07-26 front-end review (12,150 words across 8 measured
-pages, ~55 minutes to read; 13 hand-duplicated page shells; the migration checklist of
-seven CI gates, the `data-metric` spans, and `resume.html`'s standalone-for-PDF
-constraint) so that a scoped session can decide without re-deriving any of it. The record
-exists *before* the decision on the same reasoning [`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md)
-was written before its migration: the question turns on reversing a stated property
-(`CLAUDE.md`'s "no build step") and on whether a generator undercuts ADR-004's
-learning-vehicle premise, and a reversal deserves a reviewable record rather than a diff.
+**Nothing open.** [`ADR-006`](ADR-006-hand-written-html-or-a-generator.md) closed the same
+day it was opened, and the stub-then-decide split did exactly what it was built for: the
+deciding session spent its time on the crux instead of re-deriving 12,150 words of
+measurements, and the record shows which half came from where.
+
+The verdict is **migrate to Astro**, as a lift-and-shift with an output-diff acceptance
+bar. The crux the stub insisted be answered first — whether a generator undercuts
+[`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md)'s learning-vehicle premise — turned
+out to be answerable from evidence rather than taste: the surviving learning log is seven
+notes, all of them CSS, browser-API, SVG or DNS, and Astro subtracts none of them. What it
+subtracts is transcribing a 38-line `<head>` a thirteenth time.
+
+Two things about how the decision was argued are worth keeping. **The density complaint was
+deliberately excluded from the case for migrating**, even though it is what opened the
+question — no option removes a word, and the "expensive pages cause monoliths" chain is
+unproven and contradicted by two pages that landed fine. And **the strongest opposing
+option was the home-grown one**: formalizing #141's throwaway shell script keeps zero
+dependencies and view-source fidelity, and it was rejected only on the grounds that it is a
+build step in disguise, bought at the price of a templating engine with one maintainer.
+
+**Migration is planned, not executed** — no file has moved, and `CLAUDE.md` still says "no
+build step" on purpose, because that is still true. It changes in the migration PR, in the
+same commit that makes it false.
 
 The earlier decisions — the AI-use
 posture and the private-repo boundary — were recorded on 2026-07-18 as
