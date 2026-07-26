@@ -70,12 +70,25 @@
       Without a cheap way back, every failed run is a manual rebuild, and
       experiments that are expensive to repeat stop getting repeated.
     </p>
+
+    <nav class="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#the-result">The result</a></li>
+      <li><a href="#the-finding-the-barriers-were-on-the-host-not">The finding: the barriers were on the host, not the device</a></li>
+      <li><a href="#three-back-doors-one-shape">Three back doors, one shape</a></li>
+      <li><a href="#a-deferred-item-that-turned-out-not-to-be">A deferred item that turned out not to be deferrable</a></li>
+      <li><a href="#what-this-does-not-establish">What this does not establish</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#what-it-demonstrates">What it demonstrates</a></li>
+      </ol>
+    </nav>
     <p>
       It works. It also produced a finding I did not expect, and would not have
       found by reading about it.
     </p>
 
-    <h2>The result</h2>
+    <h2 id="the-result">The result</h2>
     <p>
       One command on the Pi, then pull the router&rsquo;s power and plug it back
       in. About ninety seconds later the router has a fresh OS, a management
@@ -92,7 +105,7 @@
       sysroot to assemble, which is normally the expensive part of that trick.
     </p>
 
-    <h2>The finding: the barriers were on the host, not the device</h2>
+    <h2 id="the-finding-the-barriers-were-on-the-host-not">The finding: the barriers were on the host, not the device</h2>
     <p>
       I expected the router to be the obstacle. Embedded network gear is where
       you expect the hostile surprises: locked-down defaults, firmware quirks,
@@ -141,7 +154,7 @@
       ambushed every later piece of automation in this lab.
     </p>
 
-    <h2>Three back doors, one shape</h2>
+    <h2 id="three-back-doors-one-shape">Three back doors, one shape</h2>
     <p>
       The eventual experiment asks whether an agent working on a live router can
       avoid locking itself out. That question is only meaningful if being locked
@@ -181,7 +194,7 @@
       ask of every new surface this configuration grows.
     </p>
 
-    <h2>A deferred item that turned out not to be deferrable</h2>
+    <h2 id="a-deferred-item-that-turned-out-not-to-be">A deferred item that turned out not to be deferrable</h2>
     <p>
       RouterOS has a feature called device-mode that gates whole categories of
       functionality, and changing it requires physical confirmation &mdash; a
@@ -212,7 +225,7 @@
       would have gone if the flag had reset.
     </p>
 
-    <h2>What this does not establish</h2>
+    <h2 id="what-this-does-not-establish">What this does not establish</h2>
     <p>
       Stating this up front rather than at the bottom, because a working demo is
       only useful if you say where it stops.
@@ -244,7 +257,7 @@
         apparatus for it. Apparatus that works is not a result.</li>
     </ul>
 
-    <h2>Stack</h2>
+    <h2 id="stack">Stack</h2>
     <p>
       MikroTik hEX (RouterOS 7, ARM), Raspberry Pi 5 running Raspberry Pi OS
       from NVMe, MikroTik Netinstall under <code>qemu-user-static</code>, BOOTP
@@ -264,7 +277,7 @@
       thing that is only cheap the second time.
     </p>
 
-    <h2>What it demonstrates</h2>
+    <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       Building the recovery mechanism before the experiment that needs it, and
       being willing to test an assumption rather than design around it. The

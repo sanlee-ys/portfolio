@@ -71,7 +71,22 @@
       went with what it showed instead of my own instinct.
     </p>
 
-    <h2>What the eval caught</h2>
+    <nav class="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#what-the-eval-caught">What the eval caught</a></li>
+      <li><a href="#why-the-numbers-can-be-trusted">Why the numbers can be trusted</a></li>
+      <li><a href="#why-an-llm-at-all">Why an LLM at all</a></li>
+      <li><a href="#two-ways-of-not-fooling-myself">Two ways of not fooling myself</a></li>
+      <li><a href="#the-third-axis">The third axis</a></li>
+      <li><a href="#the-decisions">The decisions</a></li>
+      <li><a href="#autonomy-ladder">The ladder it’s climbing</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#what-it-demonstrates">What it demonstrates</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="what-the-eval-caught">What the eval caught</h2>
     <p>
       Two moments show why the eval mattered at all.
     </p>
@@ -119,7 +134,7 @@
         changing exactly one of them.</p>
     </div>
 
-    <h2>Why the numbers can be trusted</h2>
+    <h2 id="why-the-numbers-can-be-trusted">Why the numbers can be trusted</h2>
     <p>
       The eval has been rebuilt more than once, and the gaps between the versions
       are the honest part. v1 graded the model on 300 snippets it generated itself. Those numbers
@@ -179,7 +194,7 @@
         ceiling&rsquo;s clothes. Note what it wasn&rsquo;t: a bigger model.</p>
     </div>
 
-    <h2>Why an LLM at all</h2>
+    <h2 id="why-an-llm-at-all">Why an LLM at all</h2>
     <p>
       Everything above measures something layered <em>on top of</em> a language
       model: a sharper prompt, retrieval, a bigger model for the hard rows. None
@@ -262,7 +277,7 @@
         the caveats still get stated.</p>
     </div>
 
-    <h2>Two ways of not fooling myself</h2>
+    <h2 id="two-ways-of-not-fooling-myself">Two ways of not fooling myself</h2>
     <p>
       Fifty-four hand-labeled snippets is a small set, and a small set has a wide
       error bar. Two follow-ups exist to keep that honest.
@@ -358,7 +373,7 @@
         three independent measurements now say escalation barely pays.</p>
     </div>
 
-    <h2>The third axis</h2>
+    <h2 id="the-third-axis">The third axis</h2>
     <p>
       v3 added <code>region</code>, which breaks the output contract on purpose:
       callers that expected two fields now get three. Six labels, with
@@ -391,7 +406,7 @@
       earned, not assumed.
     </p>
 
-    <h2>The decisions</h2>
+    <h2 id="the-decisions">The decisions</h2>
 
     <div class="decision">
       <p class="tag">Decision &middot; ADR-002</p>
@@ -600,7 +615,7 @@
       &ldquo;no.&rdquo;
     </p>
 
-    <h2>Stack</h2>
+    <h2 id="stack">Stack</h2>
     <p>
       Python, the Anthropic SDK (Sonnet 5 for classification, Opus as the grading
       judge), pandas for the eval tables, FastAPI for the HTTP endpoint, and
@@ -613,7 +628,7 @@
       experiments that were measured and cut.
     </p>
 
-    <h2>What it demonstrates</h2>
+    <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       The dataset is small and the scale is personal. The transferable part is the
       method: evals work like unit tests for an LLM system &mdash; you find out

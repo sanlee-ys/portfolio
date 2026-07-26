@@ -68,6 +68,20 @@
       them fuse into one tangled codebase, or impose discipline on the seams
       between them. I chose discipline and recorded why at each step.
     </p>
+
+    <nav class="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#what-it-grew-into">What it grew into</a></li>
+      <li><a href="#the-map">The map</a></li>
+      <li><a href="#how-it-flows">How it flows</a></li>
+      <li><a href="#example-run">Example run</a></li>
+      <li><a href="#the-problem">The problem</a></li>
+      <li><a href="#the-decisions">The decisions</a></li>
+      <li><a href="#the-outcome">The outcome</a></li>
+      <li><a href="#where-it-goes-next">Where it goes next</a></li>
+      </ol>
+    </nav>
     <p>
       This is more process than a one-person project strictly needs. I know
       &mdash; I built it that way on purpose, as practice for the seam-level
@@ -76,7 +90,7 @@
       every decision.
     </p>
 
-    <h2>What it grew into</h2>
+    <h2 id="what-it-grew-into">What it grew into</h2>
     <ul class="repo-grid">
       <li><strong><a href="https://github.com/sanlee-ys/notes-api">notes-api</a></strong><span>FastAPI REST service. The knowledge base and data layer.</span></li>
       <li><strong><a href="https://github.com/sanlee-ys/defense-news-classifier">defense-news-classifier</a></strong><span>LLM classifier with a real eval harness. Labels the content.</span></li>
@@ -85,7 +99,7 @@
     </ul>
     <p class="ex-caption">All four repos are public &mdash; the ADRs and contract tests referenced below are checkable, not narrated.</p>
 
-    <h2>The map</h2>
+    <h2 id="the-map">The map</h2>
     <p>Click a box to see what each part does. The same flow is written out in words further down, so this is an enhancement, not a requirement.</p>
     <figure class="diagram-wrap">
       <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="group" aria-label="Interactive map of the system: notes-api, classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop.">
@@ -100,7 +114,7 @@
       <figcaption class="diagram-detail" id="diagram-detail" aria-live="polite" aria-atomic="true">Click a box above to see what each part does.</figcaption>
     </figure>
 
-    <h2>How it flows</h2>
+    <h2 id="how-it-flows">How it flows</h2>
     <ol class="flow">
       <li>A note is created in <strong>notes-api</strong> (<code>POST /notes</code>), which enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately; the task runs after the response is sent.</li>
       <li>The <strong>background task</strong> POSTs the note text to the classifier's <code>/classify</code> endpoint.</li>
@@ -109,7 +123,7 @@
       <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
     </ol>
 
-    <h2>Example run</h2>
+    <h2 id="example-run">Example run</h2>
     <p>
       "How it flows" in words is one thing. Here is the same loop carrying real
       data. Every request and response field below is the actual schema from the
@@ -230,7 +244,7 @@
       </li>
     </ol>
 
-    <h2>The problem</h2>
+    <h2 id="the-problem">The problem</h2>
     <p>
       Once it was four repos, the easy path was to fuse them so they could call
       each other directly. That buys convenience and pays for it with independence:
@@ -240,7 +254,7 @@
       lives.
     </p>
 
-    <h2>The decisions</h2>
+    <h2 id="the-decisions">The decisions</h2>
 
     <div class="decision" id="decision-contracts">
       <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
@@ -320,7 +334,7 @@
         re-argued.</p>
     </div>
 
-    <h2>The outcome</h2>
+    <h2 id="the-outcome">The outcome</h2>
     <ul>
       <li><strong>Create a note and it is automatically classified and tagged</strong>, asynchronously, with no coupling between note creation and classifier availability.</li>
       <li><strong>The four repos stay independently deployable</strong> &mdash; though cross-repo drift is <em>not</em> yet caught by a red build. I thought it was; an audit proved otherwise, and closing that gap needs one shared contract artifact both sides assert against.</li>
@@ -334,7 +348,7 @@
       guessing. The ADRs and contract tests back this up.
     </p>
 
-    <h2>Where it goes next</h2>
+    <h2 id="where-it-goes-next">Where it goes next</h2>
     <p>
       This page is the horizontal view: four repos and the contracts on the
       seams between them. The roadmap is vertical &mdash; an autonomy ladder
