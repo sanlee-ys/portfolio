@@ -10,6 +10,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
 | [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Accepted |
 | [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad — **on-demand via `@claude` only** since 2026-07-26 (Amendment 7) | Accepted |
+| [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? | **Proposed — open** |
 
 ## Why this tier was missing
 
@@ -42,7 +43,18 @@ Nothing is deleted from `CLAUDE.md` by adding a record here.
 
 ## Still to record
 
-Nothing pending. The two decisions listed here when this tier was created — the AI-use
+**One open question: [`ADR-006`](ADR-006-hand-written-html-or-a-generator.md).** It is a
+deliberate **stub** — status *Proposed*, with *Decision* and *Consequences* left empty. It
+holds the evidence from the 2026-07-26 front-end review (12,150 words across 8 measured
+pages, ~55 minutes to read; 13 hand-duplicated page shells; the migration checklist of
+seven CI gates, the `data-metric` spans, and `resume.html`'s standalone-for-PDF
+constraint) so that a scoped session can decide without re-deriving any of it. The record
+exists *before* the decision on the same reasoning [`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md)
+was written before its migration: the question turns on reversing a stated property
+(`CLAUDE.md`'s "no build step") and on whether a generator undercuts ADR-004's
+learning-vehicle premise, and a reversal deserves a reviewable record rather than a diff.
+
+The earlier decisions — the AI-use
 posture and the private-repo boundary — were recorded on 2026-07-18 as
 [`ADR-002`](ADR-002-ai-use-posture.md) and [`ADR-003`](ADR-003-private-repo-boundary.md). Per
 the split above, both remain in `CLAUDE.md` as operative instruction; the ADRs carry the why.
