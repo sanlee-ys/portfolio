@@ -110,6 +110,23 @@ cross-repo write-up in the `architecture` repo.
 *Reasoning: [`decisions/ADR-005`](decisions/ADR-005-review-check-signal.md). This
 section is the operative rule.*
 
+**It runs only when you ask.** Since 2026-07-26 (ADR-005 Amendment 7) there is no
+automatic review: opening a PR fires nothing. Comment `@claude` on the PR to get
+one. Only the repo owner can trigger it — on a public repo that guard is the only
+thing between a stranger's comment and this repo's API key.
+
+Two consequences worth holding on to:
+
+- **No check appears unless you asked for one.** A PR with no `Claude Review` check
+  has not been reviewed and is not failing — the lane simply never fired. Do not
+  read its absence as a pass.
+- **The review reads `main`, not your PR's tree.** A comment-triggered run checks
+  out the default branch, so the agent sees your change through `gh pr diff` only.
+  It can still read the repo for context; it cannot open a file you changed and see
+  your version of it. Reviews of self-contained diffs are unaffected; a change whose
+  meaning lives in the surrounding file is worth describing in the comment you
+  trigger it with.
+
 The `Claude Review` check reports **tooling health, not a verdict**. The verdict
 is whatever the review posted as a PR comment.
 

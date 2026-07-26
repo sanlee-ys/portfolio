@@ -9,7 +9,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-002](ADR-002-ai-use-posture.md) | State the AI assist as method, not confession | Accepted |
 | [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
 | [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Accepted |
-| [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad | Accepted |
+| [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad — **on-demand via `@claude` only** since 2026-07-26 (Amendment 7) | Accepted |
 
 ## Why this tier was missing
 
@@ -159,6 +159,19 @@ at the whole-program level, so a single malformed element discarded the commands
 where those commands are the only thing to act on. The guard is now per-field. The
 defect is minor and was never observed in production; the five amendments that shipped
 with no way to find one are the finding.
+
+A seventh amendment (2026-07-26) ended the automated pass. `ADR-005`'s *Alternatives*
+table had rejected "drop the automated review, keep only `@claude`" on an explicit
+condition — *"it deserved one attempt at working before being judged"* — and six
+amendments were that attempt. The lane now works and therefore costs money on every PR,
+so the trigger is gone and the review fires only when asked. Two follow-on effects were
+handled rather than noted: the `mention` job was **folded into** the review job instead
+of left as the survivor (deleting the unreachable review job would have taken the review
+prompt and all of this classify machinery with it, downgrading `@claude` exactly as it
+became the only path), and Amendment 3's verdict probe — which assumed "the review runs
+once, on open" — now filters comments by a timestamp taken before the run, so a
+re-review that gets silenced still reddens. The classify suite's fourteen fixtures pass
+unchanged, which is Amendment 6's investment paying off on the first change after it.
 
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec

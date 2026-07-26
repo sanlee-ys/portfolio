@@ -14,7 +14,10 @@ a detached merge-ref checkout broke the prompt's own first command, and the agen
 *asked a human for approval* and waited (2026-07-25, *Amendment 5*); Amendment 5's
 reproduce-it lesson carried to the classify step, which was never the part that could
 not test itself, immediately finding a whole-program guard that discarded every
-denied command whenever one element was malformed (2026-07-25, *Amendment 6*)
+denied command whenever one element was malformed (2026-07-25, *Amendment 6*); the
+automated pass dropped and the two jobs folded into one, leaving the lane on-demand
+via `@claude` only — this record's own rejected alternative, chosen once the
+condition it was rejected on had been met (2026-07-26, *Amendment 7*)
 **Date:** 2026-07-23
 **Deciders:** San Lee
 
@@ -876,3 +879,129 @@ including all of Amendment 5 — its prompt changes, its PR-number interpolation
 its untouched `--allowedTools` are not revisited here. This changes no behaviour
 anyone was relying on; it changes what happens when the SDK hands the step something
 it did not expect, and it changes how the next change here gets verified.
+
+---
+
+## Amendment 7 — 2026-07-26: the rejected alternative, chosen on the condition it was rejected on
+
+This record's *Alternatives Considered* table contains this option:
+
+> **Drop the automated review; keep only `@claude` on demand** — *Defensible, and it was the
+> real status quo — an on-demand flow that worked plus an automated one that did not. Rejected
+> because the automated pass is the one that catches what you did not think to ask about, which
+> is the entire value of a review-on-open. **It deserved one attempt at working before being
+> judged.***
+
+That attempt has now happened. It took six amendments — a tool grant, a turn ceiling sized
+from measurement, a denial counter that could count, a calibration so a survived denial does
+not redden, denied *calls* named instead of the string `Bash`, and a prompt fix for a detached
+merge ref that was making the agent ask an absent human for approval. Since #104 and #111 the
+automated review has posted real verdicts on real PRs. **The rejection condition is satisfied,
+and the option is now taken.**
+
+**The decision.** The `pull_request: [opened]` trigger is removed. The lane fires only on an
+owner `@claude` comment. The driver is cost: this is one of three repos running the pattern
+(`defense-news-classifier` ADR-016, `kb-agent` ADR-008), all three changed together, and the
+recurring per-PR charge stopped being worth paying on autopilot.
+
+**The uncomfortable part, said directly.** This lane got *more* expensive precisely because
+the amendments worked. #101 cost $0.55 to review nothing. A run that reads the diff, opens the
+files, and posts findings costs more than that and buys something. So the bill is not evidence
+the work was wasted — it is the receipt for it. What changed is not the value per review; it
+is that paying for one on **every** PR, unprompted, is a different purchase from paying for
+one when a review is actually wanted. Decision 2's colour model, the grant, the ceiling, the
+classify step and its fourteen fixtures are all untouched and all still earn their keep on the
+runs that do happen.
+
+### The two jobs are now one
+
+Dropping the trigger made the `review` job unreachable — its `if` required
+`github.event_name == 'pull_request'`. Deleting it was the obvious move and it was wrong: it
+would have taken the review prompt, the tool grant, and six amendments of classify-step
+machinery with it, leaving `@claude` served by the tag-mode `mention` job, which has no review
+prompt and no exit-code classification. **That would have downgraded the on-demand review at
+the exact moment it became the only review** — the same shape as Amendment 1's finding, where
+the `@claude` path was made the documented remediation while still carrying a budget sized for
+chat. This record has made that mistake once; it is not making it twice.
+
+So the `review` job now fires on the comment events, and the `mention` job is gone. This also
+converges portfolio onto the shape the two sibling repos have always had: one agent-mode job
+across every trigger. `github.event.pull_request.number || github.event.issue.number` supplies
+the PR number on both event types, which is the pattern those repos already use.
+
+### Two things this genuinely degrades, neither hidden
+
+**1. The checked-out tree is `main`, not the PR.** On a `pull_request` event the default
+checkout is the merge ref, so the tree was the PR merged into base. On a comment event
+`github.ref` is the default branch, so it is plain `main` and contains none of the PR's
+changes. `gh pr diff` was already authoritative for what changed — Amendment 5 made the prompt
+lead with it — so the review still works, but `Read`/`Grep`/`Glob` are now context tools
+(conventions, `CLAUDE.md`, unchanged neighbours) rather than a way to see the change. Reading a
+*changed* file shows its pre-PR content, and the prompt now says so in those words, because
+Amendment 2 exists specifically because the review could not read files and #108's inline-SVG
+diff was unreviewable without it.
+
+Checking out `refs/pull/N/merge` would restore the old tree and is the documented follow-up if
+review depth visibly suffers. Not done here: that ref can be absent on closed or long-merged
+PRs, and trading a silent narrowing for a loud checkout failure is the wrong direction on a
+change whose entire purpose is to stop this lane costing money unattended.
+
+**2. Amendment 3's verdict probe rested on a premise this breaks — and it is repaired, not
+noted.** That amendment reads "did `claude` author a comment on this PR" to separate a denial
+the review survived from one that silenced it, and it could assume the answer meant *this* run
+because "the review runs once, on open." A re-runnable lane makes that false: a second
+`@claude` on an already-reviewed PR would find the **first** run's verdict and read a silenced
+re-review as a successful one, switching off redden-on-silence exactly when it is needed. A
+step now stamps a UTC timestamp before the review and the probe filters
+`createdAt > env.SINCE`. Still one `gh ... --jq` call — jq reads `env.SINCE` directly, so no
+`--arg` and no second process, and the shape `scripts/classify-review-outcome.test.cjs` stubs
+is unchanged. All fourteen fixtures pass.
+
+That test suite is why this amendment can claim the classify step still works rather than hope
+so, which is Amendment 6's whole point arriving on schedule: the review self-skips on this PR
+for the eighth time, but the step that reports it is exercised across fourteen paths by this
+PR's own `qa` run.
+
+### What is given up, and what is not
+
+The unprompted pass is the one that catches what you did not think to ask about. On-demand
+review requires **remembering**, and the PRs you forget to ask about correlate with the ones
+you were least likely to scrutinise yourself. That cost is accepted, not solved, and it is the
+same cost this table named when it rejected the option — the difference is that the option is
+now being weighed against a *working* automated pass with a real price tag rather than a broken
+one with a hypothetical benefit.
+
+Not given up: the `qa` job's deterministic gates (links, mobile overflow, private-repo names,
+published metrics, and the classify-step suite) run on every PR and are unaffected. They were
+always the enforcing layer; ADR-005's opening claim is that the Claude review is advisory, and
+an advisory check that runs when asked is still advisory.
+
+**Security note.** `author_association == 'OWNER'` was one guard among several on a mixed
+trigger surface. It is now the **only** thing between a stranger's `@claude` comment and this
+repo's API key, because comment events run in the base repo's context with secrets regardless
+of who commented. It is unchanged in form and load-bearing in fact. The same-repo fork gate is
+unreachable rather than unnecessary, and is recorded in the workflow so it is not dropped by
+reflex if an automatic pass ever returns.
+
+**Downstream surfaces for this amendment:**
+- `.github/workflows/claude-review.yml` — `on:` loses `pull_request`; the `mention` job is
+  **deleted** and the `review` job's `if` becomes the two OWNER-gated `@claude` comment
+  clauses; the prompt's PR-number interpolation gains the `|| issue.number` fallback and its
+  merge-ref paragraph is rewritten to describe the `main` tree; a `Record the pre-review
+  timestamp` step is added and the classify step's verdict probe filters on it.
+  `--allowedTools`, `--max-turns 40`, the model pin, the concurrency rule and every
+  classification branch are **unchanged**.
+- `scripts/classify-review-outcome.test.cjs` — **unchanged**, and that is the claim being made:
+  the `gh` stub answers `pr view --json ... --jq` with a count and ignores the jq program, so
+  the tightened filter is transparent to it. All 14 fixtures pass against the edited step.
+- `CLAUDE.md`'s "Reading the Claude Review check" — the section now opens with *how the review
+  is triggered*, since that is the first thing a reader needs and it is no longer
+  "automatically." The colour meanings are unchanged.
+- `decisions/README.md` — the ADR-005 narrative gains this amendment.
+- **The self-skip note still holds for the review and still does not hold for the classify
+  step** (Amendment 6's narrowing). Verify by commenting `@claude` on a PR after this merges,
+  judged by a posted verdict comment.
+
+**Unchanged by Amendment 7:** every decision and every prior amendment stands. This changes
+*when* the review runs and *which job* serves `@claude`; it changes nothing about what a colour
+means, what the agent is granted, or what the classify step reports.
