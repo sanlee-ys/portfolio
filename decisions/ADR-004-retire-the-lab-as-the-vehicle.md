@@ -292,3 +292,26 @@ viewBox that rendered at 232px inside the `.decision` box and dropped the axis t
 to ~10px; the viewBox was resized to 232 so it renders 1:1 on a phone.
 
 **All three named candidates have now landed.** Nothing from this record is open.
+
+## Amendment (2026-07-26): the learning vehicle gains a layer
+
+[`ADR-006`](ADR-006-hand-written-html-or-a-generator.md) decided to migrate the site
+to Astro, and its own *Downstream surfaces* required that this record be checked
+rather than left to quietly go stale — because this is where "the portfolio is a
+front-end learning vehicle" is written down, and a generator could plausibly have
+falsified it.
+
+It does not. The test applied was narrow: does a generator remove learning surface?
+The log this record moved to `colophon.html` is seven notes — `IntersectionObserver`,
+keyframes and stacking, Flexbox vs Grid, `clamp()` and container queries,
+scroll-driven storytelling, data-driven SVG, and DNS — and Astro subtracts none of
+them. The stylesheet stays whole and global, the inline SVGs stay hand-authored,
+zero-JS-by-default survives.
+
+What changes is the *Consequences* line above warning that front-end learning "loses
+its explicit container and must be defended elsewhere, or it quietly stops." That
+risk is unchanged in kind, but the layer being learned widens: layouts, props and a
+build join the list. Recorded here rather than in ADR-006 alone, so the next reader
+of this record does not have to infer that the premise was rechecked.
+
+Nothing else in this record changes, and no candidate reopens.
