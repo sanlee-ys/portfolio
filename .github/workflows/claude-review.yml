@@ -1,25 +1,27 @@
 name: Claude Review
 
-# AI code-review pilot built on anthropics/claude-code-action@v1.
+# AI code review built on anthropics/claude-code-action@v1.
 #
-# INERT until two human steps are done (see the PR body for exact commands):
-#   1. Install the Claude GitHub App on this repo.
-#   2. Add the ANTHROPIC_API_KEY repository secret.
-# Until both exist the review job fails auth and the mention flow no-ops.
-# Nothing in this file contains or exposes a key.
+# INERT without two pieces of human setup:
+#   1. The Claude GitHub App installed on this repo.
+#   2. The ANTHROPIC_API_KEY repository secret.
+# Until both exist the review job fails auth. Nothing in this file contains or
+# exposes a key.
 
+# ON DEMAND ONLY, as of 2026-07-26 (ADR-005 Amendment 7). There is no automatic
+# trigger: the review fires when San comments `@claude` on a PR, and at no other
+# time. It costs nothing when idle.
+#
+# The progression is worth keeping because each step was taken on evidence.
+# `synchronize` was rejected on a logged cost incident (an uncapped fan-out, one
+# run per push). `pull_request: [opened]` replaced it as the compromise — one
+# automatic pass per PR — and that is what has now been dropped. It was not the
+# wrong design: it only started costing real money once Amendments 1–6 made the
+# review actually work, so the bill was the evidence that the fix had landed.
 on:
-  # Automated review fires ONCE per PR, on open only.
-  #
-  # Deliberately NOT `synchronize`: a logged cost incident showed an uncapped
-  # fan-out (one run per push) burning API spend. Re-review on demand by
-  # commenting `@claude` on the PR instead of re-running on every push.
-  pull_request:
-    types: [opened]
-
-  # @claude mention flow — the interactive mode the action auto-detects
-  # (docs: "automatically detects whether to run in interactive mode ...
-  # based on your configuration"). Documented trigger set for mentions.
+  # The only triggers. Both are comment events, which is what makes `@claude`
+  # fire at all — the action's trigger phrase only matches once an event
+  # delivers the comment.
   issue_comment:
     types: [created]
   pull_request_review_comment:
@@ -62,10 +64,14 @@ permissions:
 # bot's own progress comment killed the run that posted it, ~16s in, every
 # time -- observed on #82 (run 29649688617 cancelled by 29649695453).
 #
-# The `OWNER` gate below already makes those bot-triggered runs skip both jobs,
+# The `OWNER` gate below already makes those bot-triggered runs skip the job,
 # but a run whose jobs all skip STILL cancels the in-flight run in its group.
 # Queueing instead of cancelling costs a few seconds of runner time for the
 # no-op run and nothing in API spend.
+#
+# This got MORE load-bearing on 2026-07-26, not less: `issue_comment` used to be
+# one trigger of three and is now one of two, both comment events. Every run this
+# workflow does is one whose own progress comment re-enters this group.
 #
 # Tradeoff: a genuine burst of `@claude` comments now serializes rather than
 # the newest superseding the older ones. Bounded by the OWNER gate.
@@ -74,27 +80,77 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # --- Automated review when a PR is opened -------------------------------
-  # PUBLIC-REPO SECURITY: gated to SAME-REPO PRs. This uses `pull_request`
-  # (never `pull_request_target`), so GitHub already withholds secrets from
-  # fork PRs — but the gate also stops the job from running (and failing on a
-  # missing key) against untrusted fork code, and keeps review on trusted
-  # branches only.
+  # --- On-demand review, triggered by an owner `@claude` comment -----------
+  #
+  # ONE job as of 2026-07-26, down from two. This was the `review` job (agent
+  # mode: an explicit review `prompt`, the tuned tool grant, and the classify
+  # step that owns the exit code). The separate tag-mode `mention` job it used to
+  # sit beside is GONE, folded into this one — see ADR-005 Amendment 7.
+  #
+  # Why fold rather than delete: dropping the `pull_request` trigger made this
+  # job unreachable, and deleting it would have taken the review prompt and six
+  # amendments of classify-step machinery with it, leaving `@claude` answering
+  # from the conversational tag-mode path. That would have quietly downgraded
+  # the on-demand review at the exact moment it became the ONLY review. This
+  # shape also matches defense-news-classifier and kb-agent, which have always
+  # run one agent-mode job across both event types.
+  #
+  # PUBLIC-REPO SECURITY: comment events FAIL OPEN — they run in the base repo's
+  # context WITH secrets no matter who commented, unlike fork `pull_request`
+  # runs where GitHub withholds them. `author_association == 'OWNER'` is
+  # therefore the ONLY thing between a stranger's `@claude` and this repo's API
+  # key. It is load-bearing, not defence in depth, and it is evaluated before a
+  # runner is allocated.
+  #
+  # The same-repo fork gate that used to be here went with the `pull_request`
+  # trigger. It is unreachable now rather than unnecessary — recorded so it is
+  # not dropped by reflex if an automatic pass ever returns.
   review:
     if: >-
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request != null &&
+       contains(github.event.comment.body, '@claude') &&
+       github.event.comment.author_association == 'OWNER') ||
+      (github.event_name == 'pull_request_review_comment' &&
+       contains(github.event.comment.body, '@claude') &&
+       github.event.comment.author_association == 'OWNER')
     runs-on: ubuntu-latest
     steps:
       # No `ref:` — the security-doc "preferred" pattern: never check out the
-      # PR's head branch by name. On a `pull_request` event the default is the
-      # MERGE ref (`refs/remotes/pull/N/merge`), so the tree Claude reads is the
-      # PR merged into base — its outcome, not its diff. That distinction is
-      # load-bearing: reading a file here cannot tell you what the PR changed,
-      # which is why the review is told to start from `gh pr diff`. (An earlier
-      # version of this comment said "base ref by default", which is wrong and
-      # would have had the review reading pre-PR content.)
+      # PR's head branch by name.
+      #
+      # WHAT THIS TREE IS CHANGED on 2026-07-26 and the prompt below was
+      # corrected to match. On a `pull_request` event the default was the MERGE
+      # ref, so the tree was the PR merged into base. On a comment event
+      # `github.ref` is the DEFAULT BRANCH, so the tree is plain `main` — it does
+      # not contain the PR's changes at all.
+      #
+      # This does not break the review, because `gh pr diff` was always the
+      # authoritative source for what changed (Amendment 5 made the prompt lead
+      # with it). It does narrow what `Read`/`Grep`/`Glob` are good for: repo
+      # conventions, CLAUDE.md, neighbouring unchanged code — context, not the
+      # change itself. Reading a CHANGED file here shows its pre-PR content.
+      #
+      # Checking out `refs/pull/N/merge` explicitly would restore the old tree
+      # and is the documented follow-up if review depth visibly suffers. Not done
+      # here: that ref can be absent on closed or long-merged PRs, and trading a
+      # silent narrowing for a loud checkout failure is a bad deal on a change
+      # whose entire purpose is to stop this lane costing money unattended.
       - uses: actions/checkout@v7
+
+      # Timestamp taken BEFORE the review runs, so the classify step can tell
+      # THIS run's verdict comment from one left by an earlier run.
+      #
+      # Amendment 3's verdict probe rested on "the review runs once, on open, so
+      # at classify time the only claude comment is this review's summary." This
+      # workflow is now re-runnable by comment, which makes that false: a second
+      # `@claude` on a PR that was already reviewed would find the FIRST run's
+      # comment and read a silenced review as a successful one — turning the
+      # redden-on-silence calibration off exactly when it is needed. Filtering on
+      # `createdAt > SINCE` restores the premise instead of assuming it.
+      - name: Record the pre-review timestamp
+        id: since
+        run: echo "ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
 
       # `continue-on-error` so the NEXT step decides this job's colour. The
       # action exits 1 for every non-success subtype, which collapses two very
@@ -110,19 +166,26 @@ jobs:
             Review this pull request for a public front-end learning repo
             (static HTML/CSS/JS, no build step, served on GitHub Pages).
 
-            You are reviewing PR #${{ github.event.pull_request.number }} of
+            You are reviewing PR #${{ github.event.pull_request.number || github.event.issue.number }} of
             ${{ github.repository }}. Pass that number explicitly to every `gh`
-            call. The checkout is a DETACHED merge ref, so `gh` cannot infer the
-            PR from a branch — a bare `gh pr diff` fails with "could not
-            determine current branch", and every way of looking the number up
-            for yourself is outside your tool grant.
+            call. This run was triggered by a COMMENT, not by the PR, so `gh`
+            cannot infer the PR from the checkout — a bare `gh pr diff` fails
+            with "could not determine current branch", and every way of looking
+            the number up for yourself is outside your tool grant.
 
-            Start with `gh pr diff ${{ github.event.pull_request.number }}
-            --name-only`, then
-            `gh pr diff ${{ github.event.pull_request.number }}` for the
-            content. The checkout is the MERGE RESULT, so reading a file shows
-            you its final state, not what this PR did to it — the diff is the
-            only thing that tells you what changed.
+            Start with
+            `gh pr diff ${{ github.event.pull_request.number || github.event.issue.number }} --name-only`,
+            then
+            `gh pr diff ${{ github.event.pull_request.number || github.event.issue.number }}`
+            for the content.
+
+            THE CHECKED-OUT TREE IS `main`, NOT THIS PR. A comment-triggered run
+            checks out the default branch, so the working tree does not contain
+            this PR's changes. `gh pr diff` is the ONLY thing that tells you what
+            changed — do not infer it from a file. Use `Read`/`Grep`/`Glob` for
+            surrounding context (conventions, CLAUDE.md, unchanged neighbouring
+            code); if you open a file this PR modified, you are looking at its
+            PRE-PR content, so do not report on it as though it were the change.
 
             Scope, in priority order:
             - Skip pure moves. A file whose diff is a rename with no content
@@ -270,9 +333,10 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ github.event.pull_request.number || github.event.issue.number }}
           EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
           STEP_OUTCOME: ${{ steps.claude.outcome }}
+          SINCE: ${{ steps.since.outputs.ts }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
@@ -388,14 +452,25 @@ jobs:
           # denials) does not.
           #
           # "Did it post a verdict?" = did `claude` author an issue comment on this
-          # PR. The review runs once, on open, so at classify time the only claude
-          # comment is this review's summary (its prompt mandates one via `gh pr
-          # comment`); the classify step's own comment is authored by
-          # github-actions, not claude, so it is never self-counted. An inline-only
-          # review with no summary counts as no-verdict -- it violates the prompt,
-          # and reddening it is acceptable.
+          # PR **during this run**. Its prompt mandates one via `gh pr comment`;
+          # the classify step's own comment is authored by github-actions, not
+          # claude, so it is never self-counted. An inline-only review with no
+          # summary counts as no-verdict -- it violates the prompt, and reddening
+          # it is acceptable.
+          #
+          # The `createdAt > env.SINCE` filter is what makes "during this run"
+          # true. Amendment 3 could assume it: the review fired once, on open, so
+          # any claude comment had to be its own. Amendment 7 made the lane
+          # re-runnable by comment, so an earlier run's verdict would otherwise
+          # count as this one's and a silenced re-review would go green. `SINCE`
+          # is stamped by a step before the review; both timestamps are UTC
+          # ISO-8601, which compares correctly as a string.
+          #
+          # Still ONE `gh ... --jq` call, deliberately: jq reads `env.SINCE`
+          # directly, so this needs no `--arg` and no second process. The shape
+          # is what scripts/classify-review-outcome.test.cjs stubs.
           if [ "$DENIALS" -gt 0 ]; then
-            POSTED=$(gh pr view "$PR" --json comments --jq '[.comments[] | select(.author.login | ascii_downcase | contains("claude"))] | length' 2>/dev/null || echo 0)
+            POSTED=$(gh pr view "$PR" --json comments --jq '[.comments[] | select(.author.login | ascii_downcase | contains("claude")) | select(.createdAt > env.SINCE)] | length' 2>/dev/null || echo 0)
             if [ "${POSTED:-0}" -gt 0 ]; then
               echo "::warning::Review posted a verdict but was denied $DENIALS tool call(s): ${DENIED_CALLS:-${DENIED_TOOLS:-unknown}}. Not failing -- the review completed. Grant these in --allowedTools to silence the noise."
             else
@@ -463,54 +538,3 @@ jobs:
               ;;
           esac
 
-  # --- @claude mention flow -----------------------------------------------
-  # Owner-gated: on a public repo anyone can comment, so restrict to the repo
-  # owner to bound API cost. Broaden via author_association if collaborators
-  # should trigger it later.
-  mention:
-    if: >-
-      (github.event_name == 'issue_comment' &&
-        contains(github.event.comment.body, '@claude') &&
-        github.event.comment.author_association == 'OWNER') ||
-      (github.event_name == 'pull_request_review_comment' &&
-        contains(github.event.comment.body, '@claude') &&
-        github.event.comment.author_association == 'OWNER')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # No `prompt`: for comment events the action responds to the @claude
-          # mention itself (docs: "when omitted for issue/PR comments, Claude
-          # responds to trigger phrase").
-          #
-          # This job posts fine without `--allowedTools` — tag mode installs the
-          # comment server unconditionally, which is why the only claude[bot]
-          # comments this repo has ever received came from here and not from the
-          # review job. But it shares the review job's blind spot: no Bash means
-          # no diff, so it was answering "review this PR" from the merged file
-          # tree with no idea what the PR changed. Same grant, read-only subset;
-          # it does not need `gh pr comment` because the comment server is its
-          # channel.
-          #
-          # max-turns was 8, reasoned as "a deliberate hard cap on an
-          # owner-triggered, CONVERSATIONAL flow." That reasoning was right for
-          # the flow it described and wrong for the one that actually arrived.
-          # ADR-005 made `@claude` the documented remediation for an
-          # inconclusive review — both CLAUDE.md and the review job's own
-          # failure message say to re-run that way — which points a full-review
-          # workload at a ceiling one third the size of the job that just
-          # exhausted doing it. Observed on PR #105: the re-run died at 8 turns
-          # having posted only a checklist of what it intended to review. The
-          # documented escape hatch failed harder than the thing it escapes.
-          #
-          # Matched to the review job's 40. A mention is still owner-only and
-          # human-rate-limited, so the cost guard here is the trigger, not the
-          # turn count. If this ever needs to stay small, the fix is to change
-          # the remediation ADR-005 documents — not to leave the two out of sync.
-          claude_args: |
-            --model claude-sonnet-5
-            --max-turns 40
-            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*)"
