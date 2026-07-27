@@ -75,11 +75,6 @@ import SiteNav from '../components/SiteNav.astro';
     <section class="orientation reveal" aria-label="What this record demonstrates">
       <p class="kicker">Start here</p>
       <p class="orientation-lede">A working record of how I build and run a small AI system, framed for whoever is reading: what it does for its user, and why every change had to earn its place on evidence.</p>
-      <ul class="orientation-points">
-        <li>The user is a defense-news analyst; the job is to triage a firehose so the day starts from a sorted knowledge base, not a raw feed.</li>
-        <li>Every change is gated on an eval. Three that read better but measured worse, a cleaner prompt, a retrieval add, and a routing upgrade, were reverted, retired, and declined.</li>
-        <li>Model choice is gated the same way: escalating to the premium model was measured at about 1.97&times; the cost for zero rows gained.</li>
-      </ul>
       <p class="orientation-routes">Read it as <a href="projects/product-and-program.html">Product &amp; Program</a>, go straight to the <a href="projects/defense-news-classifier.html">Classifier</a>, or see the <a href="projects/faithfulness-judge.html">Judge</a>, where I caught my own measurement lying to me.</p>
     </section>
 
@@ -112,70 +107,12 @@ import SiteNav from '../components/SiteNav.astro';
       <h2 class="section-title reveal">The decision log</h2>
       <p class="log-intro reveal">The real calls behind the system. The ones that went the wrong way are here too, set with the same care as the wins, because that is the part worth reading.</p>
 
-      <div class="decision" id="decision-contracts">
-        <p class="kicker">Decoupled by contract<span class="code-ref">SYS-004 &middot; SYS-006</span></p>
-        <h3>Decouple with contracts, not shared code</h3>
-        <p>The repos talk over frozen HTTP contracts with explicit versioning, and each side carries tests pinning the shape. The system behaves as one thing while each piece stays independently deployable.</p>
-        <p class="tradeoff"><strong>Then I audited it and found the seam broken.</strong> The classifier added a field, the coordinated consumer update never landed, and both repos' CI stayed green &mdash; because each side asserted against its own copy of the shape rather than a shared one.</p>
-        <details>
-          <summary>What that taught me</summary>
-          <p>Two unit tests that happen to agree are not a contract test, and calling them one bought months of false confidence. The ceremony I'd paid for was the documentation half; the enforcement half was never wired. Corrected in the open rather than quietly fixed. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
-        </details>
-      </div>
-
-      <div class="decision" id="decision-eval">
-        <p class="kicker">Eval rebuilt<span class="code-ref">EVAL &middot; v1 &rarr; v3</span></p>
-        <h3>I rebuilt the eval until it could tell me I was wrong</h3>
-        <p>v1 graded the model on 300 snippets it generated itself, which measures consistency, not correctness. v2 replaced that with 54 hand-labeled real snippets, cross-checked by an Opus judge, and it has been catching me ever since.</p>
-        <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
-        <details>
-          <summary>Read the numbers</summary>
-          <p>Category accuracy actually rose (79.0% to 88.9%) because real vocabulary separates more cleanly. Domain fell because the synthetic set was trivially easy to grade. The gold set is 54 snippets, hand-labeled, later corroborated at n=300 with confidence intervals half as wide. Current three-axis numbers: category <span data-metric="category_accuracy">92.6%</span>, domain <span data-metric="domain_accuracy">92.6%</span>, region <span data-metric="region_accuracy">87.0%</span>. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
-        </details>
-      </div>
-
       <div class="decision" id="decision-grounding">
         <p class="kicker">BM25 retired<span class="code-ref">EVAL &middot; BM25</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
         <p>I added BM25 lexical retrieval to ground each call, expecting a clear win. The first measurement said it barely helped. Then I found the measurement itself was unfair.</p>
         <p class="tradeoff"><strong>The result:</strong> I had been scoring the grounded arm against a stale baseline built on an older prompt. Rebuilt so both arms ran the same prompt, grounding fixed a domain call zero times and broke four across 162 classifications. It was retired outright, not left on as an option.</p>
-        <details>
-          <summary>The discipline</summary>
-          <p>An unfair baseline flatters whatever you were hoping for, and comparing two things means changing exactly one of them. The retrieval code stays in the repo, dormant and reproducible, because the built-it-measured-it-cut-it trail is the artifact. <a href="projects/defense-news-classifier.html#decision-grounding">Full eval &rarr;</a></p>
-        </details>
-      </div>
-
-      <div class="decision" id="decision-truncation">
-        <p class="kicker">False result caught<span class="code-ref">JUDGE &middot; ADR-001</span></p>
-        <h3>I nearly published a finding that was my own bug</h3>
-        <p>Measuring how well an LLM judge catches made-up claims, the first run showed a dramatic gap between the premium and cheap model tiers. It was a great headline and it was false.</p>
-        <p class="tradeoff"><strong>The result:</strong> a <code>max_tokens</code> setting meant to force a one-word verdict truncated the cheaper model before it reached the verdict on 20% of claims, and my scoring counted every one as a disagreement. Fixed, both tiers agree with human labels at about the same rate.</p>
-        <details>
-          <summary>How it surfaced</summary>
-          <p>Reading the failure log before publishing, not after. The failures didn't look like judgment errors, which are scattered and arguable. They were empty. Errors have a shape, and that shape was wrong. <a href="projects/faithfulness-judge.html">Full writeup &rarr;</a></p>
-        </details>
-      </div>
-
-      <div class="decision" id="decision-prompt">
-        <p class="kicker">Prompt reverted<span class="code-ref">EVAL &middot; PROMPT</span></p>
-        <h3>A prompt that read better and measured worse, reverted</h3>
-        <p>A change that sounds right can move the decision boundary the wrong way, and intuition cannot see that. I sharpened the procurement-versus-industry rule so it read cleaner to a human.</p>
-        <p class="tradeoff"><strong>The result:</strong> category accuracy dropped from 79.0% to 76.7% and industry recall from 0.217 to 0.100. I reverted it.</p>
-        <details>
-          <summary>Why measurement won</summary>
-          <p>The sharper rule gave the model a cleaner excuse to dump borderline company stories into the wrong bucket, which I only caught once I ran the eval. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
-        </details>
-      </div>
-
-      <div class="decision" id="decision-ceiling">
-        <p class="kicker">Ceiling disproved<span class="code-ref">EVAL &middot; PROMPT</span></p>
-        <h3>I called it a ceiling, then went looking anyway</h3>
-        <p>Category accuracy hadn't moved through a model upgrade, so I concluded the limit was label ambiguity rather than model horsepower. That is a comfortable conclusion, because it excuses you from more work.</p>
-        <p class="tradeoff"><strong>The result:</strong> a per-cell confusion breakdown showed the misses weren't scattered, they clustered on one boundary. Two targeted rubric clauses moved category from 90.7% to 94.4% with nothing regressing. It was a prompt problem wearing a ceiling's clothes.</p>
-        <details>
-          <summary>Why it matters</summary>
-          <p>&ldquo;That's the ceiling&rdquo; is a hypothesis, not a finding. The half I got right is that it wasn't model horsepower, which a later routing experiment confirmed by buying nothing at twice the price. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
-        </details>
+        <p>An unfair baseline flatters whatever you were hoping for, and comparing two things means changing exactly one of them. The retrieval code stays in the repo, dormant and reproducible, because the built-it-measured-it-cut-it trail is the artifact. <a href="projects/defense-news-classifier.html#decision-grounding">Full eval &rarr;</a></p>
       </div>
 
       <div class="decision" id="decision-model">
@@ -183,53 +120,37 @@ import SiteNav from '../components/SiteNav.astro';
         <h3>Gate model choice on evidence, not vibes</h3>
         <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself. I built the upgrade, measured it, and declined it.</p>
         <p class="tradeoff"><strong>The result:</strong> routing the uncertain cases to the premium model moved <strong>zero rows</strong> on both axes at about 1.97&times; the cost per article. Sending everything to the premium model scored identically, so there was no headroom for any router to capture.</p>
-        <details>
-          <summary>What the eval showed</summary>
-          <p>A targeted prompt fix had already taken the ground routing was aimed at, so the cheapest fix won and that is now measured rather than asserted. The harness stays in the repo as the record. <a href="projects/defense-news-classifier.html">Full verdict &rarr;</a></p>
-        </details>
+        <p>A targeted prompt fix had already taken the ground routing was aimed at, so the cheapest fix won and that is now measured rather than asserted. The harness stays in the repo as the record. <a href="projects/defense-news-classifier.html">Full verdict &rarr;</a></p>
       </div>
 
-      <div class="decision" id="decision-tooluse">
-        <p class="kicker">Output forced to schema<span class="code-ref">ADR-002</span></p>
-        <h3>Force structured output with tool-use, not prompt parsing</h3>
-        <p>The model is called with a forced tool schema (all three fields required, strict enums), so an invalid label is rejected at the API layer before it reaches application code.</p>
-        <p class="tradeoff"><strong>Tradeoff:</strong> a few extra tokens and a more verbose call, in exchange for app code with no defensive parsing.</p>
-        <details>
-          <summary>How it held up</summary>
-          <p>The schema becomes the contract. Out-of-enum responses were rare (once in 300) and a single re-sample handled them. <a href="projects/defense-news-classifier.html">Full writeup &rarr;</a></p>
-        </details>
+      <div class="decision" id="decision-eval">
+        <p class="kicker">Eval rebuilt<span class="code-ref">EVAL &middot; v1 &rarr; v3</span></p>
+        <h3>I rebuilt the eval until it could tell me I was wrong</h3>
+        <p>v1 graded the model on 300 snippets it generated itself, which measures consistency, not correctness. v2 replaced that with 54 hand-labeled real snippets, cross-checked by an Opus judge, and it has been catching me ever since.</p>
+        <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
+        <p>Category accuracy actually rose, because real vocabulary separates more cleanly; domain fell because the synthetic set was trivially easy to grade. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
       </div>
 
-      <div class="decision" id="decision-rightsized">
-        <p class="kicker">Right-sized off Kafka<span class="code-ref">ARCH</span></p>
-        <h3>I built the loop on Kafka, then cut it</h3>
-        <p>I built the enrichment loop on Kafka to learn event-driven architecture properly: an idempotent consumer, at-least-once delivery, offset management.</p>
-        <p class="tradeoff"><strong>Then I cut it.</strong> A single-user workload with derived, idempotent tags never needed a distributed log, so it is now an in-process FastAPI BackgroundTask.</p>
-        <details>
-          <summary>What that trades away</summary>
-          <p>You give up durability across a crash and replay, neither of which this workload needs yet. The day it does, the move is an outbox and a queue, not a reflex reach for a broker. <a href="projects/the-system.html">Full writeup &rarr;</a></p>
-        </details>
-      </div>
+      <p class="ledger-intro reveal">Six more, in one line each. The full telling of every one is on the page it links to.</p>
+      <ul class="ledger reveal">
+        <li id="decision-contracts">Decoupled the repos with frozen HTTP contracts &mdash; then audited the seam and found it <strong>broken with both repos' CI green</strong>, because each side asserted against its own copy of the shape. Two unit tests that happen to agree are not a contract test. <a href="projects/the-system.html">The System &rarr;</a></li>
+        <li id="decision-truncation">Nearly published a dramatic premium-vs-cheap model gap that was <strong>my own bug</strong> &mdash; a <code>max_tokens</code> cap truncated the cheap tier before its verdict on 20% of claims, and my scoring counted each as a disagreement. <a href="projects/faithfulness-judge.html">Judge &rarr;</a></li>
+        <li id="decision-ceiling">Called it a ceiling, then went looking anyway &mdash; the misses clustered on one boundary, and two rubric clauses moved category <strong>90.7% &rarr; 94.4%</strong> with nothing regressing. A prompt problem wearing a ceiling's clothes. <a href="projects/defense-news-classifier.html">Classifier &rarr;</a></li>
+        <li id="decision-prompt">A prompt that read better to a human and measured worse &mdash; category <strong>79.0% &rarr; 76.7%</strong>, industry recall 0.217 &rarr; 0.100. Reverted. <a href="projects/defense-news-classifier.html">Classifier &rarr;</a></li>
+        <li id="decision-rightsized">Built the enrichment loop on Kafka to learn it properly, then cut it &mdash; a single-user idempotent workload <strong>never needed a distributed log</strong>. Now an in-process background task. <a href="projects/the-system.html">The System &rarr;</a></li>
+        <li id="decision-tooluse">Forced output to a tool schema instead of parsing prose, so an invalid label is rejected at the API layer &mdash; <strong>one out-of-enum response in 300</strong>, handled by a re-sample. <a href="projects/defense-news-classifier.html">Classifier &rarr;</a></li>
+      </ul>
     </section>
 
     <section class="measure">
       <h2 class="section-title reveal">Classifier evidence</h2>
-      <p class="reveal">The classifier's numbers, with the honest part kept in. Synthetic self-graded, then real hand-labeled, then a model migration, a prompt fix, and a third output axis &mdash; every column after the first measured on the same 54 hand-labeled snippets.</p>
-      <table class="metrics">
-        <thead>
-          <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 + Sonnet 5</th><th>v2 + prompt fix</th><th>v3 three-axis (current)</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td><span data-metric="category_accuracy">92.6%</span></td></tr>
-          <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td><span data-metric="category_macro_f1">0.911</span></td></tr>
-          <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td><span data-metric="domain_accuracy">92.6%</span></td></tr>
-          <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td><span data-metric="domain_macro_f1">0.933</span></td></tr>
-          <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_accuracy">87.0%</span></td></tr>
-          <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_macro_f1">0.927</span></td></tr>
-        </tbody>
-      </table>
-      <p class="reveal">Category went up on real text because real vocabulary separates more cleanly. Domain went down because the synthetic set was trivially separable, and the lower number is the trustworthy one. When category then sat still through a model upgrade, I called it a ceiling of label ambiguity. A confusion breakdown proved me wrong: the misses clustered on one boundary, and two rubric clauses took category to 94.4%.</p>
-      <p class="reveal">v3 added a third axis, region, which breaks the output contract on purpose. It costs about one category row and debuts at 87.0% &mdash; where all seven misses are the same named failure, stories with no geographic anchor being pulled to a specific region. <a href="projects/defense-news-classifier.html">See the full eval &rarr;</a></p>
+      <p class="reveal">Where the classifier stands now, on 54 hand-labeled real snippets.</p>
+      <ul class="stat-strip reveal">
+        <li><span class="stat-value" data-metric="category_accuracy">92.6%</span><span class="stat-label">Category</span></li>
+        <li><span class="stat-value" data-metric="domain_accuracy">92.6%</span><span class="stat-label">Domain</span></li>
+        <li><span class="stat-value" data-metric="region_accuracy">87.0%</span><span class="stat-label">Region</span></li>
+      </ul>
+      <p class="reveal">Those are the numbers after the eval got harder, not before. The full trajectory &mdash; synthetic self-graded, then real hand-labeled, a model migration, a prompt fix and a third axis, with the ceiling I called wrongly and the misses that clustered on one boundary &mdash; is the table on the classifier page. <a href="projects/defense-news-classifier.html">See the full eval &rarr;</a></p>
     </section>
 
     <section class="measure">
