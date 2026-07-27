@@ -546,8 +546,19 @@ body {
 
 /* .measure is a nested grid re-establishing the same tracks, so the stat strip
    inside it can still reach `wide`. It therefore spans the whole width of its
-   parent rather than sitting in the content track. */
-.measure { grid-column: full; }
+   parent rather than sitting in the content track.
+
+   `main.wrap > .measure`, not a bare `.measure`, and that is load-bearing.
+   :is() takes the specificity of its most specific argument, so the default
+   rule above scores (0,1,1) and a bare `.measure` at (0,1,0) LOSES to it. The
+   first version of this shipped bare: .measure stayed in the content track,
+   its nested grid measured 100% as 544px instead of the viewport, and every
+   block inside it landed at 496px on a left edge of 392 — a third width and a
+   third edge, on the exact page ADR-008 was written to give two. The diagram
+   was at 912 and the stat strip beside it at 496. Caught by measuring the live
+   page after deploy; no gate would have caught it, because nothing overflowed
+   and nothing 404'd. */
+main.wrap > .measure { grid-column: full; }
 
 /* Promoted. The rule for adding to this list: an object belongs on `wide` if
    its CONTENT has an intrinsic width — a table with columns, an SVG with a
