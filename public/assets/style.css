@@ -8,16 +8,28 @@
    browser already has open. It also stops a third party from seeing every
    visitor, which is the same reason the analytics here are Plausible.
 
-   Geist ships as a VARIABLE font: Google served weights 400/500/600 from one
-   file per subset, so `font-weight: 400 600` (a RANGE, not a value) is the
-   whole weight axis in a single request. Only latin + latin-ext are kept;
-   unicode-range means latin-ext is never fetched unless a glyph needs it,
-   and the site's current copy never does. The ranges are Google's own,
-   copied verbatim so subsetting behaviour is unchanged. */
+   Geist ships as a VARIABLE font: one file per subset carries the whole weight
+   axis, so `font-weight: 100 900` (a RANGE, not a value) is every weight in a
+   single request. Only latin + latin-ext are kept; unicode-range means
+   latin-ext is never fetched unless a glyph needs it, and the site's current
+   copy never does. The ranges are Google's own, copied verbatim so subsetting
+   behaviour is unchanged.
+
+   The declared range was `400 600` until the 2026-07-27 type pass, because
+   that is what Google's stylesheet declared. The FILES were never that narrow
+   — both subsets carry wght 100-900 — and a declared range is a clamp, so
+   every `font-weight: 700` on this site (decision tags, ladder IDs, pills, the
+   flow markers) was silently rendering at 600. Declaring the axis the file
+   actually has costs no bytes and gets the weights the CSS already asked for.
+
+   Geist Mono is the second voice, added in the same pass: it carries the
+   measured things — metrics, IDs, dates, code, the flow line. It is subset
+   here rather than fetched, for exactly the reasons above; see fonts/OFL.txt
+   for where the file came from and how it was cut. */
 @font-face {
   font-family: "Geist";
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 100 900;
   font-display: swap;
   src: url("fonts/geist-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
@@ -26,9 +38,27 @@
 @font-face {
   font-family: "Geist";
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 100 900;
   font-display: swap;
   src: url("fonts/geist-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/geist-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/geist-mono-latin-ext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -43,7 +73,23 @@
   --border: #232a35;
   --btn-text: #0b0e13;
   --shadow: rgba(0, 0, 0, 0.35);
-  --radius: 14px;
+  /* Argument text. --muted was doing two jobs: genuinely secondary metadata
+     (labels, dates, captions) AND the body of the actual arguments — the about
+     section, the ledger rows, the tradeoff lines. The result was a page whose
+     load-bearing prose was the faintest thing on it. --text-secondary is a
+     half-step down from --text, enough to sit under a heading without reading
+     as an aside; --muted is now reserved for metadata that really is quieter
+     than the sentence next to it. */
+  --text-secondary: #c9d1de;
+  /* ONE radius scale. Components hardcoded 10px while --radius said 14px, so
+     the token described a corner the site did not actually draw anywhere.
+     --radius is the working value every panel/input/image uses; --radius-sm is
+     for things measured in a few px of text (inline code, focus rings);
+     --radius-lg is the one larger surface (the system diagram). Pills stay
+     literal 999px — that is a shape, not a step on this scale. */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
   /* The content column. ONE width for every block on the page: hero copy,
      prose, tables, diagrams, bordered blocks. See the "One content column"
      block below for why this beats capping prose separately.
@@ -54,6 +100,11 @@
   --col: 720px;
   --maxw: calc(var(--col) + 48px);
   --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* The data voice. Every measured thing on this site is set in it: metrics and
+     stat values, ledger IDs and code-refs, dates, the flow line, rung IDs,
+     pills, code blocks. One token so that stays a rule rather than six
+     hand-typed stacks that drift apart (which is what was here before). */
+  --mono: "Geist Mono", ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 html[data-theme="light"] {
@@ -66,6 +117,7 @@ html[data-theme="light"] {
   --border: #e4e8ee;
   --btn-text: #ffffff;
   --shadow: rgba(20, 30, 60, 0.12);
+  --text-secondary: #2f3743;
 }
 
 /* smooth the swap */
@@ -206,11 +258,20 @@ body {
   margin: 0 0 18px;
 }
 
+/* Display scale. The old ceiling (3.1rem h1, 1.6rem section titles) left the
+   page almost flat: at desktop width the biggest thing on it was ~2x the body
+   text, so nothing announced itself and every section read as the same
+   priority. Opening the top end up gives the record a masthead and the
+   sections real rank. The clamp minimums move only a little (h1 2 -> 2.4rem),
+   so a 320px phone gets a slightly firmer masthead and the same layout; the
+   mobile gate measures that rather than trusting it.
+   Letter-spacing tightens as size grows, which is the standard correction:
+   tracking that reads as airy at 1rem reads as loose at 3.8. */
 .hero h1 {
-  font-size: clamp(2rem, 5vw, 3.1rem);
-  line-height: 1.1;
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  line-height: 1.05;
   margin: 0 0 24px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 /* Hero identity line: the warm, first-person "who I am" statement.
@@ -225,9 +286,22 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* ---- Who gets --muted, and who does not ------------------------------------
+   Until 2026-07-27 --muted was doing two incompatible jobs. It was the colour
+   of labels, dates and captions — correct — and it was ALSO the colour of the
+   about section, the ledger rows, the tradeoff lines and the hero's third
+   sentence. That is an inversion: the arguments this site exists to make were
+   set fainter than the headings announcing them, so the page read as a stack
+   of titles with grey filler under each one.
+
+   The rule now: if it is a sentence making a claim, it is --text-secondary
+   (a half-step down from --text — subordinate to a heading, not an aside). If
+   it is a label, a date, a count, a caption or a nav item, it stays --muted.
+   Everything below follows that split, and the comments call it out where the
+   call is close. */
 .lede {
   font-size: 1.02rem;
-  color: var(--muted);
+  color: var(--text-secondary);
   line-height: 1.55;
   max-width: 52ch;
   margin: 0 0 28px;
@@ -318,7 +392,7 @@ body {
 .proof a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* The doors: a clean link row between the hero and the work, so every reader can
@@ -372,7 +446,7 @@ body {
 .btn {
   display: inline-block;
   padding: 12px 22px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   font-weight: 600;
   text-decoration: none;
   background: var(--accent);
@@ -391,13 +465,14 @@ body {
 
 /* Sections */
 .section-title {
-  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  font-size: clamp(1.7rem, 4.5vw, 2.1rem);
+  line-height: 1.2;
   margin: 72px 0 6px;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .section-sub {
-  color: var(--muted);
+  color: var(--text-secondary);
   margin: 0 0 36px;
 }
 
@@ -467,7 +542,7 @@ body {
 .back:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 /* The "read the full writeup" link under the homepage diagram. It kept its
@@ -623,6 +698,7 @@ body {
   display: inline-block;
   vertical-align: middle;
   margin-left: 12px;
+  font-family: var(--mono);
   font-size: 0.55em;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -638,7 +714,7 @@ body {
    one width and tone. The drift came from tagging only two of the four <p>s with
    a class (620px + muted) and leaving the other two at full width + default
    color. Styling the section's children once keeps them uniform. */
-.about p { color: var(--muted); margin: 0 0 16px; }
+.about p { color: var(--text-secondary); margin: 0 0 16px; }
 
 /* ---- Project writeup components ---- */
 .article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
@@ -661,7 +737,7 @@ body {
   padding: 16px 18px;
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
@@ -706,7 +782,7 @@ body {
 .article-body .toc a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* Repo cards (the pieces of the system) */
@@ -720,12 +796,12 @@ body {
 }
 .repo-grid li {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 14px 16px;
   background: var(--panel);
 }
 .repo-grid strong { display: block; margin-bottom: 4px; }
-.repo-grid span { color: var(--muted); font-size: 0.92rem; }
+.repo-grid span { color: var(--text-secondary); font-size: 0.92rem; }
 
 /* Numbered data-flow */
 .flow { list-style: none; counter-reset: step; padding: 0; margin: 18px 0; }
@@ -758,7 +834,7 @@ body {
 .decision {
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 16px 18px;
   margin: 16px 0;
   background: var(--panel);
@@ -772,7 +848,8 @@ body {
   letter-spacing: 0.08em;
   font-weight: 700;
 }
-.decision .tradeoff { color: var(--muted); font-size: 0.95rem; }
+/* The tradeoff line is the punchline of the card, not a footnote to it. */
+.decision .tradeoff { color: var(--text-secondary); font-size: 0.95rem; }
 
 /* Results table */
 .article-body table,
@@ -796,6 +873,19 @@ body {
 .article-body table.metrics th:not(:first-child),
 .measure table.metrics td:not(:first-child),
 .measure table.metrics th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+/* The numbers themselves in the data voice. Right-aligned mono with tabular
+   figures is what makes a column of accuracies scannable as a column rather
+   than as six unrelated strings. */
+.article-body table.metrics td:not(:first-child),
+.measure table.metrics td:not(:first-child) { font-family: var(--mono); font-size: 0.94em; }
+
+/* Any figure that is asserted against the classifier's artifact. Marking these
+   in the data voice is not decoration: it is the visual claim that the number
+   is measured and checked, which is precisely what the data-metric attribute
+   means. Styled by attribute so the markup is not touched — the published
+   metrics guard reads these spans, and a redesign has no business editing
+   them. */
+[data-metric] { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
 /* Now / Next / Later roadmap */
 .roadmap {
@@ -806,13 +896,13 @@ body {
 }
 .roadmap > div {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 14px 16px;
   background: var(--panel);
 }
 .roadmap h3 { margin: 0 0 8px; font-size: 1rem; }
 .roadmap ul { margin: 0; padding-left: 1.1rem; }
-.roadmap li { font-size: 0.92rem; color: var(--muted); margin-bottom: 6px; }
+.roadmap li { font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 6px; }
 
 /* Interactive system diagram (SVG, Tier 3) */
 .diagram-wrap { margin: 18px 0; }
@@ -820,7 +910,7 @@ body {
    The map is the enhancement; this line is the seam in plain words, so the flow
    survives JS-off, mobile, screenshots, and a screen reader skimming the page. */
 .flow-line {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.8rem;
   line-height: 1.9;
   letter-spacing: 0.01em;
@@ -832,7 +922,9 @@ body {
   width: 100%;
   height: auto;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  /* The one surface on --radius-lg: it is the largest object on the page and a
+     10px corner on an 800-unit box reads as a rendering accident. */
+  border-radius: var(--radius-lg);
   background: var(--panel);
 }
 #system-diagram marker path { fill: var(--muted); }
@@ -861,21 +953,40 @@ body {
 .diagram-detail {
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 14px 16px;
   background: var(--panel);
   margin-top: 12px;
-  color: var(--muted);
+  color: var(--text-secondary);
 }
 
-.article-body h1 { font-size: 2.2rem; margin: 18px 0 8px; letter-spacing: -0.02em; }
+/* Writeup headings, rebalanced against the homepage scale above. These were
+   flat values (2.2 / 1.3rem) while the homepage clamped, so a project page's
+   title was smaller than the homepage's section titles at desktop width —
+   the deepest page in the site announced itself least. h1 now clamps to just
+   under the homepage masthead, and h2 sits a step under .section-title so a
+   reader can tell a page title from a section from a subsection by size
+   alone. */
+.article-body h1 {
+  font-size: clamp(2.1rem, 5vw, 2.9rem);
+  line-height: 1.1;
+  margin: 18px 0 8px;
+  letter-spacing: -0.03em;
+}
 .article-body .subtitle { color: var(--muted); font-size: 1.05rem; margin: 0 0 36px; }
-.article-body h2 { margin: 40px 0 12px; font-size: 1.3rem; }
+.article-body h2 {
+  margin: 48px 0 12px;
+  font-size: clamp(1.45rem, 3.5vw, 1.75rem);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.article-body h3 { letter-spacing: -0.005em; }
 .article-body p, .article-body li { color: var(--text); }
 .article-body code {
   background: var(--accent-soft);
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
   font-size: 0.9em;
 }
 
@@ -884,7 +995,7 @@ body {
 .article-body pre {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 13px 15px;
   margin: 8px 0 0;
   /* Wrap long lines instead of scrolling sideways. pre-wrap keeps the JSON
@@ -892,7 +1003,7 @@ body {
      the reader never has to scroll horizontally to read the artifact. */
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
   font-size: 0.8rem;
   line-height: 1.5;
   color: var(--text);
@@ -915,13 +1026,13 @@ body {
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
 }
-.example-run .ex-note { color: var(--muted); font-size: 0.92rem; margin: 6px 0 0; }
+.example-run .ex-note { color: var(--text-secondary); font-size: 0.92rem; margin: 6px 0 0; }
 .ex-caption {
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 0.92rem;
   border-left: 3px solid var(--accent);
   background: var(--accent-soft);
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 var(--radius) var(--radius) 0;
   padding: 9px 14px;
   margin: 8px 0 0;
 }
@@ -953,14 +1064,15 @@ body {
   border: 2px solid var(--accent);
 }
 .tl-date {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--accent);
 }
 .tl-title { font-weight: 600; margin-top: 2px; }
-.tl-body { color: var(--muted); font-size: 0.95rem; margin: 4px 0 0; }
+.tl-body { color: var(--text-secondary); font-size: 0.95rem; margin: 4px 0 0; }
 .tl-quote { color: var(--text); font-style: italic; }
 
 /* ---- The autonomy ladder, drawn as a climb ----------------------------
@@ -1028,7 +1140,8 @@ body {
   margin: 0;
 }
 .rung-id {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -1038,6 +1151,7 @@ body {
 .rung[data-state="spec"] .rung-id { color: var(--muted); }
 .rung-name { font-weight: 600; }
 .rung-state {
+  font-family: var(--mono);
   font-size: 0.72rem;
   letter-spacing: 0.02em;
   color: var(--muted);
@@ -1049,7 +1163,7 @@ body {
 .rung[data-state="shipped"] .rung-state,
 .rung[data-state="partial"] .rung-state { color: var(--accent); border-color: var(--accent); }
 .rung-gain { margin: 6px 0 0; font-size: 0.95rem; }
-.rung-driver { margin: 4px 0 0; font-size: 0.95rem; color: var(--muted); }
+.rung-driver { margin: 4px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
 .rung-driver .lbl {
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -1066,7 +1180,7 @@ body {
   position: relative;
   padding-left: 18px;
   font-size: 0.9rem;
-  color: var(--muted);
+  color: var(--text-secondary);
   margin-top: 4px;
 }
 .subrungs li::before {
@@ -1155,13 +1269,13 @@ body {
    width — that mismatch was one of the homepage's stray right edges. Both are
    now --col, so the class is a semantic grouping rather than a width. */
 
-.log-intro { color: var(--muted); margin: 0 0 24px; }
+.log-intro { color: var(--text-secondary); margin: 0 0 24px; }
 
 /* Decision IDs in monospace as a deliberate ledger/ID aesthetic. They already
    left-align via the shared .decision padding; tabular-nums just keeps any
    figures even-width. */
 .decision .tag {
-  font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, monospace;
+  font-family: var(--mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1179,7 +1293,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 2px 8px;
-  font-family: var(--font);
+  font-family: var(--mono);
 }
 
 /* Click a diagram node and its matching decision glows briefly. */
@@ -1195,7 +1309,7 @@ body {
   font-weight: 600;
   font-size: 0.92rem;
 }
-.decision details > *:not(summary) { color: var(--muted); font-size: 0.96rem; margin: 10px 0 0; }
+.decision details > *:not(summary) { color: var(--text-secondary); font-size: 0.96rem; margin: 10px 0 0; }
 
 /* Links inside the reading column (prose + evidence), readable on dark. */
 .measure a { color: var(--accent); }
@@ -1225,7 +1339,7 @@ body {
   color: var(--text);
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 10px 14px;
   margin: 8px 0 28px;
 }
@@ -1241,14 +1355,14 @@ body {
   padding: 20px 22px;
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 .orientation .kicker { margin: 0 0 10px; }
 .orientation-lede { color: var(--text); font-size: 1.05rem; margin: 0 0 14px; }
 .orientation-points { list-style: none; margin: 0 0 14px; padding: 0; }
 .orientation-points li {
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 0.95rem;
   margin: 0 0 8px;
   padding-left: 20px;
@@ -1261,14 +1375,14 @@ body {
   left: 0;
   color: var(--accent);
 }
-.orientation-routes { margin: 0; font-size: 0.95rem; color: var(--muted); }
+.orientation-routes { margin: 0; font-size: 0.95rem; color: var(--text-secondary); }
 
 /* Decision log: flip the hierarchy so the human kicker leads and the ledger
    ID (SYS-004, ADR-002, EVAL...) rides behind it as quiet metadata. */
 .measure .decision .kicker { margin: 0 0 6px; }
 .measure .decision .kicker .code-ref {
   margin-left: 8px;
-  font-family: ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, monospace;
+  font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   font-weight: 400;
   font-size: 0.82em;
@@ -1284,7 +1398,7 @@ body {
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
   display: block;
 }
@@ -1322,7 +1436,9 @@ body {
   border-top: 1px solid var(--border);
   font-size: 0.92rem;
   line-height: 1.55;
-  color: var(--muted);
+  /* Each row is a whole decision compressed to one sentence. These are the
+     arguments, not an index of them. */
+  color: var(--text-secondary);
   /* Long tokens (metric strings, code) wrap rather than widen the page. */
   overflow-wrap: anywhere;
 }
@@ -1354,20 +1470,22 @@ body {
   gap: 2px;
   padding: 14px 16px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
 .stat-strip .stat-value {
+  font-family: var(--mono);
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 .stat-strip .stat-label {
   font-size: 0.78rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
 }
