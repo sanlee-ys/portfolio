@@ -732,20 +732,37 @@ body {
    `columns: 300px` rather than a column count, so the list is intrinsically
    responsive — two columns in the 720px content column, one on a phone, with
    no breakpoint. */
+/* ---- The de-boxing (2026-07-27) ---------------------------------------
+   Ten different things on this site were drawn as the SAME object: 1px
+   border, --panel fill, a radius, and often a 3px accent stripe down the
+   left. The table of contents, the orientation block, the diagram caption,
+   the repo list, the roadmap columns, the stat strip, code blocks, the
+   example-run captions and the glossary's filter input all wore the decision
+   card's clothes. When everything is a card, being a card means nothing —
+   and the one place it should mean something is the decision log, which is
+   the point of the site.
+
+   So: the full card treatment (border + fill + radius + accent stripe)
+   belongs to .decision alone, including the glossary's reuse of it. Every
+   other block is rebuilt in ledger grammar — 1px --border rules along the
+   top or bottom edge, generous space, aligned left edges, tabular figures —
+   which is how a printed record separates things without drawing a frame
+   around each one. Nothing here changes what any block SAYS or where it
+   sits; it changes what it is made of.
+------------------------------------------------------------------------ */
 .toc {
   margin: 28px 0 8px;
-  padding: 16px 18px;
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  background: var(--panel);
+  padding: 14px 0 18px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .toc-heading {
   margin: 0 0 10px;
-  font-size: 0.72rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   font-weight: 600;
   color: var(--muted);
 }
@@ -770,6 +787,7 @@ body {
   content: counter(toc) ".";
   margin-right: 8px;
   color: var(--muted);
+  font-family: var(--mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -786,19 +804,21 @@ body {
 }
 
 /* Repo cards (the pieces of the system) */
+/* The pieces of the system. Four repos with a name and a one-line job each —
+   a list, not four objects. A rule over each entry keeps the columns visibly
+   aligned, and the gaps between the rules do the separating that four borders
+   used to do with twelve more lines of ink. */
 .repo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 14px;
-  margin: 18px 0;
+  gap: 20px 32px;
+  margin: 22px 0;
   padding: 0;
   list-style: none;
 }
 .repo-grid li {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding: 12px 0 0;
 }
 .repo-grid strong { display: block; margin-bottom: 4px; }
 .repo-grid span { color: var(--text-secondary); font-size: 0.92rem; }
@@ -888,19 +908,29 @@ body {
 [data-metric] { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
 /* Now / Next / Later roadmap */
+/* Now / Next / Later. Three columns of a schedule, so they are ruled like
+   columns of a schedule: one hairline across the top of each, and the heading
+   set as a column label rather than as a third-level heading competing with
+   the real ones on the page. */
 .roadmap {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
-  margin: 18px 0;
+  gap: 22px 32px;
+  margin: 22px 0;
 }
 .roadmap > div {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding: 12px 0 0;
 }
-.roadmap h3 { margin: 0 0 8px; font-size: 1rem; }
+.roadmap h3 {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
 .roadmap ul { margin: 0; padding-left: 1.1rem; }
 .roadmap li { font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 6px; }
 
@@ -950,13 +980,12 @@ body {
    Style the rect stroke; outline clips unreliably on an SVG <g>. */
 .node:focus { outline: none; }
 .node:focus-visible rect { stroke: var(--accent); stroke-width: 2.5; }
+/* The diagram's live caption. It is a caption — it belongs under the figure
+   on a rule, not in a second panel stacked on the first one. */
 .diagram-detail {
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  background: var(--panel);
-  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding: 12px 0 0;
+  margin-top: 14px;
   color: var(--text-secondary);
 }
 
@@ -992,12 +1021,17 @@ body {
 
 /* Block code (the Example-run artifacts). The page only had inline <code>
    before, so a <code> inside a <pre> needs the inline pill styling reset off. */
+/* Block code keeps a tint — an artifact pasted into the page should read as
+   a different surface from the prose — but loses the border and the radius.
+   The tint is mixed from --text rather than set to --panel: --panel is nearly
+   invisible against the light theme's background (#fff on #fbfcfe), so the
+   old treatment leaned on the border to exist at all in light mode. */
 .article-body pre {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 13px 15px;
-  margin: 8px 0 0;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  border: 0;
+  border-radius: 0;
+  padding: 14px 16px;
+  margin: 10px 0 0;
   /* Wrap long lines instead of scrolling sideways. pre-wrap keeps the JSON
      indentation and newlines; overflow-wrap breaks an over-long string/URL so
      the reader never has to scroll horizontally to read the artifact. */
@@ -1027,14 +1061,15 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .example-run .ex-note { color: var(--text-secondary); font-size: 0.92rem; margin: 6px 0 0; }
+/* A note about the artifact above it. The 3px accent stripe is now the
+   decision card's signature and nothing else's, so this gets the quiet
+   version: one hairline, an indent, no fill. */
 .ex-caption {
   color: var(--text-secondary);
   font-size: 0.92rem;
-  border-left: 3px solid var(--accent);
-  background: var(--accent-soft);
-  border-radius: 0 var(--radius) var(--radius) 0;
-  padding: 9px 14px;
-  margin: 8px 0 0;
+  border-left: 1px solid var(--border);
+  padding: 2px 0 2px 14px;
+  margin: 12px 0 0;
 }
 
 /* Colophon ledger, drawn as a vertical timeline. The spine is one absolutely
@@ -1332,18 +1367,30 @@ body {
 .notes-list li { color: var(--muted); font-size: 0.92rem; }
 .muted-line { color: var(--muted); font-size: 0.92rem; }
 
-/* Glossary filter */
+/* Glossary filter. A ruled field rather than a boxed one: the glossary's
+   entries ARE decision cards, so a second bordered rectangle sitting above
+   them read as the first entry in the list. */
 .glossary-filter {
   width: 100%;
   font: inherit;
   color: var(--text);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px 14px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 10px 2px;
   margin: 8px 0 28px;
+  transition: border-color 0.15s ease;
 }
-.glossary-filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.glossary-filter::placeholder { color: var(--muted); }
+.glossary-filter:hover { border-bottom-color: var(--muted); }
+/* Two signals, because the border alone is a 1px colour change: the rule goes
+   accent AND the focus ring is still drawn. */
+.glossary-filter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-bottom-color: var(--accent);
+}
 .glossary-list .decision[hidden] { display: none; }
 
 /* Orientation block: the skimmer's read at the top of the record. Quiet on
@@ -1352,11 +1399,9 @@ body {
 .orientation {
   /* full column width, like every other block in <main> */
   margin: 56px 0 8px;
-  padding: 20px 22px;
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  background: var(--panel);
+  padding: 16px 0 22px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 .orientation .kicker { margin: 0 0 10px; }
 .orientation-lede { color: var(--text); font-size: 1.05rem; margin: 0 0 14px; }
@@ -1454,38 +1499,47 @@ body {
 
 .ledger li a:hover { text-decoration: underline; }
 
+/* Three headline accuracies. Read as a ruled row of a results table, not as
+   three cards: each figure sits under its own hairline with the label beneath
+   it, the way a column head sits over a column.
+
+   The rule is drawn PER CELL rather than as one border across the container,
+   which is what makes this survive the responsive collapse. At 320px the grid
+   drops to a single column and each figure keeps its own rule, so it reads as
+   a ruled list; at desktop the three rules line up across the row with the
+   grid gaps breaking them, which is the column-head reading. One declaration,
+   both layouts, no breakpoint. */
 .stat-strip {
   list-style: none;
   padding: 0;
-  margin: 18px 0 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  margin: 24px 0 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px 32px;
 }
 
 .stat-strip li {
-  flex: 1 1 120px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--panel);
+  gap: 4px;
+  border-top: 1px solid var(--border);
+  padding: 12px 0 0;
 }
 
 .stat-strip .stat-value {
   font-family: var(--mono);
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: clamp(1.7rem, 4vw, 2.1rem);
+  font-weight: 500;
+  line-height: 1.1;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .stat-strip .stat-label {
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
