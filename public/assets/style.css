@@ -90,21 +90,44 @@
   --radius-sm: 6px;
   --radius: 10px;
   --radius-lg: 14px;
-  /* The content column. ONE width for every block on the page: hero copy,
-     prose, tables, diagrams, bordered blocks. See the "One content column"
-     block below for why this beats capping prose separately.
-     --maxw is the column plus .wrap's two 24px gutters, so every .wrap on the
-     site — hero, doors, main, footer — lands its content on the same two
-     vertical lines. The full-bleed bands still span the viewport; it is only
-     their inner .wrap that is column-width. */
-  --col: 720px;
-  --maxw: calc(var(--col) + 48px);
+  /* ---- The two tracks (ADR-008) ---------------------------------------
+     --content is the prose measure. --wide is where objects with an intrinsic
+     width go: tables, the diagram, the multi-column grids. They are
+     concentric, so a wide artifact breaks out by the same amount on both
+     sides and the page has exactly two left edges rather than one or six.
+     See the "Breakout grid" block below for the full construction.
+
+     34rem, NOT 65ch. `ch` is the advance of the digit 0, and Geist's 0 is much
+     wider than its mean lowercase glyph, so a 65ch track measures ~94 real
+     characters — which is the width ADR-008 exists to fix. 34rem measures ~71.
+     --wide is the metrics table's 877px max-content width plus air. */
+  --content: 34rem;
+  --wide: 57rem;
+  --gutter: 24px;
   --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   /* The data voice. Every measured thing on this site is set in it: metrics and
      stat values, ledger IDs and code-refs, dates, the flow line, rung IDs,
      pills, code blocks. One token so that stays a rule rather than six
      hand-typed stacks that drift apart (which is what was here before). */
   --mono: "Geist Mono", ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* The page's column track list, held in a token so every grid container on
+     the site declares the SAME one instead of a copy that can drift. Named
+     lines, outside in: full / wide / content.
+
+     The two breakout tracks are minmax(0, N): they take their full width when
+     there is room and shrink to nothing when there is not, which is what makes
+     the collapse to a single padded column happen with no breakpoint. The
+     content track is min(100% - two gutters, --content), so below ~600px it
+     tracks the viewport instead of forcing one. The gutters are
+     minmax(--gutter, 1fr) — never smaller than the gutter, and they absorb all
+     the slack at desktop, which is what centres the whole thing. */
+  --page-grid:
+    [full-start] minmax(var(--gutter), 1fr)
+    [wide-start] minmax(0, calc((var(--wide) - var(--content)) / 2))
+    [content-start] min(100% - var(--gutter) * 2, var(--content)) [content-end]
+    minmax(0, calc((var(--wide) - var(--content)) / 2)) [wide-end]
+    minmax(var(--gutter), 1fr) [full-end];
 }
 
 html[data-theme="light"] {
@@ -197,10 +220,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* The inner wrap of the full-bleed bands (hero, doors, footer). It is the
+   CONTENT track by default, so the hero copy starts on the same vertical line
+   as every paragraph in <main> below it. The two navs override it to --wide;
+   see the note on .doors .wrap. */
 .wrap {
-  max-width: var(--maxw);
+  max-width: calc(var(--content) + var(--gutter) * 2);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--gutter);
 }
 
 /* Hero */
@@ -399,6 +426,13 @@ body {
    reach the project pages without first reading the whole homepage. The doors are
    the same for everyone; we don't tell a reader which one is "theirs". */
 .doors { border-bottom: 1px solid var(--border); }
+/* The two navs sit on --wide, not on the content track (ADR-008 §4). Measured
+   rather than chosen: seven links is ~664px of set text, so a 544px container
+   wraps the row onto two centred lines at every desktop size. It is chrome,
+   not prose — it has no measure to protect — and --wide keeps it sharing an
+   edge with the tables and the diagram instead of inventing a third one. */
+.doors .wrap,
+.footer .wrap { max-width: calc(var(--wide) + var(--gutter) * 2); }
 .doors .wrap {
   display: flex;
   flex-wrap: wrap;
@@ -480,37 +514,77 @@ body {
    whether or not it carries an intro class. */
 .section-title + p { margin-top: 0; }
 
-/* ---- One content column -----------------------------------------------
-   Everything inside <main> shares ONE width, so the page has exactly one left
-   edge and one right edge.
+/* ---- Breakout grid (ADR-008) -------------------------------------------
+   REPLACES the "One content column" rule that stood here until 2026-07-27.
+   That rule said: everything in <main> shares ONE width, prose runs long, and
+   the way to buy the measure back is to shorten the table headers rather than
+   introduce a second edge. It was argued from a real measurement — the
+   homepage had grown SIX distinct right edges (1053 / 1091 / 1099 / 1264 /
+   1376 / 1400 at 1920px) and a ragged stack of near-miss edges does read as
+   sloppiness. That observation still stands and this construction has to keep
+   honouring it. What did not stand:
 
-   The previous attempt capped prose to a ~70-character measure and left tables
-   and diagrams at the container width. Better line length, but it gave the page
-   two right edges 86px apart, and measuring found the homepage had grown SIX
-   distinct right edges (1053 / 1091 / 1099 / 1264 / 1376 / 1400 at a 1920
-   viewport) — three of which predated that change, since .section-sub, the
-   system diagram and the section headings sat at the full .wrap width while
-   .measure sat at 720. A ragged stack of near-miss edges reads as sloppiness
-   long before anyone notices the line length is comfortable.
+   - The column cost more than the comment claimed. It said ~91 characters;
+     measured across four pages it was running 94-96, with paragraphs over 100.
+     The comfortable band is 65-75. That is not a near miss.
+   - Its escape hatch was backwards. The table headers it proposed shortening
+     ("v2 real (Sonnet 4.6)", "v2 + prompt fix") name which eval, which data,
+     which model — they ARE the argument. Degrading the evidence to satisfy a
+     layout rule inverts what this site is for.
+   - "One column" and "no ragged edges" were treated as one claim. They are
+     two. The six edges it measured were accidents, components sized
+     independently. Two edges that are DESIGNED, land in the same place on
+     every page, and sit 184px apart are a different object — a report has a
+     text measure and a plate width and nobody reads that as sloppiness.
 
-   So: alignment wins over optimal measure here. This site's content is prose
-   INTERLEAVED with six-column metrics tables and diagrams — the tables are the
-   argument, not decoration, and they need ~672px to keep their headers on two
-   lines. Squeezing them into a 509px prose measure wrapped every header onto
-   three. When the widest necessary object and the ideal measure disagree, and
-   they alternate down the page, one honest column beats two competing ones.
+   So: two tracks, concentric, from the --page-grid token above. Children of a
+   grid container default to `content`; the enumerated wide artifacts below are
+   promoted to `wide`. The full reasoning, the measurements, and the two
+   artifacts that are deliberately NOT promoted are in
+   decisions/ADR-008-breakout-grid.md.
 
-   Prose therefore runs ~91 characters. That is above the comfortable 65-75
-   band, and it is a deliberate trade, not an oversight. The way to buy the
-   measure back is to make the tables narrower (shorter column headers), not to
-   re-introduce a second edge.
+   The hero, doors and footer are still full-bleed BANDS — their backgrounds
+   and rules span the viewport. Their inner .wrap is the content track, so the
+   hero copy starts on the same vertical line as the prose below it; the two
+   NAVS override to --wide, for the reason noted there. */
+:is(main.wrap, .measure) {
+  display: grid;
+  grid-template-columns: var(--page-grid);
+  /* The grid's own gutter tracks do the insetting now, so the container must
+     not also carry .wrap's max-width and side padding. */
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
 
-   The hero and doors are still full-bleed BANDS — their backgrounds and border
-   rules span the viewport — but their inner .wrap is the same column, so the
-   hero copy starts on the same vertical line as the decision log below it.
-   Aligning only <main> would have swapped a right-edge mismatch for a 56px
-   left-edge one between the hero and the content. */
-.measure { max-width: var(--col); }
+/* Default: prose measure. */
+:is(main.wrap, .measure) > * { grid-column: content; }
+
+/* .measure is a nested grid re-establishing the same tracks, so the stat strip
+   inside it can still reach `wide`. It therefore spans the whole width of its
+   parent rather than sitting in the content track. */
+.measure { grid-column: full; }
+
+/* Promoted. The rule for adding to this list: an object belongs on `wide` if
+   its CONTENT has an intrinsic width — a table with columns, an SVG with a
+   viewBox, a grid with a minimum track. Prose never does, which is why prose
+   is the thing that gets constrained. `.wide` is the escape hatch for
+   page-local artifacts (the gallery's masonry columns). */
+:is(main.wrap, .measure) > :is(
+  table,
+  pre,
+  figure.diagram-wrap,
+  .diagram,
+  .stat-strip,
+  .repo-grid,
+  .roadmap,
+  .toc,
+  .notes-list,
+  .wide
+) { grid-column: wide; }
+
+/* Kept as a semantic grouping for the homepage's four sections; its width is
+   now the grid's business, not a max-width. */
 
 /* The project-card grid (.cards / .card / .tags / @container card) was removed
    in the 2026-07-26 design pass. The homepage stopped being a card grid when it
@@ -677,14 +751,11 @@ body {
 
 /* Project pages */
 .article-body {
-  /* Keep the same 24px side gutter as .wrap. The old `0` here zeroed the
-     horizontal padding (shorthand overrides .wrap), so on a phone the body
-     text ran edge-to-edge. On desktop this just insets the column a touch;
-     on mobile it gives the content room to breathe. The width itself comes
-     from the one-column rule near the top — these pages used to sit at a
-     672px content width while the homepage sat at 720, which is one of the
-     stray edges that rule exists to remove. */
-  padding: 72px 24px 96px;
+  /* Horizontal padding is 0 because the grid's gutter tracks provide it now
+     (ADR-008); before the grid this had to restate .wrap's 24px, and the
+     original `0` here was a bug that let body text run edge-to-edge on a
+     phone. The gutter tracks have a 24px minimum, so that cannot recur. */
+  padding: 72px 0 96px;
 }
 
 .article-body .back {
@@ -1299,10 +1370,10 @@ body {
 
 /* ===== Decision Log homepage ===== */
 
-/* .measure's width is set by the one-column rule near the top. It used to be
-   the NARROW column, with the diagram masthead above it left at the full .wrap
-   width — that mismatch was one of the homepage's stray right edges. Both are
-   now --col, so the class is a semantic grouping rather than a width. */
+/* .measure carries no width of its own. It was the NARROW column once, then a
+   width equal to everything else, and since ADR-008 it is a nested grid that
+   re-establishes the page tracks so the stat strip inside it can reach `wide`.
+   The name is now purely a semantic grouping. */
 
 .log-intro { color: var(--text-secondary); margin: 0 0 24px; }
 
