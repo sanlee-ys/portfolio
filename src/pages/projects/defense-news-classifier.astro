@@ -108,7 +108,7 @@ import SiteNav from '../../components/SiteNav.astro';
       Two moments show why the eval mattered at all.
     </p>
 
-    <div class="decision">
+    <div class="decision" data-outcome="reversal">
       <p class="tag">The prompt that read better and performed worse</p>
       <p>I sharpened the system prompt to draw a cleaner line between
         <code>procurement</code> (a purchase, the buyer's view) and
@@ -122,7 +122,7 @@ import SiteNav from '../../components/SiteNav.astro';
         the difference here; the numbers could.</p>
     </div>
 
-    <div class="decision" id="decision-grounding">
+    <div class="decision" id="decision-grounding" data-outcome="reversal">
       <p class="tag">The grounding that did not pay</p>
       <p>I added BM25 lexical retrieval to ground each classification in similar
         documents, expecting a clear win. Measured lift: +1.9% category accuracy
@@ -247,7 +247,7 @@ import SiteNav from '../../components/SiteNav.astro';
         I can quietly drop.</p>
     </div>
 
-    <div class="decision">
+    <div class="decision" data-outcome="reversal">
       <p class="tag">The upgrade that bought nothing</p>
       <p>The roadmap called for tiered routing: escalate the uncertain cases to
         the more expensive model. I built the trigger, measured it, and shipped

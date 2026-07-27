@@ -124,7 +124,7 @@ import SiteNav from '../../components/SiteNav.astro';
         with the falsified consequences struck through rather than deleted.</p>
     </div>
 
-    <div class="decision" id="decision-rightsized">
+    <div class="decision" id="decision-rightsized" data-outcome="reversal">
       <p class="tag">Decision &middot; SYS-005</p>
       <h3>Make the enrichment loop async and idempotent by design</h3>
       <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
