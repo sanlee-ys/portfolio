@@ -12,6 +12,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad — **on-demand via `@claude` only** since 2026-07-26 (Amendment 7) | Accepted |
 | [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? — **migrated to Astro**, executed 2026-07-26 | Accepted |
 | [ADR-007](ADR-007-split-dont-trim.md) | Split, don't trim — the two-speed reader | Accepted |
+| [ADR-008](ADR-008-breakout-grid.md) | A breakout grid — two deliberate edges, not one honest column. **Reverses the "One content column" rule** | Accepted |
 
 ## Why this tier was missing
 
@@ -62,6 +63,31 @@ plus a table duplicated from the classifier. And at the single point where a pro
 ADR-004's floor — compressing the classifier's decision cards to linked ADR one-liners — **the
 floor won**, for the sake of ~150 words. The record says so explicitly, because a floor that
 bends the first time it costs something is not a floor.
+
+[`ADR-008`](ADR-008-breakout-grid.md) is the first record in this tier that
+**reverses another one of this repo's own written rules** rather than an unwritten
+habit. The *"One content column"* comment block in `public/assets/style.css` was a
+real decision, argued from a real measurement — six near-miss right edges on the
+homepage, which do read as sloppiness — and it concluded that one column at 720px
+beat two competing ones, with prose running long as the accepted price.
+
+What overturned it was measuring the price. The comment said ~91 characters;
+measured across four pages the site was running **94–96, with paragraphs over
+100**, against a comfortable band of 65–75. And its own prescribed escape hatch —
+shorten the metrics table's column headers to buy the measure back — pointed at
+the evidence: those headers name which eval, which data, which model. **Degrading
+the evidence to satisfy a layout rule inverts what this site is for.**
+
+The record is worth reading for one distinction it draws, because it is the thing
+the old rule got wrong: *"one column"* and *"no ragged edges"* were treated as the
+same claim. Six edges nobody designed are not the same object as two edges that
+land in the same place on every page and sit 184px apart. It also records a
+correction it would have been easy to make silently — the obvious way to write "65
+characters" in CSS is `65ch`, and in Geist that measures **~94 real characters**,
+which is exactly the defect. The token is set in `rem` and verified by
+measurement. Three artifacts the rule would obviously promote are argued down
+rather than promoted, including the autonomy ladder, which was on the list until it
+was rendered.
 
 [`ADR-006`](ADR-006-hand-written-html-or-a-generator.md) closed the same
 day it was opened, and the stub-then-decide split did exactly what it was built for: the
