@@ -434,13 +434,13 @@ constraint is now structural, enforced by living in `public/`.
   transcription is where content silently drifts; a mechanical transform plus an
   output diff is checkable, which hand-porting is not. The script was throwaway
   and is not committed — the evidence is the diff, not the tool.
-- **`sitemap.xml` stays hand-maintained; `@astrojs/sitemap` was not added.** The
-  integration emits `sitemap-index.xml`, which would 404 the existing
-  `sitemap.xml` that `robots.txt` advertises and search engines already hold.
-  This is `ADR-004` §2's reasoning applied unchanged — GitHub Pages has no
+- **`sitemap.xml` stayed hand-maintained in the migration PR; `@astrojs/sitemap`
+  was not added.** The integration emits `sitemap-index.xml`, which would 404 the
+  existing `sitemap.xml` that `robots.txt` advertises and search engines already
+  hold. This is `ADR-004` §2's reasoning applied unchanged — GitHub Pages has no
   redirect mechanism, so a live indexed URL is not worth moving for a
-  convenience. **This leaves the one benefit the decision claimed and did not
-  deliver**, and it is a follow-on, not a silent drop.
+  convenience. It was named as the one claimed benefit not yet delivered, and
+  **closed the same day — see *Sitemap follow-up* below.**
 - **Nothing else in the out-of-scope list moved.** No design change, no content
   change, no Markdown conversion, no stylesheet split, no search. The stylesheet
   is byte-identical and still global.
@@ -455,3 +455,62 @@ paths, not site-relative ones.
 13 after. The missing page is `graphify-out/graph.html`, a gitignored local
 artifact that was never part of the site and had been silently inside the gate's
 walk. Building narrowed the gate to what actually ships.
+
+## Sitemap follow-up (2026-07-26)
+
+The migration record above named the generated sitemap as the one claimed
+benefit not delivered. It is delivered now, and the shape of the answer is worth
+recording because the obvious route was the wrong one.
+
+**`@astrojs/sitemap` was evaluated and rejected on a hard constraint, not a
+preference.** It always emits `sitemap-index.xml` plus a numbered `sitemap-0.xml`,
+and its `filenameBase` option changes the prefix rather than the shape — there is
+no configuration that yields a single `sitemap.xml`. Adopting it would 404
+`https://sanlee.me/sitemap.xml`, a live URL that `robots.txt` advertises and
+search engines already hold, on a host with no redirect mechanism. That is
+[`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md) §2's reasoning exactly, and
+it outranks a dependency preference.
+
+**So the sitemap is emitted by a ~60-line local build integration.** This needs
+defending, because this record rejected a home-grown generator two sections ago.
+The distinction is real rather than convenient: the shell generator would have
+been an **open-ended templating system** — one maintainer, no ecosystem, and a
+new requirement every time a page changed. This is a **frozen single-purpose
+spec** (sitemaps.org 0.9) with one input, the list of pages the build just
+produced, and no evolution path. The comparison is also not bespoke-versus-
+ecosystem: the ecosystem option fails a constraint the bespoke one meets.
+
+**Two things it does better than the file it replaces**, which is what makes this
+a benefit rather than a lateral move:
+
+- **It cannot drift from the site.** It reads the build output, so it can neither
+  list a page that does not exist nor miss one that does. *Migration record* §4
+  above records the opposite failure in this very repo: the hand-maintained file
+  listed three retired `lab/` URLs and the omission surfaced only during a later
+  migration.
+- **`lastmod` comes from git**, not from someone remembering to retype a date.
+
+**One instrument defect, caught before it shipped.** The first version validated
+`lastmod` with a date-format check and a comment claiming it guarded against
+shallow clones. It did not: `git log -1` in a `fetch-depth: 1` checkout returns
+the checkout commit for *every* file, and that answer is a perfectly well-formed
+date. The check could not have failed. This is the same failure shape
+[`ADR-005`](ADR-005-review-check-signal.md) is largely a record of — a counter
+that could not count — so it was fixed the way that record prescribes: ask the
+question directly (`git rev-parse --is-shallow-repository`) and, when the answer
+is yes, **emit no dates at all rather than twelve identical ones**. Verified by
+building in a real `--depth 1` clone: 12 pages, 0 lastmod, one warning.
+`deploy-pages.yml` sets `fetch-depth: 0` so production keeps its dates, and the
+build degrades rather than lies if that is ever removed.
+
+**Honest note on the dates as they stand today.** All twelve currently read
+`2026-07-26`, because the migration rewrote every page's source file that day.
+That is accurate rather than a bug, and it re-spreads as pages are edited
+individually. Emitting anything else would mean hand-curating the dates, which is
+the thing being removed.
+
+**Verified:** the generated URL set is **identical** to the hand-maintained
+file's — same 12 URLs, with `resume.html` picked up as a `public/` passthrough
+and `404.html` correctly excluded, since listing a `noindex` page asks a crawler
+to index the page that exists to say there is nothing there. `robots.txt` is
+unchanged, which was the entire point.
