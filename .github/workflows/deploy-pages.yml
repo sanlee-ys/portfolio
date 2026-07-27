@@ -23,11 +23,26 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
       - uses: actions/configure-pages@v6
+
+      # Since ADR-006 the site is built rather than served from the repo tree.
+      # Only `dist/` is uploaded now, so `decisions/`, `learning/`, `handoff/`
+      # and the READMEs stop being published — checked before the migration, and
+      # nothing on the site links to them (the colophon's learning-note links
+      # point at github.com, not at sanlee.me paths).
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
 
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: "."
+          path: "dist"
 
       - id: deployment
         uses: actions/deploy-pages@v5

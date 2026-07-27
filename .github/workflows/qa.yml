@@ -14,9 +14,22 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+          cache: npm
+
+      # Since ADR-006 the site is built, so every gate below reads `dist/`
+      # rather than the repo tree. SITE_ROOT is what points them there, and each
+      # walking gate fails if it finds no pages — a gate aimed at an empty
+      # directory would otherwise pass while checking nothing, which is the
+      # silent failure ADR-006 named as the main risk of this move.
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
 
       - name: Check internal links
         run: node scripts/link-check.cjs
+        env:
+          SITE_ROOT: dist
 
       - name: Private-repo guard (adversarial suites, A+B and C)
         run: node --test scripts/private-repo-check.test.cjs scripts/private-name-precommit.test.cjs
@@ -36,14 +49,21 @@ jobs:
           # Authenticated read raises the API rate limit; the token can't see
           # other repos' private visibility, and the script filters !private.
           GITHUB_TOKEN: ${{ github.token }}
+          SITE_ROOT: dist
 
       # Published figures are quoted from the classifier's eval runs. They used to
       # be retyped by hand, and in July 2026 that put two-prompt-changes-stale
       # numbers on this site and on the résumé. This asserts every marked figure
       # against the producer's generated artifact. A mismatch fails; a fetch
       # failure warns and passes, so an outage cannot redden the build.
+      # SITE_ROOT covers the HTML only. This gate also reads Markdown markers in
+      # the ADRs, README and learning notes, which are never built, so it walks
+      # the repo tree for those and `dist/` for pages. Pointing it at one root
+      # would silently halve its reach.
       - name: Published metrics match the classifier artifact
         run: node scripts/check-published-metrics.cjs
+        env:
+          SITE_ROOT: dist
 
       # Ports the architecture repo's 'Downstream surfaces' rule down to this repo's
       # ADR tier. Stdlib Python, no venv — this is a static site with no Python
@@ -61,5 +81,11 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
+      # Serves `dist/` over HTTP rather than opening files. The layout emits
+      # root-absolute asset paths, which do not resolve over `file://` — and an
+      # unstyled page does not overflow, so the file:// version of this gate
+      # would pass while measuring nothing.
       - name: Mobile QA gate (no horizontal overflow at 320/360/390/430)
         run: node scripts/mobile-qa.cjs
+        env:
+          SITE_ROOT: dist

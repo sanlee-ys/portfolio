@@ -55,6 +55,11 @@ reasoning; the operative instruction stays in `CLAUDE.md` where agents read it.
   holds, or a sticky element covers something. Hence rule 5 — the gate is a floor, not a
   substitute for looking.
 - **It costs a Playwright + Chromium dependency** in a repo that otherwise has no build step.
+  *(Superseded 2026-07-26 by [`ADR-006`](ADR-006-hand-written-html-or-a-generator.md): the
+  repo now has a build step. Left as written — it was true when decided, and the consequence
+  it weighs was real at the time. The gate itself is unchanged in intent; it now serves
+  `dist/` over HTTP rather than opening files, because the built pages use root-absolute
+  asset paths that `file://` cannot resolve.)*
   Accepted: the alternative is a manual device check that will not happen reliably.
 - **It runs on every layout change**, which is a real few-seconds tax on trivial edits. That
   is the correct trade for a public site where the author is not the typical reader.

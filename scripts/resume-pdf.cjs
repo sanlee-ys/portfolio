@@ -25,7 +25,20 @@ catch (e) {
   process.exit(1);
 }
 
-const ROOT = process.cwd();
+// `resume.html` is deliberately standalone — its own inline <style> and
+// @font-face rules, no link to the shared stylesheet — so this script can render
+// it offline while aborting every non-`file:` request. `ADR-006` made that
+// property structural rather than remembered: the file lives in `public/` and is
+// copied into the build verbatim, so nothing in the layout can reach it.
+//
+// This reads and writes `public/`, NOT the build. Both files are tracked and the
+// point of the script is that they never drift; pointing it at `dist/` would
+// write the PDF into a gitignored directory and leave the committed one stale —
+// exactly the drift it exists to prevent. `file://` still works here precisely
+// because the page has no root-absolute dependencies to resolve.
+const ROOT = process.env.SITE_ROOT
+  ? path.resolve(process.env.SITE_ROOT)
+  : path.join(process.cwd(), 'public');
 
 (async () => {
   // Browser resolution is PW_CHROMIUM or Playwright's own — nothing in between.

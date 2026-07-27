@@ -32,7 +32,11 @@ const fs = require('fs');
 const path = require('path');
 
 const OWNER = 'sanlee-ys'; // public owner name; not a secret
-const ROOT = process.cwd();
+// Since `ADR-006` the published pages are build output; SITE_ROOT points this at
+// `dist/`. This guard is fail-closed by design, so the zero-page check in
+// main() matters more here than anywhere else: a boundary check that scanned no
+// files is not a passing boundary check.
+const ROOT = process.env.SITE_ROOT ? path.resolve(process.env.SITE_ROOT) : process.cwd();
 
 // --- Layer A: every sanlee-ys/<repo> reference (URL or bare slug) ------------
 const REPO_REF = /sanlee-ys\/([A-Za-z0-9._-]+)/g;
@@ -142,10 +146,19 @@ function findHtml(dir) {
 }
 
 async function main() {
-  const publicRepos = await fetchPublicRepos(); // throws -> fail-closed below
+  // Deliberately before fetchPublicRepos(): there is no point asking GitHub for
+  // a repo list when there are no pages to scan, and exiting mid-fetch trips a
+  // libuv teardown assertion on Windows that turns a clean exit 1 into a 127.
   const pages = findHtml('.')
     .sort()
     .map((file) => ({ file, text: fs.readFileSync(path.join(ROOT, file), 'utf8') }));
+  if (pages.length === 0) {
+    console.error(`✗ private-repo guard: no HTML found under ${ROOT}. Nothing was scanned.`);
+    console.error('  Run `npm run build` first, or unset SITE_ROOT.');
+    process.exit(1);
+  }
+
+  const publicRepos = await fetchPublicRepos(); // throws -> fail-closed below
   const violations = checkContent(pages, publicRepos);
   if (violations.length) {
     console.error('✗ private-repo guard: violation(s) found\n');
