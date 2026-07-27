@@ -1,0 +1,177 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+---
+<Base
+  title="The Autonomy Ladder · San Lee"
+  description="Four levels of the same system handed more self-direction, each written down before it was built. Two of the four shipped a no, and the measurements are why."
+  canonical="https://sanlee.me/projects/autonomy-ladder.html"
+  ogType="article"
+>
+
+  <SiteNav />
+
+  <main class="wrap article-body">
+    <a class="back" href="defense-news-classifier.html">&larr; Back to the classifier</a>
+    <h1>The Autonomy Ladder</h1>
+    <p class="subtitle">The same system handed more self-direction, one level at a time. Every level was written down before it was built, and two of them shipped a &ldquo;no.&rdquo;</p>
+
+    <p>
+      This classifier is also the protagonist of the portfolio&rsquo;s roadmap:
+      an autonomy ladder. Each level is the <em>same system</em> handed more
+      self-direction, not a separate demo. The axis is who drives &mdash;
+      reaching for a tool doesn&rsquo;t move you up a level; deciding for
+      yourself does.
+    </p>
+    <!-- The ladder as a climb rather than a table. Same payload the four-row
+         table carried (what it gains / who drives / state), but two things a
+         table structurally cannot draw are now visible: L2's climbed-then-
+         retired arc, and L4's backward critic edge. Vertical by design -- it is
+         a ladder, and vertical is what survives 320px. -->
+    <p class="flow-line">
+      L1 a human runs it <span class="flow-arrow">&rarr;</span> L2 + a tool
+      <span class="flow-arrow">&rarr;</span> L3 it decides it&rsquo;s done
+      <span class="flow-arrow">&rarr;</span> L4 agents coordinate
+    </p>
+
+    <ol class="ladder">
+      <li class="rung" data-state="shipped">
+        <p class="rung-head">
+          <span class="rung-id">L1</span>
+          <span class="rung-name">Single call</span>
+          <span class="rung-state">Shipped &middot; v1</span>
+        </p>
+        <p class="rung-gain">Prompt, structured output, the eval harness.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> A human runs each item.</p>
+      </li>
+
+      <li class="rung" data-state="retired">
+        <p class="rung-head">
+          <span class="rung-id">L2</span>
+          <span class="rung-name">Augmented</span>
+          <span class="rung-state">Shipped v2.0.0, then retired</span>
+        </p>
+        <p class="rung-gain">BM25 retrieval grounds the label in a corpus.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> A human runs it; the model reaches for a tool.</p>
+        <!-- No explanatory note here on purpose. The struck marker and the
+             "then retired" chip carry the climb-down; the paragraph below the
+             ladder already carries the reasoning, and the measured numbers live
+             in "The grounding that did not pay" above. Saying it a third time
+             would be the visual doing prose's job badly. -->
+      </li>
+
+      <li class="rung" data-state="shipped">
+        <p class="rung-head">
+          <span class="rung-id">L3</span>
+          <span class="rung-name">Autonomous loop</span>
+          <span class="rung-state">Climbed &middot; both rungs</span>
+        </p>
+        <p class="rung-gain">Wrapped in a loop that iterates to an explicit done-signal.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> The system decides when it&rsquo;s done.</p>
+        <!-- One level, two sub-rungs; both are now climbed, and each one's
+             honest headline is the held-out set disagreeing with the loop. -->
+        <ul class="subrungs">
+          <li data-done="yes">rung 1 &mdash; prompt-optimization loop <span>shipped, rode the v2.1.0 tag</span></li>
+          <li data-done="yes">rung 2 &mdash; agent-driven ML loop <span>built &middot; its live run gamed its own metric, and got caught</span></li>
+        </ul>
+      </li>
+
+      <li class="rung" data-state="retired">
+        <p class="rung-head">
+          <span class="rung-id">L4</span>
+          <span class="rung-name">Multi-agent</span>
+          <span class="rung-state">Built, measured &middot; declined</span>
+        </p>
+        <p class="rung-gain">Decomposed: triage, classify, and a critic that can hand work <em>backward</em>.</p>
+        <p class="rung-driver"><span class="lbl">Who drives</span> Multiple agents coordinate.</p>
+        <!-- L4's honesty test drawn rather than described: the backward edge is
+             what separates a critic from a linear pipeline with extra steps. -->
+        <svg class="backedge" viewBox="0 0 260 104" role="img"
+             aria-label="Triage passes to classify, classify passes to critic, and the critic hands work backward to triage.">
+          <defs>
+            <marker id="be-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+            <!-- Separate marker so the backward edge's head picks up the accent
+                 with the line; markers don't inherit the referencing path's stroke. -->
+            <marker id="be-arrow-back" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+              <path class="be-head-back" d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+          </defs>
+          <rect class="be-box" x="4" y="14" width="72" height="34" rx="8" />
+          <text class="be-label" x="40" y="36" text-anchor="middle">Triage</text>
+          <rect class="be-box" x="86" y="14" width="72" height="34" rx="8" />
+          <text class="be-label" x="122" y="36" text-anchor="middle">Classify</text>
+          <rect class="be-box" x="168" y="14" width="72" height="34" rx="8" />
+          <text class="be-label" x="204" y="36" text-anchor="middle">Critic</text>
+          <path class="be-edge" d="M 76 31 L 84 31" marker-end="url(#be-arrow)" />
+          <path class="be-edge" d="M 158 31 L 166 31" marker-end="url(#be-arrow)" />
+          <!-- The one edge that matters: critic back to triage. -->
+          <path class="be-edge be-back" d="M 204 48 C 204 84, 40 84, 40 50"
+                marker-end="url(#be-arrow-back)" />
+          <text class="be-note" x="122" y="99" text-anchor="middle">hands work backward</text>
+        </svg>
+      </li>
+    </ol>
+    <p>
+      Every level is now climbed, and every level&rsquo;s story ends the same
+      way: the measurement got the last word. The L2 question &mdash; does
+      giving the model something to lean on help? &mdash; was eventually asked
+      three separate ways: retrieved neighbor documents as context (harmful:
+      0 domain calls fixed, 4 broken &mdash;
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>),
+      machine-mined keyword features (helpful on the set they were mined
+      from, harmful off it &mdash; see L3 below), and retrieved <em>labeled</em>
+      examples as few-shot exemplars (inert: 91.0% vs 90.0% baseline on an
+      n=300 paired test, p=0.70 &mdash;
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/019-knn-exemplar-fewshot.md">ADR-019</a>).
+      Three shapes, three different ways to not beat a well-prompted single
+      call. A rung that was climbed and then climbed back down is still part
+      of the record, which is why L2 isn&rsquo;t quietly relabeled.
+    </p>
+    <p>
+      L3&rsquo;s two rungs each earned an autonomy scar, and the
+      <a href="loop-replay.html">run replay</a> now steps through both
+      recorded runs. Rung 1&rsquo;s shows the prompt-optimization loop gaining
+      on the set it tuned against while slipping on held-out gold. Rung 2 &mdash; an agent doing error-driven feature engineering on
+      a trained baseline
+      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/018-agent-driven-ml-loop.md">ADR-018</a>)
+      &mdash; did it live and bigger: +6.0 points on the validation split it
+      was allowed to see, <strong>&minus;8.6 on the human-labeled set it
+      wasn&rsquo;t</strong>. The loop&rsquo;s design assumed its own gains
+      might be fake, so the held-out set had veto power, and it used it.
+      That&rsquo;s not the harness failing &mdash; that&rsquo;s the harness
+      being the product.
+    </p>
+    <p>
+      L4 put the metric-gaming story where the ladder always said it would
+      live: the backward edge. The critic was aimed at the one named,
+      rule-checkable error cluster &mdash; seven rows where the model inferred
+      a region from the US actor when the text stated no place &mdash; and it
+      fixed <strong>six of the seven</strong>. The honesty test passed. The
+      pipeline still lost
+      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/020-l4-multi-agent-pipeline.md">ADR-020</a>):
+      the critic&rsquo;s restraint lived only in its prompt, it challenged
+      4&times; more often than its charter allowed, and outside its target it
+      broke more labels than it fixed &mdash; the repo&rsquo;s first
+      <em>statistically significant</em> harm (domain 91.3% &rarr; 86.7% on
+      the n=300 paired test, p=0.016) at 4&times; the cost. Both halves are
+      the finding: the backward edge works, and an agent whose scope is
+      enforced by prose instead of code will spend that power freely.
+    </p>
+    <p>
+      Each level was written down before it was built.
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/006-autonomy-ladder-portfolio-spine.md">ADR-006</a>
+      records the decision to make the ladder the spine, and the
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/docs/specs/autonomy-ladder.md">living roadmap</a>
+      holds the per-level detail &mdash; so what shipped can be checked
+      against what was promised, including the levels that shipped a
+      &ldquo;no.&rdquo;
+    </p>
+
+  </main>
+  <script is:inline src="../assets/theme.js"></script>
+  <script is:inline src="../assets/last-updated.js"></script>
+</Base>

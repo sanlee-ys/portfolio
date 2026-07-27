@@ -1,0 +1,104 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+---
+<Base
+  title="Why an LLM at All · San Lee"
+  description="A TF-IDF and logistic-regression baseline, built untuned on purpose, measured against the LLM on the same 54 hand-labeled rows. It lost by 20 and 26 points, and the two handicaps that cut against it are named."
+  canonical="https://sanlee.me/projects/classifier-baseline.html"
+  ogType="article"
+>
+
+  <SiteNav />
+
+  <main class="wrap article-body">
+    <a class="back" href="defense-news-classifier.html">&larr; Back to the classifier</a>
+    <h1>Why an LLM at All</h1>
+    <p class="subtitle">The boring baseline, built so the foundational spend has a number under it instead of an assumption.</p>
+
+    <p>
+      Everything above measures something layered <em>on top of</em> a language
+      model: a sharper prompt, retrieval, a bigger model for the hard rows. None
+      of it asks the question a skeptical reader asks in the first thirty
+      seconds. Does this task need an LLM? For most of this project&rsquo;s life
+      there was no answer, which is a conspicuous hole in a repo whose whole
+      argument is measure before you spend.
+    </p>
+    <p>
+      So I built the boring baseline: TF-IDF features into logistic regression,
+      one classifier per axis, trained on 300 real snippets graded by the Opus
+      judge (the scaled set described further down, not v1&rsquo;s synthetic
+      one) and scored once against the same 54 hand-labeled rows as everything
+      else on this page. Deliberately standard, not tuned. A clever baseline invites
+      &ldquo;you rigged it,&rdquo; and a hobbled one invites the same accusation
+      in reverse.
+    </p>
+
+    <table class="metrics">
+      <thead>
+        <tr><th>Against human gold, n=54</th><th>Classical baseline</th><th>The LLM</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Category accuracy</td><td>72.2%</td><td>92.6%</td></tr>
+        <tr><td>Domain accuracy</td><td>66.7%</td><td>92.6%</td></tr>
+        <tr><td>Cost per article</td><td>$0.00</td><td>one API call</td></tr>
+        <tr><td>All 54 rows, wall-clock</td><td>4.8&nbsp;ms</td><td>network-bound, seconds</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      The LLM wins by 20 points on category and 26 on domain. Both arms ran on
+      identical rows, so that gap can be tested rather than eyeballed: a paired
+      exact McNemar returns <strong>p=0.013</strong> on category and
+      <strong>p=0.0005</strong> on domain. Counted as disagreements, the baseline
+      alone was wrong 14 times to the LLM&rsquo;s 3 on category, and 15 to 1 on
+      domain. The foundational spend now has a number under it instead of an
+      assumption
+      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/017-classical-baseline-bakeoff.md">ADR-017</a>,
+      full report in
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/baseline_eval.txt">baseline_eval.txt</a>).
+    </p>
+    <p>
+      I built it expecting either answer to be worth publishing. A baseline that
+      landed close would have been the strongest negative result here by a wide
+      margin, and I&rsquo;d have had to say so on this page. It didn&rsquo;t, and
+      the reason it didn&rsquo;t is more useful than the margin.
+    </p>
+
+    <div class="decision">
+      <p class="tag">Where the baseline actually broke</p>
+      <p>The misses aren&rsquo;t spread evenly. The baseline collapses toward
+        whichever class is lexically loud: five of six <code>policy</code>
+        stories came back as <code>operations</code>, and six of eleven
+        <code>land</code> rows came back as <code>air</code>. Those are the
+        labels that depend on what <em>kind of claim</em> an article is making
+        rather than which words it contains. A treaty and a deployment share a
+        vocabulary; only one of them is policy.</p>
+      <p class="tradeoff"><strong>What that means for the spend:</strong> the
+        LLM isn&rsquo;t buying accuracy in general, it&rsquo;s buying the
+        boundaries that need reading comprehension. That is a much more specific
+        claim than &ldquo;the LLM is better,&rdquo; and it&rsquo;s the one the
+        numbers actually support.</p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Two handicaps I&rsquo;d rather name than have found</p>
+      <p>The training labels came from the Opus judge, not from people, so the
+        baseline was learning to imitate a grader that itself disagrees with
+        humans about 5&ndash;6% of the time, and then it was tested against those
+        humans. Separately, <code>industry</code> had exactly
+        <strong>one</strong> training row, which makes that label structurally
+        unlearnable rather than merely hard. The baseline scored 0.000 on it,
+        as it had to.</p>
+      <p class="tradeoff"><strong>Why they stay in the writeup:</strong> both
+        cut against the baseline, which means both flatter the conclusion I was
+        hoping for. That is the exact failure the grounding experiment above
+        already taught me once, when an unfair frozen baseline inflated a lift
+        that turned out not to exist. A margin this size survives the caveats;
+        the caveats still get stated.</p>
+    </div>
+
+  </main>
+  <script is:inline src="../assets/theme.js"></script>
+  <script is:inline src="../assets/last-updated.js"></script>
+</Base>
