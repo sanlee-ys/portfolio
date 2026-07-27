@@ -1,0 +1,31 @@
+---
+// The site nav. Until 2026-07-26 this markup existed 13 times over, which is
+// why 12 of 13 pages simply went without it: adding it meant 12 hand edits.
+// PR #141 generated the copies with a throwaway script and said in its own
+// commit message that this is the one transform a layout does once. This is
+// that once.
+//
+// `current` matches an item's `id` and marks the active page three ways —
+// accent, underline and `aria-current` — so the indicator never depends on
+// colour alone. Passing an id that matches nothing simply marks nothing, which
+// is correct for pages that are not nav destinations (colophon, 404, the lab
+// pages).
+const { current } = Astro.props;
+
+const items = [
+  { id: 'the-system', href: '/projects/the-system.html', label: 'System' },
+  { id: 'defense-news-classifier', href: '/projects/defense-news-classifier.html', label: 'Classifier' },
+  { id: 'faithfulness-judge', href: '/projects/faithfulness-judge.html', label: 'Judge' },
+  { id: 'product-and-program', href: '/projects/product-and-program.html', label: 'Product & Program' },
+  { id: 'netops-lab', href: '/projects/netops-lab.html', label: 'Network Lab' },
+  { id: 'glossary', href: '/glossary.html', label: 'Glossary' },
+  { id: 'resume', href: '/resume.html', label: 'Résumé' },
+];
+---
+<nav class="doors" aria-label="The work">
+  <div class="wrap">
+    {items.map((item) => (
+      <a href={item.href} aria-current={item.id === current ? 'page' : undefined}>{item.label}</a>
+    ))}
+  </div>
+</nav>

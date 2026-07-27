@@ -9,7 +9,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = process.cwd();
+// Since `ADR-006` the site is a build artifact. SITE_ROOT points this at
+// `dist/`; with it unset the script still works from the repo root, which is
+// what keeps it runnable by hand.
+const ROOT = process.env.SITE_ROOT ? path.resolve(process.env.SITE_ROOT) : process.cwd();
 
 function findHtml(dir) {
   const out = [];
@@ -24,6 +27,13 @@ function findHtml(dir) {
 
 let broken = 0;
 const pages = findHtml('.').sort();
+// A gate that checked nothing must not report success. `ADR-006` named this as
+// the silent-failure risk of pointing these scripts at build output.
+if (pages.length === 0) {
+  console.error(`✗ link-check: no HTML found under ${ROOT}. Nothing was checked.`);
+  console.error('  Run `npm run build` first, or unset SITE_ROOT.');
+  process.exit(1);
+}
 for (const page of pages) {
   const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
   const dir = path.dirname(page);

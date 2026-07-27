@@ -1,60 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zero-Touch Provisioning &middot; San Lee</title>
-  <meta name="description" content="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device." />
-  <link rel="canonical" href="https://sanlee.me/projects/netops-lab.html" />
-  <meta property="og:site_name" content="San Lee" />
-  <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://sanlee.me/projects/netops-lab.html" />
-  <meta property="og:title" content="Zero-Touch Provisioning &middot; San Lee" />
-  <meta property="og:description" content="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device." />
-  <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Zero-Touch Provisioning &middot; San Lee" />
-  <meta name="twitter:description" content="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device." />
-  <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
-  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
-  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
-  <link rel="stylesheet" href="../assets/style.css" />
-  <script>
-    (function () {
-      try {
-        var saved = localStorage.getItem("theme");
-        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-        document.documentElement.setAttribute("data-theme", t);
-      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
-    })();
-  </script>
-<!-- Privacy-friendly analytics by Plausible -->
-<script async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
-<script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
-</script>
-</head>
-<body>
-  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
-    <span class="theme-icon-dark">&#9789;</span>
-    <span class="theme-icon-light">&#9728;</span>
-  </button>
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+---
+<Base
+  title="Zero-Touch Provisioning · San Lee"
+  description="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device."
+  canonical="https://sanlee.me/projects/netops-lab.html"
+  ogType="article"
+>
 
-  <nav class="doors" aria-label="The work">
-    <div class="wrap">
-      <a href="../projects/the-system.html">System</a>
-      <a href="../projects/defense-news-classifier.html">Classifier</a>
-      <a href="../projects/faithfulness-judge.html">Judge</a>
-      <a href="../projects/product-and-program.html">Product &amp; Program</a>
-      <a href="../projects/netops-lab.html" aria-current="page">Network Lab</a>
-      <a href="../glossary.html">Glossary</a>
-      <a href="../resume.html">R&eacute;sum&eacute;</a>
-    </div>
-  </nav>
+  <SiteNav current="netops-lab" />
+
 
   <main class="wrap article-body">
     <a class="back" href="../index.html">&larr; Back</a>
@@ -294,7 +250,6 @@
       reason for the lab.
     </p>
   </main>
-  <script src="../assets/theme.js"></script>
-  <script src="../assets/last-updated.js"></script>
-</body>
-</html>
+  <script is:inline src="../assets/theme.js"></script>
+  <script is:inline src="../assets/last-updated.js"></script>
+</Base>

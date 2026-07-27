@@ -1,60 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The System &middot; San Lee</title>
-  <meta name="description" content="How a single LLM classifier grew into a four-repo system, and the seam-level discipline I put on it: frozen contracts, idempotency, and recorded decisions." />
-  <link rel="canonical" href="https://sanlee.me/projects/the-system.html" />
-  <meta property="og:site_name" content="San Lee" />
-  <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://sanlee.me/projects/the-system.html" />
-  <meta property="og:title" content="The System &middot; San Lee" />
-  <meta property="og:description" content="How a single LLM classifier grew into a four-repo system, and the seam-level discipline I put on it: frozen contracts, idempotency, and recorded decisions." />
-  <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="The System &middot; San Lee" />
-  <meta name="twitter:description" content="How a single LLM classifier grew into a four-repo system, and the seam-level discipline I put on it: frozen contracts, idempotency, and recorded decisions." />
-  <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
-  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
-  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
-  <link rel="stylesheet" href="../assets/style.css" />
-  <script>
-    (function () {
-      try {
-        var saved = localStorage.getItem("theme");
-        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-        document.documentElement.setAttribute("data-theme", t);
-      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
-    })();
-  </script>
-<!-- Privacy-friendly analytics by Plausible -->
-<script async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
-<script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
-</script>
-</head>
-<body>
-  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
-    <span class="theme-icon-dark">&#9789;</span>
-    <span class="theme-icon-light">&#9728;</span>
-  </button>
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+---
+<Base
+  title="The System · San Lee"
+  description="How a single LLM classifier grew into a four-repo system, and the seam-level discipline I put on it: frozen contracts, idempotency, and recorded decisions."
+  canonical="https://sanlee.me/projects/the-system.html"
+  ogType="article"
+>
 
-  <nav class="doors" aria-label="The work">
-    <div class="wrap">
-      <a href="../projects/the-system.html" aria-current="page">System</a>
-      <a href="../projects/defense-news-classifier.html">Classifier</a>
-      <a href="../projects/faithfulness-judge.html">Judge</a>
-      <a href="../projects/product-and-program.html">Product &amp; Program</a>
-      <a href="../projects/netops-lab.html">Network Lab</a>
-      <a href="../glossary.html">Glossary</a>
-      <a href="../resume.html">R&eacute;sum&eacute;</a>
-    </div>
-  </nav>
+  <SiteNav current="the-system" />
+
 
   <main class="wrap article-body">
     <a class="back" href="../index.html">&larr; Back</a>
@@ -119,7 +75,7 @@
       <li>A note is created in <strong>notes-api</strong> (<code>POST /notes</code>), which enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately; the task runs after the response is sent.</li>
       <li>The <strong>background task</strong> POSTs the note text to the classifier's <code>/classify</code> endpoint.</li>
       <li>The <strong>classifier</strong> classifies the text (one Sonnet call, structured output forced via tool-use) into a category, an operational domain, and a region, and returns them.</li>
-      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/{id}/tags</code>, replace semantics), preserving the user's own tags. It currently maps the first two; the region field is newer than this consumer. <code>CLASSIFIER_URL</code> unset makes the whole step a no-op.</li>
+      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/&#123;id&#125;/tags</code>, replace semantics), preserving the user's own tags. It currently maps the first two; the region field is newer than this consumer. <code>CLASSIFIER_URL</code> unset makes the whole step a no-op.</li>
       <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
     </ol>
 
@@ -142,10 +98,10 @@
           returns <code>201</code> immediately and schedules the enrichment as a
           background task, so <code>tags</code> is still empty at this point.</p>
         <pre><code>POST /notes
-{
+&#123;
   "title": "USS Ronald Reagan first ordnance drop",
   "content": "F/A-18E Hornets assigned to the \"Eagles\" of Strike Fighter Attack Squadron 115 ... in support of Operation Iraqi Freedom."
-}</code></pre>
+&#125;</code></pre>
       </li>
       <li>
         <p class="ex-step">The classifier is forced to answer in schema</p>
@@ -154,17 +110,17 @@
           with <code>tool_choice</code> pinned to the <code>classify_article</code>
           tool forces the model to answer only as an enum-validated tool call,
           which the endpoint returns as
-          <code>{category, operational_domain, region}</code>. No confidence
+          <code>&#123;category, operational_domain, region&#125;</code>. No confidence
           score, by design.</p>
         <pre><code>// forced tool_use emitted by the model
-{
+&#123;
   "name": "classify_article",
-  "input": {
+  "input": &#123;
     "category": "operations",
     "operational_domain": "air",
     "region": "middle-east"
-  }
-}</code></pre>
+  &#125;
+&#125;</code></pre>
       </li>
       <li>
         <p class="ex-step">Labels become namespaced tags</p>
@@ -174,7 +130,7 @@
           semantics, so reprocessing converges instead of piling up duplicates.
           The user's own tags are preserved. The background task writes through
           the ORM in-process rather than calling the service's own HTTP
-          endpoint; the equivalent <code>PUT /notes/{id}/tags</code> exists for
+          endpoint; the equivalent <code>PUT /notes/&#123;id&#125;/tags</code> exists for
           external callers and carries the same replace semantics.</p>
         <p class="ex-note"><strong>Note what happens to <code>region</code>
           here: nothing.</strong> The classifier grew a third field in v3;
@@ -195,15 +151,15 @@
           have noticed if it had. That's written up honestly in the
           <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-004-classify-http-contract.md">SYS-004 amendment</a>
           rather than quietly fixed.</p>
-        <pre><code>classifier_tags({
+        <pre><code>classifier_tags(&#123;
     "category": "operations",
     "operational_domain": "air",
     "region": "middle-east",   # not mapped yet — ignored, not an error
-})
+&#125;)
 # -&gt; ["category:operations", "domain:air"]
 
 # written in-process; note.tags = merge_tags(note.tags, new_tags)
-{ "tags": ["category:operations", "domain:air"] }</code></pre>
+&#123; "tags": ["category:operations", "domain:air"] &#125;</code></pre>
       </li>
       <li>
         <p class="ex-step">The note is now enriched</p>
@@ -213,14 +169,14 @@
           <code>domain:</code> tags, which keeps the schema small and the state
           honest.</p>
         <pre><code>GET /notes/1
-{
+&#123;
   "id": 1,
   "title": "USS Ronald Reagan first ordnance drop",
   "content": "F/A-18E Hornets ... Operation Iraqi Freedom.",
   "tags": ["category:operations", "domain:air"],
   "created_at": "...",
   "updated_at": "..."
-}</code></pre>
+&#125;</code></pre>
       </li>
       <li>
         <p class="ex-step">The agent can find it</p>
@@ -229,18 +185,18 @@
           for grounding. The result follows the system-wide observation contract
           (SYS-003): a status, a summary, the payload, and a cited source.</p>
         <pre><code>search_notes(tag="domain:air")  -&gt;  GET /notes?tag=domain:air
-{
+&#123;
   "status": "success",
   "summary": "1 matching note(s).",
   "payload": [
-    {
+    &#123;
       "id": 1,
       "title": "USS Ronald Reagan first ordnance drop",
       "tags": ["category:operations", "domain:air"]
-    }
+    &#125;
   ],
   "source": "notes-api service, http://127.0.0.1:8000/notes"
-}</code></pre>
+&#125;</code></pre>
       </li>
     </ol>
 
@@ -363,8 +319,7 @@
       <a href="defense-news-classifier.html#autonomy-ladder">classifier page</a>.
     </p>
   </main>
-  <script src="../assets/theme.js"></script>
-  <script src="../assets/last-updated.js"></script>
-  <script src="../assets/diagram.js"></script>
-</body>
-</html>
+  <script is:inline src="../assets/theme.js"></script>
+  <script is:inline src="../assets/last-updated.js"></script>
+  <script is:inline src="../assets/diagram.js"></script>
+</Base>

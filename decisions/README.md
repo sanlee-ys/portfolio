@@ -63,9 +63,24 @@ option was the home-grown one**: formalizing #141's throwaway shell script keeps
 dependencies and view-source fidelity, and it was rejected only on the grounds that it is a
 build step in disguise, bought at the price of a templating engine with one maintainer.
 
-**Migration is planned, not executed** — no file has moved, and `CLAUDE.md` still says "no
-build step" on purpose, because that is still true. It changes in the migration PR, in the
-same commit that makes it false.
+**The migration then executed the same day.** `CLAUDE.md`'s "no build step" line changed in
+the migration PR, in the same commit that made it false, as this paragraph originally
+promised.
+
+The acceptance bar is what makes the result claimable: every page was compared against its
+pre-migration self as a **parsed DOM**, so entity spelling, brace escapes and attribute
+order normalised away and only content differences survived — **12/12 pages semantically
+identical**. It earned its keep immediately by catching two regressions on `404.html` that
+every CI gate was green through: the layout had **dropped that page's `noindex`**, and had
+given it an empty `og:url` and a null canonical. The page with no social metadata is the one
+that proves an unconditional layout is wrong.
+
+Two honest notes. The plan's one unfulfilled benefit is the **generated sitemap** —
+`@astrojs/sitemap` emits `sitemap-index.xml`, which would 404 the `sitemap.xml` that
+`robots.txt` advertises, so `ADR-004` §2's live-URL reasoning applied and it stayed
+hand-maintained. And the `Article.astro` layout the plan specified was **not built**: the
+back link and `.article-body` turned out to be page content, and wrapping them would have
+meant editing content to fit the abstraction.
 
 The earlier decisions — the AI-use
 posture and the private-repo boundary — were recorded on 2026-07-18 as

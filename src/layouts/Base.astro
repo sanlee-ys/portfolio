@@ -1,0 +1,78 @@
+---
+// The page shell that was copied by hand into all 13 pages until 2026-07-26.
+// Everything here used to be duplicated per file: the head, the theme
+// bootstrap, the analytics snippet and the theme toggle. See `ADR-006`.
+//
+// Every <script> and <style> below carries `is:inline`. That is load-bearing,
+// not decoration: without it Astro bundles and renames the asset, which would
+// break the `public/` paths and hash the filenames the site already publishes.
+// `social` gates the canonical + Open Graph + Twitter block. It defaults to
+// "this page has a canonical URL", which is the same question. 404.html is the
+// page that proves the gate is needed: it carries `noindex` and deliberately no
+// canonical and no social tags, and an unconditional block gave it an empty
+// `og:url` and a null canonical -- worse than emitting nothing.
+const {
+  title,
+  description,
+  canonical,
+  robots,
+  ogType = 'article',
+  ogTitle = title,
+  ogDescription = description,
+  social = canonical != null,
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  {description && <meta name="description" content={description} />}
+  {robots && <meta name="robots" content={robots} />}
+  {canonical && <link rel="canonical" href={canonical} />}
+  {social && (
+    <Fragment>
+      <meta property="og:site_name" content="San Lee" />
+      <meta property="og:type" content={ogType} />
+      <meta property="og:url" content={canonical} />
+      <meta property="og:title" content={ogTitle} />
+      <meta property="og:description" content={ogDescription} />
+      <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={ogTitle} />
+      <meta name="twitter:description" content={ogDescription} />
+      <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
+    </Fragment>
+  )}
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/assets/style.css" />
+  <script is:inline>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+<!-- Privacy-friendly analytics by Plausible -->
+<script is:inline async src="https://plausible.io/js/pa-ka6NxL3Pt5fcGylyI63YV.js"></script>
+<script is:inline>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+  <slot name="head" />
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span class="theme-icon-dark">&#9789;</span>
+    <span class="theme-icon-light">&#9728;</span>
+  </button>
+  <slot />
+</body>
+</html>

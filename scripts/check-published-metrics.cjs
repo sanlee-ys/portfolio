@@ -43,6 +43,16 @@ const path = require('path');
 const https = require('https');
 
 const ROOT = process.cwd();
+
+/*
+ * Since `ADR-006` the published HTML is a build artifact, not the repo tree, so
+ * the pages this gate must read live in `dist/` (SITE_ROOT). The Markdown it
+ * must read — ADRs, README, ROADMAP, learning notes — is still the repo tree and
+ * is never built. Walking only one root would silently halve the gate's reach,
+ * so it walks both and says which is which.
+ */
+const HTML_ROOT = process.env.SITE_ROOT ? path.resolve(process.env.SITE_ROOT) : ROOT;
+const BUILD_DIRS = new Set(['dist', 'public', 'src', 'node_modules', 'scripts']);
 const ARTIFACT_URL =
   'https://raw.githubusercontent.com/sanlee-ys/defense-news-classifier/main/evals/metrics.json';
 
@@ -96,15 +106,33 @@ function fetchJson(url) {
   });
 }
 
-function claimFiles(dir, out = []) {
-  for (const name of fs.readdirSync(path.join(ROOT, dir))) {
-    if (name.startsWith('.') || name === 'node_modules' || name === 'scripts') continue;
+function claimFiles(root, exts, dir = '.', out = []) {
+  for (const name of fs.readdirSync(path.join(root, dir))) {
+    if (name.startsWith('.') || BUILD_DIRS.has(name)) continue;
     const rel = dir === '.' ? name : `${dir}/${name}`;
-    const stat = fs.statSync(path.join(ROOT, rel));
-    if (stat.isDirectory()) claimFiles(rel, out);
-    else if (name.endsWith('.html') || name.endsWith('.md')) out.push(rel);
+    const stat = fs.statSync(path.join(root, rel));
+    if (stat.isDirectory()) claimFiles(root, exts, rel, out);
+    else if (exts.some((e) => name.endsWith(e))) out.push(rel);
   }
   return out;
+}
+
+/*
+ * Every claim-bearing file, tagged with the root it came from. The zero-page
+ * guard below is the reason this returns a tagged list rather than paths: a gate
+ * pointed at an empty directory finds nothing and, without the guard, reports
+ * that as success. That is the exact silent failure `ADR-006` named as the risk
+ * of moving these gates onto build output.
+ */
+function allClaimFiles() {
+  const html = claimFiles(HTML_ROOT, ['.html']).map((rel) => ({ root: HTML_ROOT, rel }));
+  const md = claimFiles(ROOT, ['.md']).map((rel) => ({ root: ROOT, rel }));
+  if (html.length === 0) {
+    console.error(`✗ check-published-metrics: no HTML found under ${HTML_ROOT}.`);
+    console.error('  Nothing was checked. Run `npm run build` first, or unset SITE_ROOT.');
+    process.exit(1);
+  }
+  return [...html, ...md];
 }
 
 /*
@@ -152,8 +180,8 @@ function main() {
     const problems = [];
     let checked = 0;
 
-    for (const file of claimFiles('.')) {
-      const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    for (const { root, rel: file } of allClaimFiles()) {
+      const text = fs.readFileSync(path.join(root, file), 'utf8');
       for (const [key, shown] of markersIn(text, file)) {
         if (!known.has(key)) {
           problems.push(

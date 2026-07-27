@@ -28,7 +28,15 @@ catch (e) {
   process.exit(1);
 }
 
-const ROOT = process.cwd();
+const { serve } = require('./static-server.cjs');
+
+// Since `ADR-006` the pages are build output and their asset paths are
+// root-absolute, because one shared layout serves several directory depths.
+// Root-absolute paths do NOT resolve over `file://`, so this gate now serves
+// the build over HTTP instead of opening files. Opening `dist/*.html` as files
+// renders them unstyled — and an unstyled page does not overflow, so the gate
+// would go green while testing nothing.
+const ROOT = process.env.SITE_ROOT ? path.resolve(process.env.SITE_ROOT) : process.cwd();
 const WIDTHS = [320, 360, 390, 430]; // 320 covers Display-Zoom phones; 430 the largest iPhone
 
 function findHtml(dir) {
@@ -45,6 +53,12 @@ function findHtml(dir) {
 
 (async () => {
   const pages = findHtml('.').sort();
+  // A gate that rendered no pages must not report success (`ADR-006`).
+  if (pages.length === 0) {
+    console.error(`mobile-qa error: no HTML found under ${ROOT}. Nothing was rendered.`);
+    console.error('  Run `npm run build` first, or unset SITE_ROOT.');
+    process.exit(1);
+  }
   // Browser resolution is PW_CHROMIUM or Playwright's own — nothing in between.
   // A hardcoded default would silently outrank the pinned revision on any host
   // that happened to have that path, which is the one case nobody would notice.
@@ -54,16 +68,20 @@ function findHtml(dir) {
     console.error('Unset it to use the Chromium from `npm --prefix scripts exec -- playwright install chromium`.');
     process.exit(1);
   }
+  const site = await serve(ROOT);
   const browser = await chromium.launch(exe ? { executablePath: exe } : {});
   const page = await browser.newPage();
   // Block external requests (analytics/fonts) so pages load fast and offline.
-  await page.route('**/*', r => (r.request().url().startsWith('file:') ? r.continue() : r.abort()));
+  // The allowed origin is the local server, not `file:` — the gate serves the
+  // build now, so a `file:`-only filter would abort the stylesheet itself and
+  // measure an unstyled page.
+  await page.route('**/*', r => (r.request().url().startsWith(site.origin) ? r.continue() : r.abort()));
 
   let fails = 0;
   for (const w of WIDTHS) {
     await page.setViewportSize({ width: w, height: 800 });
     for (const rel of pages) {
-      await page.goto('file://' + path.join(ROOT, rel), { waitUntil: 'domcontentloaded', timeout: 10000 });
+      await page.goto(`${site.origin}/${rel}`, { waitUntil: 'domcontentloaded', timeout: 10000 });
       const over = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth
       );
@@ -71,6 +89,7 @@ function findHtml(dir) {
     }
   }
   await browser.close();
+  await site.close();
 
   if (fails) {
     console.error(`\n✗ ${fails} horizontal-overflow issue(s) across ${WIDTHS.join('/')}px. Fix before committing.`);

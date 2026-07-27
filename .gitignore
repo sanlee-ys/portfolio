@@ -1,7 +1,10 @@
-# This is a no-build static site — no package.json/lockfile at the root.
-# scripts/package.json pins Playwright for the QA tooling only; it's tracked,
-# node_modules/ under it is not.
+# Since ADR-006 the site IS built: Astro at the root (package.json +
+# package-lock.json are tracked, and CI runs `npm ci`), output to dist/.
+# scripts/package.json separately pins Playwright for the QA tooling; both
+# lockfiles are tracked, neither node_modules/ is.
 node_modules/
+dist/
+.astro/
 
 graphify-out/
 

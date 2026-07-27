@@ -1,7 +1,44 @@
 # CLAUDE.md — working agreement for this repo
 
 Public portfolio site — static HTML/CSS/JS, served at **sanlee.me** via GitHub
-Pages. No build step; every page links `assets/style.css`.
+Pages. Built with **Astro** since 2026-07-26 ([`decisions/ADR-006`](decisions/ADR-006-hand-written-html-or-a-generator.md));
+output is still static HTML with zero JS by default.
+
+## The build, and the two things it changes about working here
+
+*Reasoning and alternatives: [`decisions/ADR-006`](decisions/ADR-006-hand-written-html-or-a-generator.md).
+This section is canonical for what to **do**.*
+
+```
+npm ci && npm run build      # -> dist/
+npm run dev                  # local dev server with HMR
+```
+
+- **Pages live in `src/pages/*.astro`; static files live in `public/`.** Shared
+  chrome — head, theme bootstrap, analytics, theme toggle — is
+  `src/layouts/Base.astro`, and the site nav is `src/components/SiteNav.astro`.
+  Change them once, not thirteen times. `astro.config.mjs` sets
+  `build.format: 'file'`, which is what keeps URLs as `glossary.html` rather
+  than `glossary/index.html`; **do not change it** — every inbound link breaks.
+- **`public/resume.html` is standalone on purpose and must stay in `public/`.**
+  It carries its own inline `<style>` and `@font-face` rules and links no shared
+  stylesheet, because `scripts/resume-pdf.cjs` renders it offline and aborts
+  every non-`file:` request. Moving it into `src/pages/` would hoist shared CSS
+  into it and break `resume.pdf`.
+- **Every `<script>` and `<style>` in a page needs `is:inline`.** Without it
+  Astro bundles and renames the asset, breaking the `public/` paths. Literal
+  `{` and `}` in page content must be written `&#123;`/`&#125;` — in `.astro`,
+  `{` opens a JS expression.
+
+**The gates now read the build, not the repo.** Run them with `SITE_ROOT=dist`
+after `npm run build`, or use `npm run qa`, which does both:
+
+```
+npm run qa
+```
+
+Each walking gate **fails if it finds no pages**, so a gate pointed at an
+unbuilt or empty directory reddens instead of passing on an empty walk.
 
 ## Mobile is a contract, not an afterthought
 
@@ -14,14 +51,19 @@ committed.** The owner should never have to QA the phone layout after the fact.
 
 Before committing any layout / style / markup change:
 
-1. **Run the mobile QA gate** from the repo root:
+1. **Build, then run the mobile QA gate** from the repo root:
 
    ```
-   node scripts/mobile-qa.cjs
+   npm run build && SITE_ROOT=dist node scripts/mobile-qa.cjs
    ```
 
    It renders every page at **320 / 360 / 390 / 430 px** and **fails on any
-   horizontal overflow**. It must be green before you commit.
+   horizontal overflow**. It must be green before you commit. **It serves
+   `dist/` over HTTP rather than opening files** — the layout emits
+   root-absolute asset paths, which do not resolve over `file://`, and an
+   unstyled page does not overflow, so a `file://` run would pass while
+   measuring nothing. Running it against a stale `dist/` tests the previous
+   build; rebuild first.
 
    **Prerequisite — a Chromium matching the pinned Playwright.** `node_modules/`
    isn't tracked, and each Playwright version maps to one browser revision, so

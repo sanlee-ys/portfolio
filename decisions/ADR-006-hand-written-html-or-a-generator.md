@@ -1,10 +1,8 @@
 # ADR-006: Hand-written HTML, or a static site generator?
 
-**Status:** **Accepted 2026-07-26 — migrate to Astro.** Decided in a scoped
-session the same day the question was opened. Migration is **planned, not
-executed**; no file has moved. See *Decision*, *Consequences*, and *Migration
-plan*.
-**Date:** 2026-07-26 (question opened); 2026-07-26 (decided)
+**Status:** **Accepted 2026-07-26 — migrate to Astro. Migration EXECUTED the
+same day**; see *Migration record* for what the plan got right and wrong.
+**Date:** 2026-07-26 (question opened, decided, and executed)
 **Deciders:** San Lee
 
 ---
@@ -371,3 +369,89 @@ evidence, not with fresh enthusiasm.*
 | **Formalize the shell generator instead** — promote #141's throwaway script into a committed `scripts/render-shell.cjs` owning head, nav, footer and ToC | Genuinely tempting: it kills the N-edit problem while keeping zero dependencies and view-source fidelity. Rejected because it is a build step wearing a disguise — the emitted HTML would still not be the authored HTML — and it buys that at the price of a bespoke templating engine with one maintainer, no ecosystem, and no answer for the next need after this one. If a build step is being accepted either way, accept the one other people maintain |
 | **Migrate, but sequence it behind the netops-lab pillar** | The disciplined-sounding option, rejected on arithmetic. The port's cost scales with page count, page-adding is confirmed ongoing, and every shared-chrome edit in the interim is work that gets ported or discarded — #141 and #142 already are. Deferring makes the same migration strictly more expensive to buy a delay with no expiry date attached |
 | **Convert content to Markdown in the same pass** | Rejected as the specific move that turns a verifiable port into an unverifiable rewrite. The pages carry hand-tuned inline SVG, `data-metric` spans that a CI gate asserts against, and nine `<details>` blocks on the homepage alone; round-tripping those through Markdown would break the output-diff acceptance bar, which is the only thing making a 13-page migration checkable. Available as a follow-on decision once the port is proven |
+
+## Migration record
+
+Executed 2026-07-26, the same day the decision was made. The plan above is left
+unedited; this section records what it got right, what it got wrong, and the two
+regressions the acceptance bar caught before they shipped.
+
+**The acceptance bar worked, and it is the reason this record can claim
+anything.** Every page was compared against its pre-migration self as a parsed
+DOM, not as text — so entity spelling, brace escapes, attribute order and
+template whitespace normalised away on their own, and only content differences
+survived. Final state: **12/12 pages semantically identical**, matching on node
+sequence, meta tags, resolved link targets, `data-metric` spans and rendered
+text. The comparison ran with **both sides served over HTTP**, which is not a
+detail: the build's absolute asset paths do not resolve over `file://`, and the
+first run reported a phantom 6-word difference on every page purely because the
+build rendered unstyled and `innerText` is CSS-dependent.
+
+**Two real regressions, both on `404.html`, both caught by the diff and not by
+any gate.** The layout emitted the social block unconditionally, which (1)
+**dropped `<meta name="robots" content="noindex">`**, quietly making the 404 page
+indexable, and (2) gave it an empty `og:url` and a `null` canonical. Neither
+would have reddened CI: every gate was green while both were live. The layout now
+gates canonical/OG/Twitter behind a `social` prop that defaults to "this page has
+a canonical URL", and takes an explicit `robots` prop. **The page with no social
+metadata is the one that proves an unconditional layout is wrong** — a
+uniformity the hand-written version never had, because nobody hand-copies tags
+onto a 404.
+
+**What the plan got right.** Both *Verified at decision time* predictions held
+exactly. The gate redirection was one line per script (`SITE_ROOT`, defaulting to
+`process.cwd()`), and `mobile-qa.cjs` did have to stop using `file://` and serve
+the build — for a sharper reason than predicted: an **unstyled page does not
+overflow**, so the `file://` version of that gate would have passed while
+measuring nothing. `resume.html` needed no code change and its standalone
+constraint is now structural, enforced by living in `public/`.
+
+**What the plan missed.** Four things, none fatal:
+
+- **Literal `{` and `}` in page content break the compiler**, since `{` opens a
+  JS expression in `.astro`. They appear in prose (`PUT /notes/{id}/tags`) and in
+  `<pre>` JSON samples, and are now written `&#123;`/`&#125;`. Script and style
+  contents are already raw text and were deliberately left alone.
+- **`is:inline` is mandatory on every `<script>` and `<style>`**, or Astro
+  bundles and renames them and the `public/` paths break. For the three pages
+  with page-scoped `<style>`, an un-inlined block would also have been *scoped*
+  and stopped matching its own markup.
+- **`check-published-metrics.cjs` reads Markdown as well as HTML.** Pointing it
+  at `dist/` alone would have silently halved its reach, since the ADRs, README
+  and learning notes are never built. It now walks two roots deliberately.
+- **`.gitignore`'s opening comment asserted the no-build property** and was not
+  on the *Downstream surfaces* list. The list is otherwise complete.
+
+**Deviations from the plan, made deliberately.**
+
+- **One layout and one component, not two layouts.** `Article.astro` was going to
+  own `.article-body` and the back link, but both are page content — the back
+  link's text differs per page, and `scroll-storytelling.html` has four
+  `<section>`s *after* `</main>`. Wrapping them would have meant editing content
+  to fit the abstraction. `Base.astro` + `SiteNav.astro` is less machinery and
+  strictly higher fidelity.
+- **The pages were ported by a script, not by hand.** Twelve pages of
+  transcription is where content silently drifts; a mechanical transform plus an
+  output diff is checkable, which hand-porting is not. The script was throwaway
+  and is not committed — the evidence is the diff, not the tool.
+- **`sitemap.xml` stays hand-maintained; `@astrojs/sitemap` was not added.** The
+  integration emits `sitemap-index.xml`, which would 404 the existing
+  `sitemap.xml` that `robots.txt` advertises and search engines already hold.
+  This is `ADR-004` §2's reasoning applied unchanged — GitHub Pages has no
+  redirect mechanism, so a live indexed URL is not worth moving for a
+  convenience. **This leaves the one benefit the decision claimed and did not
+  deliver**, and it is a follow-on, not a silent drop.
+- **Nothing else in the out-of-scope list moved.** No design change, no content
+  change, no Markdown conversion, no stylesheet split, no search. The stylesheet
+  is byte-identical and still global.
+
+**What stopped being published.** The deploy uploads `dist/` instead of the repo
+root, so `decisions/`, `learning/`, `handoff/`, `README.md` and `ROADMAP.md` are
+no longer served at `sanlee.me`. Checked before the migration: nothing on the
+site links to them — the colophon's learning-note links point at `github.com`
+paths, not site-relative ones.
+
+**One measurement worth keeping.** `link-check.cjs` reported 14 pages before and
+13 after. The missing page is `graphify-out/graph.html`, a gitignored local
+artifact that was never part of the site and had been silently inside the gate's
+walk. Building narrowed the gate to what actually ships.
