@@ -10,7 +10,8 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
 | [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Accepted |
 | [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad — **on-demand via `@claude` only** since 2026-07-26 (Amendment 7) | Accepted |
-| [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? — **migrate to Astro**; planned, not executed | Accepted |
+| [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? — **migrated to Astro**, executed 2026-07-26 | Accepted |
+| [ADR-007](ADR-007-split-dont-trim.md) | Split, don't trim — the two-speed reader | Accepted |
 
 ## Why this tier was missing
 
@@ -43,7 +44,26 @@ Nothing is deleted from `CLAUDE.md` by adding a record here.
 
 ## Still to record
 
-**Nothing open.** [`ADR-006`](ADR-006-hand-written-html-or-a-generator.md) closed the same
+**One open item, and it is implementation rather than a question:**
+[`ADR-007`](ADR-007-split-dont-trim.md) is accepted and its splits have not shipped yet.
+
+ADR-007 answers the complaint that opened ADR-006 and that ADR-006 pointedly refused to take
+credit for: *too much information density.* It resolves the tension the owner raised — that
+[`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md)'s content floor was written before the
+judge and netops pages existed, so every page can respect it individually while the
+*aggregate* burden grows past anything that record considered. The resolution: **the floor
+governs deleting substance, not relocating it**, with a rider that a split unit must be a
+whole argument — claim, evidence and caveat travel together.
+
+Two things about it are worth reading even if the diff is not. It **corrects a measurement in
+public** rather than quietly: the homepage was first reported as one 1,264-word section, which
+would have aimed the fix at the wrong place, and the real concentration is the decision log
+plus a table duplicated from the classifier. And at the single point where a proposed cut met
+ADR-004's floor — compressing the classifier's decision cards to linked ADR one-liners — **the
+floor won**, for the sake of ~150 words. The record says so explicitly, because a floor that
+bends the first time it costs something is not a floor.
+
+[`ADR-006`](ADR-006-hand-written-html-or-a-generator.md) closed the same
 day it was opened, and the stub-then-decide split did exactly what it was built for: the
 deciding session spent its time on the crux instead of re-deriving 12,150 words of
 measurements, and the record shows which half came from where.
