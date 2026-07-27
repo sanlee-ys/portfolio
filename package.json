@@ -10,6 +10,6 @@
     "gates": "node scripts/link-check.cjs && node scripts/check-published-metrics.cjs && node scripts/private-repo-check.cjs && node scripts/mobile-qa.cjs"
   },
   "dependencies": {
-    "astro": "^5.14.1"
+    "astro": "^7.1.3"
   }
 }
