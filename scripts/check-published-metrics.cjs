@@ -124,6 +124,23 @@ function claimFiles(root, exts, dir = '.', out = []) {
  * that as success. That is the exact silent failure `ADR-006` named as the risk
  * of moving these gates onto build output.
  */
+/*
+ * How many `data-metric` attributes does this file contain, versus how many the
+ * marker pattern could actually parse? Any gap is a figure published on the site
+ * and checked by nobody.
+ *
+ * This exists because the failure it catches is invisible by construction: a
+ * marker the pattern cannot read is not a mismatch, it is an absence, and an
+ * absence is exactly what a passing run looks like. Counting the raw attribute
+ * is the only way to notice. Same lesson as `ADR-005`'s denial counter, which
+ * read a field that did not exist and reported zero for ten days.
+ */
+function unparsedMarkers(text, file) {
+  if (file.endsWith('.md')) return 0;
+  const raw = (text.match(/\bdata-metric=/g) || []).length;
+  return raw - markersIn(text, file).length;
+}
+
 function allClaimFiles() {
   const html = claimFiles(HTML_ROOT, ['.html']).map((rel) => ({ root: HTML_ROOT, rel }));
   const md = claimFiles(ROOT, ['.md']).map((rel) => ({ root: ROOT, rel }));
@@ -143,7 +160,14 @@ function allClaimFiles() {
  */
 function markersIn(text, file) {
   const found = [];
-  const html = /<span data-metric="([^"]+)">([^<]+)<\/span>/g;
+  // Attribute-order tolerant ON PURPOSE. This pattern used to require
+  // `data-metric` to be the FIRST attribute on the span, so a marker written
+  // `<span class="stat-value" data-metric="...">` matched nothing and left that
+  // figure unguarded — while the gate stayed green, because it only reports on
+  // the markers it can see. That happened for real on 2026-07-26, to the three
+  // headline accuracy numbers on the homepage. The parity check in
+  // `unparsedMarkers()` is the backstop for whatever this pattern still misses.
+  const html = /<span\b[^>]*\bdata-metric="([^"]+)"[^>]*>([^<]*)<\/span>/g;
   const md = /<!--\s*metric:([A-Za-z0-9_]+)\s*-->\s*\**\s*(\d+(?:\.\d+)?%?)/g;
   const re = file.endsWith('.md') ? md : html;
   let m;
@@ -182,6 +206,19 @@ function main() {
 
     for (const { root, rel: file } of allClaimFiles()) {
       const text = fs.readFileSync(path.join(root, file), 'utf8');
+
+      const missed = unparsedMarkers(text, file);
+      if (missed > 0) {
+        problems.push(
+          `${safe(file)}: ${missed} \`data-metric\` attribute(s) present that this ` +
+            `checker could not parse, so those published figures are guarded by nothing.\n` +
+            `  A marker must be a single <span> carrying data-metric with plain text ` +
+            `inside: <span data-metric="key">92.6%</span> (other attributes are fine).\n` +
+            `  This fails loudly because the alternative is a green run that checked ` +
+            `fewer numbers than you think it did.`
+        );
+      }
+
       for (const [key, shown] of markersIn(text, file)) {
         if (!known.has(key)) {
           problems.push(
