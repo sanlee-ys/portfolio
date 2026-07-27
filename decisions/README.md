@@ -75,10 +75,16 @@ every CI gate was green through: the layout had **dropped that page's `noindex`*
 given it an empty `og:url` and a null canonical. The page with no social metadata is the one
 that proves an unconditional layout is wrong.
 
-Two honest notes. The plan's one unfulfilled benefit is the **generated sitemap** —
-`@astrojs/sitemap` emits `sitemap-index.xml`, which would 404 the `sitemap.xml` that
-`robots.txt` advertises, so `ADR-004` §2's live-URL reasoning applied and it stayed
-hand-maintained. And the `Article.astro` layout the plan specified was **not built**: the
+Two honest notes. The plan's one unfulfilled benefit was the **generated sitemap**, and it
+**closed the same day**: `@astrojs/sitemap` cannot emit a single `sitemap.xml` (only
+`sitemap-index.xml` + a numbered file, with `filenameBase` changing the prefix, not the
+shape), which would have 404'd the live URL `robots.txt` advertises — so a ~60-line build
+integration emits it instead, reading the build output so it cannot drift from the site, and
+dating each entry from git. That rejection-of-a-dependency needs the distinction stated:
+ADR-006 turned down a home-grown *templating system* as open-ended with one maintainer; a
+frozen single-purpose spec with one input is a different object, and here the ecosystem
+option fails a constraint the local one meets. And the `Article.astro` layout the plan
+specified was **not built**: the
 back link and `.article-body` turned out to be page content, and wrapping them would have
 meant editing content to fit the abstraction.
 

@@ -21,7 +21,15 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      # Full history, not the default shallow clone: `sitemap.xml` derives each
+      # page's <lastmod> from its source file's last commit, and `git log -1` in
+      # a depth-1 checkout returns the checkout commit for every file. The
+      # integration detects shallowness and drops lastmod rather than dating
+      # every page identically, so without this the sitemap still builds — it
+      # just loses its dates.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
