@@ -70,6 +70,25 @@
   --muted: #9aa3b2;
   --accent: #6ea8fe;
   --accent-soft: rgba(110, 168, 254, 0.12);
+  /* ---- The second hue: reversal ----------------------------------------
+     A copper/amber counterpart to the blue, and it carries ONE meaning:
+     this is the record of something that was built and then taken back —
+     retired, reverted, declined, cut. Blue keeps links, focus, and shipped.
+
+     A ledger that colours its reversals the same as its wins is telling you
+     the wins are what it is for. Two thirds of the good writing on this site
+     is a negative result, so the negative results get a colour.
+
+     Contrast, measured against this theme's own backgrounds rather than
+     assumed: #e8a44c is 8.9:1 on --bg and 8.2:1 on --panel; the light theme's
+     #b45309 is 4.9:1 on --bg and 5.0:1 on white. Both clear 4.5:1 for text,
+     which matters because this hue is used on text (tags, IDs, chips), not
+     only on markers.
+
+     The restraint is the point. If a decision's outcome is not literally a
+     revert, decline or retirement, it stays blue. */
+  --accent-warm: #e8a44c;
+  --accent-warm-soft: rgba(232, 164, 76, 0.14);
   --border: #232a35;
   --btn-text: #0b0e13;
   --shadow: rgba(0, 0, 0, 0.35);
@@ -137,6 +156,8 @@ html[data-theme="light"] {
   --muted: #5b6472;
   --accent: #2563eb;
   --accent-soft: rgba(37, 99, 235, 0.10);
+  --accent-warm: #b45309;
+  --accent-warm-soft: rgba(180, 83, 9, 0.10);
   --border: #e4e8ee;
   --btn-text: #ffffff;
   --shadow: rgba(20, 30, 60, 0.12);
@@ -174,40 +195,29 @@ body, .btn, .hero { transition: background-color 0.2s ease, border-color 0.2s ea
 html[data-theme="dark"] .theme-icon-light { display: none; }
 html[data-theme="light"] .theme-icon-dark { display: none; }
 
-/* Scroll progress bar (Lesson 5) — fills as you scroll the page.
-   Driven by scroll position, not time: animation-timeline: scroll(). */
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 30;
-  height: 3px;
-  width: 100%;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: 0 50%; /* grow from the left edge */
-}
+/* ---- The motion cut (2026-07-27) --------------------------------------
+   Three decorative effects were removed here and their markup with them: the
+   scroll progress bar (a fixed 3px accent rule driven by
+   animation-timeline: scroll()), the hero's three drifting gradient blobs,
+   and the whole scroll-reveal system — assets/reveal.js, the .reveal resting
+   state, the data-delay stagger, and every class="reveal" on the homepage.
 
-/* Only animate where scroll timelines are supported; elsewhere the bar stays
-   at scaleX(0) (invisible) — no broken UI. */
-@supports (animation-timeline: scroll()) {
-  .scroll-progress {
-    animation-name: progress-grow;
-    animation-timing-function: linear;
-    animation-fill-mode: both;
-    /* tie progress to the root scroller's vertical (block) axis */
-    animation-timeline: scroll(root block);
-  }
-}
+   The reveal system is the one worth stating plainly, because it was the most
+   defensible of the three and is still the most costly. It made every element
+   below the fold start at opacity: 0 and wait for an IntersectionObserver.
+   That is content hidden until JavaScript says otherwise, on a site whose
+   whole argument is the reading. It cost a request, it delayed every heading
+   by up to 360ms of stagger, and what it bought was the page assembling
+   itself while you watched — which is a thing a lab notebook does not do.
 
-@keyframes progress-grow {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
+   What is kept is the motion that MEANS something: a diagram node lighting
+   its matching decision card, the arrow that nudges toward the page it opens,
+   and hover states. Those are feedback, not ornament, and they got slightly
+   stronger in the same pass rather than being trimmed alongside.
 
-@media (prefers-reduced-motion: reduce) {
-  .scroll-progress { animation: none; }
-}
+   The learning notes that taught these effects are unchanged and still
+   linked from the colophon; learning/01 carries a dated note that the
+   technique is no longer used here. */
 
 html { scroll-behavior: smooth; }
 
@@ -230,40 +240,14 @@ body {
   padding: 0 var(--gutter);
 }
 
-/* Hero */
+/* Hero. Plain now: the three drifting accent blobs that used to sit on a
+   ::before layer behind this went with the motion cut above, and with them
+   the position/overflow/z-index scaffolding that existed only to stack them
+   behind the text. What is left is a band, a rule, and fluid padding. */
 .hero {
-  position: relative;
-  overflow: hidden;
   /* fluid padding: scales with viewport between the min and max — no breakpoint. */
   padding: clamp(56px, 10vw, 96px) 0 clamp(40px, 7vw, 72px);
   border-bottom: 1px solid var(--border);
-}
-
-/* Ambient animated gradient — three soft accent blobs that slowly drift.
-   Lives on a ::before layer behind the content so text stays crisp. */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: -25%;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(40% 40% at 18% 28%, var(--accent-soft), transparent 70%),
-    radial-gradient(38% 38% at 82% 22%, var(--accent-soft), transparent 70%),
-    radial-gradient(34% 34% at 60% 82%, var(--accent-soft), transparent 70%);
-  animation: hero-drift 20s ease-in-out infinite alternate;
-}
-
-/* Content must sit above the gradient layer. */
-.hero .wrap { position: relative; z-index: 1; }
-
-@keyframes hero-drift {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(0, -4%, 0) scale(1.08); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero::before { animation: none; }
 }
 
 /* On small phones the hero padding eats into the visible viewport, pushing the
@@ -631,14 +615,21 @@ body {
 
 .card-link:hover { text-decoration: underline; }
 
-/* Arrow nudge on hover. inline-block is required — you can't transform a
-   plain inline element. */
+/* Arrow nudge. The second interaction the motion cut kept: it points at the
+   page it opens, so it is a signifier rather than an ornament. inline-block is
+   required — you can't transform a plain inline element. The nudge went from
+   4px to 6px and now fires on keyboard focus too, which it never did. */
 .card-link .arrow {
   display: inline-block;
-  transition: transform 0.18s ease;
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.card-link:hover .arrow { transform: translateX(4px); }
+.card-link:hover .arrow,
+.card-link:focus-visible .arrow { transform: translateX(6px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-link .arrow { transition: none; }
+}
 
 /* Spacing for the "read the full writeup" link beneath the homepage diagram. */
 .diagram-more { margin: 14px 0 8px; }
@@ -724,29 +715,6 @@ body {
     background: var(--bg);
     box-shadow: 1px 0 0 var(--border);
   }
-}
-
-/* Scroll-reveal (Lesson 1) */
-/* Resting state: invisible + nudged down. JS adds .is-visible to animate in. */
-.reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Stagger: the 2nd card lands a beat after the 1st. */
-.reveal[data-delay="1"] { transition-delay: 0.12s; }
-.reveal[data-delay="2"] { transition-delay: 0.24s; }
-.reveal[data-delay="3"] { transition-delay: 0.36s; }
-
-/* Accessibility: users who ask for less motion get the content, not the animation. */
-@media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
 }
 
 /* Project pages */
@@ -942,6 +910,28 @@ body {
 /* The tradeoff line is the punchline of the card, not a footnote to it. */
 .decision .tradeoff { color: var(--text-secondary); font-size: 0.95rem; }
 
+/* ---- Reversal cards ---------------------------------------------------
+   data-outcome="reversal" marks a decision whose OUTCOME was to take
+   something back: retired, reverted, declined, cut. The card's signature
+   stripe and its ID line go warm; everything else about the card is
+   unchanged, and its links stay blue because a link is a link.
+
+   The bar for this attribute is literal, not thematic. A card about catching
+   a bug, or about a measurement that surprised me, is not a reversal — it is
+   a finding, and it stays blue. Six cards carry it today: BM25 retired and
+   the premium model declined (homepage), the prompt that read better and
+   measured worse, the grounding that did not pay and the upgrade that bought
+   nothing (classifier), and the Kafka cut (the system).
+
+   The colophon's timeline was checked against the same bar and left blue.
+   Its entries are catches and refusals, which is a different thing from a
+   decision being reversed, and colouring them would spend the hue on the
+   first place it looked plausible. */
+.decision[data-outcome="reversal"] { border-left-color: var(--accent-warm); }
+.decision[data-outcome="reversal"] .tag,
+.decision[data-outcome="reversal"] .kicker { color: var(--accent-warm); }
+.decision[data-outcome="reversal"] .kicker .code-ref { color: var(--accent-warm); opacity: 0.75; }
+
 /* Results table */
 .article-body table,
 .measure table {
@@ -1045,8 +1035,12 @@ body {
   font-weight: 600;
   pointer-events: none;
 }
-.node:hover rect { stroke: var(--accent); }
-.node.active rect { stroke: var(--accent); fill: var(--accent-soft); }
+/* Hover now tints the node as well as outlining it — the outline alone was a
+   1.5px colour change on a dark field, which is barely an answer to a
+   pointer. Active stays a step stronger again, so hovered and selected do not
+   look the same. */
+.node:hover rect { stroke: var(--accent); fill: var(--accent-soft); }
+.node.active rect { stroke: var(--accent); stroke-width: 2.5; fill: var(--accent-soft); }
 /* Keyboard focus ring for the diagram's nodes (the only new interactive controls).
    Style the rect stroke; outline clips unreliably on an SVG <g>. */
 .node:focus { outline: none; }
@@ -1219,8 +1213,13 @@ body {
 .rung[data-state="shipped"]::before { background: var(--accent); }
 /* Retired: filled, then struck through. Drawn as climbed-and-stepped-back
    rather than blanked, because the record keeps rungs that were climbed down
-   from -- the ::after bar is the "climbed back down" mark. */
-.rung[data-state="retired"]::before { background: var(--muted); border-color: var(--muted); }
+   from -- the ::after bar is the "climbed back down" mark.
+   This is the ladder's reversal state (L2 retired, L4 declined), so it takes
+   --accent-warm rather than --muted. Muted said "less important"; the climb
+   down is the most interesting thing on the ladder. State is still encoded
+   three ways -- marker shape, marker fill, and the chip's text -- so nothing
+   here depends on colour alone. */
+.rung[data-state="retired"]::before { background: var(--accent-warm); border-color: var(--accent-warm); }
 .rung[data-state="retired"]::after {
   content: "";
   position: absolute;
@@ -1253,7 +1252,7 @@ body {
   letter-spacing: 0.02em;
   color: var(--accent);
 }
-.rung[data-state="retired"] .rung-id,
+.rung[data-state="retired"] .rung-id { color: var(--accent-warm); }
 .rung[data-state="spec"] .rung-id { color: var(--muted); }
 .rung-name { font-weight: 600; }
 .rung-state {
@@ -1268,6 +1267,7 @@ body {
 }
 .rung[data-state="shipped"] .rung-state,
 .rung[data-state="partial"] .rung-state { color: var(--accent); border-color: var(--accent); }
+.rung[data-state="retired"] .rung-state { color: var(--accent-warm); border-color: var(--accent-warm); }
 .rung-gain { margin: 6px 0 0; font-size: 0.95rem; }
 .rung-driver { margin: 4px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
 .rung-driver .lbl {
@@ -1385,7 +1385,9 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Reversal / right-sizing marker. Muted on purpose: reads as "noted," not "alarm." */
+/* Reversal / right-sizing marker. Now on --accent-warm rather than --muted:
+   the muted version read as "noted", which is one step too quiet for the
+   thing this site is proudest of. Still a small outlined chip, not an alarm. */
 .pill {
   display: inline-block;
   margin-left: 8px;
@@ -1394,17 +1396,22 @@ body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
-  background: var(--bg);
-  border: 1px solid var(--border);
+  color: var(--accent-warm);
+  background: var(--accent-warm-soft);
+  border: 1px solid var(--accent-warm);
   border-radius: 999px;
   padding: 2px 8px;
   font-family: var(--mono);
 }
 
-/* Click a diagram node and its matching decision glows briefly. */
+/* Click a diagram node and its matching decision glows. This is one of the
+   two interactions the motion cut KEPT, and it got stronger rather than
+   quieter: a 2px ring alone was easy to miss when the card you were sent to
+   was already below the fold, so it now carries a soft halo outside the ring.
+   That is feedback answering an action, which is the test the removed effects
+   failed. */
 .decision { transition: box-shadow 0.3s ease; }
-.decision.target { box-shadow: 0 0 0 2px var(--accent); }
+.decision.target { box-shadow: 0 0 0 2px var(--accent), 0 0 0 9px var(--accent-soft); }
 @media (prefers-reduced-motion: reduce) { .decision { transition: none; } }
 
 /* In-place evidence via native <details>: keyboard + find-in-page for free. */

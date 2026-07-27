@@ -27,7 +27,6 @@ import SiteNav from '../components/SiteNav.astro';
   </script>
   </Fragment>
 
-  <div class="scroll-progress" aria-hidden="true"></div>
   <header class="hero">
     <div class="wrap">
       <h1>San Lee</h1>
@@ -72,15 +71,15 @@ import SiteNav from '../components/SiteNav.astro';
   </div>
 
   <main class="wrap" id="work">
-    <section class="orientation reveal" aria-label="What this record demonstrates">
+    <section class="orientation" aria-label="What this record demonstrates">
       <p class="kicker">Start here</p>
       <p class="orientation-lede">A working record of how I build and run a small AI system, framed for whoever is reading: what it does for its user, and why every change had to earn its place on evidence.</p>
       <p class="orientation-routes">Read it as <a href="projects/product-and-program.html">Product &amp; Program</a>, go straight to the <a href="projects/defense-news-classifier.html">Classifier</a>, or see the <a href="projects/faithfulness-judge.html">Judge</a>, where I caught my own measurement lying to me.</p>
     </section>
 
-    <h2 class="section-title reveal">The system</h2>
-    <p class="section-sub reveal">Three services wired into one loop: an API, an LLM classifier, and a RAG agent. Click a component to jump to the decision behind it.</p>
-    <figure class="diagram-wrap reveal">
+    <h2 class="section-title">The system</h2>
+    <p class="section-sub">Three services wired into one loop: an API, an LLM classifier, and a RAG agent. Click a component to jump to the decision behind it.</p>
+    <figure class="diagram-wrap">
       <p class="flow-line" aria-label="System data flow, in order">
         Notes API <span class="flow-arrow" aria-hidden="true">&rarr;</span>
         BackgroundTask <span class="flow-arrow" aria-hidden="true">&rarr;</span>
@@ -101,13 +100,13 @@ import SiteNav from '../components/SiteNav.astro';
       </svg>
       <figcaption class="diagram-detail" id="diagram-detail" aria-live="polite" aria-atomic="true">Select a component to see what it does and the decision behind it.</figcaption>
     </figure>
-    <p class="diagram-more reveal"><a class="card-link" href="projects/the-system.html">Read the full writeup <span class="arrow">&rarr;</span></a></p>
+    <p class="diagram-more"><a class="card-link" href="projects/the-system.html">Read the full writeup <span class="arrow">&rarr;</span></a></p>
 
     <section class="measure">
-      <h2 class="section-title reveal">The decision log</h2>
-      <p class="log-intro reveal">The real calls behind the system. The ones that went the wrong way are here too, set with the same care as the wins, because that is the part worth reading.</p>
+      <h2 class="section-title">The decision log</h2>
+      <p class="log-intro">The real calls behind the system. The ones that went the wrong way are here too, set with the same care as the wins, because that is the part worth reading.</p>
 
-      <div class="decision" id="decision-grounding">
+      <div class="decision" id="decision-grounding" data-outcome="reversal">
         <p class="kicker">BM25 retired<span class="code-ref">EVAL &middot; BM25</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
         <p>I added BM25 lexical retrieval to ground each call, expecting a clear win. The first measurement said it barely helped. Then I found the measurement itself was unfair.</p>
@@ -115,7 +114,7 @@ import SiteNav from '../components/SiteNav.astro';
         <p>An unfair baseline flatters whatever you were hoping for, and comparing two things means changing exactly one of them. The retrieval code stays in the repo, dormant and reproducible, because the built-it-measured-it-cut-it trail is the artifact. <a href="projects/defense-news-classifier.html#decision-grounding">Full eval &rarr;</a></p>
       </div>
 
-      <div class="decision" id="decision-model">
+      <div class="decision" id="decision-model" data-outcome="reversal">
         <p class="kicker">Model gated on evidence<span class="code-ref">SYS-002 &middot; ADR-013</span></p>
         <h3>Gate model choice on evidence, not vibes</h3>
         <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself. I built the upgrade, measured it, and declined it.</p>
@@ -131,8 +130,8 @@ import SiteNav from '../components/SiteNav.astro';
         <p>Category accuracy actually rose, because real vocabulary separates more cleanly; domain fell because the synthetic set was trivially easy to grade. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
       </div>
 
-      <p class="ledger-intro reveal">Six more, in one line each. The full telling of every one is on the page it links to.</p>
-      <ul class="ledger reveal">
+      <p class="ledger-intro">Six more, in one line each. The full telling of every one is on the page it links to.</p>
+      <ul class="ledger">
         <li id="decision-contracts">Decoupled the repos with frozen HTTP contracts &mdash; then audited the seam and found it <strong>broken with both repos' CI green</strong>, because each side asserted against its own copy of the shape. Two unit tests that happen to agree are not a contract test. <a href="projects/the-system.html">The System &rarr;</a></li>
         <li id="decision-truncation">Nearly published a dramatic premium-vs-cheap model gap that was <strong>my own bug</strong> &mdash; a <code>max_tokens</code> cap truncated the cheap tier before its verdict on 20% of claims, and my scoring counted each as a disagreement. <a href="projects/faithfulness-judge.html">Judge &rarr;</a></li>
         <li id="decision-ceiling">Called it a ceiling, then went looking anyway &mdash; the misses clustered on one boundary, and two rubric clauses moved category <strong>90.7% &rarr; 94.4%</strong> with nothing regressing. A prompt problem wearing a ceiling's clothes. <a href="projects/defense-news-classifier.html">Classifier &rarr;</a></li>
@@ -143,20 +142,20 @@ import SiteNav from '../components/SiteNav.astro';
     </section>
 
     <section class="measure">
-      <h2 class="section-title reveal">Classifier evidence</h2>
-      <p class="reveal">Where the classifier stands now, on 54 hand-labeled real snippets.</p>
-      <ul class="stat-strip reveal">
+      <h2 class="section-title">Classifier evidence</h2>
+      <p>Where the classifier stands now, on 54 hand-labeled real snippets.</p>
+      <ul class="stat-strip">
         <li><span class="stat-value" data-metric="category_accuracy">92.6%</span><span class="stat-label">Category</span></li>
         <li><span class="stat-value" data-metric="domain_accuracy">92.6%</span><span class="stat-label">Domain</span></li>
         <li><span class="stat-value" data-metric="region_accuracy">87.0%</span><span class="stat-label">Region</span></li>
       </ul>
-      <p class="reveal">Those are the numbers after the eval got harder, not before. The full trajectory &mdash; synthetic self-graded, then real hand-labeled, a model migration, a prompt fix and a third axis, with the ceiling I called wrongly and the misses that clustered on one boundary &mdash; is the table on the classifier page. <a href="projects/defense-news-classifier.html">See the full eval &rarr;</a></p>
+      <p>Those are the numbers after the eval got harder, not before. The full trajectory &mdash; synthetic self-graded, then real hand-labeled, a model migration, a prompt fix and a third axis, with the ceiling I called wrongly and the misses that clustered on one boundary &mdash; is the table on the classifier page. <a href="projects/defense-news-classifier.html">See the full eval &rarr;</a></p>
     </section>
 
     <section class="measure">
-      <h2 class="section-title reveal">Field notes</h2>
-      <p class="reveal">Notes I keep while learning, in plain language, on the techniques behind all of this. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
-      <ul class="notes-list reveal">
+      <h2 class="section-title">Field notes</h2>
+      <p>Notes I keep while learning, in plain language, on the techniques behind all of this. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
+      <ul class="notes-list">
         <li>Structured output via tool-use</li>
         <li>Eval-driven development</li>
         <li>Reading the numbers</li>
@@ -170,34 +169,34 @@ import SiteNav from '../components/SiteNav.astro';
         <li>Reproducible environments with uv</li>
         <li>Checkpoint, resume, and retries</li>
       </ul>
-      <p class="muted-line reveal">More are being written up.</p>
+      <p class="muted-line">More are being written up.</p>
     </section>
 
     <section class="measure about">
-      <h2 class="section-title reveal">About, honestly</h2>
-      <p class="reveal">
+      <h2 class="section-title">About, honestly</h2>
+      <p>
         For most of my career, what to build was decided above me. I was close to
         the work: running systems, shipping pieces of them, living with the seams.
         I had not owned a full-loop system, so I built one myself, in the open, to
         get that experience &mdash; decisions recorded, failed attempts included.
         It&rsquo;s a small system, but I took the process seriously.
       </p>
-      <p class="reveal">
+      <p>
         I did not get here alone. Most of what I know came from people who were
         patient when I was the one who did not know yet, and generous with hard-won
         expertise. I try to pass that forward where I can.
       </p>
-      <p class="reveal">
+      <p>
         It is a solo build, so the program layer is simulated &mdash; I lay out what
         that means on the <a href="projects/product-and-program.html">Product
         &amp; Program</a> page.
       </p>
-      <p class="reveal">
+      <p>
         Outside the work: traveling, hiking, a bit of photography, and a Scottish
         Fold named Sango who supervises. The good frames live in
         <a href="lab/gallery.html">the gallery</a>.
       </p>
-      <figure class="sango reveal">
+      <figure class="sango">
         <img src="assets/img/sango-boop.jpeg" alt="Sango, a Scottish Fold, asleep" loading="lazy" width="240" height="240" />
         <figcaption>Sango, Chief Nap Officer.</figcaption>
       </figure>
@@ -220,7 +219,6 @@ import SiteNav from '../components/SiteNav.astro';
   </footer>
   <script is:inline src="assets/theme.js"></script>
   <script is:inline src="assets/last-updated.js"></script>
-  <script is:inline src="assets/reveal.js"></script>
   <script is:inline src="assets/diagram.js"></script>
   <script is:inline src="assets/events.js"></script>
 </Base>

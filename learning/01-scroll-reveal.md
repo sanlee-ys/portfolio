@@ -2,6 +2,14 @@
 
 **Tier 1 (CSS craft) · the cards and headings fade up as you scroll to them.**
 
+> **No longer used on this site (removed 2026-07-27).** The technique below is
+> unchanged and still worth knowing; the site stopped using it in the editorial
+> redesign. The reason was not that it was badly built — it was that it made
+> every element below the fold start at `opacity: 0` and wait for JavaScript, on
+> a site whose whole argument is the reading. `assets/reveal.js` and the
+> `.reveal` styles are deleted; the *Files* section at the bottom describes where
+> they were.
+
 ## Concept
 
 Elements start invisible and animate into place when they enter the viewport.
@@ -40,8 +48,10 @@ this is the exact same idea pointed at the DOM.
   are all native browser primitives. A lot of "fancy" front-end is just knowing
   the platform.
 
-## Files
+## Files (as they were, until 2026-07-27)
 
 - `assets/reveal.js` — the observer
 - `assets/style.css` — `.reveal` / `.is-visible`, stagger via `data-delay`, reduced-motion
 - `index.html` — `class="reveal"` on the headings and cards
+
+All three are gone. See the note at the top.

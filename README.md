@@ -21,7 +21,7 @@ systems / product language.
 | `projects/` | One HTML writeup per featured project — problem, decisions, outcome. |
 | `lab/` | Two front-end experiments kept at stable URLs; the section itself is retired (`ADR-004`). |
 | `learning/` | The learning log — one Markdown lesson per technique. |
-| `assets/` | Stylesheet, JS (theme, reveal, diagram, events), share card, favicons. |
+| `assets/` | Stylesheet, self-hosted fonts, JS (theme, diagram, events, last-updated), share card, favicons. |
 | `scripts/` | The QA gates CI runs (see **QA** below), plus the local pre-commit guard and the résumé PDF build. |
 | `ROADMAP.md` | The site's own tracked backlog. |
 | `f2073a6c….txt` | IndexNow key. Proves domain ownership when pinging Bing to crawl a URL, so it has to stay served from the root; the contents are the filename stem with no trailing newline. Not a secret — it is designed to be publicly fetchable. Don't delete it as stray junk. |
