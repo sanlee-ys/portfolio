@@ -49,6 +49,21 @@ for (const page of pages) {
     if (!fs.existsSync(target)) {
       broken++;
       console.log(`  BROKEN  ${page}  ->  ${url}`);
+      continue;
+    }
+
+    // The fragment, not just the file. A link to a real page and a dead anchor
+    // lands the reader at the top with no sign anything went wrong, and until
+    // 2026-07-26 this gate reported that as fine — it split the `#` off and
+    // never looked at it. That made every deep link in the site unverified,
+    // which mattered the moment `ADR-007` started moving sections between pages.
+    const frag = url.includes('#') ? url.split('#')[1].split('?')[0] : '';
+    if (!frag || !target.endsWith('.html')) continue;
+    const targetHtml = fs.readFileSync(target, 'utf8');
+    const hasId = new RegExp(`\\sid=["']${frag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`).test(targetHtml);
+    if (!hasId) {
+      broken++;
+      console.log(`  DEAD ANCHOR  ${page}  ->  ${url}  (no id="${frag}" in ${clean})`);
     }
   }
 }

@@ -65,7 +65,7 @@ import SiteNav from '../components/SiteNav.astro';
           <code>BackgroundTask</code> to call the classifier and write its
           labels back as tags. I first built this loop on Kafka, then
           right-sized it once the workload didn't earn a broker.
-          <a href="index.html#decision-rightsized">Full decision &rarr;</a></p>
+          <a href="projects/the-system.html#decision-rightsized">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-bm25" data-term="bm25 keyword search lexical retrieval">
@@ -78,7 +78,7 @@ import SiteNav from '../components/SiteNav.astro';
           lightweight grounding layer for the classifier. The measured lift
           (+1.9% category accuracy, a net of one call in 54, and +0.0% on
           domain) didn't justify the added complexity, so it didn't ship.
-          <a href="index.html#decision-grounding">Full decision &rarr;</a></p>
+          <a href="projects/defense-news-classifier.html#decision-grounding">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-classification" data-term="classification classifier label">
@@ -113,7 +113,7 @@ import SiteNav from '../components/SiteNav.astro';
           through a breaking change. Two unit tests that happen to agree
           aren&rsquo;t a contract test &mdash; a real one needs a single shared
           artifact both sides check against, so changing one copy fails the
-          other&rsquo;s build. <a href="index.html#decision-contracts">Full decision &rarr;</a></p>
+          other&rsquo;s build. <a href="projects/the-system.html#decision-contracts">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-eval" data-term="eval evaluation eval harness eval-driven development testing">
@@ -126,7 +126,7 @@ import SiteNav from '../components/SiteNav.astro';
           the whole site is built to demonstrate. Every prompt change,
           retrieval experiment, and model choice got measured against one,
           including the changes that failed and got reverted.
-          <a href="index.html#decision-eval">Full decision &rarr;</a></p>
+          <a href="projects/defense-news-classifier.html#why-the-numbers-can-be-trusted">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-f1" data-term="f1 precision recall macro-f1 accuracy metrics">
@@ -151,7 +151,7 @@ import SiteNav from '../components/SiteNav.astro';
           snippets) and pulled from real DoD news wire and SEC filings, not
           model-generated. Its job is to test label boundaries and eval
           discipline, not production-scale generalization.
-          <a href="index.html#decision-eval">Full decision &rarr;</a></p>
+          <a href="projects/defense-news-classifier.html#why-the-numbers-can-be-trusted">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-idempotency" data-term="idempotency idempotent retry">
@@ -163,7 +163,7 @@ import SiteNav from '../components/SiteNav.astro';
           classify-and-tag writeback didn't need Kafka's delivery
           guarantees. The tags I write are derived and idempotent, so
           re-running the step just re-arrives at the same state.
-          <a href="index.html#decision-rightsized">Full decision &rarr;</a></p>
+          <a href="projects/the-system.html#decision-rightsized">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-judge-model" data-term="judge model llm judge opus judge grading">
@@ -175,7 +175,7 @@ import SiteNav from '../components/SiteNav.astro';
           classifier's real-text eval with an Opus judge &mdash; useful for
           catching errors hand-review can't keep up with, as long as I still
           spot-check the judge itself.
-          <a href="index.html#decision-eval">Full decision &rarr;</a></p>
+          <a href="projects/defense-news-classifier.html#why-the-numbers-can-be-trusted">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-rag" data-term="rag retrieval augmented generation">
@@ -199,7 +199,7 @@ import SiteNav from '../components/SiteNav.astro';
         <p class="tradeoff"><strong>Here:</strong> my classifier's tool
           schema makes an invalid label a rejected API call, not a runtime
           bug. Out-of-enum responses were rare: once in 300.
-          <a href="index.html#decision-tooluse">Full decision &rarr;</a></p>
+          <a href="projects/defense-news-classifier.html">Full decision &rarr;</a></p>
       </div>
     </div>
   </main>
