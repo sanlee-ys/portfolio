@@ -30,12 +30,25 @@ npm run dev                  # local dev server with HMR
   `{` and `}` in page content must be written `&#123;`/`&#125;` — in `.astro`,
   `{` opens a JS expression.
 
-**The gates now read the build, not the repo.** Run them with `SITE_ROOT=dist`
-after `npm run build`, or use `npm run qa`, which does both:
+**The gates now read the build, not the repo.** `npm run qa` builds and then
+runs all four:
 
 ```
 npm run qa
 ```
+
+`npm run gates` runs them against an existing `dist/` without rebuilding. Both
+go through `scripts/gates.cjs`, which is what points the gates at `dist/`
+— **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
+and does not work on Windows**, so the default lives in that runner rather than
+in the script line. Set `SITE_ROOT` yourself to override it; run a gate
+directly (`node scripts/link-check.cjs`) and it walks the repo root, which is
+what makes each one usable by hand.
+
+Aim a gate at the repo root while `dist/` and `public/` are both sitting there
+and you get ~180 *phantom* broken links: root-absolute hrefs like `/assets/…`
+resolve against a directory that has no `assets/`. That is the failure to
+recognize before you go looking for a regression that isn't there.
 
 Each walking gate **fails if it finds no pages**, so a gate pointed at an
 unbuilt or empty directory reddens instead of passing on an empty walk.

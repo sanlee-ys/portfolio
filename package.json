@@ -7,7 +7,7 @@
     "build": "astro build",
     "preview": "astro preview --port 4322",
     "qa": "npm run build && npm run gates",
-    "gates": "node scripts/link-check.cjs && node scripts/check-published-metrics.cjs && node scripts/private-repo-check.cjs && node scripts/mobile-qa.cjs"
+    "gates": "node scripts/gates.cjs"
   },
   "dependencies": {
     "astro": "^5.14.1"
