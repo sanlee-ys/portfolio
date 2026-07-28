@@ -25,10 +25,14 @@
  * exactly what a YAML parser would do to it, and extractRunBlock throws rather
  * than guessing if the shape it expects is gone.
  *
- * REQUIRES bash and jq — both are on the ubuntu runner and in Git Bash on
- * Windows. The test SKIPS (it does not pass) if either is missing, because a
- * silent pass on an unrun gate is the exact failure CLAUDE.md warns about for
- * the mobile gate.
+ * REQUIRES a bash that can run this harness, and a jq that bash can reach.
+ * The ubuntu runner has both; a Windows box may have neither under those names
+ * even with both installed — see "WHAT HAVING BASH HAS TO MEAN" below, which is
+ * a bug report as much as a comment. The test SKIPS (it does not pass) when no
+ * such bash is found, because a silent pass on an unrun gate is the exact
+ * failure CLAUDE.md warns about for the mobile gate. On CI the same condition
+ * FAILS instead of skipping: there the interpreter is guaranteed, so its
+ * absence means the harness broke, and a skip would be that silent pass.
  */
 const { test, describe } = require('node:test');
 const assert = require('node:assert');
@@ -92,11 +96,166 @@ const SCRIPT = extractRunBlock(fs.readFileSync(WORKFLOW, 'utf8'), STEP_NAME);
 
 // ---- Harness ---------------------------------------------------------------
 
-function have(cmd) {
-  const r = spawnSync(cmd, ['--version'], { encoding: 'utf8', shell: false });
-  return !r.error && r.status === 0;
+/*
+ * The `gh` stub. Records the comment body; answers the verdict probe with a
+ * count. Nothing here touches the network.
+ *
+ * Hoisted to a const because the prerequisite probe below runs THIS stub, not
+ * a simpler one shaped like it. It is an extension-less `#!` script, and that is
+ * load-bearing on Windows: MSYS decides whether a file is executable from the
+ * shebang, so a bash that cannot resolve `/usr/bin/env` cannot run it at all.
+ */
+const GH_STUB = [
+  '#!/usr/bin/env bash',
+  'if [ "$1" = "pr" ] && [ "$2" = "comment" ]; then',
+  '  shift 3',                      // drop `pr comment <number>`
+  '  while [ "$1" != "--body" ] && [ $# -gt 0 ]; do shift; done',
+  '  printf "%s" "$2" > "$GH_STUB_COMMENT"',
+  '  exit 0',
+  'fi',
+  'if [ "$1" = "pr" ] && [ "$2" = "view" ]; then',
+  '  printf "%s\\n" "$GH_STUB_VERDICT_COMMENTS"',
+  '  exit 0',
+  'fi',
+  'echo "gh stub: unexpected invocation: $*" >&2',
+  'exit 1',
+].join('\n');
+
+/** A temp dir holding the script under test, with the stubbed `gh` on PATH. */
+function makeSandbox() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'classify-'));
+  const binDir = path.join(dir, 'bin');
+  fs.mkdirSync(binDir);
+  fs.writeFileSync(path.join(binDir, 'gh'), GH_STUB, { mode: 0o755 });
+  return { dir, binDir };
 }
-const CAN_RUN = have('bash') && have('jq');
+
+/** Run `scriptText` through `bashPath` inside `sandbox`, stub ahead of PATH. */
+function runScript(bashPath, sandbox, scriptText, env) {
+  const scriptFile = path.join(sandbox.dir, 'step.sh');
+  fs.writeFileSync(scriptFile, scriptText);
+  return spawnSync(bashPath, [scriptFile], {
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      PATH: `${sandbox.binDir}${path.delimiter}${process.env.PATH}`,
+      ...env,
+    },
+  });
+}
+
+// ---- Prerequisites ---------------------------------------------------------
+
+/*
+ * WHAT HAVING BASH HAS TO MEAN, and why the obvious probe did not mean it.
+ *
+ * This gate used to ask `bash --version` and `jq --version` from Node and take
+ * exit 0 for an answer. On a Windows dev host both answered, the suite ran, and
+ * all fourteen cases failed `AssertionError: 127 == 0` — "command not found",
+ * asserted on as though it were the step's own exit code. `npm run qa` then
+ * reddened at this gate no matter what change was under test, which trains you
+ * to ignore the runner: the inverse of the subset-of-CI defect gates.cjs warns
+ * about, and just as corrosive. Three things that probe cannot see:
+ *
+ *   1. WHICH bash. `bash` on PATH under Windows is typically
+ *      `C:\Windows\System32\bash.exe` — the WSL launcher. It is a real bash and
+ *      reports GNU bash 5.3.9, and then cannot open the harness's script,
+ *      because `C:\Users\…\step.sh` is not a path Linux has. It fails as
+ *      `/bin/bash: C:Userssanle…step.sh: No such file or directory`, exit 127.
+ *   2. WHOSE jq. Probing jq from Node measures the Windows process namespace.
+ *      The script's jq is resolved by the child shell — which, under WSL, is a
+ *      different machine's PATH. Answering here proves nothing there.
+ *   3. THE STUB. Git for Windows ships two bashes and they are not
+ *      interchangeable. `Git\usr\bin\bash.exe` runs the script and finds jq and
+ *      still fails every `gh` case, because it cannot resolve the stub's
+ *      `/usr/bin/env`. Only `Git\bin\bash.exe` does all three — measured, which
+ *      is why only that one is a candidate.
+ *
+ * So this is not a feature check, it is a rehearsal: build the sandbox `runStep`
+ * builds and run a script through it that does the three things a real case
+ * needs. Both paths share makeSandbox/runScript rather than resembling each
+ * other, for the same reason the step is extracted from the YAML instead of
+ * copied — a probe that can drift from what it certifies eventually will.
+ */
+const CANARY = [
+  'set -euo pipefail',
+  // Captured through a command substitution, which is the shape the step
+  // depends on and a stricter test than "jq ran". Windows jq writes CRLF; if a
+  // shell ever handed that back intact, `SUBTYPE` would be `success\r`, the
+  // step's `case` would fall through to its failure branch, and the suite would
+  // report a defect in the workflow. This rejects such a pairing up front.
+  "V=$(jq -rn '\"jq\"')",
+  '[ "$V" = "jq" ] || { echo "jq output not usable through \\$(): [$V]" >&2; exit 3; }',
+  'gh pr view 0',
+].join('\n');
+
+/*
+ * Candidates, in order, mirroring gates.cjs's Python search: an explicit
+ * override first, then the name CI uses, then the Windows spellings. `BASH` is
+ * a shell variable bash does not export, so it is free to use as the override.
+ */
+function bashCandidates() {
+  if (process.env.BASH) return [process.env.BASH];
+  const found = ['bash'];
+  if (process.platform === 'win32') {
+    const roots = [
+      process.env.ProgramFiles,
+      process.env.ProgramW6432,
+      process.env['ProgramFiles(x86)'],
+      process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Programs'),
+    ];
+    for (const root of roots) if (root) found.push(path.join(root, 'Git', 'bin', 'bash.exe'));
+  }
+  return [...new Set(found)];
+}
+
+const PROBE_LOG = [];
+function findBash() {
+  for (const candidate of bashCandidates()) {
+    const sandbox = makeSandbox();
+    try {
+      const r = runScript(candidate, sandbox, CANARY, { GH_STUB_VERDICT_COMMENTS: 'stub-ok' });
+      if (!r.error && r.status === 0 && (r.stdout || '').includes('stub-ok')) return candidate;
+      const why = r.error
+        ? r.error.code || r.error.message
+        : `exit ${r.status}: ${(r.stderr || r.stdout || '').trim().split('\n')[0] || '(no output)'}`;
+      PROBE_LOG.push(`${candidate} — ${why}`);
+    } finally {
+      fs.rmSync(sandbox.dir, { recursive: true, force: true });
+    }
+  }
+  return null;
+}
+
+const BASH = findBash();
+
+const DIAGNOSIS = [
+  'No bash on this host can run this harness. Candidates tried, in order:',
+  ...PROBE_LOG.map((line) => `    ${line}`),
+  '',
+  'One bash must be able to do all three of: execute a script written to the OS',
+  'temp directory, return jq output through a command substitution unaltered,',
+  'and exec an extension-less `#!` stub from a PATH entry. Every case here needs',
+  'all three. On Windows that means Git for Windows plus a jq — and the bash at',
+  'Git\\bin\\bash.exe, not the one at Git\\usr\\bin\\bash.exe.',
+  'Point at one explicitly with BASH="C:\\Program Files\\Git\\bin\\bash.exe".',
+].join('\n');
+
+/*
+ * Missing interpreter: SKIP locally, FAIL on CI. The asymmetry is the whole
+ * design. Locally it is an honest environment gap and the header promises a
+ * skip. On the ubuntu runner bash and jq are guaranteed, so the same condition
+ * can only mean the harness itself broke — and skipping would hand back a green
+ * check for a suite that ran nothing, which is precisely what this file exists
+ * to refuse. GitHub Actions always sets CI=true.
+ */
+if (!BASH && process.env.CI) {
+  test('a bash that can run this harness is available', () => assert.fail(DIAGNOSIS));
+} else if (!BASH) {
+  // Loud on purpose: `node --test`'s own "skipped 14" summary line scrolls past
+  // inside `npm run qa` and reads as a pass.
+  console.error(`\n! classify-review-outcome: SKIPPED — not run, and not passed.\n${DIAGNOSIS}\n`);
+}
 
 /**
  * Run the extracted step against one synthetic execution log.
@@ -109,48 +268,21 @@ const CAN_RUN = have('bash') && have('jq');
  * step posted via `gh pr comment`, or null if it posted nothing.
  */
 function runStep(execLog, { verdictComments = 0, stepOutcome = 'success', omitExecFile = false } = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'classify-'));
+  const sandbox = makeSandbox();
   try {
-    const execFile = path.join(dir, 'execution.json');
+    const execFile = path.join(sandbox.dir, 'execution.json');
     fs.writeFileSync(execFile, JSON.stringify(execLog));
-    const commentFile = path.join(dir, 'comment.txt');
-    const scriptFile = path.join(dir, 'step.sh');
-    fs.writeFileSync(scriptFile, SCRIPT);
+    const commentFile = path.join(sandbox.dir, 'comment.txt');
 
-    // `gh` stub. Records the comment body; answers the verdict probe with a
-    // count. Nothing here touches the network.
-    const binDir = path.join(dir, 'bin');
-    fs.mkdirSync(binDir);
-    fs.writeFileSync(path.join(binDir, 'gh'), [
-      '#!/usr/bin/env bash',
-      'if [ "$1" = "pr" ] && [ "$2" = "comment" ]; then',
-      '  shift 3',                      // drop `pr comment <number>`
-      '  while [ "$1" != "--body" ] && [ $# -gt 0 ]; do shift; done',
-      '  printf "%s" "$2" > "$GH_STUB_COMMENT"',
-      '  exit 0',
-      'fi',
-      'if [ "$1" = "pr" ] && [ "$2" = "view" ]; then',
-      '  printf "%s\\n" "$GH_STUB_VERDICT_COMMENTS"',
-      '  exit 0',
-      'fi',
-      'echo "gh stub: unexpected invocation: $*" >&2',
-      'exit 1',
-    ].join('\n'), { mode: 0o755 });
-
-    const r = spawnSync('bash', [scriptFile], {
-      encoding: 'utf8',
-      env: {
-        ...process.env,
-        PATH: `${binDir}${path.delimiter}${process.env.PATH}`,
-        GH_TOKEN: 'stub-token',
-        PR: '999',
-        EXEC_FILE: omitExecFile ? '' : execFile,
-        STEP_OUTCOME: stepOutcome,
-        RUN_URL: 'https://example.invalid/run/1',
-        GITHUB_RUN_ID: '1',
-        GH_STUB_COMMENT: commentFile,
-        GH_STUB_VERDICT_COMMENTS: String(verdictComments),
-      },
+    const r = runScript(BASH, sandbox, SCRIPT, {
+      GH_TOKEN: 'stub-token',
+      PR: '999',
+      EXEC_FILE: omitExecFile ? '' : execFile,
+      STEP_OUTCOME: stepOutcome,
+      RUN_URL: 'https://example.invalid/run/1',
+      GITHUB_RUN_ID: '1',
+      GH_STUB_COMMENT: commentFile,
+      GH_STUB_VERDICT_COMMENTS: String(verdictComments),
     });
     return {
       status: r.status,
@@ -159,7 +291,7 @@ function runStep(execLog, { verdictComments = 0, stepOutcome = 'success', omitEx
       comment: fs.existsSync(commentFile) ? fs.readFileSync(commentFile, 'utf8') : null,
     };
   } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(sandbox.dir, { recursive: true, force: true });
   }
 }
 
@@ -181,7 +313,7 @@ const bash = (command) => ({ tool_name: 'Bash', tool_input: { command } });
 
 // ---- Tests -----------------------------------------------------------------
 
-describe('Classify the review outcome', { skip: CAN_RUN ? false : 'needs bash and jq on PATH' }, () => {
+describe('Classify the review outcome', { skip: BASH ? false : 'no bash can run this harness — see the diagnosis above' }, () => {
   test('clean review: green, no comment', () => {
     const r = runStep(resultLog({ turns: 22 }));
     assert.equal(r.status, 0);
