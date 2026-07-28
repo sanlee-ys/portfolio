@@ -140,9 +140,9 @@ function runSiteGate(label, script) {
 }
 
 /*
- * Ordered cheapest-first, which is also build-independent-first. The three
+ * Ordered cheapest-first, which is also build-independent-first. The four
  * checks above the line need no `dist/`, no browser and no network, and finish
- * in seconds; the five below walk the built site, and the last two launch a
+ * in seconds; the six below walk the built site, and the last two launch a
  * browser — contrast-check renders every page in both themes, mobile-qa renders
  * 64 page-widths. A missing ADR section should redden in two seconds, not after
  * a full render pass.
@@ -162,11 +162,21 @@ const CHECKS = [
     run: () => runNodeTest('review classify suite', ['scripts/classify-review-outcome.test.cjs']),
   },
   {
+    label: 'font-coverage gate (adversarial suite)',
+    needsSite: false,
+    run: () => runNodeTest('font-coverage suite', ['scripts/font-coverage.test.cjs']),
+  },
+  {
     label: 'ADRs list their downstream surfaces',
     needsSite: false,
     run: runAdrLint,
   },
   { label: 'internal links', needsSite: true, run: () => runSiteGate('link-check', 'scripts/link-check.cjs') },
+  {
+    label: 'every character in the copy has a self-hosted glyph',
+    needsSite: true,
+    run: () => runSiteGate('font-coverage', 'scripts/font-coverage.cjs'),
+  },
   {
     label: 'published metrics match the classifier artifact',
     needsSite: true,
