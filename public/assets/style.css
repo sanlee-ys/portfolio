@@ -1711,10 +1711,24 @@ main.wrap > .measure { grid-column: full; }
 
    The bar for this attribute is literal, not thematic. A card about catching
    a bug, or about a measurement that surprised me, is not a reversal — it is
-   a finding, and it stays blue. Six cards carry it today: BM25 retired and
+   a finding, and it stays blue. Six decisions carry it today: BM25 retired and
    the premium model declined (homepage), the prompt that read better and
    measured worse, the grounding that did not pay and the upgrade that bought
    nothing (classifier), and the Kafka cut (the system).
+
+   Six DECISIONS, not six elements. Four of them are restated somewhere else on
+   the site — in the homepage proof band, or as a homepage ledger footnote — and
+   the mark belongs on every surface a reversal appears on, because the legend
+   is taught once and applied wherever the reader next meets a rule. The ledger
+   is what proved that: it went unmarked while the cards it summarises were
+   marked, so the block that restates the most decisions was the block that
+   contradicted the legend hardest. Add a reversal and you are marking a
+   decision everywhere it surfaces, not tagging one element.
+
+   The other four footnotes were audited against the same literal bar and left
+   blue: the contract seam and the truncation bug are catches, the ceiling is a
+   finding that went the other way (a measurement improved), and the tool schema
+   was kept. Nothing was taken back in any of them.
 
    The colophon's timeline was checked against the same bar and left blue.
    Its entries are catches and refusals, which is a different thing from a
@@ -2680,6 +2694,27 @@ main.wrap > .measure { grid-column: full; }
   letter-spacing: 0.06em;
   color: var(--muted);
 }
+
+/* Two of the six footnotes are literal reversals — the prompt that measured
+   worse and the Kafka cut — and both already carry the mark on the page they
+   link to. They did not carry it here, which made the ledger the one block on
+   the site that taught the legend and then broke it: a reader who learned the
+   rule on the second screen and applied it on the fifth counted four wins out
+   of six, the exact inverse of what the block says.
+
+   Same construction as .proof li, one pseudo-element over: the numeral is
+   ::before here, so the companion hairline is ::after. */
+.ledger li[data-outcome="reversal"] { border-top-color: var(--accent-warm); }
+.ledger li[data-outcome="reversal"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3px;
+  height: 1px;
+  background: var(--accent-warm);
+}
+.ledger li[data-outcome="reversal"]::before { color: var(--accent-warm); }
 
 .ledger li strong { color: var(--text); font-weight: 600; }
 
