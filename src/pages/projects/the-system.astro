@@ -12,7 +12,7 @@ import SiteNav from '../../components/SiteNav.astro';
   <SiteNav current="the-system" />
 
 
-  <main class="wrap article-body">
+  <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>The System</h1>
     <p class="subtitle">How a single classifier grew into a four-repo system, and the discipline I put on the seams as it did.</p>
@@ -125,7 +125,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <div class="decision" id="decision-rightsized" data-outcome="reversal">
-      <p class="tag">Decision &middot; SYS-005</p>
+      <p class="tag"><span class="sr-only">Reversed. </span>Decision &middot; SYS-005</p>
       <h3>Make the enrichment loop async and idempotent by design</h3>
       <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
         calls the classifier, then writes the returned labels back as namespaced

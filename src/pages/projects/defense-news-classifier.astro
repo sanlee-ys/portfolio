@@ -12,7 +12,7 @@ import SiteNav from '../../components/SiteNav.astro';
   <SiteNav current="defense-news-classifier" />
 
 
-  <main class="wrap article-body">
+  <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Defense News Classifier</h1>
     <p class="subtitle">An LLM classifier, and the eval harness that kept me honest about it.</p>
@@ -109,7 +109,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <div class="decision" data-outcome="reversal">
-      <p class="tag">The prompt that read better and performed worse</p>
+      <p class="tag"><span class="sr-only">Reversed. </span>The prompt that read better and performed worse</p>
       <p>I sharpened the system prompt to draw a cleaner line between
         <code>procurement</code> (a purchase, the buyer's view) and
         <code>industry</code> (a company's own business news). It read better to
@@ -123,7 +123,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <div class="decision" id="decision-grounding" data-outcome="reversal">
-      <p class="tag">The grounding that did not pay</p>
+      <p class="tag"><span class="sr-only">Reversed. </span>The grounding that did not pay</p>
       <p>I added BM25 lexical retrieval to ground each classification in similar
         documents, expecting a clear win. Measured lift: +1.9% category accuracy
         (a net of one correct call in 54) and +0.0% on domain, where grounding
@@ -248,7 +248,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <div class="decision" data-outcome="reversal">
-      <p class="tag">The upgrade that bought nothing</p>
+      <p class="tag"><span class="sr-only">Reversed. </span>The upgrade that bought nothing</p>
       <p>The roadmap called for tiered routing: escalate the uncertain cases to
         the more expensive model. I built the trigger, measured it, and shipped
         the negative result. Routing moved <strong>+0 rows</strong> on both axes

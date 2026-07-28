@@ -20,6 +20,11 @@ const {
   ogTitle = title,
   ogDescription = description,
   social = canonical != null,
+  // Where the skip link lands. Every page's <main> carries `id="main"` except
+  // the homepage, whose <main> has been `id="work"` since before this existed
+  // and is deep-linked as `index.html#work` from the glossary — renaming it
+  // would 404 those anchors, so the homepage overrides the target instead.
+  skipTo = '#main',
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -92,6 +97,7 @@ const {
   <slot name="head" />
 </head>
 <body>
+  <a class="skip-link" href={skipTo}>Skip to content</a>
   <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
     <span class="theme-icon-dark">&#9789;</span>
     <span class="theme-icon-light">&#9728;</span>
