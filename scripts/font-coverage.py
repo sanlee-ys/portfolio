@@ -59,6 +59,18 @@ EXPECTED = {
     0x263D: "moon: theme toggle; no dingbats in any of the three faces",
 }
 
+# DECLARED-ONLY exceptions: a range claims the codepoint, the file does not have
+# it, and that is not fixable by re-cutting because the upstream face has no such
+# glyph either. The Google ranges are family-wide rather than a per-file promise,
+# so a gap like this is upstream's, not a drift introduced here.
+EXPECTED_DECLARED = {
+    0x20A9: "won sign: inside Google's latin-ext range U+20A0-20AB, but absent "
+            "from Geist and Geist Mono upstream (checked against the variable "
+            "sources). Newsreader has it, so site prose is covered; only "
+            "resume.html, whose stack is Geist-only, falls to the platform for "
+            "the one line that uses it.",
+}
+
 # Stylesheets that declare @font-face, and the directory each one's url() is
 # relative to. resume.html is standalone by design (see CLAUDE.md) and repeats
 # the Geist declarations, so it drifts independently and is checked separately.
@@ -158,10 +170,13 @@ def main() -> None:
                           if cp in rng and cp not in cmap})
         char = chr(cp) if cp not in (0xA0,) else "nbsp"
 
-        if claimed:
+        if claimed and cp not in EXPECTED_DECLARED:
             declared_only.append(f"U+{cp:04X} {char} -- declared by {', '.join(claimed)}")
         if covered:
-            print(f"  U+{cp:04X} {char:>4}  covered   {', '.join(covered)}")
+            note = "  [declared-gap noted]" if cp in EXPECTED_DECLARED and claimed else ""
+            print(f"  U+{cp:04X} {char:>4}  covered   {', '.join(covered)}{note}")
+        elif cp in EXPECTED_DECLARED:
+            print(f"  U+{cp:04X} {char:>4}  expected  {EXPECTED_DECLARED[cp].split('.')[0]}")
         elif cp in EXPECTED:
             print(f"  U+{cp:04X} {char:>4}  expected  {EXPECTED[cp]}")
         else:
