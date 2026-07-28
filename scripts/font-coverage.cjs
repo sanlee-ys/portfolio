@@ -68,9 +68,10 @@ const EXPECTED = new Map([
  */
 const EXPECTED_DECLARED = new Map([
   [0x20a9, 'won sign: inside Google\'s latin-ext range U+20A0-20AB, but absent from '
-    + 'Geist and Geist Mono upstream. Nothing falls to the platform for it — site '
-    + 'prose is covered by Newsreader and resume.html by newsreader-won.woff2 — so '
-    + 'what remains is only the range over-claiming, which is upstream\'s to fix.'],
+    + 'Geist and Geist Mono upstream. No copy on this site uses one — resume.html '
+    + 'says "KRW" rather than the sign — and site prose, if it ever did, is covered '
+    + 'by Newsreader. What remains is only the range over-claiming, which is '
+    + 'upstream\'s to fix.'],
 ]);
 
 /*

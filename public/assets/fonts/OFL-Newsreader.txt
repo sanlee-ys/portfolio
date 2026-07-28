@@ -21,14 +21,6 @@ Files in this directory, and where each came from:
       come from geist-arrows.woff2 instead. Neither npm package is a
       dependency of this site; only the generated woff2 files are committed.
 
-  newsreader-won.woff2
-      The won sign (U+20A9) alone, cut from the same Newsreader source by the
-      same script. It exists because Geist has no won sign at any weight, and
-      public/resume.html -- which is deliberately standalone and sets an
-      all-Geist stack -- uses one. Without it that character came from the
-      platform, which made the committed resume.pdf embed a different face for
-      it depending on which machine last generated the file.
-
 Newsreader is under the SIL Open Font License 1.1, the same license the rest
 of this directory is under. The upstream notice and the full license follow.
 
