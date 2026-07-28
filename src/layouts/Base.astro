@@ -50,14 +50,37 @@ const {
   <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <!--
+    The masthead and every paragraph on the site are set in Newsreader, so the
+    roman is on the critical path for the largest element on the page. Without
+    this the browser cannot discover it until style.css has been fetched AND
+    parsed; the preload starts it in parallel with the stylesheet instead.
+    Only the roman is preloaded -- the italic, the two latin-ext subsets and
+    both Geist families are wanted later or not at all on a given page, and a
+    preload for a font the page never uses is a wasted request plus a console
+    warning. `crossorigin` is required even same-origin: fonts are fetched in
+    CORS mode, and a preload whose mode does not match the real request is
+    simply downloaded twice.
+  -->
+  <link rel="preload" href="/assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/assets/style.css" />
   <script is:inline>
+    // Paper is the default. The record is a printed thing first and a lit one
+    // second, so with nothing stored and no OS preference expressed this
+    // resolves to "light" -- the inverse of what it did until the journal
+    // pass, where anything short of an explicit OS "light" fell through to
+    // dark. Precedence is unchanged and still puts the reader first: a stored
+    // choice wins, then an explicit OS preference for dark, then paper. The
+    // catch arm matches, so a browser with localStorage blocked gets paper
+    // rather than the old hard-coded dark. The stylesheet's :root carries the
+    // light tokens for the same reason -- if this script never runs at all,
+    // the page is still paper rather than unstyled-dark.
     (function () {
       try {
         var saved = localStorage.getItem("theme");
-        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
         document.documentElement.setAttribute("data-theme", t);
-      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+      } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
     })();
   </script>
 <!-- Privacy-friendly analytics by Plausible -->

@@ -1,3 +1,34 @@
+/* ===========================================================================
+   THE PUBLISHED LAB JOURNAL
+   ---------------------------------------------------------------------------
+   This site is a decision log: measured calls, reversals, negative results
+   kept in. The visual argument is that it is a JOURNAL — something printed on
+   paper, kept over time by someone careful, with the metadata pushed into the
+   margin where a footnote belongs and the prose left alone in the middle.
+
+   Three consequences run through everything below.
+
+   1. LIGHT IS THE DEFAULT, and the ground is warm paper (#f6f2e8), not white.
+      Dark is not the primary state inverted; it is "night reading" — a warm
+      near-black with lamp-lit ink. Both are declared here, light in :root so
+      that a reader whose JavaScript never runs still gets paper.
+   2. THREE VOICES, and the split is semantic, not decorative.
+        serif (Newsreader) — prose and display: the argument, in the reading
+                             face. Everything a person is meant to READ.
+        sans  (Geist)      — chrome: nav, labels, kickers, chips, footer. The
+                             apparatus around the reading.
+        mono  (Geist Mono) — data: metrics, IDs, dates, code, folios. Anything
+                             measured or cited.
+      A block that changes voice is making a claim about what kind of thing it
+      is, which is why the voices are tokens and not hand-typed stacks.
+   3. MARGINALIA over boxes. At >=64rem the wide track of the breakout grid
+      (ADR-008) becomes a true margin: decision kickers and their code-refs,
+      the ledger's footnote numbers, section folios, and the ToC's label all
+      move OUT of the reading column and sit in it, right-aligned to the text
+      edge. Below that width they fold back inline. No drop caps — a drop cap
+      is a costume; a margin note is a working habit.
+   =========================================================================== */
+
 /* Geist: one screen-first sans, self-hosted (SIL OFL 1.1, see fonts/OFL.txt).
    This replaces the @import from fonts.googleapis.com, which was the worst
    shape a webfont can have: the browser had to fetch style.css, parse it,
@@ -62,16 +93,93 @@
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+/* Newsreader — the reading face, added in the journal pass. Self-hosted for
+   the same reasons as Geist above: no third origin, no serialized discovery,
+   no third party watching every visitor. SIL OFL 1.1; the license and the
+   provenance of these four files are in fonts/OFL-Newsreader.txt.
+
+   WHY THIS FACE. Newsreader was drawn by Production Type for on-screen news
+   reading, so it is a text serif that survives being set at 17px on a phone
+   and still has enough contrast to carry a masthead at 60. Its italic is a
+   true italic rather than a slant, which is what makes the margin notes and
+   the hero's identity line work — they change voice, not just angle.
+
+   WHICH CUT. Newsreader ships an optical-size axis (opsz 6-72) alongside
+   weight. The full two-axis file is 132KB latin roman + 147KB italic; the
+   weight-only instance is 58KB + 65KB. Taking the smaller one is not a
+   shortcut, it is the same argument the Geist comment above spends three
+   paragraphs making — a site whose stylesheet lectures about webfont cost
+   does not get to quintuple its font payload for an optical grade most
+   readers will never consciously see. The display sizes get their tightening
+   from letter-spacing instead, declared with the type scale below.
+
+   Latin + latin-ext only, ranges copied verbatim from the upstream package
+   (@fontsource-variable/newsreader 5.3.0) so subsetting behaviour is
+   unchanged. latin-ext is never fetched unless a glyph needs it. */
+@font-face {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("fonts/newsreader-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("fonts/newsreader-latin-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("fonts/newsreader-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("fonts/newsreader-latin-ext-italic.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 :root {
-  /* dark theme (default) */
-  --bg: #0f1115;
-  --panel: #161a21;
-  --text: #e7eaf0;
-  --muted: #9aa3b2;
-  --accent: #6ea8fe;
-  --accent-soft: rgba(110, 168, 254, 0.12);
+  /* ---- Paper (the default) ----------------------------------------------
+     Light-first, and warm. The old default was a dark #0f1115 with a cool
+     near-white alternate; both were screen colours. This ground is paper:
+     a warm off-white with real chroma in it, and ink that is a warm near-black
+     rather than a grey. The difference is small per pixel and total in effect
+     — every hairline, every panel and every muted label inherits the warmth,
+     so the page reads as a printed thing rather than a lit one.
+
+     Contrast measured against this theme's own ground, not assumed:
+       --text #1f1c17 on --bg .......... 15.9:1
+       --text-secondary #3a352c ........ 11.0:1
+       --muted #655d4f ................. 5.6:1   (labels, dates, captions)
+       --accent #1d4e73 ................ 7.6:1
+       --accent-warm #9c3b1b ........... 6.5:1
+     All of them clear 4.5:1 for body text, which matters because both accents
+     are used ON TEXT here (tags, IDs, chips), not only on rules and markers. */
+  --bg: #f6f2e8;
+  --panel: #fffdf6;
+  --text: #1f1c17;
+  --muted: #655d4f;
+  /* Ink blue: the colour of a fountain pen, not of a hyperlink. It keeps the
+     same job the old #2563eb had — links, focus, shipped — but at a value that
+     belongs on paper. */
+  --accent: #1d4e73;
+  --accent-soft: rgba(29, 78, 115, 0.10);
   /* ---- The second hue: reversal ----------------------------------------
-     A copper/amber counterpart to the blue, and it carries ONE meaning:
+     A correction-ink counterpart to the blue, and it carries ONE meaning:
      this is the record of something that was built and then taken back —
      retired, reverted, declined, cut. Blue keeps links, focus, and shipped.
 
@@ -79,19 +187,29 @@
      the wins are what it is for. Two thirds of the good writing on this site
      is a negative result, so the negative results get a colour.
 
-     Contrast, measured against this theme's own backgrounds rather than
-     assumed: #e8a44c is 8.9:1 on --bg and 8.2:1 on --panel; the light theme's
-     #b45309 is 4.9:1 on --bg and 5.0:1 on white. Both clear 4.5:1 for text,
-     which matters because this hue is used on text (tags, IDs, chips), not
-     only on markers.
+     The hue moved with the ground: the old copper/amber was tuned to sit on a
+     cool dark field, and on paper it reads as highlighter. Oxide red is what
+     an editor's pencil actually leaves on a page, and it is the one mark on
+     this site that means "I took this back".
 
      The restraint is the point. If a decision's outcome is not literally a
      revert, decline or retirement, it stays blue. */
-  --accent-warm: #e8a44c;
-  --accent-warm-soft: rgba(232, 164, 76, 0.14);
-  --border: #232a35;
-  --btn-text: #0b0e13;
-  --shadow: rgba(0, 0, 0, 0.35);
+  --accent-warm: #9c3b1b;
+  --accent-warm-soft: rgba(156, 59, 27, 0.10);
+  --border: #ddd4c1;
+  --btn-text: #fffdf6;
+  --shadow: rgba(60, 45, 20, 0.10);
+  /* ---- Two weights of rule ---------------------------------------------
+     A printed page separates things with rules, and it uses more than one.
+     --border is the hairline: row rules, block edges, the quiet stuff.
+     --rule-strong is the ink rule: the head of a table, the top of a decision
+     entry, the masthead. Having both is what lets the whole site drop its
+     boxes without going flat — the hierarchy moves into the LINES.
+     --highlight is the one fill left in the system: the mark a diagram click
+     leaves on the decision it sends you to. It is a highlighter swipe, which
+     is what a reader actually does to a page they are working through. */
+  --rule-strong: #46402f;
+  --highlight: rgba(203, 160, 74, 0.26);
   /* Argument text. --muted was doing two jobs: genuinely secondary metadata
      (labels, dates, captions) AND the body of the actual arguments — the about
      section, the ledger rows, the tradeoff lines. The result was a page whose
@@ -99,16 +217,13 @@
      half-step down from --text, enough to sit under a heading without reading
      as an aside; --muted is now reserved for metadata that really is quieter
      than the sentence next to it. */
-  --text-secondary: #c9d1de;
-  /* ONE radius scale. Components hardcoded 10px while --radius said 14px, so
-     the token described a corner the site did not actually draw anywhere.
-     --radius is the working value every panel/input/image uses; --radius-sm is
-     for things measured in a few px of text (inline code, focus rings);
-     --radius-lg is the one larger surface (the system diagram). Pills stay
-     literal 999px — that is a shape, not a step on this scale. */
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
+  --text-secondary: #3a352c;
+  /* Corners, near enough to none. The old scale (6/10/14px) drew soft-cornered
+     app surfaces; nothing on a printed page has a 14px radius. What is left is
+     the minimum that keeps a 1px rule from looking chipped where it turns. */
+  --radius-sm: 2px;
+  --radius: 2px;
+  --radius-lg: 3px;
   /* ---- The two tracks (ADR-008) ---------------------------------------
      --content is the prose measure. --wide is where objects with an intrinsic
      width go: tables, the diagram, the multi-column grids. They are
@@ -123,6 +238,18 @@
   --content: 34rem;
   --wide: 57rem;
   --gutter: 24px;
+  /* The margin. Each wide track is (57rem - 34rem) / 2 = 11.5rem, so a note of
+     9.5rem plus a 1.75rem gap sits inside it exactly, right-aligned to the
+     text edge. Held as tokens because four different things move out there and
+     they must all land on the same line. */
+  --margin-note: 9.5rem;
+  --margin-gap: 1.75rem;
+  /* The reading face. Prose, headings, the masthead — everything the reader is
+     meant to read rather than operate. */
+  --serif: "Newsreader", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", serif;
+  /* The chrome voice. Nav, labels, kickers, chips, buttons, the footer: the
+     apparatus around the reading. Kept deliberately screen-native — this is
+     the part of the page that is software, and it should not pretend. */
   --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   /* The data voice. Every measured thing on this site is set in it: metrics and
      stat values, ledger IDs and code-refs, dates, the flow line, rung IDs,
@@ -149,19 +276,47 @@
     minmax(var(--gutter), 1fr) [full-end];
 }
 
-html[data-theme="light"] {
-  --bg: #fbfcfe;
-  --panel: #ffffff;
-  --text: #1a1f29;
-  --muted: #5b6472;
-  --accent: #2563eb;
-  --accent-soft: rgba(37, 99, 235, 0.10);
-  --accent-warm: #b45309;
-  --accent-warm-soft: rgba(180, 83, 9, 0.10);
-  --border: #e4e8ee;
-  --btn-text: #ffffff;
-  --shadow: rgba(20, 30, 60, 0.12);
-  --text-secondary: #2f3743;
+/* ---- Night reading -------------------------------------------------------
+   Not the paper theme inverted. A dark theme built by flipping a warm light
+   one usually lands on a cold blue-black, because the eye reads "dark" as
+   "cool" and the tokens follow; that would throw away the whole point of the
+   ground being warm in the first place. So this is its own object: the same
+   room after dark, with a lamp on. Near-black with brown in it, ink that is
+   bone rather than white, and both accents lifted to the values they need at
+   low luminance instead of the values they had on paper.
+
+   Contrast against this theme's own ground:
+     --text #ece4d5 ............ 15.0:1
+     --text-secondary #cfc6b5 .. 11.4:1
+     --muted #9a9081 ........... 6.0:1
+     --accent #9cb8d2 .......... 9.0:1
+     --accent-warm #e0a163 ..... 8.8:1
+
+   The blue is deliberately DESATURATED from the value a pure contrast check
+   would have accepted. A saturated cornflower on a ground this warm reads as a
+   hyperlink stapled onto the page — the one element that clearly came from a
+   browser rather than from the record. Pulling the chroma down lands it where
+   ink looks under a lamp: still unmistakably the link colour, no longer the
+   loudest thing in a paragraph.
+
+   The reversal hue is the one that changes character rather than just value:
+   oxide red is unreadable at this luminance, so at night the correction mark
+   is the copper it has to be. Same meaning, same restraint, different lamp. */
+html[data-theme="dark"] {
+  --bg: #16130f;
+  --panel: #1e1a15;
+  --text: #ece4d5;
+  --muted: #9a9081;
+  --accent: #9cb8d2;
+  --accent-soft: rgba(156, 184, 210, 0.13);
+  --accent-warm: #e0a163;
+  --accent-warm-soft: rgba(224, 161, 99, 0.14);
+  --border: #332d24;
+  --rule-strong: #6b6252;
+  --highlight: rgba(224, 161, 99, 0.15);
+  --btn-text: #16130f;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --text-secondary: #cfc6b5;
 }
 
 /* smooth the swap */
@@ -169,7 +324,8 @@ body, .btn, .hero { transition: background-color 0.2s ease, border-color 0.2s ea
 
 * { box-sizing: border-box; }
 
-/* Theme toggle */
+/* Theme toggle. A stamped square rather than a floating pill: it is the one
+   control on the page, and on paper a control is a printed box. */
 .theme-toggle {
   position: fixed;
   top: 18px;
@@ -177,23 +333,28 @@ body, .btn, .hero { transition: background-color 0.2s ease, border-color 0.2s ea
   z-index: 20;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule-strong);
   background: var(--panel);
   color: var(--text);
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.15s ease, transform 0.12s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.theme-toggle:hover { border-color: var(--accent); transform: translateY(-1px); }
+.theme-toggle:hover { border-color: var(--accent); background: var(--accent-soft); }
 
+/* Paper is the default, including when the theme script never runs, so the
+   sun is what shows with NO data-theme attribute at all. Keyed off
+   [data-theme="dark"] only — the old pair keyed off "light" and would have
+   shown both glyphs on a JS-off render. */
+.theme-icon-dark { display: none; }
+html[data-theme="dark"] .theme-icon-dark { display: inline; }
 html[data-theme="dark"] .theme-icon-light { display: none; }
-html[data-theme="light"] .theme-icon-dark { display: none; }
 
 /* ---- The motion cut (2026-07-27) --------------------------------------
    Three decorative effects were removed here and their markup with them: the
@@ -221,13 +382,24 @@ html[data-theme="light"] .theme-icon-dark { display: none; }
 
 html { scroll-behavior: smooth; }
 
+/* The reading default. Prose is the serif, at 17px with 1.62 leading — a
+   measure-and-leading pair chosen for a text face, not inherited from a UI
+   one. Root stays at 16px so every rem in the file keeps meaning what it
+   meant; only the body's own inherited size moves, and the handful of
+   component sizes that sat just under it were re-tuned rather than left to
+   drift below the new baseline.
+
+   font-smoothing is deliberately NOT forced to antialiased any more. It thins
+   a serif on macOS to the point where the hairlines start to disappear at
+   text sizes, which is the one thing this face is here to avoid. */
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.62;
+  text-rendering: optimizeLegibility;
 }
 
 /* The inner wrap of the full-bleed bands (hero, doors, footer). It is the
@@ -244,10 +416,14 @@ body {
    ::before layer behind this went with the motion cut above, and with them
    the position/overflow/z-index scaffolding that existed only to stack them
    behind the text. What is left is a band, a rule, and fluid padding. */
+/* The masthead rule is 2px of ink, and the nav's own hairline sits a row
+   below it. Together they make the double rule that closes a masthead and
+   opens a running head on a printed page — which is exactly what the hero and
+   the doors nav are. Neither element gained any markup to do it. */
 .hero {
   /* fluid padding: scales with viewport between the min and max — no breakpoint. */
-  padding: clamp(56px, 10vw, 96px) 0 clamp(40px, 7vw, 72px);
-  border-bottom: 1px solid var(--border);
+  padding: clamp(56px, 10vw, 96px) 0 clamp(36px, 6vw, 60px);
+  border-bottom: 2px solid var(--rule-strong);
 }
 
 /* On small phones the hero padding eats into the visible viewport, pushing the
@@ -261,11 +437,12 @@ body {
 }
 
 .eyebrow {
+  font-family: var(--font);
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--muted);
   margin: 0 0 18px;
 }
 
@@ -278,23 +455,40 @@ body {
    mobile gate measures that rather than trusting it.
    Letter-spacing tightens as size grows, which is the standard correction:
    tracking that reads as airy at 1rem reads as loose at 3.8. */
+/* The masthead. Set in the reading face at 600, which is where Newsreader's
+   stems get the weight a nameplate needs without turning into a display cut.
+   It runs a step larger than the old sans masthead because a serif at the same
+   optical size reads smaller — the letterforms give more of their height to
+   the serifs and less to the x-height.
+
+   The negative tracking is doing the job the optical-size axis would have done
+   if this build carried it (see the Newsreader note above): a text-grade
+   drawing set at 60px is very slightly too loose, and -0.025em is the amount
+   that costs nothing and fixes it. */
 .hero h1 {
-  font-size: clamp(2.4rem, 6vw, 3.8rem);
-  line-height: 1.05;
-  margin: 0 0 24px;
-  letter-spacing: -0.03em;
+  font-family: var(--serif);
+  font-size: clamp(2.7rem, 7vw, 4.2rem);
+  font-weight: 600;
+  line-height: 1.02;
+  margin: 0 0 20px;
+  letter-spacing: -0.025em;
 }
 
-/* Hero identity line: the warm, first-person "who I am" statement.
-   Lighter weight + capped measure so it reads as a sentence, not a banner. */
+/* Hero identity line: the warm, first-person "who I am" statement. In the
+   italic, which is the single most journal-shaped decision in the hero — the
+   standfirst under a masthead is set in italic in every printed record I was
+   thinking about while building this, and Newsreader's is a true italic with
+   its own drawing rather than a slanted roman. */
 .tagline {
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.2rem, 3.2vw, 1.5rem);
   color: var(--text);
   font-weight: 400;
-  line-height: 1.45;
-  max-width: 42ch;
-  margin: 0 0 16px;
-  letter-spacing: -0.01em;
+  line-height: 1.4;
+  max-width: 40ch;
+  margin: 0 0 14px;
+  letter-spacing: 0;
 }
 
 /* ---- Who gets --muted, and who does not ------------------------------------
@@ -311,19 +505,24 @@ body {
    Everything below follows that split, and the comments call it out where the
    call is close. */
 .lede {
-  font-size: 1.02rem;
+  font-size: 1.075rem;
   color: var(--text-secondary);
-  line-height: 1.55;
+  line-height: 1.58;
   max-width: 52ch;
-  margin: 0 0 28px;
+  margin: 0 0 26px;
 }
 
-/* Present-tense anchor under the arc: who/where now (the employer + tenure),
-   the way Lee Robinson names Cursor up top. Quiet, so it sits below the arc. */
+/* Present-tense anchor under the arc: who/where now (the employer + tenure).
+   This one crosses into the chrome voice on purpose. It is the dateline —
+   the small line under a masthead that says where and when this was filed —
+   and a dateline is apparatus, not argument. Sans, tracked, small. */
 .now {
+  font-family: var(--font);
   color: var(--muted);
-  font-size: 1rem;
-  margin: -6px 0 24px;
+  font-size: 0.86rem;
+  letter-spacing: 0.015em;
+  line-height: 1.5;
+  margin: 0 0 22px;
 }
 
 /* Content-first hero: a quiet row of social icons instead of big buttons. The
@@ -350,7 +549,10 @@ body {
   transition: color 0.15s ease, transform 0.12s ease;
 }
 .hero-links a:hover { color: var(--accent); transform: translateY(-1px); }
-.hero-links a svg { width: 22px; height: 22px; display: block; }
+/* 19px, not 22. The masthead and the standfirst above these got finer with the
+   serif, and a row of 22px glyphs under them read as a toolbar bolted to a
+   title page. The 44px tap target is unchanged — only the drawn mark shrank. */
+.hero-links a svg { width: 19px; height: 19px; display: block; }
 
 /* "What the record shows" — the 60-second layer.
 
@@ -372,17 +574,22 @@ body {
 /* Stacked, not an inline row. The old middot separators worked when these were
    five short keywords that flowed together; three full claims each take their
    own line, which left a dangling "·" at the end of every line but the last. */
+/* Drawn as the contents line of an issue: three claims centred under the
+   running head, closed by a hairline. Serif, because these are sentences; the
+   figures inside them break to the mono, because those are the measurements
+   and the whole point of the line is that they are checkable. */
 .proof {
   list-style: none;
-  padding: 0;
-  margin: 18px 0 6px;
+  padding: 16px 0 18px;
+  margin: 0 0 4px;
+  border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  letter-spacing: 0.01em;
+  gap: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  letter-spacing: 0;
   color: var(--muted);
   text-align: center;
 }
@@ -398,7 +605,14 @@ body {
   transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 .proof a:hover { color: var(--text); text-decoration-color: var(--accent); }
-.proof a strong { color: var(--text); font-weight: 600; }
+.proof a strong {
+  color: var(--text);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
 .proof a em { font-style: italic; }
 .proof a:focus-visible {
   outline: 2px solid var(--accent);
@@ -421,15 +635,22 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px 28px;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  gap: 8px 26px;
+  padding-top: 13px;
+  padding-bottom: 13px;
 }
+/* Running head. Small, tracked caps in the chrome voice — the line that sits
+   under a masthead naming the sections of the issue. Caps here rather than in
+   the markup: the copy is title-case and stays that way for screen readers and
+   for anyone who copies it. */
 .doors a {
+  font-family: var(--font);
   color: var(--text);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.72rem;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
   transition: color 0.15s ease;
 }
 .doors a:hover { color: var(--accent); }
@@ -463,35 +684,50 @@ body {
 
 .btn {
   display: inline-block;
-  padding: 12px 22px;
+  padding: 11px 20px;
   border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 0.8rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   text-decoration: none;
   background: var(--accent);
   color: var(--btn-text);
   border: 1px solid var(--accent);
-  transition: transform 0.12s ease, opacity 0.12s ease;
+  transition: background-color 0.12s ease, color 0.12s ease;
 }
 
-.btn:hover { transform: translateY(-1px); opacity: 0.92; }
+.btn:hover { background: var(--text); border-color: var(--text); }
 
 .btn.ghost {
   background: transparent;
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--rule-strong);
 }
+.btn.ghost:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
 
-/* Sections */
+/* ---- Section heads, ruled ------------------------------------------------
+   Every section opens on an ink rule that runs the width of the reading
+   column. That single line does what a card border used to: it says a new
+   thing starts here, without drawing a box around the thing. It is also the
+   move that makes the homepage and the project pages read as one document —
+   .section-title and .article-body h2 are ruled identically, so a section is
+   a section wherever you are in the site. */
 .section-title {
-  font-size: clamp(1.7rem, 4.5vw, 2.1rem);
-  line-height: 1.2;
-  margin: 72px 0 6px;
-  letter-spacing: -0.02em;
+  font-family: var(--serif);
+  font-size: clamp(1.85rem, 4.5vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 76px 0 8px;
+  padding-top: 18px;
+  border-top: 2px solid var(--rule-strong);
+  letter-spacing: -0.018em;
 }
 
 .section-sub {
   color: var(--text-secondary);
-  margin: 0 0 36px;
+  margin: 0 0 34px;
 }
 
 /* Every section's intro paragraph sits the same distance below its title,
@@ -578,6 +814,15 @@ main.wrap > .measure { grid-column: full; }
   .wide
 ) { grid-column: wide; }
 
+/* The marginalia system that turns these two tracks into a MARGIN lives at
+   the very bottom of this file, not here. It has to: several of its rules
+   override component defaults at IDENTICAL specificity (.ledger li,
+   .article-body h2::before), so it only wins if it comes last in source
+   order. Written next to the grid it depends on -- which is where it wants
+   to live -- the margin notes silently stayed inline at every width and the
+   whole construction did nothing. Caught by screenshotting the built page:
+   nothing overflowed, nothing 404d, and no gate would have flagged it. */
+
 /* Kept as a semantic grouping for the homepage's four sections; its width is
    now the grid's business, not a max-width. */
 
@@ -588,11 +833,18 @@ main.wrap > .measure { grid-column: full; }
    on the page, and wrote recommendations for refining them. Dead CSS is not
    free: it describes a site that does not exist. The kicker and the standalone
    writeup link below are the two pieces still in use. */
+/* The label above a block. In the chrome voice, tracked caps, and quiet: on
+   the homepage's decision entries this is what gets pushed out into the margin
+   at desktop widths (see "Marginalia" below), so it is drawn as a note rather
+   than as a heading — it has to survive being read at 156px wide and out of
+   the reading column. */
 .kicker {
+  font-family: var(--font);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  font-size: 0.68rem;
   font-weight: 600;
+  line-height: 1.5;
   color: var(--accent);
   margin: 0 0 12px;
 }
@@ -618,13 +870,31 @@ main.wrap > .measure { grid-column: full; }
    name from the card era; the flex-column properties it used to need there
    (margin-top:auto, align-self) went with the cards, since they do nothing
    inside a paragraph. */
+/* "Read the full writeup →". A journal's continued-on marker: it is a route,
+   not a sentence, so it drops to the chrome voice a size below the prose.
+
+   NOT uppercase, and that is a measured restraint rather than a preference:
+   .card-link is used both standalone under the diagram AND inline at the end
+   of prose paragraphs on the project pages, where "The full bake-off,
+   handicaps included →" set in tracked caps runs ~300px and would push a
+   320px viewport sideways. The tracked-caps treatment is given only to the
+   standalone case below, where the line is its own paragraph and can wrap. */
 .card-link {
+  font-family: var(--font);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--accent);
   text-decoration: none;
-  font-weight: 600;
 }
 
-.card-link:hover { text-decoration: underline; }
+.card-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.diagram-more .card-link {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
 
 /* Arrow nudge. The second interaction the motion cut kept: it points at the
    page it opens, so it is a signifier rather than an ornament. inline-block is
@@ -645,10 +915,12 @@ main.wrap > .measure { grid-column: full; }
 /* Spacing for the "read the full writeup" link beneath the homepage diagram. */
 .diagram-more { margin: 14px 0 8px; }
 
-/* Footer */
+/* Footer — the colophon rule that closes the issue. 2px of ink, the same
+   weight that opens every section, so the document is bounded top and bottom
+   by the same mark. */
 .footer {
-  border-top: 1px solid var(--border);
-  padding: 32px 0;
+  border-top: 2px solid var(--rule-strong);
+  padding: 34px 0;
   color: var(--muted);
 }
 
@@ -658,19 +930,21 @@ main.wrap > .measure { grid-column: full; }
   align-items: center;
 }
 
+/* The two lines that close the page are the colophon's own voice: the reading
+   face, in italic, small. A printer's imprint, not a legal footer. */
 .footer .disclaimer {
-  margin: 10px 0 0;
-  font-size: 0.78rem;
+  margin: 12px 0 0;
+  font-style: italic;
+  font-size: 0.84rem;
   color: var(--muted);
-  opacity: 0.85;
   text-align: center;
 }
 
 .last-updated {
   margin: 28px 0 0;
-  font-size: 0.78rem;
+  font-style: italic;
+  font-size: 0.84rem;
   color: var(--muted);
-  opacity: 0.85;
   text-align: center;
 }
 
@@ -689,10 +963,15 @@ main.wrap > .measure { grid-column: full; }
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  font-family: var(--font);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
   color: var(--muted);
   text-decoration: none;
 }
-.footer a:hover { color: var(--text); }
+.footer a:hover { color: var(--accent); }
 
 @media (max-width: 560px) {
   .footer nav {
@@ -738,26 +1017,32 @@ main.wrap > .measure { grid-column: full; }
 }
 
 .article-body .back {
-  color: var(--accent);
+  font-family: var(--font);
+  color: var(--muted);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
 }
+.article-body .back:hover { color: var(--accent); }
 
-/* Small inline status pill (e.g. WIP). */
+/* Small inline status stamp (e.g. WIP). Square, because a rounded pill is a
+   UI badge and this page is a document; a stamp on a document has corners. */
 .badge {
   display: inline-block;
   vertical-align: middle;
   margin-left: 12px;
   font-family: var(--mono);
-  font-size: 0.55em;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 0.5em;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
   background: var(--accent-soft);
   border: 1px solid var(--accent);
-  border-radius: 999px;
-  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  padding: 3px 9px;
 }
 
 /* About section: scope the prose to the whole section so every paragraph shares
@@ -767,7 +1052,7 @@ main.wrap > .measure { grid-column: full; }
 .about p { color: var(--text-secondary); margin: 0 0 16px; }
 
 /* ---- Project writeup components ---- */
-.article-body .lead { font-size: 1.15rem; color: var(--text); margin: 0 0 24px; }
+.article-body .lead { font-size: 1.18rem; line-height: 1.55; color: var(--text); margin: 0 0 26px; }
 
 /* "On this page" — an in-page map for the long writeups. Measured: the
    classifier is 3,194 words, 14.5 minutes, 10.1 screens at 900px tall. A ToC
@@ -801,16 +1086,16 @@ main.wrap > .measure { grid-column: full; }
    sits; it changes what it is made of.
 ------------------------------------------------------------------------ */
 .toc {
-  margin: 28px 0 8px;
+  margin: 30px 0 8px;
   padding: 14px 0 18px;
-  border-top: 1px solid var(--border);
+  border-top: 2px solid var(--rule-strong);
   border-bottom: 1px solid var(--border);
 }
 
 .toc-heading {
-  margin: 0 0 10px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
+  margin: 0 0 12px;
+  font-family: var(--font);
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-weight: 600;
@@ -833,11 +1118,16 @@ main.wrap > .measure { grid-column: full; }
   break-inside: avoid;
 }
 
+/* The ToC numeral and the section folio beside the heading it points at are
+   the same numeral in the same face. That is the whole reason both are
+   counters. */
 .toc li::before {
-  content: counter(toc) ".";
-  margin-right: 8px;
+  content: counter(toc);
+  display: inline-block;
+  width: 1.5em;
   color: var(--muted);
   font-family: var(--mono);
+  font-size: 0.78rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -867,59 +1157,100 @@ main.wrap > .measure { grid-column: full; }
   list-style: none;
 }
 .repo-grid li {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule-strong);
   padding: 12px 0 0;
 }
-.repo-grid strong { display: block; margin-bottom: 4px; }
-.repo-grid span { color: var(--text-secondary); font-size: 0.92rem; }
+.repo-grid strong {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.repo-grid span { color: var(--text-secondary); font-size: 0.95rem; }
 
-/* Numbered data-flow */
+/* Numbered data-flow. The step markers were filled accent circles — the one
+   remaining place on the site where a number sat inside a coloured disc. On
+   paper a numbered step is a numeral in a ruled box, so that is what it is:
+   square, hairline, mono, no fill. */
 .flow { list-style: none; counter-reset: step; padding: 0; margin: 18px 0; }
 .flow li {
   position: relative;
-  padding: 6px 0 16px 42px;
-  border-left: 2px solid var(--border);
-  margin-left: 14px;
+  padding: 3px 0 18px 42px;
+  border-left: 1px solid var(--border);
+  margin-left: 13px;
 }
 .flow li:last-child { border-left-color: transparent; }
 .flow li::before {
   counter-increment: step;
   content: counter(step);
   position: absolute;
-  left: -15px;
+  left: -13px;
   top: 0;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
-  color: var(--btn-text);
-  border-radius: 50%;
-  font-size: 0.85rem;
-  font-weight: 700;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  font-weight: 500;
 }
 
-/* Decision blocks */
+/* ---- Decision entries ----------------------------------------------------
+   The last card on the site, un-carded. The 2026-07-27 de-boxing kept the
+   full card treatment — border, --panel fill, radius, 3px accent stripe — for
+   .decision alone, on the argument that if everything is a card then being a
+   card means nothing. That argument is right and this goes one step further:
+   in a journal, nothing is a card. An entry is a ruled block of the page.
+
+   So the fill, the four borders and the radius all go, and what is left is one
+   2px ink rule across the top of the entry with the label out in the margin.
+   The entries then stack into a continuous ruled ledger rather than a column
+   of floating tiles, which is what the decision log has always claimed to be.
+
+   What this BUYS, beyond the look: the entries now sit on exactly the same
+   left edge as the prose around them, so a reader's eye does not step in and
+   out by 18px of card padding six times down the page. The old card said
+   "this is a different kind of object". It is not — it is the same argument,
+   filed. */
 .decision {
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 16px 18px;
-  margin: 16px 0;
-  background: var(--panel);
+  position: relative;
+  border: 0;
+  border-top: 2px solid var(--rule-strong);
+  border-radius: 0;
+  padding: 22px 0 30px;
+  margin: 0;
+  background: none;
 }
-.decision h3 { margin: 0 0 8px; font-size: 1.08rem; }
-.decision p { margin: 6px 0; }
+.decision h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.decision p { margin: 8px 0; }
+/* The entry label on the project pages. It does the job .kicker does on the
+   homepage, so it is drawn the same way and moves to the same margin. */
 .decision .tag {
-  font-size: 0.7rem;
+  font-family: var(--font);
+  font-size: 0.68rem;
+  line-height: 1.5;
   color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin: 0 0 10px;
 }
-/* The tradeoff line is the punchline of the card, not a footnote to it. */
-.decision .tradeoff { color: var(--text-secondary); font-size: 0.95rem; }
+/* The tradeoff line is the punchline of the entry, not a footnote to it. */
+.decision .tradeoff { color: var(--text-secondary); }
 
 /* ---- Reversal cards ---------------------------------------------------
    data-outcome="reversal" marks a decision whose OUTCOME was to take
@@ -938,29 +1269,74 @@ main.wrap > .measure { grid-column: full; }
    Its entries are catches and refusals, which is a different thing from a
    decision being reversed, and colouring them would spend the hue on the
    first place it looked plausible. */
-.decision[data-outcome="reversal"] { border-left-color: var(--accent-warm); }
+/* The entry's rule goes oxide, AND it doubles. A second hairline 3px under the
+   first is the printer's mark for a struck or superseded entry, and it is a
+   difference in SHAPE rather than only in hue — which matters because the six
+   reversals are the most important thing on this site to be able to find, and
+   colour alone is not a way to mark them. */
+.decision[data-outcome="reversal"] { border-top-color: var(--accent-warm); }
+.decision[data-outcome="reversal"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3px;
+  height: 1px;
+  background: var(--accent-warm);
+}
 .decision[data-outcome="reversal"] .tag,
 .decision[data-outcome="reversal"] .kicker { color: var(--accent-warm); }
-.decision[data-outcome="reversal"] .kicker .code-ref { color: var(--accent-warm); opacity: 0.75; }
+.decision[data-outcome="reversal"] .kicker .code-ref { color: var(--accent-warm); opacity: 0.8; }
 
-/* Results table */
+/* ---- Results tables, set the way a journal sets them --------------------
+   Three rules and no more: an ink rule over the head, a hairline under it, an
+   ink rule under the last row. Row rules stay as the faintest hairline the
+   palette has rather than disappearing entirely — a six-column accuracy table
+   is scanned across, and pure booktabs (no row rules at all) makes that harder
+   on a phone where the first column is sticky and the rest scrolls under it.
+   So: strong rules bound the object, hairlines guide the eye inside it.
+
+   No vertical rules and no zebra striping. Both are ways of compensating for
+   columns that are not aligned; these are, because the figures are mono and
+   tabular. */
 .article-body table,
 .measure table {
   border-collapse: collapse;
   width: 100%;
-  margin: 18px 0;
-  font-size: 0.95rem;
+  margin: 20px 0 8px;
+  font-size: 0.92rem;
+  border-top: 2px solid var(--rule-strong);
+  border-bottom: 2px solid var(--rule-strong);
 }
 .article-body th,
 .article-body td,
 .measure th,
 .measure td {
   text-align: left;
-  padding: 9px 12px;
+  padding: 9px 12px 9px 0;
   border-bottom: 1px solid var(--border);
 }
 .article-body th,
-.measure th { color: var(--muted); font-weight: 600; }
+.measure th {
+  font-family: var(--font);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
+  color: var(--muted);
+  font-weight: 600;
+  padding-top: 12px;
+  padding-bottom: 10px;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.article-body tbody tr:last-child td,
+.measure tbody tr:last-child td { border-bottom: 0; }
+/* Cells are padded on the right only, so the row label sits on the page's own
+   left edge and the last column's figures sit on its right edge. A table that
+   is inset from the measure on both sides reads as a picture of a table. */
+.article-body :is(th, td):last-child,
+.measure :is(th, td):last-child { padding-right: 0; }
 .article-body table.metrics td:not(:first-child),
 .article-body table.metrics th:not(:first-child),
 .measure table.metrics td:not(:first-child),
@@ -991,20 +1367,20 @@ main.wrap > .measure { grid-column: full; }
   margin: 22px 0;
 }
 .roadmap > div {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule-strong);
   padding: 12px 0 0;
 }
 .roadmap h3 {
   margin: 0 0 10px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
+  font-family: var(--font);
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--muted);
 }
 .roadmap ul { margin: 0; padding-left: 1.1rem; }
-.roadmap li { font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 6px; }
+.roadmap li { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 6px; }
 
 /* Interactive system diagram (SVG, Tier 3) */
 .diagram-wrap { margin: 18px 0; }
@@ -1020,30 +1396,43 @@ main.wrap > .measure { grid-column: full; }
   margin: 0 0 14px;
 }
 .flow-line .flow-arrow { color: var(--accent); opacity: 0.85; }
+/* The system map, drawn as a PLATE: a figure pasted onto the page, with a
+   printed border and a caption under it. The border goes to ink weight and the
+   fill to --panel, which on paper is very slightly lighter than the ground —
+   the difference a pasted-in plate has from the sheet it is pasted to. */
 .diagram {
   width: 100%;
   height: auto;
-  border: 1px solid var(--border);
-  /* The one surface on --radius-lg: it is the largest object on the page and a
-     10px corner on an 800-unit box reads as a rendering accident. */
+  border: 1px solid var(--rule-strong);
   border-radius: var(--radius-lg);
   background: var(--panel);
 }
 #system-diagram marker path { fill: var(--muted); }
-.edge { stroke: var(--muted); stroke-width: 2; opacity: 0.7; }
-.edge-label { fill: var(--muted); font-size: 12px; }
+.edge { stroke: var(--muted); stroke-width: 1.5; opacity: 0.75; }
+/* Everything lettered inside the plate is a name or a route — a repo, an HTTP
+   verb, a path — so the whole figure is set in the data voice. SVG text
+   inherits from <body>, which is now the serif; without these two rules the
+   diagram would have quietly become a serif drawing. */
+.edge-label {
+  fill: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
 .edge-label-bg { fill: var(--panel); }
 .node rect {
   fill: var(--bg);
-  stroke: var(--border);
-  stroke-width: 1.5;
+  stroke: var(--rule-strong);
+  stroke-width: 1;
   cursor: pointer;
   transition: stroke 0.15s ease, fill 0.15s ease;
 }
 .node text {
   fill: var(--text);
-  font-size: 15px;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   pointer-events: none;
 }
 /* Hover now tints the node as well as outlining it — the outline alone was a
@@ -1051,17 +1440,21 @@ main.wrap > .measure { grid-column: full; }
    pointer. Active stays a step stronger again, so hovered and selected do not
    look the same. */
 .node:hover rect { stroke: var(--accent); fill: var(--accent-soft); }
-.node.active rect { stroke: var(--accent); stroke-width: 2.5; fill: var(--accent-soft); }
+.node.active rect { stroke: var(--accent); stroke-width: 2; fill: var(--accent-soft); }
 /* Keyboard focus ring for the diagram's nodes (the only new interactive controls).
    Style the rect stroke; outline clips unreliably on an SVG <g>. */
 .node:focus { outline: none; }
 .node:focus-visible rect { stroke: var(--accent); stroke-width: 2.5; }
 /* The diagram's live caption. It is a caption — it belongs under the figure
    on a rule, not in a second panel stacked on the first one. */
+/* A plate's caption: set in the reading face, one size down, under a hairline.
+   Not italic — it changes as you click nodes, and an italic that reflows on
+   interaction reads as an error state. */
 .diagram-detail {
   border-top: 1px solid var(--border);
   padding: 12px 0 0;
   margin-top: 14px;
+  font-size: 0.96rem;
   color: var(--text-secondary);
 }
 
@@ -1073,26 +1466,76 @@ main.wrap > .measure { grid-column: full; }
    reader can tell a page title from a section from a subsection by size
    alone. */
 .article-body h1 {
-  font-size: clamp(2.1rem, 5vw, 2.9rem);
-  line-height: 1.1;
-  margin: 18px 0 8px;
-  letter-spacing: -0.03em;
+  font-family: var(--serif);
+  font-size: clamp(2.3rem, 5.4vw, 3.2rem);
+  font-weight: 600;
+  line-height: 1.06;
+  margin: 20px 0 10px;
+  letter-spacing: -0.025em;
 }
-.article-body .subtitle { color: var(--muted); font-size: 1.05rem; margin: 0 0 36px; }
+/* The article's standfirst, in the same italic as the homepage tagline. Two
+   pages, one gesture: the sentence directly under a title is always the
+   italic on this site. */
+.article-body .subtitle {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 1.15rem;
+  line-height: 1.45;
+  margin: 0 0 34px;
+}
+
+/* ---- Section folios ------------------------------------------------------
+   Each h2 is numbered, and the number is set in the data voice out in the
+   margin. It is not decoration: on the long writeups it is the same numbering
+   the table of contents uses, so "3." in the ToC and "3" beside the heading
+   are the same reference, and a reader who jumps can tell where they landed.
+   Generated by a CSS counter, so no markup carries a number that could fall
+   out of step with the document order.
+
+   The rule above the heading is the same 2px ink as the homepage's
+   .section-title, which is what makes a section look like a section on either
+   kind of page. */
+.article-body { counter-reset: folio; }
 .article-body h2 {
-  margin: 48px 0 12px;
-  font-size: clamp(1.45rem, 3.5vw, 1.75rem);
-  line-height: 1.25;
+  position: relative;
+  counter-increment: folio;
+  font-family: var(--serif);
+  font-weight: 600;
+  margin: 56px 0 14px;
+  padding-top: 20px;
+  border-top: 2px solid var(--rule-strong);
+  font-size: clamp(1.55rem, 3.5vw, 1.9rem);
+  line-height: 1.2;
   letter-spacing: -0.015em;
 }
-.article-body h3 { letter-spacing: -0.005em; }
+.article-body h2::before {
+  content: counter(folio);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-right: 0.7em;
+  vertical-align: 0.28em;
+}
+.article-body h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.15rem;
+  letter-spacing: -0.005em;
+}
 .article-body p, .article-body li { color: var(--text); }
+/* Inline code sat on --accent-soft, which put a blue wash behind every label
+   name in the prose and made the enums compete with the links around them. On
+   paper a quoted token is a neutral tint, so it is mixed from the ink instead
+   of from the accent — and it inherits --text rather than colouring itself. */
 .article-body code {
-  background: var(--accent-soft);
-  padding: 2px 6px;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  padding: 1px 5px;
   border-radius: var(--radius-sm);
   font-family: var(--mono);
-  font-size: 0.9em;
+  font-size: 0.85em;
 }
 
 /* Block code (the Example-run artifacts). The page only had inline <code>
@@ -1105,6 +1548,7 @@ main.wrap > .measure { grid-column: full; }
 .article-body pre {
   background: color-mix(in srgb, var(--text) 5%, transparent);
   border: 0;
+  border-left: 2px solid var(--border);
   border-radius: 0;
   padding: 14px 16px;
   margin: 10px 0 0;
@@ -1130,19 +1574,24 @@ main.wrap > .measure { grid-column: full; }
   width: 22px; height: 22px;
   margin-right: 10px;
   display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   background: var(--accent-soft);
   color: var(--accent);
-  font-size: 0.8rem;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
-.example-run .ex-note { color: var(--text-secondary); font-size: 0.92rem; margin: 6px 0 0; }
+.example-run .ex-note { color: var(--text-secondary); font-size: 0.95rem; margin: 6px 0 0; }
 /* A note about the artifact above it. The 3px accent stripe is now the
    decision card's signature and nothing else's, so this gets the quiet
    version: one hairline, an indent, no fill. */
+/* A note about the artifact above it: set as a note — reading face, italic,
+   a size down, hanging off one hairline. Same object as .ci-caption below. */
 .ex-caption {
   color: var(--text-secondary);
-  font-size: 0.92rem;
+  font-style: italic;
+  font-size: 0.95rem;
   border-left: 1px solid var(--border);
   padding: 2px 0 2px 14px;
   margin: 12px 0 0;
@@ -1265,15 +1714,16 @@ main.wrap > .measure { grid-column: full; }
 }
 .rung[data-state="retired"] .rung-id { color: var(--accent-warm); }
 .rung[data-state="spec"] .rung-id { color: var(--muted); }
-.rung-name { font-weight: 600; }
+.rung-name { font-weight: 600; font-size: 1.05rem; }
 .rung-state {
   font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--muted);
   border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 2px 9px;
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
   white-space: nowrap;
 }
 .rung[data-state="shipped"] .rung-state,
@@ -1282,12 +1732,13 @@ main.wrap > .measure { grid-column: full; }
 .rung-gain { margin: 6px 0 0; font-size: 0.95rem; }
 .rung-driver { margin: 4px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
 .rung-driver .lbl {
-  font-size: 0.7rem;
+  font-family: var(--font);
+  font-size: 0.64rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
   color: var(--muted);
-  opacity: 0.8;
-  margin-right: 6px;
+  margin-right: 7px;
 }
 /* L3's two sub-rungs. Lowercase "rung" is the spec's own word for a sub-step
    inside a Level; the markers keep the two numbering schemes visually distinct
@@ -1318,14 +1769,14 @@ main.wrap > .measure { grid-column: full; }
   height: auto;
   margin: 10px 0 0;
 }
-.backedge .be-box { fill: var(--bg); stroke: var(--border); stroke-width: 1.5; }
-.backedge .be-label { fill: var(--text); font-size: 13px; font-weight: 600; }
+.backedge .be-box { fill: var(--bg); stroke: var(--rule-strong); stroke-width: 1; }
+.backedge .be-label { fill: var(--text); font-family: var(--mono); font-size: 12px; font-weight: 500; }
 .backedge .be-edge { fill: none; stroke: var(--muted); stroke-width: 1.5; }
 /* The one edge the table could not draw, so it gets the accent. */
 .backedge .be-back { stroke: var(--accent); stroke-dasharray: 4 3; }
 /* 12px in viewBox units, not 11: at 320px the SVG scales to ~0.93, so 11px
    landed at 10.2px rendered. 12 keeps the annotation above 11px on a phone. */
-.backedge .be-note { fill: var(--muted); font-size: 12px; }
+.backedge .be-note { fill: var(--muted); font-family: var(--font); font-size: 12px; }
 .backedge marker path { fill: var(--muted); }
 .backedge marker path.be-head-back { fill: var(--accent); }
 
@@ -1346,17 +1797,27 @@ main.wrap > .measure { grid-column: full; }
   height: auto;
   margin: 14px 0 6px;
 }
+/* SVG <text> inherits from <body>, which is the serif now, so every lettered
+   figure on the site has to say which voice it is in. Ticks and n-labels are
+   measurements (mono); the metric name is a label (sans). */
 .ci-plot .ci-grid { stroke: var(--border); stroke-width: 1; }
-.ci-plot .ci-tick { fill: var(--muted); font-size: 12px; }
-.ci-plot .ci-metric { fill: var(--text); font-size: 13px; font-weight: 600; }
-.ci-plot .ci-n { fill: var(--muted); font-size: 12px; }
+.ci-plot .ci-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+.ci-plot .ci-metric {
+  fill: var(--text);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ci-plot .ci-n { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
 /* The n=54 gold-set interval: muted and thin -- the noisy "before". */
 .ci-plot .ci-gold { stroke: var(--muted); stroke-width: 1.5; }
 .ci-plot .ci-dot-gold { fill: var(--bg); stroke: var(--muted); stroke-width: 1.5; }
 /* The n=300 scaled interval: accent and heavier -- the tightened result. */
 .ci-plot .ci-scaled { stroke: var(--accent); stroke-width: 3; }
 .ci-plot .ci-dot-scaled { fill: var(--accent); }
-.ci-caption { color: var(--muted); font-size: 0.9rem; margin: 0 0 4px; }
+.ci-caption { color: var(--muted); font-style: italic; font-size: 0.95rem; margin: 0 0 4px; }
 
 /* Inline links inside prose. Without this they fall back to the browser's
    default deep blue, which is nearly unreadable on the dark background. Accent
@@ -1386,7 +1847,7 @@ main.wrap > .measure { grid-column: full; }
    re-establishes the page tracks so the stat strip inside it can reach `wide`.
    The name is now purely a semantic grouping. */
 
-.log-intro { color: var(--text-secondary); margin: 0 0 24px; }
+.log-intro { color: var(--text-secondary); margin: 0 0 28px; }
 
 /* Decision IDs in monospace as a deliberate ledger/ID aesthetic. They already
    left-align via the shared .decision padding; tabular-nums just keeps any
@@ -1404,13 +1865,13 @@ main.wrap > .measure { grid-column: full; }
   margin-left: 8px;
   vertical-align: middle;
   font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent-warm);
   background: var(--accent-warm-soft);
   border: 1px solid var(--accent-warm);
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   padding: 2px 8px;
   font-family: var(--mono);
 }
@@ -1420,20 +1881,33 @@ main.wrap > .measure { grid-column: full; }
    quieter: a 2px ring alone was easy to miss when the card you were sent to
    was already below the fold, so it now carries a soft halo outside the ring.
    That is feedback answering an action, which is the test the removed effects
-   failed. */
-.decision { transition: box-shadow 0.3s ease; }
-.decision.target { box-shadow: 0 0 0 2px var(--accent), 0 0 0 9px var(--accent-soft); }
+   failed.
+
+   The ring is gone with the box it used to ring. What answers the click now is
+   a HIGHLIGHTER SWIPE: the entry takes a warm wash that bleeds 14px past the
+   reading column on both sides, drawn with two box-shadows rather than
+   negative margins so it cannot disturb the grid. It is the mark a reader
+   actually leaves on a page they are working through, it needs no border to
+   exist, and it is unmistakable even when the entry it lands on is below the
+   fold. */
+.decision { transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+.decision.target {
+  background: var(--highlight);
+  box-shadow: -14px 0 0 var(--highlight), 14px 0 0 var(--highlight);
+}
 @media (prefers-reduced-motion: reduce) { .decision { transition: none; } }
 
 /* In-place evidence via native <details>: keyboard + find-in-page for free. */
-.decision details { margin-top: 12px; }
+.decision details { margin-top: 14px; }
 .decision summary {
   cursor: pointer;
   color: var(--accent);
+  font-family: var(--font);
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
 }
-.decision details > *:not(summary) { color: var(--text-secondary); font-size: 0.96rem; margin: 10px 0 0; }
+.decision details > *:not(summary) { color: var(--text-secondary); font-size: 0.98rem; margin: 10px 0 0; }
 
 /* Links inside the reading column (prose + evidence), readable on dark. */
 .measure a { color: var(--accent); }
@@ -1445,16 +1919,23 @@ main.wrap > .measure { grid-column: full; }
 .measure p a:hover { text-decoration-color: var(--accent); }
 
 /* Field-notes index: a quiet wrapping list of titles. */
+/* The field-notes index, set the way an index is set: a hairline under every
+   entry so the eye can run along it, columns that reflow with no breakpoint. */
 .notes-list {
   list-style: none;
   padding: 0;
-  margin: 14px 0 10px;
+  margin: 16px 0 10px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 6px 22px;
+  gap: 0 32px;
 }
-.notes-list li { color: var(--muted); font-size: 0.92rem; }
-.muted-line { color: var(--muted); font-size: 0.92rem; }
+.notes-list li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  padding: 8px 0 7px;
+  border-bottom: 1px solid var(--border);
+}
+.muted-line { color: var(--muted); font-size: 0.92rem; font-style: italic; }
 
 /* Glossary filter. A ruled field rather than a boxed one: the glossary's
    entries ARE decision cards, so a second bordered rectangle sitting above
@@ -1462,6 +1943,8 @@ main.wrap > .measure { grid-column: full; }
 .glossary-filter {
   width: 100%;
   font: inherit;
+  font-family: var(--font);
+  font-size: 0.95rem;
   color: var(--text);
   background: transparent;
   border: 0;
@@ -1486,14 +1969,15 @@ main.wrap > .measure { grid-column: full; }
    purpose (same border-left-accent family as the decision cards), so it orients
    without reading as a marketing banner. */
 .orientation {
+  position: relative;
   /* full column width, like every other block in <main> */
-  margin: 56px 0 8px;
-  padding: 16px 0 22px;
-  border-top: 1px solid var(--border);
+  margin: 52px 0 8px;
+  padding: 18px 0 24px;
+  border-top: 2px solid var(--rule-strong);
   border-bottom: 1px solid var(--border);
 }
 .orientation .kicker { margin: 0 0 10px; }
-.orientation-lede { color: var(--text); font-size: 1.05rem; margin: 0 0 14px; }
+.orientation-lede { color: var(--text); font-size: 1.1rem; line-height: 1.55; margin: 0 0 14px; }
 .orientation-points { list-style: none; margin: 0 0 14px; padding: 0; }
 .orientation-points li {
   color: var(--text-secondary);
@@ -1519,25 +2003,35 @@ main.wrap > .measure { grid-column: full; }
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   font-weight: 400;
-  font-size: 0.82em;
-  letter-spacing: 0.04em;
+  font-size: 0.94em;
+  letter-spacing: 0.02em;
+  text-transform: none;
   color: var(--muted);
-  opacity: 0.85;
 }
 
-/* Sango: one small frame, not a gallery. */
-.sango { margin: 24px 0 0; max-width: 320px; }
+/* Sango: one small frame, not a gallery — and now a MOUNTED one. The photo
+   sits on a paper mat with the caption printed on the mount below it, which is
+   how a single picture appears in a notebook: pasted in, not floated. It is
+   the only photographic object on the page, so it is the one place a mat is
+   an accent rather than another box in a page full of boxes. */
+.sango {
+  margin: 26px 0 0;
+  max-width: 300px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 11px;
+}
 .sango img {
   width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border-radius: 0;
+  border: 0;
   display: block;
 }
 .sango figcaption {
-  margin-top: 8px;
+  margin-top: 10px;
   color: var(--muted);
   font-size: 0.85rem;
   font-style: italic;
@@ -1550,31 +2044,61 @@ main.wrap > .measure { grid-column: full; }
    <table>: a table of one-line summaries is the shape most likely to overflow
    at 320px, and ADR-001 makes that a contract, not a preference.
 --------------------------------------------------------------------------- */
+/* Reads as a note to the reader, so it is set as one: reading face, italic,
+   a size down. It was briefly tracked caps to match the other block labels
+   and that was wrong — the other labels are two or three words, and this is a
+   whole sentence. A sentence in caps is a sign, not a note. */
 .ledger-intro {
-  margin: 28px 0 10px;
-  font-size: 0.9rem;
+  margin: 34px 0 14px;
+  font-style: italic;
+  font-size: 0.95rem;
   color: var(--muted);
 }
 
+/* ---- The six, as footnotes ----------------------------------------------
+   Three decisions get a full entry; the other six get one sentence each. That
+   is exactly the relationship a footnote has to a body paragraph, so they are
+   drawn as footnotes: numbered, hairline-ruled, set a size down, and — at
+   desktop — the numeral hangs out in the margin on the same line as every
+   other margin note on the page.
+
+   The numbering is a CSS counter, not markup, for the same reason the section
+   folios are: a hand-typed "4." in the HTML is one edit away from lying. */
 .ledger {
   list-style: none;
   padding: 0;
   margin: 0;
+  counter-reset: footnote;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .ledger li {
-  padding: 12px 0 0;
+  position: relative;
+  counter-increment: footnote;
+  padding: 12px 0 0 1.9rem;
   border-top: 1px solid var(--border);
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 0.96rem;
+  line-height: 1.58;
   /* Each row is a whole decision compressed to one sentence. These are the
      arguments, not an index of them. */
   color: var(--text-secondary);
   /* Long tokens (metric strings, code) wrap rather than widen the page. */
   overflow-wrap: anywhere;
+}
+
+.ledger li::before {
+  content: counter(footnote);
+  position: absolute;
+  left: 0;
+  top: 13px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--muted);
 }
 
 .ledger li strong { color: var(--text); font-weight: 600; }
@@ -1601,34 +2125,156 @@ main.wrap > .measure { grid-column: full; }
 .stat-strip {
   list-style: none;
   padding: 0;
-  margin: 24px 0 18px;
+  margin: 26px 0 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px 32px;
+  gap: 18px 36px;
 }
 
+/* Ink rule over each figure, hairline under the label: the two rules that
+   bound a column in a printed results table, drawn per cell so they survive
+   the collapse to one column on a phone. */
 .stat-strip li {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  border-top: 1px solid var(--border);
-  padding: 12px 0 0;
+  gap: 6px;
+  border-top: 2px solid var(--rule-strong);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0 10px;
 }
 
 .stat-strip .stat-value {
   font-family: var(--mono);
-  font-size: clamp(1.7rem, 4vw, 2.1rem);
-  font-weight: 500;
-  line-height: 1.1;
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.05;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
 
 .stat-strip .stat-label {
-  font-family: var(--mono);
-  font-size: 0.7rem;
+  font-family: var(--font);
+  font-size: 0.66rem;
+  font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
+
+
+/* ---- Marginalia (the journal's grammar) ---------------------------------
+   ADR-008 bought two concentric tracks so that objects with an intrinsic
+   width could break out of the prose measure. This uses the SAME geometry for
+   the opposite purpose: the 11.5rem of wide track sitting either side of the
+   reading column is a MARGIN, and metadata belongs in it.
+
+   What moves out there, and the rule for deciding:
+
+     .decision .kicker   the homepage entry's status label + its code-ref
+     .ledger li::before  footnote numbers for the six one-line entries
+     .article-body h2    section folios, numbered to match the ToC
+     .toc-heading        the "On this page" label beside its own list
+     .orientation .kicker
+
+   The test is METADATA, NOT TITLE. A block's label, ID, date or number goes to
+   the margin; the sentence that names the block does not. That is why the
+   homepage decision entries give up their kicker (the h3 underneath is the
+   title) while the project pages keep .tag in place — on those entries .tag IS
+   the title, and a page whose headings all live in the gutter is a stunt, not
+   a journal.
+
+   Everything out there is set right-aligned, hard against the reading column's
+   left edge, so the notes and the prose share one line rather than floating.
+   Below 64rem there is no margin to speak of and every one of them folds back
+   inline — which is the same reason a printed sidenote becomes a footnote in a
+   paperback. The fold is the default and the margin is the enhancement, so the
+   phone layout is never the leftover.
+
+   Implementation note: these are position:absolute against a relatively
+   positioned block, NOT extra grid columns. Grid placement would have needed
+   each block to be a direct child of the page grid, and .decision entries sit
+   inside .measure, .ledger items inside a <ul>, and h2s inside .article-body.
+   Absolute positioning works at any depth and costs nothing at the widths
+   where it is switched off. Each note's `top` is set to its block's own
+   padding-top so the note's first line sits on the first line of the block it
+   annotates — a margin note that starts one line high reads as belonging to
+   the paragraph above it.
+
+   64rem, measured rather than picked: the two wide tracks are 11.5rem each and
+   the content track is 34rem, so the grid's own content is 57rem = 912px. At
+   1024px there is still a 56px outer gutter on each side, which is the point
+   where a 9.5rem note in the margin stops touching the edge of the window. */
+@media (min-width: 64rem) {
+  /* Homepage decision entries: the status label and its ledger ID go out. */
+  .measure .decision > .kicker {
+    position: absolute;
+    top: 22px;
+    right: calc(100% + var(--margin-gap));
+    width: var(--margin-note);
+    margin: 0;
+    text-align: right;
+  }
+  /* Out in the margin the code-ref stops being a trailing aside and becomes
+     the second line of the note, which is how a citation sits under a label. */
+  .measure .decision > .kicker .code-ref {
+    display: block;
+    margin: 3px 0 0;
+  }
+
+  /* "Start here" beside the orientation block. */
+  .orientation > .kicker {
+    position: absolute;
+    top: 19px;
+    right: calc(100% + var(--margin-gap));
+    width: var(--margin-note);
+    margin: 0;
+    text-align: right;
+  }
+
+  /* Project-page entry labels. On those pages .tag is the entry's name, and it
+     goes out for the same reason the homepage kicker does: the entries below
+     it are already bounded by their own ink rule, so the label is free to
+     become the thing in the margin that tells you what you are looking at. */
+  .article-body .decision > .tag {
+    position: absolute;
+    top: 22px;
+    right: calc(100% + var(--margin-gap));
+    width: var(--margin-note);
+    margin: 0;
+    text-align: right;
+  }
+
+  /* The six one-line entries become numbered footnotes: the hanging indent
+     they carry on a phone straightens out and the numeral moves to the
+     margin, where a footnote number belongs. */
+  .ledger li {
+    padding-left: 0;
+  }
+  .ledger li::before {
+    left: auto;
+    right: calc(100% + var(--margin-gap));
+    width: var(--margin-note);
+    text-align: right;
+  }
+
+  /* Section folios on the project pages, numbered to match the ToC. */
+  .article-body h2::before {
+    position: absolute;
+    top: 22px;
+    right: calc(100% + var(--margin-gap));
+    width: var(--margin-note);
+    margin-right: 0;
+    vertical-align: baseline;
+    text-align: right;
+  }
+}
+
+/* The ToC is deliberately NOT on this list, and the reason is worth writing
+   down because it is the trap in the whole construction: .toc is promoted to
+   the `wide` track by the rule above, so its containing block already occupies
+   the margin. A note positioned off ITS left edge lands in the outer gutter,
+   not in the margin, and would have sat on a different vertical line from
+   every other note on the page. Anything that breaks out to `wide` gives up
+   its marginalia; that is the cost of being wide, and it is the right trade
+   for a table or a diagram. */
