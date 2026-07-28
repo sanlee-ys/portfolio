@@ -193,9 +193,25 @@
      this site that means "I took this back".
 
      The restraint is the point. If a decision's outcome is not literally a
-     revert, decline or retirement, it stays blue. */
-  --accent-warm: #9c3b1b;
-  --accent-warm-soft: rgba(156, 59, 27, 0.10);
+     revert, decline or retirement, it stays blue.
+
+     THE VALUE IS SET BY THE PROSE IT MARKS, not by what looked like oxide.
+     At #9c3b1b it measured 6.15:1 on this ground while the prose it was
+     marking ran 10.89:1 — an emphasis mark quieter than the thing it
+     emphasises, which is an inversion however good the hue looks. #5e1f0d is
+     the same pigment taken to 11.20:1, level with --text-secondary.
+
+     What that costs, stated plainly: contrast is luminance, so a mark at
+     parity with the prose is necessarily NEAR the prose in luminance — the
+     oxide and the ink now differ by about 1.4:1, where before they differed
+     by 2.6:1. The separation therefore moves entirely into hue and shape.
+     That is survivable here only because the shape channel already exists and
+     was always the primary one: a reversal carries a DOUBLED rule, not just a
+     coloured one, precisely so the six most important entries on this site are
+     not findable by colour alone. The hue is now reinforcement rather than the
+     signal, which is the right order for it. */
+  --accent-warm: #5e1f0d;
+  --accent-warm-soft: rgba(94, 31, 13, 0.10);
   --border: #ddd4c1;
   --btn-text: #fffdf6;
   --shadow: rgba(60, 45, 20, 0.10);
@@ -309,8 +325,13 @@ html[data-theme="dark"] {
   --muted: #9a9081;
   --accent: #9cb8d2;
   --accent-soft: rgba(156, 184, 210, 0.13);
-  --accent-warm: #e0a163;
-  --accent-warm-soft: rgba(224, 161, 99, 0.14);
+  /* Same correction as the light oxide, in the other direction: at #e0a163 the
+     night copper measured 8.33:1 against prose at 10.93:1 — the same emphasis
+     inversion. #ffbe77 is 11.36:1, and going UP rather than down is what keeps
+     the chroma; a copper darkened to parity on this ground would have gone
+     muddy where a lightened one stays plainly copper. */
+  --accent-warm: #ffbe77;
+  --accent-warm-soft: rgba(255, 190, 119, 0.14);
   --border: #332d24;
   --rule-strong: #6b6252;
   --highlight: rgba(224, 161, 99, 0.15);
@@ -510,10 +531,24 @@ body {
 /* Present-tense anchor under the arc: who/where now (the employer + tenure).
    This one crosses into the chrome voice on purpose. It is the dateline —
    the small line under a masthead that says where and when this was filed —
-   and a dateline is apparatus, not argument. Sans, tracked, small. */
+   and a dateline is apparatus, not argument. Sans, tracked, small.
+
+   It is NOT --muted, and that is the correction. The dateline argument is
+   sound about the VOICE and was wrong about the WEIGHT: reading "apparatus"
+   as "quiet" made the one fact this site's reader actually needs — what San
+   does, and where — the most suppressed text on the first screen. Measured on
+   paper it sat at 5.81:1 while the thesis paragraph directly beneath it ran
+   10.89:1 and the nav ran 15.19:1; every one of six independent reviewers
+   found it, from four different lenses, which is as clear a signal as this
+   kind of round produces.
+
+   So the voice stays (sans, small, tracked — it is still a dateline) and the
+   weight moves to --text-secondary, the tier this file already reserves for
+   "a sentence making a claim". That puts it level with the lede below it
+   rather than a full step under everything around it. */
 .now {
   font-family: var(--font);
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 0.86rem;
   letter-spacing: 0.015em;
   line-height: 1.5;
@@ -1414,7 +1449,25 @@ main.wrap > .measure { grid-column: full; }
 }
 .decision[data-outcome="reversal"] .tag,
 .decision[data-outcome="reversal"] .kicker { color: var(--accent-warm); }
-.decision[data-outcome="reversal"] .kicker .code-ref { color: var(--accent-warm); opacity: 0.8; }
+/* No opacity here any more, and that is the whole fix.
+
+   `opacity: 0.8` composited the code-ref to roughly #827b6e on paper — 3.80:1,
+   under the AA floor — and it did it INVISIBLY, because the declared colour
+   still reads 5.81:1 in devtools and in the stylesheet. Nothing that inspects
+   colour tokens can see an opacity applied on top of them. The ADR and SYS
+   numbers are the receipts that these decisions are documented and traceable,
+   and they were the faintest text in the whole composition. If something
+   should be quieter, give it a quieter colour; do not fade a compliant one
+   into non-compliance somewhere no checker will look.
+
+   Note what the `color` here does and does not do: on the homepage these
+   entries sit inside `.measure`, and `.measure .decision .kicker .code-ref`
+   further down this file matches at equal specificity and later, so --muted
+   wins and the ID stays metadata-coloured whatever the outcome was. That is
+   the behaviour we want (an ID is an ID), and this declaration only takes
+   effect for a reversal entry rendered outside `.measure`. It is kept rather
+   than deleted so that case stays consistent with the rest of the mark. */
+.decision[data-outcome="reversal"] .kicker .code-ref { color: var(--accent-warm); }
 
 /* ---- Results tables, set the way a journal sets them --------------------
    Three rules and no more: an ink rule over the head, a hairline under it, an
@@ -1444,6 +1497,15 @@ main.wrap > .measure { grid-column: full; }
   padding: 9px 12px 9px 0;
   border-bottom: 1px solid var(--border);
 }
+/* The header row is --text-secondary, not --muted, and the reason is that
+   fading it was the one channel of its four that cost something.
+
+   A column head is already unmistakable as a head: it is smaller, it is caps,
+   it is tracked, it is sans among mono figures, and it sits above an ink
+   rule. Colour was doing no work the other four were not already doing — and
+   it was the only one with an accessibility price, leaving the sole key to
+   five columns of numbers at 5.81:1 beside data at 15.9:1. A reader could
+   read every value and not which experiment produced it. */
 .article-body th,
 .measure th {
   font-family: var(--font);
@@ -1451,7 +1513,7 @@ main.wrap > .measure { grid-column: full; }
   text-transform: uppercase;
   letter-spacing: 0.1em;
   line-height: 1.45;
-  color: var(--muted);
+  color: var(--text-secondary);
   font-weight: 600;
   padding-top: 12px;
   padding-bottom: 10px;
@@ -1991,6 +2053,42 @@ main.wrap > .measure { grid-column: full; }
    The name is now purely a semantic grouping. */
 
 .log-intro { color: var(--text-secondary); margin: 0 0 28px; }
+
+/* ---- The framing arrives WITH the evidence it frames --------------------
+   This sentence used to open the decision log, roughly 2,300 CSS px down the
+   page — screen four on a phone. The proof band above it leads with three
+   consecutive zero-or-downward figures ("fixed 0, broke 4", "0 rows at 1.97x
+   the cost", "97.3% -> 88.9%"), so a reader giving the site ninety seconds
+   met three admissions of failure and the sentence explaining why they are
+   the point arrived two screens after they had already decided.
+
+   Nothing about the sentence changed; it moved. It is the standfirst of the
+   band now, which is the job it was always doing — the band is the three real
+   calls, so "The real calls behind the system" reads truer here than it did
+   over a log whose heading had just said the same thing.
+
+   The band is a --wide band, so the paragraph has to be pulled back to the
+   reading measure explicitly: a 912px line of prose is not a standfirst, it
+   is a stretched caption. It centres on the band rather than sitting on the
+   content track's left edge, because it belongs to the three columns beneath
+   it and not to the prose column that starts further down. */
+.band-intro {
+  max-width: 46rem;
+  margin: 0 auto 26px;
+  text-align: center;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+/* On a phone the band is a stacked list with its rules at the left edge, so a
+   centred standfirst would be the only centred thing on the screen. */
+@media (max-width: 640px) {
+  .band-intro {
+    text-align: left;
+    margin-left: 0;
+    margin-bottom: 22px;
+    font-size: 0.98rem;
+  }
+}
 
 /* Decision IDs in monospace as a deliberate ledger/ID aesthetic. They already
    left-align via the shared .decision padding; tabular-nums just keeps any
