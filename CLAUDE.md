@@ -31,19 +31,40 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all four:
+runs all seven checks:
 
 ```
 npm run qa
 ```
 
-`npm run gates` runs them against an existing `dist/` without rebuilding. Both
-go through `scripts/gates.cjs`, which is what points the gates at `dist/`
+**`scripts/gates.cjs` must stay a faithful mirror of
+[`.github/workflows/qa.yml`](.github/workflows/qa.yml) — add a step there, add
+it here.** A local command that runs a *subset* of CI is worse than no local
+command, because it reports success for a state CI will reject. That was true
+until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
+ship without its `## Downstream surfaces` section and `npm run qa` went green
+anyway.
+
+Three of the seven need no build, no browser and no network — the two
+`node --test` suites and the ADR linter — so they run first and redden in
+seconds. The four that walk the built site run after, slowest last.
+
+`npm run gates` runs the same seven against an existing `dist/` without
+rebuilding, and the build-independent three still run on a clone that has never
+been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
 in the script line. Set `SITE_ROOT` yourself to override it; run a gate
 directly (`node scripts/link-check.cjs`) and it walks the repo root, which is
 what makes each one usable by hand.
+
+**The ADR linter needs a Python 3, and a missing one fails the run rather than
+skipping it.** The runner probes `python3`, `python`, then `py -3` and requires
+one to actually report major version 3 — which is what rejects the Windows
+Store stub that answers to `python3` but is not Python. `PYTHON=<path>`
+overrides the search. There is no skip flag on purpose: a skip that still exits
+0 recreates the green-locally-red-in-CI bug this section exists to prevent. The
+linter is stdlib-only, so the whole remediation is installing Python 3.
 
 Aim a gate at the repo root while `dist/` and `public/` are both sitting there
 and you get ~180 *phantom* broken links: root-absolute hrefs like `/assets/…`
