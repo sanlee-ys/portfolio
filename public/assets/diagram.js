@@ -14,7 +14,7 @@
   // ---- The data: the system as nodes + edges. No coordinates here; the active
   // layout supplies those, so the same data renders wide or stacked. Each node
   // also carries `anchor` (the decision-log entry it governs) and `adr` (the IDs
-  // to surface in the caption), so clicking a box jumps to the decision behind it.
+  // to surface in the caption), so selecting a box jumps to the decision behind it.
   var nodes = [
     { id: "notes-api", label: "notes-api",
       anchor: "decision-rightsized", adr: ["SYS-005"],

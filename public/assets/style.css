@@ -426,15 +426,10 @@ body {
   border-bottom: 2px solid var(--rule-strong);
 }
 
-/* On small phones the hero padding eats into the visible viewport, pushing the
-   nav links below the iOS Safari toolbar. Tighten it so the doors nav is
-   reachable without scrolling even when the browser chrome is fully shown. */
-@media (max-width: 430px) {
-  .hero {
-    padding-top: 32px;
-    padding-bottom: 20px;
-  }
-}
+/* The phone hero is tuned in the "Phone composition" block at the foot of this
+   file, with the nav and the marginalia it has to share a screen with. Tuning
+   it here in isolation is what produced a header that ate 73% of the first
+   screen: each piece was defensible alone and nobody added them up. */
 
 .eyebrow {
   font-family: var(--font);
@@ -674,24 +669,49 @@ body {
   margin: 0 0 12px;
 }
 
-/* The claim. Undecorated by default — the whole cell is the link and the ruled
-   block is the affordance, which is how .doors and the ledger rows already
-   behave — and it takes the accent underline on hover and focus. */
+/* The claim, and it is UNDERLINED — which is a correction, not a preference.
+
+   The band shipped undecorated on the argument that "the whole cell is the
+   link and the ruled block is the affordance". That argument holds on a
+   desktop, where a pointer moving over the cell reveals the underline and
+   settles the question in about 200ms. It does not hold on a phone, because
+   there is no hover to reveal anything: the reader gets three claims, no
+   underline, no arrow, no chevron, and no way to learn that the most
+   checkable text on the page is a route to the proof. Six independent
+   reviewers reached the same place from different lenses — a reader who
+   cannot see a target does not press it.
+
+   So the affordance is drawn rather than revealed. The hairline underline is
+   present at rest and goes accent-coloured and 2px on hover and focus, which
+   keeps the desktop's answer-to-a-pointer without making the touch case
+   depend on it. The underline runs under the mono figure too: the claim and
+   its measurement are one link, and breaking the rule at the type change
+   would say they are two.
+
+   The rest-state rule is --muted, and that is a measurement rather than a
+   taste call. --border was the obvious choice and it is the wrong one: it is
+   the hairline token, #ddd4c1 on #f6f2e8 paper and #332d24 on the night
+   ground, which is about 1.3:1 in BOTH themes — an underline nobody can see
+   is the same as no underline, so drawing one would have let this ship
+   looking fixed. --muted lands near 5.6:1 on paper and 6.0:1 at night:
+   plainly visible, still a step quieter than the claim above it. */
 .proof a {
   display: block;
   font-family: var(--serif);
   font-size: 1rem;
   line-height: 1.46;
   color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-.proof a:hover {
-  color: var(--text);
   text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 3px;
+  text-decoration-color: var(--muted);
   text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.proof a:hover,
+.proof a:focus-visible {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
 }
 /* The measurement. nowrap because "97.3% → 88.9%" is one token however narrow
    the column gets; the longest of the three sets to ~230px against 272px of
@@ -1535,12 +1555,27 @@ main.wrap > .measure { grid-column: full; }
   cursor: pointer;
   transition: stroke 0.15s ease, fill 0.15s ease;
 }
+/* The node label is drawn AS A LINK, and that is the whole affordance fix.
+
+   The figure told the reader twice in words that it was interactive and showed
+   it zero times: three boxes with the same border, the same fill and the same
+   ink as the static arrow labels beside them. On a desktop a hover eventually
+   answers the question. On a phone nothing ever does, so the block spent ~430px
+   of scroll to deliver three service names.
+
+   Rather than invent a new affordance, the node borrows the one the reader has
+   already met a dozen times by this point in the page: link colour, underlined.
+   It costs nothing, it survives both themes, and it does not depend on hover,
+   colour alone, or a caption telling the truth. */
 .node text {
-  fill: var(--text);
+  fill: var(--accent);
   font-family: var(--mono);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
   pointer-events: none;
 }
 /* Hover now tints the node as well as outlining it — the outline alone was a
@@ -2386,3 +2421,170 @@ main.wrap > .measure { grid-column: full; }
    every other note on the page. Anything that breaks out to `wide` gives up
    its marginalia; that is the cost of being wide, and it is the right trade
    for a table or a diagram. */
+
+
+/* ---- The folio line: marginalia with no margin to sit in -----------------
+   Below the width where the margin exists, every note above folds back inline
+   — and folding back inline is exactly what the adversarial round called
+   fatal. The complaint was precise: at 390px the kicker "becomes just another
+   small-caps line stacked above the heading, indistinguishable from a
+   kicker", so everything that makes this a journal rather than a blog is
+   spent on the viewport that matters least.
+
+   The fix is not to force the margin onto a phone; there is no room and
+   pretending otherwise is how sidenotes end up as 40px-wide slivers. It is to
+   give the note a SECOND compact idiom that is still journal grammar. A
+   printed record that cannot afford a margin does not delete the apparatus —
+   it sets it as a folio line: the label at one edge, the citation at the
+   other, hard under the rule that opens the block.
+
+   So on a phone a decision entry opens with
+
+       BM25 RETIRED                                        EVAL · BM25
+
+   directly beneath its ink rule, and the "Start here" label runs a hairline
+   out to the right edge the way a contents entry runs leaders to its folio.
+   Both are recognisably filed-record typography, neither is a stacked
+   kicker, and neither costs a pixel of width. */
+@media (max-width: 63.999rem) {
+  /* Label left, ledger ID right, on one line under the entry's rule. */
+  .measure .decision > .kicker {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 0 0 9px;
+  }
+  /* Out here the code-ref is a folio, not a trailing aside, so it drops the
+     8px that separated it from the label when the two ran together. */
+  .measure .decision > .kicker .code-ref {
+    margin-left: 0;
+    flex: 0 0 auto;
+  }
+
+  /* "Start here" with a rule running out to the measure's edge. */
+  .orientation > .kicker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .orientation > .kicker::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--border);
+  }
+}
+
+
+/* ---- Phone composition ---------------------------------------------------
+   The one block that owns what a 390x844 first screen contains, because the
+   defect it fixes was an ADDITION defect: masthead, standfirst, dateline,
+   thesis, icon row and a three-row nav were each sized defensibly on their
+   own and together took 480 of the ~656 visible CSS px — 73% of the screen
+   before a single checkable claim. The remaining ~180px held two admissions
+   of failure and nothing else.
+
+   The budget here is explicit: everything from the top of the masthead to the
+   bottom of the nav rule must come in under HALF the 844px viewport, so the
+   proof band's first two claims are on screen one with their rules. Nothing
+   is deleted to get there — every element the desktop hero has, the phone
+   hero has. The type steps down, the vertical margins close up, and the nav
+   packs from three rows to two.
+
+   430px would have been the obvious breakpoint (it is what the mobile gate
+   measures) but the composition problem is a phone-and-small-tablet problem,
+   and a 600px portrait window has the same stacked hero with the same slack
+   in it. 640px is where the two-column nav stops needing the tighter setting. */
+@media (max-width: 640px) {
+  .hero {
+    padding-top: 20px;
+    padding-bottom: 14px;
+  }
+  /* The masthead still leads the page; it just stops being 4.2rem of it. */
+  .hero h1 {
+    font-size: 2.15rem;
+    margin-bottom: 8px;
+  }
+  .tagline {
+    font-size: 1.06rem;
+    line-height: 1.36;
+    margin-bottom: 9px;
+  }
+  .now {
+    font-size: 0.83rem;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .lede {
+    font-size: 1rem;
+    line-height: 1.52;
+    margin-bottom: 12px;
+  }
+  /* The icon row keeps its 44px targets — they are the reason it is 46px tall
+     and that is not a saving worth taking. Only the slack above it closes. */
+  .hero-links { margin-top: 0; }
+
+  /* ---- The nav, packed to two rows -------------------------------------
+     The hit-area half of this lives in its own block below, at 900px, because
+     a tablet needs thumbable targets too. What belongs HERE is the packing:
+     the type steps down and the tracking tightens so the seven items fall on
+     two rows instead of three, which is worth 44px of first screen and,
+     incidentally, takes RÉSUMÉ off the lonely third row it was stranded on.
+
+     Measured, not guessed. At 0.68rem/0.1em with 9px of padding a side the
+     seven items measure 630px of ink against 366px of container, and the row
+     that decides everything is the first one: SYSTEM + CLASSIFIER + JUDGE +
+     PRODUCT & PROGRAM comes to 376.5px — over by ten. At 0.665rem/0.09em
+     with 7px of padding and a 10px wrap gutter it comes to 349.8px in 370px
+     of container: about 20px of headroom, enough that the row does not
+     re-break on a font fallback.
+
+     Below 390px it goes back to three rows and the header back over half the
+     screen. That is honest rather than fixable: 320px of viewport is 300px of
+     container, and packing that first row into it would need a ~14% smaller
+     setting — 9px letterspaced caps, which is a worse answer than a row. */
+  .doors a {
+    font-size: 0.665rem;
+    letter-spacing: 0.09em;
+  }
+}
+
+/* ---- Thumbable nav, phone and tablet ------------------------------------
+   Seven letterspaced caps at ~11px with 10px of air between them measured
+   26px of row pitch and well under 44px in both axes — under spec on the one
+   control every reader uses. Each item becomes its own 44x44 minimum hit area
+   via inline-flex plus horizontal padding, so the row pitch IS the target.
+
+   The padding is what creates the target, so the visible gap is set to almost
+   nothing: 2px of gap plus 7px of padding a side reads as ~16px of space and
+   still gives adjacent thumbs their separation. The wrap's gutter drops to
+   10px for the same reason — the nav is chrome on --wide, it has no measure
+   to protect, and the 24px page gutter was costing a whole row.
+
+   900px rather than 640px so tablets are covered: at those widths the nav is
+   one or two rows already, so a 44px floor costs a pixel of height and buys
+   the same target everywhere a finger is plausible. The desktop nav is left
+   alone — it is a pointer target, and inflating it to 44px would cost the
+   desktop first screen 27px to fix a problem it does not have.
+
+   Note the interior-page offset below still wins: `.theme-toggle + .doors
+   .wrap` is a more specific selector, so its padding-top survives this
+   shorthand regardless of order. */
+@media (max-width: 900px) {
+  .doors .wrap {
+    gap: 0 2px;
+    padding: 4px 10px;
+  }
+  .doors a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 7px;
+  }
+  /* The active-page rule sat 6px under the word; inside a 44px box that put it
+     on the box's floor. Pull it back to the word it underlines. */
+  .doors a[aria-current="page"] { text-underline-offset: 4px; }
+}
