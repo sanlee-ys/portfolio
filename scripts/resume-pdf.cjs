@@ -56,6 +56,53 @@ const ROOT = process.env.SITE_ROOT
   await page.route('**/*', r => (r.request().url().startsWith('file:') ? r.continue() : r.abort()));
   await page.goto('file://' + path.join(ROOT, 'resume.html'), { waitUntil: 'domcontentloaded', timeout: 15000 });
   await page.emulateMedia({ media: 'print' });
+
+  /*
+   * Wait for the webfonts, and assert they arrived.
+   *
+   * This is a guard, not a bug fix: the fonts were in fact making it into the
+   * PDF before (the committed file references Geist 22 times). But nothing
+   * here waited for them. `domcontentloaded` fires when the markup is parsed,
+   * before a woff2 is necessarily fetched and applied, and `font-display:
+   * swap` renders the fallback until it is — so a correct PDF depended on the
+   * fetch winning a race it was never told to run.
+   *
+   * The failure that race loses is silent and expensive: a renamed font file
+   * or a slower machine yields a résumé quietly set in the platform UI font,
+   * and it looks fine, because a sans is a sans. `document.fonts.ready` alone
+   * would not catch that either — it resolves happily when zero faces loaded.
+   * So the loaded set is checked against the families the page declares, and a
+   * miss fails the run instead of writing a PDF in the wrong typeface.
+   */
+  const fontReport = await page.evaluate(async () => {
+    await document.fonts.ready;
+    const declared = new Set();
+    for (const sheet of document.styleSheets) {
+      for (const rule of sheet.cssRules) {
+        if (rule instanceof CSSFontFaceRule) {
+          declared.add(rule.style.fontFamily.replace(/["']/g, ''));
+        }
+      }
+    }
+    const loaded = new Set();
+    document.fonts.forEach(f => { if (f.status === 'loaded') loaded.add(f.family.replace(/["']/g, '')); });
+    return { declared: [...declared], loaded: [...loaded] };
+  });
+
+  // "Won" is ranged to a single codepoint, so it only loads on a page that
+  // actually sets one; it is expected in the loaded set here because this page
+  // does, but the check below is about the text faces.
+  const missing = fontReport.declared.filter(f => !fontReport.loaded.includes(f));
+  if (missing.length) {
+    console.error(`resume-pdf error: declared @font-face families never loaded: ${missing.join(', ')}.`);
+    console.error(`  Loaded: ${fontReport.loaded.join(', ') || '(none)'}`);
+    console.error('  The PDF would embed a platform fallback instead, which is the drift');
+    console.error('  this page is self-contained to prevent. Check the woff2 paths under');
+    console.error('  public/assets/fonts/ and that nothing is blocking file: requests.');
+    await browser.close();
+    process.exit(1);
+  }
+
   await page.pdf({
     path: path.join(ROOT, 'resume.pdf'),
     format: 'Letter',
@@ -63,5 +110,6 @@ const ROOT = process.env.SITE_ROOT
     margin: { top: '0.4in', bottom: '0.4in', left: '0.5in', right: '0.5in' },
   });
   await browser.close();
-  console.log('✓ Wrote resume.pdf from resume.html (Letter, print media).');
+  console.log(`✓ Wrote resume.pdf from resume.html (Letter, print media). `
+    + `Fonts embedded: ${fontReport.loaded.sort().join(', ')}.`);
 })().catch(e => { console.error('resume-pdf error:', e.message); process.exit(1); });
