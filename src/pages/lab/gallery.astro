@@ -16,11 +16,16 @@ import SiteNav from '../../components/SiteNav.astro';
        columns as fit", so it is responsive with zero media queries.
        break-inside: avoid stops a photo being split across two columns. */
     .gallery { columns: 220px; column-gap: 12px; margin: 28px 0; }
+    /* Squared, like every other framed thing on the site. A photograph on a
+       page is a plate: a hairline around it and nothing else. The 10px radius
+       here was the app vocabulary the rest of the site dropped, and it was
+       doing visible work -- it rounded the PHOTOGRAPH, because overflow:hidden
+       clips the image to the frame. */
     .gallery-item {
       display: block;
       break-inside: avoid;
       margin: 0 0 12px;
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
       overflow: hidden;
       border: 1px solid var(--border);
     }
@@ -60,7 +65,7 @@ import SiteNav from '../../components/SiteNav.astro';
       max-height: 80vh;
       width: auto;
       height: auto;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
     }
     .lb-caption { color: #cbd2dd; font-size: 0.9rem; margin-top: 12px; text-align: center; }
     .lb-close, .lb-prev, .lb-next {
@@ -68,7 +73,7 @@ import SiteNav from '../../components/SiteNav.astro';
       width: 44px;
       height: 44px;
       border: none;
-      border-radius: 999px;
+      border-radius: var(--radius-sm);
       background: rgba(255, 255, 255, 0.12);
       color: #fff;
       font-size: 1.5rem;
