@@ -119,12 +119,24 @@ function findHtml(dir) {
  */
 const TEXT_ATTRS = /\s(?:placeholder|alt|title|value)="([^"]*)"/gi;
 
+/*
+ * Script and style bodies are code, not copy, and are stripped whole before
+ * tags. Two details matter, and CodeQL caught the second one:
+ *
+ * - The opening tag is matched lazily to the closer rather than with
+ *   `[^>]*>`, so a `>` inside an attribute value cannot end it early.
+ * - `</script >` — whitespace before the bracket — is a VALID end tag, and a
+ *   pattern requiring `</script>` does not match it. That is not cosmetic
+ *   here: the lazy match would run on to the next `</script>` and swallow
+ *   every character of real copy in between, so glyphs would go unchecked and
+ *   this gate would report OK. A gate written to stop things going quietly
+ *   blind is the last place that should have that bug.
+ */
+const SCRIPT_OR_STYLE = /<(script|style)\b[\s\S]*?<\/\1\s*>/gi;
+
 function textOf(html) {
   const chunks = [];
-  // Script and style bodies are code, not copy. Strip them whole, before tags.
-  const stripped = html
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ');
+  const stripped = html.replace(SCRIPT_OR_STYLE, ' ');
   for (const m of stripped.matchAll(TEXT_ATTRS)) chunks.push(m[1]);
   chunks.push(stripped.replace(/<[^>]*>/g, ' '));
   return chunks.join(' ');

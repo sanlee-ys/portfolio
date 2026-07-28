@@ -108,6 +108,40 @@ test('a font changed without refreshing the manifest fails the hash check', () =
   assert.match(out, /geist-latin\.woff2/);
 });
 
+test('a `</script >` end tag does not swallow the copy after it', () => {
+  // CodeQL js/bad-tag-filter, and a real false negative rather than a nit:
+  // `</script >` is valid, a `</script>`-only pattern misses it, and the lazy
+  // match then runs to the NEXT `</script>` — eating every character in
+  // between. The stray glyph below sits in that gap, so the old pattern
+  // reported this page as clean.
+  const dir = makeFixture({
+    'index.html': '<script>var a = 1;</script >\n<p>Delta ∆ here.</p>\n<script>var b = 2;</script>',
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 1, out);
+  assert.match(out, /U\+2206/);
+});
+
+test('script and style bodies are still ignored', () => {
+  // The other half of the same rule: code is not copy. A glyph that appears
+  // only inside a script must not be reported, or the gate cries wolf.
+  const dir = makeFixture({
+    'index.html': '<script>var s = "∆";</script><style>/* ∆ */</style><p>Plain.</p>',
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, out);
+  assert.doesNotMatch(out, /U\+2206/);
+});
+
+test('a `>` inside an attribute does not end the script tag early', () => {
+  const dir = makeFixture({
+    'index.html': '<script data-x="a>b">var s = "∆";</script><p>Plain.</p>',
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, out);
+  assert.doesNotMatch(out, /U\+2206/);
+});
+
 test('an entity the gate cannot resolve fails rather than being skipped', () => {
   const dir = makeFixture({ 'index.html': '<p>Mystery &frobnicate; here.</p>' });
   const { status, out } = runGate(dir);
