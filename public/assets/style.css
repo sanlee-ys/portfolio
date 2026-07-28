@@ -571,54 +571,162 @@ body {
 
    Note this does NOT make the page shorter — it is still ~7.5 screens. It makes
    the FIRST screen sufficient, which is the part that was actually broken. */
-/* Stacked, not an inline row. The old middot separators worked when these were
-   five short keywords that flowed together; three full claims each take their
-   own line, which left a dangling "·" at the end of every line but the last. */
-/* Drawn as the contents line of an issue: three claims centred under the
-   running head, closed by a hairline. Serif, because these are sentences; the
-   figures inside them break to the mono, because those are the measurements
-   and the whole point of the line is that they are checkable. */
-.proof {
-  list-style: none;
-  padding: 16px 0 18px;
-  margin: 0 0 4px;
+/* ---- Drawn as the issue's contents table, not as a legend ----------------
+   This band was a centred stack of three quiet grey lines: 0.9rem, --muted,
+   set narrower than the prose beneath it. Measured against what it is FOR,
+   that was backwards twice over. It is the only checkable thing above the
+   fold — the whole argument of the site is evidence over name — and it was
+   the smallest, faintest object on the first screen, sitting on the reading
+   track as though it were a caption.
+
+   So it is rebuilt as the object it always was: a three-column ruled table,
+   the kind that heads a printed report. Four decisions make it, and each one
+   is journal grammar the rest of the site already speaks rather than anything
+   imported:
+
+   1. IT MOVES TO THE ARTIFACT TRACK. Three claims in columns have an
+      intrinsic width, which is exactly the ADR-008 test for `wide` — the same
+      test that promoted the diagram, the tables and the stat strip. It cannot
+      use the grid's named lines (it is not a child of the page grid; it is a
+      full-bleed band like the nav above it), so it takes --wide by max-width,
+      the way .doors .wrap and .footer .wrap already do. The band therefore
+      shares its left edge with the running head above and the diagram below.
+      No third edge is invented, which was the ADR-008 trap.
+
+   2. THE RULES ARE THE STRUCTURE. One 2px ink rule per column head —
+      --rule-strong, the same weight that closes the masthead, opens every
+      decision entry and heads every stat-strip cell. Drawn PER CELL rather
+      than as one border across the container, which is what makes it survive
+      the collapse: at desktop the three rules line up across the row with the
+      grid gaps breaking them, and at 320px each claim keeps its own rule and
+      the band reads as a ruled list. auto-fit does the folding, so there is
+      no breakpoint here and none is wanted.
+
+   3. THREE VOICES, IN ONE SENTENCE. The index is mono (it is a citation), the
+      claim is serif (it is a sentence), and the figure inside the claim
+      switches back to mono mid-line (it is a measurement). That switch is the
+      whole thesis of the type system made visible in nine words: you can see
+      which part of the line is an argument and which part is a number without
+      reading either. It also drops the band's colour from --muted to
+      --text-secondary, per the split declared at the top of this file — these
+      are sentences making claims, not metadata.
+
+   4. THE REVERSALS ARE MARKED, AND ONLY THE REVERSALS. Two of the three
+      claims are literal reversals (grounding retired, upgrade declined), and
+      they are the same two entries that carry data-outcome="reversal" in the
+      decision log below. So they carry the same mark: oxide rule, doubled by
+      a companion hairline 3px under it — the printer's mark for a struck or
+      superseded entry, a difference in shape and not only in hue. The third
+      claim is a rebuilt measurement, which is a finding rather than a
+      revert, so its entry below is blue and its rule here stays ink. The
+      reader meets the mark at the top of the page and meets it again three
+      times further down, which is the point of having a second hue at all.
+
+   Not given marginalia, deliberately: anything promoted to `wide` occupies
+   the margin itself, so a note off its left edge would land in the outer
+   gutter and sit on a different vertical line from every other note on the
+   page. See the note at the very bottom of this file. */
+.proof-band {
+  max-width: calc(var(--wide) + var(--gutter) * 2);
+  /* Air above, so three short ink rules read as their own object rather than
+     as a continuation of the masthead's 2px rule and the nav hairline stacked
+     just above them. */
+  padding-top: clamp(34px, 4.4vw, 58px);
+  padding-bottom: clamp(30px, 4vw, 52px);
   border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  letter-spacing: 0;
-  color: var(--muted);
-  text-align: center;
 }
 
-/* Quiet by default so three claims read as a legend rather than a banner; the
-   numbers carry the weight, and the accent only appears on hover/focus. */
-.proof a {
-  color: var(--muted);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--muted) 35%, transparent);
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+.proof {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: proof;
+  display: grid;
+  /* 14rem: wide enough that the three columns hold to ~780px viewport, narrow
+     enough that a 320px screen (272px of container) takes one column cleanly.
+     The 2+1 in between is the same shape the stat strip folds through, and it
+     still reads as a ruled list because every cell keeps its own rule. */
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: clamp(22px, 2.6vw, 34px) clamp(24px, 3vw, 40px);
+  text-align: left;
 }
-.proof a:hover { color: var(--text); text-decoration-color: var(--accent); }
-.proof a strong {
-  color: var(--text);
+
+.proof li {
+  position: relative;
+  counter-increment: proof;
+  border-top: 2px solid var(--rule-strong);
+  padding: 13px 0 0;
+}
+
+/* 01 / 02 / 03 — a counter, not typed numerals, for the same reason the
+   footnote numbers and the section folios are counters: a hand-typed index is
+   one edit away from lying. decimal-leading-zero because a two-digit index is
+   what a filed record uses, and it keeps the three of them the same width. */
+.proof li::before {
+  content: counter(proof, decimal-leading-zero);
+  display: block;
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
-  font-size: 0.9em;
+  font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+/* The claim. Undecorated by default — the whole cell is the link and the ruled
+   block is the affordance, which is how .doors and the ledger rows already
+   behave — and it takes the accent underline on hover and focus. */
+.proof a {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.46;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.proof a:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+/* The measurement. nowrap because "97.3% → 88.9%" is one token however narrow
+   the column gets; the longest of the three sets to ~230px against 272px of
+   container at 320px, which the mobile gate measures rather than trusts. */
+.proof a strong {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-size: 0.94em;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  white-space: nowrap;
 }
 .proof a em { font-style: italic; }
 .proof a:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline-offset: 4px;
   border-radius: var(--radius-sm);
 }
+
+/* The struck-entry mark, identical in construction to the one the decision
+   entries carry below — same hue, same doubled rule, same 3px offset — so the
+   two are read as one convention rather than two treatments that happen to
+   share a colour. */
+.proof li[data-outcome="reversal"] { border-top-color: var(--accent-warm); }
+.proof li[data-outcome="reversal"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3px;
+  height: 1px;
+  background: var(--accent-warm);
+}
+.proof li[data-outcome="reversal"]::before { color: var(--accent-warm); }
 
 /* The doors: a clean link row between the hero and the work, so every reader can
    reach the project pages without first reading the whole homepage. The doors are
