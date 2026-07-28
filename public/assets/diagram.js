@@ -35,14 +35,23 @@
 
   // ---- Two layouts: positions, box height, and font per breakpoint. Both are
   // non-collinear triangles, so no edge passes through a box. ----
+  // The viewBoxes hug the drawing rather than starting at the origin. They used
+  // to be "0 0 800 430" and "0 0 440 540", which left the plate roughly 45%
+  // empty — 159px of blank frame above the top node and 108px below the bottom
+  // one at desktop. That reads as an unfinished figure, and on a phone it is
+  // ~200px of scroll spent on nothing. The boxes below are the content extent
+  // (nodes plus their half-heights) with about 35px of margin, so the frame is
+  // now the drawing's own bounds. Positions are untouched: they are the
+  // non-collinear triangle that keeps every edge off the third node, and
+  // moving them is how you get an edge through a box.
   var LAYOUTS = {
     wide: {
-      viewBox: "0 0 800 430",
+      viewBox: "0 90 800 290",
       pos: { "notes-api": [170, 150], "classifier": [630, 150], "kb-agent": [400, 320] },
       h: 50, font: 15, edgeFont: 12, charW: 8.5, minW: 150,
     },
     narrow: {
-      viewBox: "0 0 440 540",
+      viewBox: "0 45 440 470",
       pos: { "notes-api": [130, 95], "classifier": [300, 300], "kb-agent": [130, 470] },
       h: 60, font: 18, edgeFont: 15, charW: 10.2, minW: 140,
     },
@@ -101,9 +110,10 @@
       var mx = (start.x + end.x) / 2;
       var my = (start.y + end.y) / 2;
       var w = e.label.length * (L.edgeFont * 0.62) + 10;
+      // No rx: the label knockout is a squared patch like everything else.
       edgesG.appendChild(el("rect", {
         class: "edge-label-bg", x: mx - w / 2, y: my - L.edgeFont / 2 - 3,
-        width: w, height: L.edgeFont + 6, rx: 4,
+        width: w, height: L.edgeFont + 6,
       }));
       var t = el("text", { class: "edge-label", x: mx, y: my + L.edgeFont / 3, "text-anchor": "middle" });
       t.style.fontSize = L.edgeFont + "px";
@@ -114,8 +124,10 @@
     // ---- Nodes (clickable, keyboard-operable boxes) ----
     nodes.forEach(function (n) {
       var g = el("g", { class: "node", tabindex: "0", role: "button", "aria-label": n.label });
+      // Squared, not rounded. rx: 9 was the generator's default and was the
+      // only 9px corner in a design whose largest radius is 3px.
       g.appendChild(el("rect", {
-        x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h, rx: 9,
+        x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h,
       }));
       var t = el("text", { x: n.x, y: n.y + L.font / 3, "text-anchor": "middle" });
       t.style.fontSize = L.font + "px";
