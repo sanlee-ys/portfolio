@@ -2,19 +2,24 @@ Files in this directory, and where each came from:
 
   newsreader-latin.woff2, newsreader-latin-italic.woff2
   newsreader-latin-ext.woff2, newsreader-latin-ext-italic.woff2
-      Newsreader, variable weight axis 200-800, roman and true italic.
-      Copied verbatim out of the "@fontsource-variable/newsreader" npm
-      package, v5.3.0 -- specifically its "wght" instances, the files named
-      newsreader-<subset>-wght-<style>.woff2, which carry the weight axis
-      only. The package ALSO ships "standard" files carrying Newsreader's
-      optical-size axis (opsz 6-72) alongside weight; those are roughly 2.3x
-      the bytes and were deliberately not taken. The reasoning is in the
-      Newsreader block at the top of ../style.css.
+      Newsreader, variable weight axis 200-800, roman and true italic. Cut by
+      ../../../scripts/subset-fonts.py from the upstream variable fonts in
+      google/fonts (ofl/newsreader): Newsreader[opsz,wght].ttf and
+      Newsreader-Italic[opsz,wght].ttf, version 1.003.
 
-      Only the latin and latin-ext subsets are kept, at the package's own
-      unicode ranges, so subsetting behaviour matches upstream. The npm
-      package is NOT a dependency of this site; only these four woff2 files
-      were copied in.
+      Upstream carries an optical-size axis (opsz 6-72) alongside weight. The
+      script pins opsz at its own default (18) and keeps the weight axis only,
+      which reproduces the "wght instance" files these four were previously
+      copied from ("@fontsource-variable/newsreader" v5.3.0). The two-axis
+      files are roughly 2.3x the bytes for a grade most readers never
+      consciously see; the reasoning is in the Newsreader block at the top of
+      ../style.css.
+
+      Only the latin and latin-ext subsets are kept, at Google Fonts' own
+      unicode ranges. No arrows are added here, unlike the Geist files:
+      Newsreader has no arrow glyphs upstream at any weight, so prose arrows
+      come from geist-arrows.woff2 instead. Neither npm package is a
+      dependency of this site; only the generated woff2 files are committed.
 
 Newsreader is under the SIL Open Font License 1.1, the same license the rest
 of this directory is under. The upstream notice and the full license follow.
