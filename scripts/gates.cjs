@@ -142,9 +142,10 @@ function runSiteGate(label, script) {
 /*
  * Ordered cheapest-first, which is also build-independent-first. The three
  * checks above the line need no `dist/`, no browser and no network, and finish
- * in seconds; the four below walk the built site, and mobile-qa launches a
- * browser and renders 64 page-widths. A missing ADR section should redden in
- * two seconds, not after a full render pass.
+ * in seconds; the five below walk the built site, and the last two launch a
+ * browser — contrast-check renders every page in both themes, mobile-qa renders
+ * 64 page-widths. A missing ADR section should redden in two seconds, not after
+ * a full render pass.
  */
 const CHECKS = [
   {
@@ -175,6 +176,11 @@ const CHECKS = [
     label: 'private-repo guard (never name/link/describe a private repo)',
     needsSite: true,
     run: () => runSiteGate('private-repo-check', 'scripts/private-repo-check.cjs'),
+  },
+  {
+    label: 'text contrast AA (rendered, both themes)',
+    needsSite: true,
+    run: () => runSiteGate('contrast-check', 'scripts/contrast-check.cjs'),
   },
   {
     label: 'mobile QA (no horizontal overflow at 320/360/390/430)',

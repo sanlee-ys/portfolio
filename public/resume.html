@@ -111,6 +111,13 @@
     .contact { color: var(--muted); font-size: 0.94rem; }
     .contact a { color: var(--muted); }
     .contact a:hover { color: var(--accent); }
+    /* The dots between the three contact links are decoration: the links are
+       already separate elements, so the glyph carries nothing a reader needs.
+       `aria-hidden` on the spans is what says that — it stops a screen reader
+       announcing "middle dot" twice, and it is also what exempts them from the
+       contrast gate, which measures content text and takes the platform's own
+       marker for "not content" at its word. The fade stays because it is now
+       declared decoration rather than quiet text. */
     .contact .sep { opacity: 0.5; margin: 0 8px; }
 
     section { margin-top: 30px; }
@@ -172,8 +179,8 @@
       <h1>San Lee</h1>
       <p class="role-line">Senior Product Associate</p>
       <p class="contact">
-        <a href="mailto:hi@sanlee.me">hi@sanlee.me</a><span class="sep">&middot;</span>
-        <a href="https://www.linkedin.com/in/leesan/">linkedin.com/in/leesan</a><span class="sep">&middot;</span>
+        <a href="mailto:hi@sanlee.me">hi@sanlee.me</a><span class="sep" aria-hidden="true">&middot;</span>
+        <a href="https://www.linkedin.com/in/leesan/">linkedin.com/in/leesan</a><span class="sep" aria-hidden="true">&middot;</span>
         <a href="https://sanlee.me">sanlee.me</a>
       </p>
     </header>

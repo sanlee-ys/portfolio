@@ -112,18 +112,40 @@ import SiteNav from '../../components/SiteNav.astro';
     .stat-grid .stat-c .stat-value { color: var(--series-c); }
 
     /* Chart series colors. Kept separate from --accent since three series
-       need to stay distinguishable at once; tuned per theme for contrast. */
+       need to stay distinguishable at once; tuned per theme for contrast.
+
+       "Tuned for contrast" was true of these as CHART STROKES, where the bar
+       is 3:1 against the paper, and false of them as TEXT, which is what they
+       also are: the honest-callout's figure, the diff's added lines, the stat
+       values. The light --series-c was #16875a, which is 3.9:1 on paper and
+       4.0:1 inside the callout -- under the 4.5:1 body-text floor on the two
+       backgrounds it is actually read against. #13724c is the same hue taken
+       down to 4.55:1 in the worst of those (the callout) and 5.3:1 on paper.
+       It was darkened exactly as far as AA needs and no further, because the
+       three series still have to be told apart from each other.
+
+       --diff-del joins them because it was the same mistake in a sharper form:
+       it was written as a bare #e5657a in the rule below, with no light value
+       at all, so a colour picked to sit on a near-black panel was rendering on
+       warm paper at 2.63:1. It is a per-theme token now, which is what stops
+       the next colour from being added the same way. The light value is set
+       level with --series-c's (4.9:1 vs 4.8:1 on the code block) so the two
+       sides of a diff read as peers -- an added line and a removed line should
+       not differ in weight, only in hue and in the +/- that carries the
+       meaning when hue cannot. */
     :root, html[data-theme="dark"] {
       --series-a: #6ea8fe; /* A: training split -- what the loop optimizes on */
       --series-b: #f2b84b; /* B: held-back split -- what drives the stop signal */
       --series-c: #4ac48a; /* C: gold held-out -- the honest number */
+      --diff-del: #e5657a;
       --warn: #f2b84b;
       --warn-soft: rgba(242, 184, 75, 0.12);
     }
     html[data-theme="light"] {
       --series-a: #2563eb;
       --series-b: #b9790a;
-      --series-c: #16875a;
+      --series-c: #13724c;
+      --diff-del: #be203a;
       --warn: #b9790a;
       --warn-soft: rgba(185, 121, 10, 0.10);
     }
@@ -234,7 +256,7 @@ import SiteNav from '../../components/SiteNav.astro';
     /* Diff view: reuse the site's monospace <pre> styling, add per-line color
        so +/- reads like a diff instead of plain text. */
     #iter-diff .diff-add { color: var(--series-c); }
-    #iter-diff .diff-del { color: #e5657a; }
+    #iter-diff .diff-del { color: var(--diff-del); }
     #iter-diff .diff-hunk { color: var(--muted); }
     #iter-diff .diff-meta { color: var(--muted); font-weight: 600; }
 

@@ -81,6 +81,16 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
+      # Measures the RENDERED colour of every text element, in both themes,
+      # against WCAG AA. A declared colour can be compliant while the painted
+      # pixel is not — an `opacity` on top of a 5.81:1 token composited it to
+      # 3.80:1 on this site, and nothing that reads declared values could see
+      # it. See ADR-009.
+      - name: Text contrast AA (rendered, both themes)
+        run: node scripts/contrast-check.cjs
+        env:
+          SITE_ROOT: dist
+
       # Serves `dist/` over HTTP rather than opening files. The layout emits
       # root-absolute asset paths, which do not resolve over `file://` — and an
       # unstyled page does not overflow, so the file:// version of this gate
