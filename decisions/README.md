@@ -13,6 +13,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? — **migrated to Astro**, executed 2026-07-26 | Accepted |
 | [ADR-007](ADR-007-split-dont-trim.md) | Split, don't trim — the two-speed reader | Accepted |
 | [ADR-008](ADR-008-breakout-grid.md) | A breakout grid — two deliberate edges, not one honest column. **Reverses the "One content column" rule** | Accepted |
+| [ADR-009](ADR-009-rendered-contrast-gate.md) | Contrast is checked on the rendered pixel, not the declared token | Accepted |
 
 ## Why this tier was missing
 
@@ -264,6 +265,31 @@ became the only path), and Amendment 3's verdict probe — which assumed "the re
 once, on open" — now filters comments by a timestamp taken before the run, so a
 re-review that gets silenced still reddens. The classify suite's fourteen fixtures pass
 unchanged, which is Amendment 6's investment paying off on the first change after it.
+
+[`ADR-009`](ADR-009-rendered-contrast-gate.md) is the fourth record in a row of the same
+shape, and the shape is now the point. A provenance subline was rendering at **3.80:1**
+while its colour token measured **5.81:1** — both numbers correct, because an `opacity`
+sat on top of the token and composited it. Every instrument that inspects *declared*
+colour agreed the text was fine: the stylesheet's own measured-contrast comment block,
+devtools, and any CSS linter. They were all reading a number that never reached the screen.
+
+That puts it with the metrics guard blind to attribute order, the sitemap's date-format
+check that could never fail, and `link-check.cjs` never validating anchors — **four gates
+or checks in this repo whose failure was invisible from a green run.** The fix is the one
+those cases keep pointing at: measure the artifact, not the description of it. The gate
+renders every built page in both themes and computes the composited pixel.
+
+Two things about it are worth reading past the diff. Its **first implementation was itself
+wrong in the same family** — it toggled `data-theme` on a loaded page and measured
+immediately, which reads new ink over old paper because `body` carries a 200ms
+background transition, and it produced 400+ confident findings for a state that never
+rendered. A gate reporting violations is not the same as a gate that is right, and the
+tell was that the numbers were too dramatic to be real. And **only one of the three real
+defects it found was the opacity bug it was built for**: the other two were a colour with
+no light-theme value at all, and a chart colour tuned against a 3:1 stroke bar then reused
+as body text on backgrounds nobody had measured it against. The convention this ADR also
+adopts — never fade text with opacity — would have caught neither, which is precisely why
+the convention alone was not accepted as the answer.
 
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec

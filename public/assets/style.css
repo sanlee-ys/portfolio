@@ -178,6 +178,12 @@
      belongs on paper. */
   --accent: #1d4e73;
   --accent-soft: rgba(29, 78, 115, 0.10);
+  /* The ink, one step back — for a mark that belongs to the link colour but
+     should not compete with the words around it (currently the flow line's
+     arrows). It is the value `--accent` at `opacity: 0.85` used to composite
+     to on this ground, written down instead of computed at paint time so a
+     checker can read it. 5.39:1. */
+  --accent-quiet: #3e6785;
   /* ---- The second hue: reversal ----------------------------------------
      A correction-ink counterpart to the blue, and it carries ONE meaning:
      this is the record of something that was built and then taken back —
@@ -352,6 +358,7 @@ html[data-theme="dark"] {
   --muted: #9a9081;
   --accent: #9cb8d2;
   --accent-soft: rgba(156, 184, 210, 0.13);
+  --accent-quiet: #889fb5; /* see the light-theme note; 6.77:1 here */
   /* Same correction as the light oxide, in the other direction: at #e0a163 the
      night copper measured 8.33:1 against prose at 10.93:1 — the same emphasis
      inversion. #ffbe77 is 11.36:1, and going UP rather than down is what keeps
@@ -1714,7 +1721,15 @@ main.wrap > .measure { grid-column: full; }
   color: var(--muted);
   margin: 0 0 14px;
 }
-.flow-line .flow-arrow { color: var(--accent); opacity: 0.85; }
+/* --accent-quiet, not `--accent` at 0.85. This one was never a violation: the
+   fade composited to 5.39:1 on paper and 6.77:1 at night, both comfortably
+   over. It is written as a token anyway, because the value of the rule "text
+   is never dimmed with opacity" is that it holds without exceptions — an
+   exception that happens to pass today is how the next author learns the fade
+   is available, and the next fade lands on something quieter. The token is set
+   to the pixel the fade was already producing, so the arrows render exactly as
+   they did. */
+.flow-line .flow-arrow { color: var(--accent-quiet); }
 /* The system map, drawn as a PLATE: a figure pasted onto the page, with a
    printed border and a caption under it.
 
@@ -2107,7 +2122,14 @@ main.wrap > .measure { grid-column: full; }
 }
 .subrungs li[data-done="yes"]::before { content: "\2713"; color: var(--accent); }
 .subrungs li[data-done="no"]::before { content: "\25CB"; color: var(--muted); }
-.subrungs li span { color: var(--muted); opacity: 0.85; }
+/* No opacity, for the reason given at .decision[data-outcome="reversal"]
+   .kicker .code-ref above — this was the second instance of that same bug and
+   it was live. --muted at 0.85 composited to #7b7366 on paper: 4.19:1, under
+   the floor, while the stylesheet and devtools both went on reporting --muted's
+   declared 5.81:1. It is plain --muted now. The sub-rung note was already the
+   quietest thing in the ladder by size and position; it did not also need to
+   be faded. */
+.subrungs li span { color: var(--muted); }
 
 /* L4's backward edge. Small enough to sit inline in the rung; max-width keeps
    it at natural size on desktop while it scales down on a phone. */

@@ -31,7 +31,7 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all seven checks:
+runs all eight checks:
 
 ```
 npm run qa
@@ -45,11 +45,11 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Three of the seven need no build, no browser and no network — the two
+Three of the eight need no build, no browser and no network — the two
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The four that walk the built site run after, slowest last.
+seconds. The five that walk the built site run after, slowest last.
 
-`npm run gates` runs the same seven against an existing `dist/` without
+`npm run gates` runs the same eight against an existing `dist/` without
 rebuilding, and the build-independent three still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
@@ -139,6 +139,41 @@ Before committing any layout / style / markup change:
    host that ships a prebuilt Chromium, `PW_CHROMIUM` is the way to point at it —
    and if it's set to a path that doesn't exist the script fails rather than
    quietly using a different browser.
+
+## Contrast: opacity never dims text
+
+*Reasoning and alternatives: [`decisions/ADR-009`](decisions/ADR-009-rendered-contrast-gate.md).
+This section is canonical for what to **do**.*
+
+**If something should be quieter, give it a quieter colour token. Never fade text with
+`opacity`.** `opacity` is for non-text decoration — rules, strokes, fills, disabled
+controls. A 5.81:1 token under `opacity: 0.8` paints at 3.80:1, and the declared value
+still reads as compliant in the stylesheet, in devtools, and to any linter that inspects
+CSS. The bug is invisible everywhere except the rendered page, which is why it shipped
+twice.
+
+`scripts/contrast-check.cjs` enforces the outcome: it renders every built page in **both
+themes** and fails any text under **4.5:1** (or 3:1 for large text — ≥24px, or ≥18.66px at
+weight ≥700), measuring the composited pixel rather than the declared token.
+
+```
+npm run build && SITE_ROOT=dist node scripts/contrast-check.cjs
+```
+
+Two things to know before you argue with it:
+
+- **A colour is only compliant against the background it is painted on.** Tokens tuned for
+  bare paper get reused inside code blocks and washed callouts, which are darker. Check the
+  value where the text actually sits — that is how a chart colour tuned to a 3:1 stroke bar
+  ended up as 3.45:1 body text.
+- **"Unresolvable" is a failure, not a skip.** Text over a `background-image`, an
+  unparseable colour, or a group `opacity` above the element supplying the background all
+  fail. The gate refuses to guess; fix the construction or make the exemption explicit.
+
+Exemptions are narrow and each one is a claim: SVG text, pseudo-element content,
+`aria-hidden="true"` subtrees, and `:disabled` controls. **Marking something `aria-hidden`
+to quiet the gate asserts it is decoration that no one reads.** Only do that when it is
+true — the résumé's `·` separators qualify; a label does not.
 
 ## Why 320px matters
 
