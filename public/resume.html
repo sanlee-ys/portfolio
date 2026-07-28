@@ -56,21 +56,14 @@
        unicode-ranges — only the url() differs, since this file sits at the
        repo root instead of in assets/.
 
-       The third face below finishes that job. One character on this page — the
-       won sign in the MBA leadership line — had no glyph in either Geist file,
-       because Geist has none at any weight (checked against the variable
-       source, not assumed). So it was still being drawn by whatever the
-       platform supplied: Segoe UI here, something else on a Mac. That is the
-       exact defect the paragraph above says this page was made self-hosted to
-       end, surviving in a single glyph, and the PDF embedded whichever one the
-       last machine had.
-
-       Newsreader — already in this repo for the main site — does have it, so
-       it is cut to that one codepoint and ranged to it. It is only ever
-       reached by the won sign and can never touch a letter. A serif won sign
-       inside a sans line sounds wrong and is not: rendered side by side at
-       this size it is a double-barred W with no visible serif character, and
-       the alternative was leaving the one reproducibility hole open. */
+       Two faces is the whole stack, and every character on this page resolves
+       inside them. A third was carried here briefly for the won sign in the
+       MBA leadership line — Geist has no won glyph at any weight — until that
+       line was rewritten to say "KRW", which put the page back inside Geist.
+       scripts/font-coverage.cjs is what keeps that true: a character with no
+       self-hosted glyph still renders, borrowed from a platform face, so it
+       would otherwise survive every gate here and reintroduce exactly the
+       defect the paragraph above describes. */
     @font-face {
       font-family: "Geist";
       font-style: normal;
@@ -87,22 +80,10 @@
       src: url("assets/fonts/geist-latin-ext.woff2") format("woff2");
       unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
     }
-    @font-face {
-      font-family: "Won";
-      font-style: normal;
-      font-weight: 400 600;
-      font-display: swap;
-      src: url("assets/fonts/newsreader-won.woff2") format("woff2");
-      unicode-range: U+20A9;
-    }
-
     :root {
       --bg: #0f1115; --panel: #161a21; --text: #e7eaf0; --muted: #9aa3b2;
       --accent: #6ea8fe; --border: #232a35;
-      /* "Won" sits after "Geist" and before the system faces: unicode-range
-         keeps it unreachable by anything but U+20A9, so every letter still
-         resolves to Geist exactly as before. */
-      --font: "Geist", "Won", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     html[data-theme="light"] {
       --bg: #fbfcfe; --panel: #ffffff; --text: #1a1f29; --muted: #5b6472;
@@ -322,7 +303,7 @@
     <section>
       <h2 class="sec">Leadership</h2>
       <div class="lead-item"><strong>Vector Regional Lead, Jersey City</strong> &mdash; ran the local chapter of JPMorganChase's global, multi-location technical knowledge-sharing program, organizing sessions for engineers in the office. <span style="color:var(--muted)">(Sep 2023 &ndash; Jul 2024)</span></div>
-      <div class="lead-item">Int'l Relations Committee Leader, SNU MBA Student Council &middot; VP, SNU MBA Sports Club (&#8361;2M budget, 33 members)</div>
+      <div class="lead-item">Int'l Relations Committee Leader, SNU MBA Student Council &middot; VP, SNU MBA Sports Club (KRW 2M budget, 33 members)</div>
     </section>
 
     <section class="skills">

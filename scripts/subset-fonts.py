@@ -9,33 +9,32 @@ arrow codepoints U+2190-2193 in the Geist faces: the site's copy uses "->" and
 "<-" (U+2192 / U+2190) in proof figures, card links and prose links, and
 Google's latin range skips them while including U+2191 / U+2193.
 
-WHAT NEWSREADER IS STILL DOING HERE (2026-07-28). It used to be the site's
-reading face and this script cut four text subsets of it. The type pass on
-2026-07-28 removed the serif — prose, the masthead and every heading are Geist
-now — so those four cuts are gone, and geist-arrows.woff2 with them: that file
-existed ONLY because Newsreader has no arrow glyph at any weight, so a
-serif-context arrow had nowhere self-hosted to come from. With one text face
-left, the arrows already in the Geist latin subsets are the only arrows the
-site can reach.
+NEWSREADER IS GONE (2026-07-28), and it left in two steps by two different
+routes, which is worth recording because neither step alone would have removed
+it. It was the site's reading face, and this script cut four text subsets of it
+plus a one-glyph won cut for public/resume.html. First the résumé stopped
+setting the won sign, which retired that cut. Then the type pass removed the
+serif — prose, the masthead and every heading are Geist now — which retired the
+four text subsets AND geist-arrows.woff2 with them: that file existed ONLY
+because Newsreader has no arrow glyph at any weight, so a serif-context arrow
+had nowhere self-hosted to come from. With one text face left, the arrows
+already in the Geist latin subsets are the only arrows the site can reach.
 
-What remains is one glyph: newsreader-won.woff2, the won sign, for
-public/resume.html. That page is standalone by design (see CLAUDE.md), sets
-its own all-Geist stack, and Geist has no won sign at any weight. So the
-Newsreader source is still loaded below, and cut down to a single codepoint.
+So this script now cuts four files from two Geist sources, and
+fonts/OFL-Newsreader.txt is gone too — an OFL notice travels with the glyphs
+that ship, and none do.
 
 Also NOT coverable from these faces, verified against the upstream cmaps:
 U+03BA kappa and the theme-toggle's U+2600 / U+263D sun and moon exist in
 neither Geist nor Geist Mono, so they intentionally stay on the --symbol-tail
-/ system fallback.
+/ system fallback. U+20A9 the won sign is a third: no copy sets one today, and
+if any ever did the coverage gate would report it UNCOVERED rather than let it
+fall to the platform.
 
 Fetching the sources (into any scratch directory):
 
     npm pack geist@1.7.2 --pack-destination <dir>
     tar -xzf <dir>/geist-1.7.2.tgz -C <dir>          # unpacks to <dir>/package
-    curl -sL -o <dir>/Newsreader.ttf        "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/Newsreader%5Bopsz,wght%5D.ttf"
-
-(Newsreader-Italic is no longer fetched: the italic cuts left with the serif,
-and the one remaining Newsreader glyph is a roman.)
 
 Then, from the repo root:
 
@@ -48,12 +47,10 @@ expected version here, re-run, and eyeball a before/after screenshot diff --
 then keep the unicode-range declarations in public/assets/style.css and
 public/resume.html in sync with what this prints.
 
-Newsreader upstream carries an optical-size axis (opsz 6-72) alongside weight;
-this script pins opsz at its fvar default (18) and keeps only the weight axis,
-reproducing the "wght instance" files the site originally took from
-@fontsource-variable/newsreader. That pin is kept for the one-glyph won cut so
-its drawing does not silently change if this is ever re-run. The Geist sources
-are already wght-only.
+Both Geist sources are wght-only, so there is no axis to pin: the whole weight
+range goes into each file and the CSS declares `font-weight: 100 900`. (The
+`instancer` machinery this script used to carry was for Newsreader's optical-
+size axis and went with it.)
 
 THE MANIFEST. Every run also writes scripts/font-coverage.json, recording each
 file's codepoints, OpenType features, byte count and sha256. That file is what
@@ -83,7 +80,6 @@ from pathlib import Path
 
 from fontTools import subset
 from fontTools.ttLib import TTFont
-from fontTools.varLib import instancer
 
 REPO = Path(__file__).resolve().parent.parent
 OUT_DIR = REPO / "public" / "assets" / "fonts"
@@ -107,13 +103,11 @@ LATIN_EXT = (
     "U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
 )
 ARROWS = "U+2190-2193"  # <- ^ -> v; Google's latin range has only ^ and v
-WON = "U+20A9"  # the won sign, for resume.html; Geist has none at any weight
 
 # nameID 5 of each source, asserted before cutting.
 EXPECT_VERSION = {
     "Geist": "Version 1.800",
     "Geist Mono": "Version 1.700",
-    "Newsreader": "Version 1.003",
 }
 
 
@@ -296,27 +290,16 @@ def main() -> None:
     cut(mono, latin_ext, "geist-mono-latin-ext.woff2")
     mono.close()
 
-    # Newsreader, down to one glyph. The four text subsets left with the serif
-    # on 2026-07-28; what is still shipped is the won sign for resume.html,
-    # which sets an all-Geist stack and would otherwise take that character
-    # from the platform. See the "Won" @font-face in public/resume.html.
-    print("Newsreader (won sign only):")
-    news = load(src / "Newsreader.ttf", "Newsreader")
-    opsz = next(a for a in news["fvar"].axes if a.axisTag == "opsz")
-    if opsz.defaultValue != 18.0:
-        raise SystemExit(f"Newsreader.ttf: opsz default moved from 18 to {opsz.defaultValue}; "
-                         "the pinned instance would no longer match the shipped file")
-    instancer.instantiateVariableFont(news, {"opsz": opsz.defaultValue},
-                                      inplace=True, updateFontNames=False)
-    cut(news, parse_ranges(WON), "newsreader-won.woff2", must_have={0x20A9})
-    news.close()
+    # Newsreader is gone from this script entirely. It had already shrunk to a
+    # single won-sign cut when resume.html stopped setting that character; the
+    # serif removal took the four text subsets and geist-arrows.woff2 with it,
+    # and there is nothing Newsreader-derived left to generate or to license.
 
     write_manifest()
 
-    print("\nDeclared unicode-range must be (style.css AND resume.html for Geist):")
-    print("  latin (Geist, Geist Mono):  " + LATIN.replace("U+2191, U+2193", "U+2190-2193"))
-    print("  latin-ext (both):           " + LATIN_EXT)
-    print("  newsreader-won.woff2:       " + WON)
+    print("\nDeclared unicode-range must be (style.css AND resume.html both):")
+    print("  latin (Geist, Geist Mono):      " + LATIN.replace("U+2191, U+2193", "U+2190-2193"))
+    print("  latin-ext (Geist, Geist Mono):  " + LATIN_EXT)
 
 
 if __name__ == "__main__":

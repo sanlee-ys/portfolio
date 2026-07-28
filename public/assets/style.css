@@ -155,11 +155,12 @@
      Geist has none. Item 2b at the top of this file records what replaced it
      and why a synthetic oblique was not an option.
 
-   Newsreader is not entirely out of the repo: `newsreader-won.woff2`, a
-   one-glyph cut for the won sign, is still referenced by public/resume.html,
-   which self-hosts its own faces and is not styled by this file. That is why
-   fonts/OFL-Newsreader.txt stays — the licence has to travel with the glyph
-   that is still shipped, not with the ones that left. */
+   Newsreader is now out of the repo entirely, and it left by two routes on the
+   same day. A one-glyph won cut had survived here for public/resume.html —
+   that page self-hosts its own faces and is not styled by this file — until
+   the résumé stopped setting the character; this pass removed the rest.
+   fonts/OFL-Newsreader.txt went with the last file: an OFL notice travels with
+   the glyphs that ship, and none do. */
 
 :root {
   /* ---- Paper (the default) ----------------------------------------------

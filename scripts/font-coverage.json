@@ -561,20 +561,6 @@
           8722
         ]
       ]
-    },
-    "newsreader-won.woff2": {
-      "sha256": "b4943789dd63d948374349eefe87089f468a8275178fb9730a83847778e1ba33",
-      "bytes": 1500,
-      "features": [
-        "pnum",
-        "tnum"
-      ],
-      "ranges": [
-        [
-          8361,
-          8361
-        ]
-      ]
     }
   }
 }

@@ -31,7 +31,7 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all ten checks:
+runs all eleven checks:
 
 ```
 npm run qa
@@ -45,12 +45,12 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Four of the ten need no build, no browser and no network — the three
+Five of the eleven need no build, no browser and no network — the four
 `node --test` suites and the ADR linter — so they run first and redden in
 seconds. The six that walk the built site run after, slowest last.
 
-`npm run gates` runs the same ten against an existing `dist/` without
-rebuilding, and the build-independent four still run on a clone that has never
+`npm run gates` runs the same eleven against an existing `dist/` without
+rebuilding, and the build-independent five still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
@@ -207,19 +207,22 @@ npm run build && SITE_ROOT=dist node scripts/font-coverage.cjs
   through. Three qualify (`κ`, and the toggle's `☀`/`☽`), because no upstream
   face here has them at all.
 
-The site ships **two text faces, Geist and Geist Mono**, plus a one-glyph
-Newsreader cut (`newsreader-won.woff2`) that only `public/resume.html` reaches.
-The serif came out on 2026-07-28 — see the "NO SERIF" block at the top of
-`style.css` — and two rules follow from it:
+The site ships **exactly two faces now, Geist and Geist Mono** — four woff2
+files from two upstream sources. The serif came out on 2026-07-28 (see the "NO
+SERIF" block at the top of `style.css`), and with it went `geist-arrows.woff2`,
+which had existed only to lend Newsreader an arrow glyph it does not have
+upstream. `fonts/OFL-Newsreader.txt` went too: an OFL notice travels with the
+glyphs that ship, and none do.
 
-- **There is no `--serif` token and no italic.** Geist ships no italic cut, so
-  `font-style: italic` renders as a synthetic oblique: the upright, sheared.
-  Emphasis is weight — **600 for inline `<em>`, 500 for the note voice** — and
-  the `em, i, cite` rule near `body` is what neutralises the browser's own
-  default italic. Adding `font-style: italic` anywhere puts a sheared face back
-  on the page and no gate will catch it; the `em, i, cite` block records why.
-- **`fonts/OFL-Newsreader.txt` stays** while that one glyph ships. An OFL notice
-  travels with the glyphs that ship, not with the ones that left.
+**There is no `--serif` token and no italic anywhere.** Geist ships no italic
+cut, so `font-style: italic` renders as a synthetic oblique — the upright,
+sheared. Emphasis is **weight**: 600 for inline `<em>`, 500 for the note voice
+that whole italic blocks (standfirsts, captions, the footer imprint) used to
+carry. The `em, i, cite` rule near `body` is also what neutralises the
+BROWSER's own default italic on those three elements. **Adding `font-style:
+italic` anywhere puts a sheared face back on the page and no gate will catch
+it** — that block records why, and a one-off check is
+`getComputedStyle(el).fontStyle !== 'normal'` over every element on every page.
 
 When subsetting, **narrow the codepoint set only.** The subsetter's default
 feature list drops `tnum`, and this site sets `font-variant-numeric:

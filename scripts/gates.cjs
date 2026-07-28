@@ -140,7 +140,7 @@ function runSiteGate(label, script) {
 }
 
 /*
- * Ordered cheapest-first, which is also build-independent-first. The four
+ * Ordered cheapest-first, which is also build-independent-first. The five
  * checks above the line need no `dist/`, no browser and no network, and finish
  * in seconds; the six below walk the built site, and the last two launch a
  * browser — contrast-check renders every page in both themes, mobile-qa renders
@@ -165,6 +165,11 @@ const CHECKS = [
     label: 'font-coverage gate (adversarial suite)',
     needsSite: false,
     run: () => runNodeTest('font-coverage suite', ['scripts/font-coverage.test.cjs']),
+  },
+  {
+    label: 'resume.pdf embeds its glyphs (adversarial suite)',
+    needsSite: false,
+    run: () => runNodeTest('resume-pdf suite', ['scripts/resume-pdf.test.cjs']),
   },
   {
     label: 'ADRs list their downstream surfaces',
