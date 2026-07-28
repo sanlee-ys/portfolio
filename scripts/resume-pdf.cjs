@@ -89,9 +89,6 @@ const ROOT = process.env.SITE_ROOT
     return { declared: [...declared], loaded: [...loaded] };
   });
 
-  // "Won" is ranged to a single codepoint, so it only loads on a page that
-  // actually sets one; it is expected in the loaded set here because this page
-  // does, but the check below is about the text faces.
   const missing = fontReport.declared.filter(f => !fontReport.loaded.includes(f));
   if (missing.length) {
     console.error(`resume-pdf error: declared @font-face families never loaded: ${missing.join(', ')}.`);
