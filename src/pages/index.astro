@@ -8,6 +8,7 @@ import SiteNav from '../components/SiteNav.astro';
   canonical="https://sanlee.me/"
   ogType="website"
   ogDescription="A decision log: the system, the calls behind it, and the times the evidence overruled me."
+  skipTo="#work"
 >
   <Fragment slot="head">
   <script is:inline type="application/ld+json">
@@ -66,14 +67,14 @@ import SiteNav from '../components/SiteNav.astro';
   <div class="wrap proof-band">
     <p class="log-intro band-intro">The real calls behind the system. The ones that went the wrong way are here too, set with the same care as the wins, because that is the part worth reading.</p>
     <ul class="proof" aria-label="What the record shows">
-      <li data-outcome="reversal"><a href="#decision-grounding">Added retrieval grounding, measured it, cut it &mdash; <strong>fixed 0, broke 4</strong></a></li>
-      <li data-outcome="reversal"><a href="#decision-model">Built the premium-model upgrade, declined it &mdash; <strong>0 rows at 1.97&times; the cost</strong></a></li>
+      <li data-outcome="reversal"><a href="#decision-grounding"><span class="sr-only">Reversed. </span>Added retrieval grounding, measured it, cut it &mdash; <strong>fixed 0, broke 4</strong></a></li>
+      <li data-outcome="reversal"><a href="#decision-model"><span class="sr-only">Reversed. </span>Built the premium-model upgrade, declined it &mdash; <strong>0 rows at 1.97&times; the cost</strong></a></li>
       <li><a href="#decision-eval">Rebuilt the eval until accuracy <em>fell</em> &mdash; <strong>97.3% &rarr; 88.9%</strong></a></li>
     </ul>
     <p class="mark-legend"><span class="mark-swatch" aria-hidden="true"></span>A doubled rule marks a decision that was reversed.</p>
   </div>
 
-  <main class="wrap" id="work">
+  <main class="wrap" id="work" tabindex="-1">
     <section class="orientation" aria-label="What this record demonstrates">
       <p class="kicker">Start here</p>
       <p class="orientation-lede">A working record of how I build and run a small AI system, framed for whoever is reading: what it does for its user, and why every change had to earn its place on evidence.</p>
@@ -109,7 +110,7 @@ import SiteNav from '../components/SiteNav.astro';
       <h2 class="section-title">The decision log</h2>
 
       <div class="decision" id="decision-grounding" data-outcome="reversal">
-        <p class="kicker">BM25 retired<span class="code-ref">EVAL &middot; BM25</span></p>
+        <p class="kicker"><span class="sr-only">Reversed. </span>BM25 retired<span class="code-ref">EVAL &middot; BM25</span></p>
         <h3>I added retrieval grounding, measured it, and cut it</h3>
         <p>I added BM25 lexical retrieval to ground each call, expecting a clear win. The first measurement said it barely helped. Then I found the measurement itself was unfair.</p>
         <p class="tradeoff"><strong>The result:</strong> I had been scoring the grounded arm against a stale baseline built on an older prompt. Rebuilt so both arms ran the same prompt, grounding fixed a domain call zero times and broke four across 162 classifications. It was retired outright, not left on as an option.</p>
@@ -117,7 +118,7 @@ import SiteNav from '../components/SiteNav.astro';
       </div>
 
       <div class="decision" id="decision-model" data-outcome="reversal">
-        <p class="kicker">Model gated on evidence<span class="code-ref">SYS-002 &middot; ADR-013</span></p>
+        <p class="kicker"><span class="sr-only">Reversed. </span>Model gated on evidence<span class="code-ref">SYS-002 &middot; ADR-013</span></p>
         <h3>Gate model choice on evidence, not vibes</h3>
         <p>Sonnet by default across the system. Escalate to Opus only where an eval shows the quality gain pays for itself. I built the upgrade, measured it, and declined it.</p>
         <p class="tradeoff"><strong>The result:</strong> routing the uncertain cases to the premium model moved <strong>zero rows</strong> on both axes at about 1.97&times; the cost per article. Sending everything to the premium model scored identically, so there was no headroom for any router to capture.</p>

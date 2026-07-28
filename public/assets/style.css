@@ -446,8 +446,8 @@ body, .btn, .hero { transition: background-color 0.2s ease, border-color 0.2s ea
   top: 18px;
   right: 18px;
   z-index: 20;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--rule-strong);
   background: var(--bg);
@@ -470,6 +470,68 @@ body, .btn, .hero { transition: background-color 0.2s ease, border-color 0.2s ea
 .theme-icon-dark { display: none; }
 html[data-theme="dark"] .theme-icon-dark { display: inline; }
 html[data-theme="dark"] .theme-icon-light { display: none; }
+
+/* ---- Text for assistive tech only ---------------------------------------
+   Deliberately NOT display:none and NOT visibility:hidden — both drop the node
+   out of the accessibility tree, which is the exact opposite of the job. 1px
+   rather than 0 because some screen readers skip a zero-area box.
+
+   This exists for the doubled oxide rule. That mark is the one thing on this
+   site another product could not reuse, and it was carried entirely by sight:
+   the legend's swatch is aria-hidden, and `data-outcome` is a CSS hook with no
+   text equivalent. So a reader on a screen reader was taught the convention on
+   the second screen and then given no way to perceive which entries followed
+   it — and those entries are the reversals, which is the site's whole argument.
+   The mark was given a SHAPE channel so it would not depend on colour; it still
+   depended on vision until this. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Skip link ----------------------------------------------------------
+   The first tab stop on every page. Without it a keyboard reader crossed the
+   toggle, six hero links and seven nav items before the homepage's first
+   paragraph, and seven nav items plus a back link plus a nine-entry ToC before
+   the first paragraph of every interior page — on every visit.
+
+   Off-screen via `left` rather than `display:none`, because a hidden element is
+   not focusable and this one has to be. z-index clears the toggle's 20: they
+   share a corner, and a skip link that lands underneath the one control it
+   overlaps is not a skip link. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 30;
+  padding: 10px 14px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 /* ---- The motion cut (2026-07-27) --------------------------------------
    Three decorative effects were removed here and their markup with them: the
@@ -495,7 +557,17 @@ html[data-theme="dark"] .theme-icon-light { display: none; }
    linked from the colophon; learning/01 carries a dated note that the
    technique is no longer used here. */
 
-html { scroll-behavior: smooth; }
+/* Smooth scrolling is a preference, not a default. Every in-page jump on this
+   site — proof band to its decision, ToC to its heading, the diagram's node to
+   the entry it lights — animated for a reader who had asked the OS for less
+   motion. Two far smaller effects (the card arrow's nudge, the decision's
+   highlight transition) were already correctly inside a reduced-motion query;
+   this one sat outside every one of them and was by far the largest movement
+   on the site. Written as `no-preference` rather than as a `reduce` override so
+   the animation is never declared for that reader at all. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 
 /* The reading default. Prose is the serif, at 17px with 1.62 leading — a
    measure-and-leading pair chosen for a text face, not inherited from a UI
@@ -998,8 +1070,10 @@ body {
    harmlessly over the hero on the homepage instead. Measured overlap at 320,
    360, 430, 560 and 768px (390 and 1440 happened to miss, which is exactly why
    this needed measuring rather than eyeballing one width). The toggle occupies
-   the top 58px; the collision stops once the centred wrap no longer reaches it,
-   at viewport > (768 + 2*58) ≈ 884px. So: clear it below 900px only, and leave
+   the top 62px (18px offset + a 44px box); the collision stops once the centred
+   wrap no longer reaches it, at viewport > (768 + 2*62) ≈ 892px — still inside
+   the 900px cutoff, which is why widening the button to a thumbable 44 did not
+   move this breakpoint. So: clear it below 900px only, and leave
    the desktop spacing alone. `.theme-toggle + .doors` matches the interior case
    precisely — on the homepage the nav follows the hero, not the button. */
 @media (max-width: 900px) {
@@ -1485,6 +1559,39 @@ main.wrap > .measure { grid-column: full; }
   outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
+}
+
+/* ---- Thumbable ToC, phone and tablet ------------------------------------
+   Measured on the classifier page at 390px: nine links 15px tall on a 32px
+   pitch. The pitch clears WCAG 2.5.8's 24px spacing offset, so this was never
+   a conformance failure — but a stacked list of nine navigation targets is not
+   the inline-prose case that exception exists for, and this repo's own bar is
+   44px, not 24. Every other sub-44 element the audit turned up on that page IS
+   an inline prose link, and those are left alone deliberately: padding a link
+   inside a sentence would ruin the leading to fix a problem the exception
+   already covers.
+
+   The 900px cutoff and the reasoning are borrowed wholesale from the nav block
+   further down: below it a finger is plausible, above it this is a pointer
+   target and inflating it would cost the desktop reader ~130px of first screen
+   to fix a problem they do not have.
+
+   The padding on the anchor IS the target, so the li's own 7px margin comes off
+   — otherwise the pitch grows twice. Baseline alignment is what keeps the mono
+   counter sitting on the link's baseline rather than at the top of its padded
+   box; the counter is a flex item here, so it needs an explicit basis to keep
+   the 1.5em gutter it had as an inline-block. */
+@media (max-width: 900px) {
+  .toc li {
+    display: flex;
+    align-items: baseline;
+    margin: 0;
+  }
+  .toc li::before { flex: 0 0 1.5em; }
+  .article-body .toc a {
+    flex: 1 1 auto;
+    padding: 11px 0;
+  }
 }
 
 /* Repo cards (the pieces of the system) */
