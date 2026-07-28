@@ -994,11 +994,16 @@ em, i, cite {
   text-align: left;
 }
 
+/* A column, not a block of text. The cell is a flex column so the claim can
+   hang from the rule and the figure can be pinned to the foot of it — see the
+   `.proof a strong` note below for why the figure needs a floor to land on. */
 .proof li {
   position: relative;
   counter-increment: proof;
   border-top: 2px solid var(--rule-strong);
-  padding: 13px 0 0;
+  padding: 11px 0 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 01 / 02 / 03 — a counter, not typed numerals, for the same reason the
@@ -1014,7 +1019,7 @@ em, i, cite {
   font-weight: 500;
   letter-spacing: 0.18em;
   color: var(--muted);
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 }
 
 /* The claim, and it is UNDERLINED — which is a correction, not a preference.
@@ -1046,12 +1051,49 @@ em, i, cite {
 
    0.94rem rather than the 1rem the serif ran at: the same /1.044 cap-height
    correction the headings took, so the three claims in the proof band keep
-   the size they had relative to everything around them. */
+   the size they had relative to everything around them.
+
+   ---- AN INDEX, NOT A FIRST TELLING ------------------------------------
+   0.9rem now, at 1.35 leading, and the reason is a repetition rather than a
+   size preference. The three claims here and the three full decision entries
+   below are the SAME three calls — that is the design, the band is their
+   index — but the band was set as prose (0.94rem at 1.5, the leading of a
+   paragraph) and read as a first telling of the story. So the reader met each
+   call as a sentence at the top of the page and met it as a sentence again
+   two thousand pixels down, and "I already read this" arrives exactly where
+   the page wants "there is more evidence".
+
+   The split is carried by register, because the copy cannot carry it: an
+   index and the thing it indexes SHOULD say the same thing. Three ranks, far
+   enough apart to be read without comparing:
+
+     band claim   0.9rem  / 1.35 / --text-secondary, over a mono value
+     entry title  1.15rem / 700  / --text
+     entry prose  1rem    / 1.7  / --text-secondary
+
+   The band is now the tightest and smallest running text on the page, which
+   is how an index is set anywhere it has ever been set. The FIGURE does not
+   come down with it — `.proof a strong` switches from `em` to `rem` below so
+   it holds the size it already had. The claim compresses around a value that
+   does not move, which is the relationship a label has to a measurement and
+   the opposite of the one a sentence has to an aside. */
+/* The link is a two-part column: the claim, then the figure at the foot of the
+   cell. It is a flex container, which is why the claim is wrapped in its own
+   `.proof-claim` span rather than left as loose text.
+
+   That span is load-bearing and not decoration. A flex container blockifies
+   every ELEMENT child, and only contiguous TEXT RUNS get gathered into an
+   anonymous item — so bare `Rebuilt the eval until accuracy <em>fell</em>`
+   splits into two flex items and the emphasis drops onto its own line. It did,
+   on the first cut of this change, at 390 and 320 only. One span puts the whole
+   sentence back in one inline formatting context. */
 .proof a {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   font-family: var(--font);
-  font-size: 0.94rem;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  line-height: 1.35;
   color: var(--text-secondary);
   text-decoration: underline;
   text-decoration-color: var(--muted);
@@ -1065,14 +1107,47 @@ em, i, cite {
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
 }
-/* The measurement. nowrap because "97.3% → 88.9%" is one token however narrow
-   the column gets; the longest of the three sets to ~230px against 272px of
-   container at 320px, which the mobile gate measures rather than trusts. */
+/* The measurement, and it gets a FLOOR to land on.
+
+   It used to be an appositive inside the claim's sentence, introduced by an em
+   dash and set wherever the wrap happened to leave it: at 1440 the figure sat
+   mid-line in column 01 ("cut it — fixed 0, broke 4"), on line three in 02 and
+   on line two in 03, purely as a function of how long each claim is. For a
+   band whose whole job is "scan three claims in two seconds" that gives the
+   eye no landing spot — the one thing on this page a skeptic actually checks
+   is in a different place in every column.
+
+   So the figure is set as a BLOCK, and `margin-top: auto` pushes it to the
+   bottom of a cell the grid has already stretched to the tallest of the three.
+   All three figures therefore sit on one line, flush left, at one size, under
+   claims that hang from their own rules — the same construction the stat strip
+   uses (rule, then value, then label), which is the shape a printed results
+   column has. The claim above it can run one line or three and the landing
+   does not move.
+
+   The em dash went with the change and it went from ALL THREE, not two. Once
+   the break is structural the dash is a second, weaker copy of it, and at 390
+   (where the band has always stacked and the figure has always fallen to its
+   own line) it was already hanging at the end of every claim line — a ragged
+   right edge with a dash on it three times over. Nothing else in the copy
+   moved.
+
+   nowrap because "97.3% → 88.9%" is one token however narrow the column gets;
+   the longest of the three sets to ~230px against 272px of container at 320px,
+   which the mobile gate measures rather than trusts. */
 .proof a strong {
+  display: block;
+  margin-top: auto;
+  padding-top: 6px;
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-  font-size: 0.94em;
+  /* rem, NOT em. It was 0.94em of the claim, so it tracked the claim's size —
+     and the claim came down a step when the band was reset as an index (see
+     the note above `.proof a`). The figure is the one thing in this band a
+     skeptic actually checks; it holds the 0.94rem it has always had and the
+     claim compresses around it. */
+  font-size: 0.94rem;
   letter-spacing: -0.015em;
   color: var(--text);
   white-space: nowrap;
