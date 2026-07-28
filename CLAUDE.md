@@ -31,7 +31,7 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all ten checks:
+runs all eleven checks:
 
 ```
 npm run qa
@@ -45,12 +45,12 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Four of the ten need no build, no browser and no network — the three
+Five of the eleven need no build, no browser and no network — the four
 `node --test` suites and the ADR linter — so they run first and redden in
 seconds. The six that walk the built site run after, slowest last.
 
-`npm run gates` runs the same ten against an existing `dist/` without
-rebuilding, and the build-independent four still run on a clone that has never
+`npm run gates` runs the same eleven against an existing `dist/` without
+rebuilding, and the build-independent five still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
