@@ -1001,7 +1001,7 @@ em, i, cite {
   position: relative;
   counter-increment: proof;
   border-top: 2px solid var(--rule-strong);
-  padding: 13px 0 0;
+  padding: 11px 0 0;
   display: flex;
   flex-direction: column;
 }
@@ -1019,7 +1019,7 @@ em, i, cite {
   font-weight: 500;
   letter-spacing: 0.18em;
   color: var(--muted);
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 }
 
 /* The claim, and it is UNDERLINED — which is a correction, not a preference.
@@ -1051,7 +1051,32 @@ em, i, cite {
 
    0.94rem rather than the 1rem the serif ran at: the same /1.044 cap-height
    correction the headings took, so the three claims in the proof band keep
-   the size they had relative to everything around them. */
+   the size they had relative to everything around them.
+
+   ---- AN INDEX, NOT A FIRST TELLING ------------------------------------
+   0.9rem now, at 1.35 leading, and the reason is a repetition rather than a
+   size preference. The three claims here and the three full decision entries
+   below are the SAME three calls — that is the design, the band is their
+   index — but the band was set as prose (0.94rem at 1.5, the leading of a
+   paragraph) and read as a first telling of the story. So the reader met each
+   call as a sentence at the top of the page and met it as a sentence again
+   two thousand pixels down, and "I already read this" arrives exactly where
+   the page wants "there is more evidence".
+
+   The split is carried by register, because the copy cannot carry it: an
+   index and the thing it indexes SHOULD say the same thing. Three ranks, far
+   enough apart to be read without comparing:
+
+     band claim   0.9rem  / 1.35 / --text-secondary, over a mono value
+     entry title  1.15rem / 700  / --text
+     entry prose  1rem    / 1.7  / --text-secondary
+
+   The band is now the tightest and smallest running text on the page, which
+   is how an index is set anywhere it has ever been set. The FIGURE does not
+   come down with it — `.proof a strong` switches from `em` to `rem` below so
+   it holds the size it already had. The claim compresses around a value that
+   does not move, which is the relationship a label has to a measurement and
+   the opposite of the one a sentence has to an aside. */
 /* The link is a two-part column: the claim, then the figure at the foot of the
    cell. It is a flex container, which is why the claim is wrapped in its own
    `.proof-claim` span rather than left as loose text.
@@ -1067,8 +1092,8 @@ em, i, cite {
   flex-direction: column;
   flex: 1 1 auto;
   font-family: var(--font);
-  font-size: 0.94rem;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  line-height: 1.35;
   color: var(--text-secondary);
   text-decoration: underline;
   text-decoration-color: var(--muted);
@@ -1113,11 +1138,16 @@ em, i, cite {
 .proof a strong {
   display: block;
   margin-top: auto;
-  padding-top: 4px;
+  padding-top: 6px;
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-  font-size: 0.94em;
+  /* rem, NOT em. It was 0.94em of the claim, so it tracked the claim's size —
+     and the claim came down a step when the band was reset as an index (see
+     the note above `.proof a`). The figure is the one thing in this band a
+     skeptic actually checks; it holds the 0.94rem it has always had and the
+     claim compresses around it. */
+  font-size: 0.94rem;
   letter-spacing: -0.015em;
   color: var(--text);
   white-space: nowrap;
