@@ -201,12 +201,78 @@ function parseRanges(spec) {
 const inRanges = (ranges, cp) => ranges.some(([a, b]) => cp >= a && cp <= b);
 
 /*
+ * A page's CSS lives in its <style> blocks and nowhere else — an @font-face
+ * cannot function in an attribute or in prose, and scanning the whole page
+ * would read a code sample in a <pre> as a live face. The opening tag is
+ * matched quote-aware so a `>` inside an attribute cannot end it early, and
+ * `</style >` closes it — the same two lessons SCRIPT_OR_STYLE records above.
+ */
+const STYLE_BODY = /<style\b(?:[^>"']|"[^"]*"|'[^']*')*>([\s\S]*?)<\/style\s*>/gi;
+
+/*
+ * The @font-face blocks of one stylesheet, found by a brace WALK rather than a
+ * regex. The first version used `@font-face\s*\{([^}]*)\}`, which holds right
+ * up until CSS does something CSS is allowed to do: a comment between the
+ * at-keyword and its brace hides the whole face from `\s*`, and a `}` inside a
+ * comment ends `[^}]*` early, truncating the body mid-declaration. So comments
+ * are stripped first, and the walk balances braces without being fooled by a
+ * brace inside a quoted string. A block that opens and never closes is
+ * reported, not skipped: the parse ran off the end, so nothing after it was
+ * seen either.
+ */
+function fontFaceBodies(cssText, label, malformed) {
+  const text = cssText.replace(/\/\*[\s\S]*?\*\//g, ' ');
+  const bodies = [];
+  let from = 0;
+  for (;;) {
+    const at = text.indexOf('@font-face', from);
+    if (at === -1) break;
+    let open = at + '@font-face'.length;
+    while (open < text.length && /\s/.test(text[open])) open += 1;
+    if (text[open] !== '{') { from = open; continue; } // the words, not the rule
+    let depth = 1;
+    let quote = null;
+    let i = open + 1;
+    while (i < text.length && depth > 0) {
+      const ch = text[i];
+      if (quote) {
+        if (ch === '\\') i += 1;
+        else if (ch === quote) quote = null;
+      } else if (ch === '"' || ch === "'") {
+        quote = ch;
+      } else if (ch === '{') {
+        depth += 1;
+      } else if (ch === '}') {
+        depth -= 1;
+      }
+      i += 1;
+    }
+    if (depth > 0) {
+      malformed.push(`${label}: a @font-face block opens and never closes — `
+        + 'the parse ran off the end of the sheet.');
+      break;
+    }
+    bodies.push(text.slice(open + 1, i - 1));
+    from = i;
+  }
+  return bodies;
+}
+
+/*
  * Every @font-face on the site, from the shared stylesheet and from any page
  * carrying its own inline rules. Not special-cased to resume.html: that page is
  * standalone today, and a gate that hard-codes the one known exception stops
  * covering the next one.
+ *
+ * A block that is found but cannot be read goes to `malformed` and fails the
+ * run — never a silent skip. A face this gate cannot see is not one missing
+ * line of output, it is every check un-run for that file: its range claims
+ * (check 2), its hash (check 3), and any codepoint only it covers. And because
+ * EXPECTED_DECLARED forgives known range gaps, a dropped face can turn an
+ * uncovered character into a quiet "expected" — a pass — which is exactly the
+ * blindness this gate exists to prevent.
  */
-function collectFaces(pages) {
+function collectFaces(pages, malformed) {
   const sources = [];
   for (const rel of ['assets/style.css', 'style.css']) {
     const p = path.join(ROOT, rel);
@@ -214,19 +280,26 @@ function collectFaces(pages) {
   }
   for (const page of pages) {
     const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
-    if (html.includes('@font-face')) {
-      sources.push([page, html, path.dirname(path.join(ROOT, page))]);
+    if (!html.includes('@font-face')) continue;
+    const css = [...html.matchAll(STYLE_BODY)].map((m) => m[1]).join('\n');
+    if (css.includes('@font-face')) {
+      sources.push([page, css, path.dirname(path.join(ROOT, page))]);
     }
   }
 
   const faces = [];
   for (const [label, text, baseDir] of sources) {
-    for (const block of text.matchAll(/@font-face\s*\{([^}]*)\}/g)) {
-      const body = block[1];
+    for (const body of fontFaceBodies(text, label, malformed)) {
       const fam = /font-family:\s*"([^"]+)"/.exec(body);
       const url = /url\("([^"]+)"\)/.exec(body);
       const rng = /unicode-range:\s*([^;]+);/.exec(body);
-      if (!fam || !url || !rng) continue;
+      if (!fam || !url || !rng) {
+        const missing = [!fam && 'a double-quoted font-family', !url && 'a double-quoted url()',
+          !rng && 'a `;`-terminated unicode-range'].filter(Boolean).join(', ');
+        malformed.push(`${label}: a @font-face block this gate cannot read — it needs ${missing}. `
+          + 'Fix the block\'s spelling, or teach collectFaces the new one.');
+        continue;
+      }
       const style = /font-style:\s*(\w+)/.exec(body);
       faces.push({
         label: `${fam[1]}/${style ? style[1] : 'normal'}`,
@@ -259,7 +332,14 @@ if (pages.length === 0) {
   process.exit(1);
 }
 
-const faces = collectFaces(pages);
+const malformed = [];
+const faces = collectFaces(pages, malformed);
+if (malformed.length) {
+  console.error('✗ font-coverage: @font-face rules found but not understood, so their');
+  console.error('  fonts went entirely unchecked.\n');
+  for (const m of malformed) console.error(`  ${m}`);
+  process.exit(1);
+}
 if (faces.length === 0) {
   console.error(`✗ font-coverage: no @font-face rules found under ${ROOT}. Nothing was checked.`);
   process.exit(1);
