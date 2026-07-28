@@ -56,21 +56,14 @@
        unicode-ranges — only the url() differs, since this file sits at the
        repo root instead of in assets/.
 
-       The third face below finishes that job. One character on this page — the
-       won sign in the MBA leadership line — had no glyph in either Geist file,
-       because Geist has none at any weight (checked against the variable
-       source, not assumed). So it was still being drawn by whatever the
-       platform supplied: Segoe UI here, something else on a Mac. That is the
-       exact defect the paragraph above says this page was made self-hosted to
-       end, surviving in a single glyph, and the PDF embedded whichever one the
-       last machine had.
-
-       Newsreader — already in this repo for the main site — does have it, so
-       it is cut to that one codepoint and ranged to it. It is only ever
-       reached by the won sign and can never touch a letter. A serif won sign
-       inside a sans line sounds wrong and is not: rendered side by side at
-       this size it is a double-barred W with no visible serif character, and
-       the alternative was leaving the one reproducibility hole open. */
+       Two faces is the whole stack, and every character on this page resolves
+       inside them. A third was carried here briefly for the won sign in the
+       MBA leadership line — Geist has no won glyph at any weight — until that
+       line was rewritten to say "KRW", which put the page back inside Geist.
+       scripts/font-coverage.cjs is what keeps that true: a character with no
+       self-hosted glyph still renders, borrowed from a platform face, so it
+       would otherwise survive every gate here and reintroduce exactly the
+       defect the paragraph above describes. */
     @font-face {
       font-family: "Geist";
       font-style: normal;
