@@ -355,26 +355,28 @@ import SiteNav from '../../components/SiteNav.astro';
         </marker>
       </defs>
 
-      <rect class="sm-set sm-a" x="4" y="10" width="44" height="36" rx="8" />
+      <!-- rx matches --radius-sm (2px). The max-width note above is why these
+           viewBox units are CSS pixels 1:1, so 2 here is 2px on the page. -->
+      <rect class="sm-set sm-a" x="4" y="10" width="44" height="36" rx="2" />
       <text class="sm-id" x="26" y="34" text-anchor="middle">A</text>
       <path class="sm-edge sm-edge-a" d="M 48 28 L 70 28" marker-end="url(#split-arrow-a)" />
-      <rect class="sm-box" x="74" y="10" width="182" height="36" rx="8" />
+      <rect class="sm-box" x="74" y="10" width="182" height="36" rx="2" />
       <text class="sm-role" x="165" y="33" text-anchor="middle">drives the next edit</text>
       <!-- The one edge that comes back. Its absence on B and C is the argument. -->
       <path class="sm-edge sm-edge-a" d="M 165 46 C 165 76, 26 76, 26 50"
             marker-end="url(#split-arrow-a)" />
       <text class="sm-note" x="96" y="90" text-anchor="middle">re-scored every iteration</text>
 
-      <rect class="sm-set sm-b" x="4" y="104" width="44" height="32" rx="8" />
+      <rect class="sm-set sm-b" x="4" y="104" width="44" height="32" rx="2" />
       <text class="sm-id" x="26" y="126" text-anchor="middle">B</text>
       <path class="sm-edge" d="M 48 120 L 70 120" marker-end="url(#split-arrow)" />
-      <rect class="sm-box" x="74" y="104" width="182" height="32" rx="8" />
+      <rect class="sm-box" x="74" y="104" width="182" height="32" rx="2" />
       <text class="sm-role" x="165" y="125" text-anchor="middle">stops the run</text>
 
-      <rect class="sm-set sm-c" x="4" y="146" width="44" height="32" rx="8" />
+      <rect class="sm-set sm-c" x="4" y="146" width="44" height="32" rx="2" />
       <text class="sm-id" x="26" y="168" text-anchor="middle">C</text>
       <path class="sm-edge" d="M 48 162 L 70 162" marker-end="url(#split-arrow)" />
-      <rect class="sm-box" x="74" y="146" width="182" height="32" rx="8" />
+      <rect class="sm-box" x="74" y="146" width="182" height="32" rx="2" />
       <text class="sm-role" x="165" y="167" text-anchor="middle">reported only</text>
     </svg>
 

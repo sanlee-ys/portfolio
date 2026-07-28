@@ -100,11 +100,15 @@ import SiteNav from '../../components/SiteNav.astro';
               <path class="be-head-back" d="M 0 0 L 10 5 L 0 10 z" />
             </marker>
           </defs>
-          <rect class="be-box" x="4" y="14" width="72" height="34" rx="8" />
+          <!-- rx matches --radius-sm (2px). These are viewBox units, and max-width
+               caps the SVG at its intrinsic 260, so they are CSS pixels 1:1 from
+               390 up; at 320 the same ~0.93 scale the be-note comment records
+               paints them at 1.86px. Measured, not assumed. -->
+          <rect class="be-box" x="4" y="14" width="72" height="34" rx="2" />
           <text class="be-label" x="40" y="36" text-anchor="middle">Triage</text>
-          <rect class="be-box" x="86" y="14" width="72" height="34" rx="8" />
+          <rect class="be-box" x="86" y="14" width="72" height="34" rx="2" />
           <text class="be-label" x="122" y="36" text-anchor="middle">Classify</text>
-          <rect class="be-box" x="168" y="14" width="72" height="34" rx="8" />
+          <rect class="be-box" x="168" y="14" width="72" height="34" rx="2" />
           <text class="be-label" x="204" y="36" text-anchor="middle">Critic</text>
           <path class="be-edge" d="M 76 31 L 84 31" marker-end="url(#be-arrow)" />
           <path class="be-edge" d="M 158 31 L 166 31" marker-end="url(#be-arrow)" />
