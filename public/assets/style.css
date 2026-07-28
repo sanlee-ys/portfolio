@@ -260,18 +260,45 @@
      they must all land on the same line. */
   --margin-note: 9.5rem;
   --margin-gap: 1.75rem;
+  /* ---- One arrow, everywhere ---------------------------------------------
+     U+2192 (→) is NOT in any of the three self-hosted subsets. Verified by
+     measuring the advance rather than by reading the spec: in Geist Mono every
+     glyph advances 60 units at 100px and the arrow advances 100, which is the
+     signature of a fallback face, and Geist and Newsreader both hand it to the
+     same generic. So every arrow on this site has always come from whatever
+     the platform supplies.
+
+     That is why the review round saw two different arrows on one page. The
+     browser resolves a missing glyph per ELEMENT, walking that element's own
+     family list — so a mono context ends at the platform monospace and a prose
+     context ends at the platform serif or sans, and those ship different
+     drawings. The arrows in "97.3% → 88.9%" and in "Full eval →" were never
+     the same glyph.
+
+     The fix is one shared tail on all three stacks, placed BEFORE the generic.
+     Fallback walks the list in order and takes the first family that has the
+     glyph, so Latin text still resolves to Geist or Newsreader exactly as
+     before and only the uncovered codepoints reach the tail — where all three
+     stacks now agree. Deterministic on Windows, macOS and most Linux, and it
+     degrades to today's behaviour anywhere none of the three symbol faces
+     exist.
+
+     The alternative was re-subsetting the woff2s to add one glyph, which means
+     the upstream font sources and a fonttools step this repo does not have and
+     should not grow for a single arrow. */
+  --symbol-tail: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2";
   /* The reading face. Prose, headings, the masthead — everything the reader is
      meant to read rather than operate. */
-  --serif: "Newsreader", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", serif;
+  --serif: "Newsreader", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", var(--symbol-tail), serif;
   /* The chrome voice. Nav, labels, kickers, chips, buttons, the footer: the
      apparatus around the reading. Kept deliberately screen-native — this is
      the part of the page that is software, and it should not pretend. */
-  --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, var(--symbol-tail), sans-serif;
   /* The data voice. Every measured thing on this site is set in it: metrics and
      stat values, ledger IDs and code-refs, dates, the flow line, rung IDs,
      pills, code blocks. One token so that stays a rule rather than six
      hand-typed stacks that drift apart (which is what was here before). */
-  --mono: "Geist Mono", ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, monospace;
+  --mono: "Geist Mono", ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, var(--symbol-tail), monospace;
 
   /* The page's column track list, held in a token so every grid container on
      the site declares the SAME one instead of a copy that can drift. Named
@@ -346,7 +373,22 @@ body, .btn, .hero { transition: background-color 0.2s ease, border-color 0.2s ea
 * { box-sizing: border-box; }
 
 /* Theme toggle. A stamped square rather than a floating pill: it is the one
-   control on the page, and on paper a control is a printed box. */
+   control on the page, and on paper a control is a printed box.
+
+   The background is --bg, not --panel, and that is the fix for a collision
+   rather than a colour preference. On every interior page the nav is the first
+   element in the body, so its full-bleed bottom hairline runs the whole width
+   of the window at y≈57 — straight through this button, which sits fixed at
+   top 18px with a height of 40. The button was --panel, a near-but-not-equal
+   tone, so the rule read as passing THROUGH it and meeting its border on both
+   sides: the first thing a skeptical engineer sees on the classifier page is
+   what looks like a z-index mistake.
+
+   Raising z-index does not fix it — the button was already above the rule at
+   z-index 20. The rule was visible because the fill did not match the ground
+   it was sitting on. Matching --bg makes the button opaque against the page
+   and the hairline terminates cleanly at its edges, which is what a control
+   stamped onto paper does. */
 .theme-toggle {
   position: fixed;
   top: 18px;
@@ -356,7 +398,7 @@ body, .btn, .hero { transition: background-color 0.2s ease, border-color 0.2s ea
   height: 40px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--rule-strong);
-  background: var(--panel);
+  background: var(--bg);
   color: var(--text);
   font-size: 1rem;
   line-height: 1;
@@ -579,6 +621,33 @@ body {
   transition: color 0.15s ease, transform 0.12s ease;
 }
 .hero-links a:hover { color: var(--accent); transform: translateY(-1px); }
+
+/* ---- The résumé says "Résumé" -------------------------------------------
+   It was an unlabeled generic-document glyph, second of six, sitting between
+   an envelope and the GitHub mark and visually near-identical to both — the
+   single highest-intent link for the audience this site is built for, and the
+   only way to know what it was was to hover it or to find RÉSUMÉ again in the
+   nav. Every reviewer flagged it; two called it "demoted twice".
+
+   So one of the six carries its name. That is the whole change: the row keeps
+   its height and its 44px targets, the other five stay glyphs, and the one
+   that matters is legible without a pointer. A single labeled item among five
+   marks does not read as an inconsistency — it reads as emphasis, which is
+   what it is. */
+.hero-links a.hero-resume {
+  width: auto;
+  min-width: 44px;
+  gap: 7px;
+  padding: 0 10px;
+  color: var(--accent);
+}
+.hero-links a.hero-resume span {
+  font-family: var(--font);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
 /* 19px, not 22. The masthead and the standfirst above these got finer with the
    serif, and a row of 22px glyphs under them read as a toolbar bolted to a
    title page. The 44px tap target is unchanged — only the drawn mark shrank. */
@@ -771,6 +840,48 @@ body {
    entries carry below — same hue, same doubled rule, same 3px offset — so the
    two are read as one convention rather than two treatments that happen to
    share a colour. */
+/* ---- The legend, because an unexplained mark is a rendering bug ----------
+   Two of the three claims carry the doubled oxide rule and one carries a
+   single ink rule. To a reader who has never seen this page, that is not a
+   convention — it is two red lines and a black one, which in ninety seconds
+   reads as an unfinished style or a broken render, never as "double means
+   reversed". Every reviewer who looked at the band said some version of this.
+
+   The legend is drawn rather than only written: the swatch is the actual
+   mark, built from the same two rules at the same 3px offset, so the reader
+   sees the thing and its meaning in one glance instead of being asked to
+   hold a sentence and go looking. That is also why it sits under the band
+   rather than above it — you meet the mark first, then the key, which is the
+   order a printed table of contents uses. */
+.mark-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 26px 0 0;
+  font-family: var(--font);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mark-swatch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 6px;
+  border-top: 2px solid var(--accent-warm);
+}
+.mark-swatch::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3px;
+  height: 1px;
+  background: var(--accent-warm);
+}
+
 .proof li[data-outcome="reversal"] { border-top-color: var(--accent-warm); }
 .proof li[data-outcome="reversal"]::after {
   content: "";
@@ -1001,6 +1112,24 @@ main.wrap > .measure { grid-column: full; }
    at desktop widths (see "Marginalia" below), so it is drawn as a note rather
    than as a heading — it has to survive being read at 156px wide and out of
    the reading column. */
+/* A kicker is NOT a link, so it does not wear the link colour.
+
+   It used to. The consequence showed up on the entry that could least afford
+   it: "EVAL REBUILT" — the label on "I rebuilt the eval until it could tell me
+   I was wrong", the strongest piece of intellectual honesty on the site — was
+   set in the same blue as every clickable thing on the page, and was not
+   clickable. On a touch device, where hover cannot correct the guess, that is
+   simply a label that lies.
+
+   It also broke the mark system from the other side. Blue is "link, focus,
+   shipped"; oxide is "reversed". A non-reversal kicker in blue put the third
+   entry in a THIRD state that means nothing, so a reader comparing the three
+   labels saw oxide / oxide / blue and had no rule that explains it.
+
+   Now: --muted is the resting state for a kicker (it is metadata, and the
+   entry's own h3 is the title), and --accent-warm is the marked state, applied
+   only where data-outcome="reversal" is. Two states, one rule, no borrowed
+   hue. */
 .kicker {
   font-family: var(--font);
   text-transform: uppercase;
@@ -1008,7 +1137,7 @@ main.wrap > .measure { grid-column: full; }
   font-size: 0.68rem;
   font-weight: 600;
   line-height: 1.5;
-  color: var(--accent);
+  color: var(--muted);
   margin: 0 0 12px;
 }
 
@@ -1587,15 +1716,25 @@ main.wrap > .measure { grid-column: full; }
 }
 .flow-line .flow-arrow { color: var(--accent); opacity: 0.85; }
 /* The system map, drawn as a PLATE: a figure pasted onto the page, with a
-   printed border and a caption under it. The border goes to ink weight and the
-   fill to --panel, which on paper is very slightly lighter than the ground —
-   the difference a pasted-in plate has from the sheet it is pasted to. */
+   printed border and a caption under it.
+
+   Restyled into the journal idiom after the review round called it, correctly,
+   "an unrestyled Mermaid default dropped into the journal" — a rounded, filled,
+   card-like object with rounded filled boxes inside it, on a page built
+   entirely from hairline rules and flush-set type. It was the only rounded
+   thing and one of the only filled things on the homepage, so the largest
+   object on the page was also the one least like the page.
+
+   Three changes and no more: the frame goes to a hairline, the corners square
+   off, and the fill goes away entirely so the plate sits on the paper rather
+   than on top of it. The nodes follow (see .node rect). What is left is a
+   ruled figure, which is what every other bounded object on this site is. */
 .diagram {
   width: 100%;
   height: auto;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-lg);
-  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: none;
 }
 #system-diagram marker path { fill: var(--muted); }
 .edge { stroke: var(--muted); stroke-width: 1.5; opacity: 0.75; }
@@ -1609,9 +1748,14 @@ main.wrap > .measure { grid-column: full; }
   font-size: 11px;
   letter-spacing: 0.02em;
 }
-.edge-label-bg { fill: var(--panel); }
+/* The label's knockout still needs to be opaque — it exists to break the edge
+   line behind the text — but it is the PAGE colour now, not a panel tone, so
+   it disappears against the unfilled plate instead of showing as a chip. */
+.edge-label-bg { fill: var(--bg); }
+/* Squared and unfilled, to match the plate. The 9px radius came from the
+   generator's defaults and was the only 9px corner on the site. */
 .node rect {
-  fill: var(--bg);
+  fill: none;
   stroke: var(--rule-strong);
   stroke-width: 1;
   cursor: pointer;
@@ -2236,6 +2380,27 @@ main.wrap > .measure { grid-column: full; }
 }
 .orientation-routes { margin: 0; font-size: 0.95rem; color: var(--text-secondary); }
 
+/* ---- The routing links were browser default blue ------------------------
+   #0000EE, underlined — the UA stylesheet's anchor colour, on the one
+   paragraph whose whole job is to route the reader to the three writeups.
+   2.00:1 on the night ground, under any floor there is; 8.41:1 on paper,
+   which passes and still looks like an unstyled page from 1998 sitting in
+   the middle of a designed one.
+
+   The cause is a scoping gap rather than a missing intention: `.measure a`
+   carries the link colour for the reading column, and `.orientation` is a
+   sibling section that sits outside `.measure`. So it inherited nothing.
+   Same idiom as every other prose link on the site, stated for this block. */
+.orientation-routes a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.15s ease;
+}
+.orientation-routes a:hover { text-decoration-color: var(--accent); }
+
 /* Decision log: flip the hierarchy so the human kicker leads and the ledger
    ID (SYS-004, ADR-002, EVAL...) rides behind it as quiet metadata. */
 .measure .decision .kicker { margin: 0 0 6px; }
@@ -2384,14 +2549,60 @@ main.wrap > .measure { grid-column: full; }
   padding: 12px 0 10px;
 }
 
+/* ---- The three display figures are the one place the data voice is NOT mono
+   and the reason is that monospace stops setting numbers well above about
+   30px. Two measured faults, both visible in the shipped build:
+
+   THE DECIMAL. A monospace face gives the period a full character cell, so
+   "92.6%" renders at display size with a visible chasm either side of the
+   point and reads as "92 . 6%". The decimal separator becomes the widest gap
+   in the number — in the three figures the whole section exists to present.
+
+   THE ZERO. Geist Mono's zero is slashed, and at 48px "87.0%" reads as
+   "87.Ø%". Worth stating because the obvious remedy does not work: the slash
+   is the DEFAULT glyph, not an optional `zero` feature, so
+   `font-feature-settings: "zero" 0` changes nothing. Verified by rendering it
+   both ways rather than assumed from the spec.
+
+   Geist fixes both at once: a round zero, a tight decimal, and — checked, not
+   hoped — genuinely tabular figures (0, 1 and 8 all advance identically at
+   tabular-nums), which is the property the mono was chosen for in the first
+   place. So the column still aligns.
+
+   The mono voice is unchanged everywhere else, including inline figures in
+   the proof band and the ledger. That is deliberate: at text size the slashed
+   zero is a data face doing its job (0 is not O) and the decimal gap is
+   invisible, so the two zeros on this page are two VOICES rather than an
+   inconsistency. This is only about display size. */
 .stat-strip .stat-value {
-  font-family: var(--mono);
+  font-family: var(--font);
   font-size: clamp(1.8rem, 4vw, 2.2rem);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.05;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.02em;
+}
+
+/* At 390px the auto-fit lands on two columns, which leaves the third figure
+   alone beside an empty cell with a half-width rule under it — a layout that
+   reads as a broken render in the one block asking to be believed. One column
+   below 520px is what the rule-per-cell construction above was designed for:
+   each figure keeps its own rule and the strip reads as a ruled list. */
+@media (max-width: 520px) {
+  .stat-strip { grid-template-columns: 1fr; }
+}
+
+/* The twin-figure note. Category and domain genuinely land on the same value
+   on this set, and at a glance two identical numbers side by side read as a
+   copy-paste bug before they read as a coincidence — in the one place the
+   page is asking to be trusted. Deliberately says no number: a metric typed
+   into prose is unguarded by the published-metrics check and is exactly how
+   this site once shipped two stale figures onto a résumé. */
+.stat-note {
+  margin: -8px 0 18px;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
 .stat-strip .stat-label {
