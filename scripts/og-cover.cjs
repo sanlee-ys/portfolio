@@ -17,8 +17,14 @@
  *
  * It renders over the repo's own static server rather than from file://, for
  * the same reason `mobile-qa.cjs` does — the card loads the site's real
- * self-hosted woff2 files by URL, so it is set in the same Newsreader and
- * Geist the pages are, not in a lookalike the renderer happened to have.
+ * self-hosted woff2 files by URL, so it is set in the same Geist and Geist
+ * Mono the pages are, not in a lookalike the renderer happened to have.
+ *
+ * That coupling is the point, and it is also the trap: delete a woff2 the card
+ * names and this script renders the fallback face without erroring. The serif
+ * removal on 2026-07-28 was exactly that case — og-cover.html named two
+ * Newsreader files that no longer exist — so the card was repointed and
+ * regenerated in the same commit. Check the PNG, not just the exit code.
  *
  * Run from the repo root, after `npm run build`:
  *     node scripts/og-cover.cjs

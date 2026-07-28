@@ -4,56 +4,69 @@
 <meta charset="utf-8">
 <style>
   @font-face {
-    font-family: "Newsreader";
-    src: url("FONTDIR/newsreader-latin.woff2") format("woff2");
-    font-weight: 200 800;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "Newsreader";
-    src: url("FONTDIR/newsreader-latin-italic.woff2") format("woff2");
-    font-weight: 200 800;
-    font-style: italic;
-  }
-  @font-face {
     font-family: "Geist";
     src: url("FONTDIR/geist-latin.woff2") format("woff2");
     font-weight: 100 900;
     font-style: normal;
   }
+  /* Geist Mono is loaded here for the first time, and it is a consequence of
+     the serif leaving rather than an addition. The card used to separate the
+     claim from its figure by FACE — claim in Newsreader, figure in Geist —
+     and with one text face left that separation would have collapsed into a
+     weight. The site never had that problem, because every measured thing on
+     it is set in Geist Mono; the card just was not following that rule yet. */
+  @font-face {
+    font-family: "Geist Mono";
+    src: url("FONTDIR/geist-mono-latin.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 1200px; height: 630px; }
+  /* The card follows the site's tokens, and it has to be updated with them or
+     the one surface every link preview renders drifts away from the page it
+     previews. Values here are the light theme of public/assets/style.css:
+     ground #fafaf9, ink #1e1c1b, argument #383533, metadata #5f5c58, ink rule
+     #423f3c, oxide #5e1f0d. There is no serif: Geist carries the card exactly
+     as it carries the site. */
   body {
-    background: #f6f2e8;
-    color: #1f1c17;
-    font-family: "Newsreader", Georgia, serif;
+    background: #fafaf9;
+    color: #1e1c1b;
+    font-family: "Geist", system-ui, sans-serif;
     padding: 62px 72px 54px;
     display: flex;
     flex-direction: column;
   }
+  /* No italic on this card either — Geist has none, and a synthetic oblique
+     baked into a PNG is one that can never be fixed by a later stylesheet. The
+     site's idiom is weight: 600 for inline stress, 500 for the note voice. */
+  em { font-style: normal; font-weight: 600; }
   .dateline {
-    font-family: "Geist", system-ui, sans-serif;
     font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.19em;
     text-transform: uppercase;
-    color: #3a352c;
+    color: #383533;
     padding-bottom: 16px;
-    border-bottom: 2px solid #46402f;
+    border-bottom: 2px solid #423f3c;
   }
+  /* 103px, not 108: the same /1.044 cap-height correction the site's headings
+     took when they moved from Newsreader to Geist, so the nameplate on the
+     card stays physically the size it was. Weight follows --display-weight. */
   h1 {
-    font-size: 108px;
-    font-weight: 600;
+    font-size: 103px;
+    font-weight: 700;
     line-height: 1;
-    letter-spacing: -0.028em;
+    letter-spacing: -0.036em;
     margin-top: 34px;
   }
   .standfirst {
-    font-style: italic;
-    font-size: 33px;
+    font-weight: 500;
+    color: #383533;
+    font-size: 31px;
     line-height: 1.32;
     margin-top: 18px;
-    max-width: 22ch;
+    max-width: 24ch;
   }
   .proof {
     margin-top: auto;
@@ -61,7 +74,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 0 40px;
   }
-  .proof li { list-style: none; position: relative; border-top: 2px solid #46402f; padding-top: 13px; }
+  .proof li { list-style: none; position: relative; border-top: 2px solid #423f3c; padding-top: 13px; }
   .proof li.rev { border-top-color: #5e1f0d; }
   .proof li.rev::after {
     content: "";
@@ -72,21 +85,21 @@
   }
   .idx {
     display: block;
-    font-family: "Geist", system-ui, sans-serif;
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.2em;
-    color: #655d4f;
+    color: #5f5c58;
     margin-bottom: 9px;
   }
   .rev .idx { color: #5e1f0d; }
-  .claim { font-size: 22px; line-height: 1.36; color: #3a352c; }
+  .claim { font-size: 21px; line-height: 1.4; color: #383533; }
   .fig {
-    font-family: "Geist", system-ui, sans-serif;
+    font-family: "Geist Mono", ui-monospace, monospace;
     font-variant-numeric: tabular-nums;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: #1f1c17;
+    font-weight: 500;
+    font-size: 0.94em;
+    letter-spacing: -0.015em;
+    color: #1e1c1b;
     white-space: nowrap;
   }
 </style>

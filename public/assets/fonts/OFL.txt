@@ -4,7 +4,6 @@ Files in this directory, and where each came from:
 
   geist-latin.woff2, geist-latin-ext.woff2
   geist-mono-latin.woff2, geist-mono-latin-ext.woff2
-  geist-arrows.woff2
       Geist Sans and Geist Mono, variable weight axis 100-900. All cut by
       ../../../scripts/subset-fonts.py from Geist-Variable.ttf and
       GeistMono-Variable.ttf as shipped in the `geist` npm package (v1.7.2),
@@ -16,9 +15,11 @@ Files in this directory, and where each came from:
       only U+2191 and U+2193. The site's copy uses -> and <- throughout, and
       leaving them out meant the platform drew them.
 
-      geist-arrows.woff2 is those four arrow glyphs alone, for the serif
-      stack: Newsreader has no arrows at any weight, so prose arrows borrow
-      Geist's. See the @font-face notes in ../style.css.
+      geist-arrows.woff2 was a fifth file here: those four arrow glyphs alone,
+      cut for the serif stack, because Newsreader has no arrows at any weight
+      and a prose arrow had nowhere self-hosted to come from. The serif came
+      out on 2026-07-28 and this went with it — with one text face left, the
+      arrows in the two files above are the only arrows the site can reach.
 
       The sans latin files were previously Google's own prebuilt subsets,
       taken verbatim. They are now generated here so that one script owns

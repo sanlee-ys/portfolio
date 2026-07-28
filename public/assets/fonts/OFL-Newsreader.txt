@@ -1,33 +1,32 @@
 Files in this directory, and where each came from:
 
-  newsreader-latin.woff2, newsreader-latin-italic.woff2
-  newsreader-latin-ext.woff2, newsreader-latin-ext-italic.woff2
-      Newsreader, variable weight axis 200-800, roman and true italic. Cut by
-      ../../../scripts/subset-fonts.py from the upstream variable fonts in
-      google/fonts (ofl/newsreader): Newsreader[opsz,wght].ttf and
-      Newsreader-Italic[opsz,wght].ttf, version 1.003.
-
-      Upstream carries an optical-size axis (opsz 6-72) alongside weight. The
-      script pins opsz at its own default (18) and keeps the weight axis only,
-      which reproduces the "wght instance" files these four were previously
-      copied from ("@fontsource-variable/newsreader" v5.3.0). The two-axis
-      files are roughly 2.3x the bytes for a grade most readers never
-      consciously see; the reasoning is in the Newsreader block at the top of
-      ../style.css.
-
-      Only the latin and latin-ext subsets are kept, at Google Fonts' own
-      unicode ranges. No arrows are added here, unlike the Geist files:
-      Newsreader has no arrow glyphs upstream at any weight, so prose arrows
-      come from geist-arrows.woff2 instead. Neither npm package is a
-      dependency of this site; only the generated woff2 files are committed.
-
   newsreader-won.woff2
-      The won sign (U+20A9) alone, cut from the same Newsreader source by the
-      same script. It exists because Geist has no won sign at any weight, and
+      The won sign (U+20A9) alone, cut by ../../../scripts/subset-fonts.py
+      from the upstream variable font in google/fonts (ofl/newsreader):
+      Newsreader[opsz,wght].ttf, version 1.003, with the optical-size axis
+      pinned at its own default (18) and the weight axis kept.
+
+      It exists because Geist has no won sign at any weight, and
       public/resume.html -- which is deliberately standalone and sets an
       all-Geist stack -- uses one. Without it that character came from the
       platform, which made the committed resume.pdf embed a different face for
       it depending on which machine last generated the file.
+
+      The npm/upstream sources are not dependencies of this site; only the
+      generated woff2 file is committed.
+
+  THE FOUR TEXT SUBSETS ARE GONE (2026-07-28). newsreader-latin.woff2,
+  newsreader-latin-italic.woff2, newsreader-latin-ext.woff2 and
+  newsreader-latin-ext-italic.woff2 were the site's reading face until the
+  type pass that took the serif out; geist-arrows.woff2, which existed only
+  to lend Newsreader an arrow glyph it does not have upstream, went with
+  them. Prose, the masthead and every heading are Geist now. See the "NO
+  SERIF" block at the top of ../style.css.
+
+  This notice STAYS, because one Newsreader-derived file is still shipped:
+  the won cut above. An OFL notice travels with the glyphs that ship, not
+  with the ones that left, so removing it alongside the four text subsets
+  would have quietly dropped the licence for a font still on the site.
 
 Newsreader is under the SIL Open Font License 1.1, the same license the rest
 of this directory is under. The upstream notice and the full license follow.

@@ -55,9 +55,9 @@ const MANIFEST_PATH = path.join(REPO_ROOT, 'scripts', 'font-coverage.json');
  * platform draws them; that is a deliberate, recorded choice, not a gap to fix.
  */
 const EXPECTED = new Map([
-  [0x03ba, 'kappa: the judge page\'s agreement statistic; no Greek in any of the three faces'],
-  [0x2600, 'sun: theme toggle; no dingbats in any of the three faces'],
-  [0x263d, 'moon: theme toggle; no dingbats in any of the three faces'],
+  [0x03ba, 'kappa: the judge page\'s agreement statistic; no Greek in Geist or Geist Mono'],
+  [0x2600, 'sun: theme toggle; no dingbats in Geist or Geist Mono'],
+  [0x263d, 'moon: theme toggle; no dingbats in Geist or Geist Mono'],
 ]);
 
 /*
@@ -68,9 +68,10 @@ const EXPECTED = new Map([
  */
 const EXPECTED_DECLARED = new Map([
   [0x20a9, 'won sign: inside Google\'s latin-ext range U+20A0-20AB, but absent from '
-    + 'Geist and Geist Mono upstream. Nothing falls to the platform for it — site '
-    + 'prose is covered by Newsreader and resume.html by newsreader-won.woff2 — so '
-    + 'what remains is only the range over-claiming, which is upstream\'s to fix.'],
+    + 'Geist and Geist Mono upstream. Nothing falls to the platform for it — the '
+    + 'only page that sets one is resume.html, which covers it with '
+    + 'newsreader-won.woff2 — so what remains is only the range over-claiming, '
+    + 'which is upstream\'s to fix.'],
 ]);
 
 /*

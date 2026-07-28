@@ -56,18 +56,25 @@ const {
   <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
   <!--
-    The masthead and every paragraph on the site are set in Newsreader, so the
-    roman is on the critical path for the largest element on the page. Without
-    this the browser cannot discover it until style.css has been fetched AND
-    parsed; the preload starts it in parallel with the stylesheet instead.
-    Only the roman is preloaded -- the italic, the two latin-ext subsets and
-    both Geist families are wanted later or not at all on a given page, and a
-    preload for a font the page never uses is a wasted request plus a console
-    warning. `crossorigin` is required even same-origin: fonts are fetched in
-    CORS mode, and a preload whose mode does not match the real request is
-    simply downloaded twice.
+    The masthead, every paragraph and all of the chrome are set in Geist, so
+    its latin roman is on the critical path for the largest element on the
+    page AND for the nav. Without this the browser cannot discover it until
+    style.css has been fetched AND parsed; the preload starts it in parallel
+    with the stylesheet instead.
+
+    This used to point at newsreader-latin.woff2. With the serif gone there is
+    one text face rather than two, so the preload follows it -- and the thing
+    being preloaded is now also the thing the chrome always needed, which is
+    strictly a better bet than the old one was.
+
+    Only the latin roman is preloaded -- the latin-ext subset and Geist Mono
+    are wanted later or not at all on a given page, and a preload for a font
+    the page never uses is a wasted request plus a console warning.
+    `crossorigin` is required even same-origin: fonts are fetched in CORS
+    mode, and a preload whose mode does not match the real request is simply
+    downloaded twice.
   -->
-  <link rel="preload" href="/assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/assets/style.css" />
   <script is:inline>
     // Paper is the default. The record is a printed thing first and a lit one

@@ -198,16 +198,32 @@ npm run build && SITE_ROOT=dist node scripts/font-coverage.cjs
   files fails instead of being believed.
 - **Re-cut the fonts and you must refresh the manifest.** If the fonts
   themselves are unchanged, use `--manifest-only`: cutting is not
-  byte-reproducible, so a full re-cut rewrites all nine binaries for nothing.
+  byte-reproducible, so a full re-cut rewrites every binary for nothing.
+  **Removing** a font is that case too — delete the woff2, run
+  `--manifest-only`, and the diff is deletions only.
 - **An unrecognised HTML entity is a failure, not a skip** — otherwise the gate
   goes silently blind on new copy. Add it to `ENTITIES` in the gate.
 - Uncovered characters are recorded in `EXPECTED` with a reason, not waved
   through. Three qualify (`κ`, and the toggle's `☀`/`☽`), because no upstream
   face here has them at all.
 
+The site ships **two text faces, Geist and Geist Mono**, plus a one-glyph
+Newsreader cut (`newsreader-won.woff2`) that only `public/resume.html` reaches.
+The serif came out on 2026-07-28 — see the "NO SERIF" block at the top of
+`style.css` — and two rules follow from it:
+
+- **There is no `--serif` token and no italic.** Geist ships no italic cut, so
+  `font-style: italic` renders as a synthetic oblique: the upright, sheared.
+  Emphasis is weight — **600 for inline `<em>`, 500 for the note voice** — and
+  the `em, i, cite` rule near `body` is what neutralises the browser's own
+  default italic. Adding `font-style: italic` anywhere puts a sheared face back
+  on the page and no gate will catch it; the `em, i, cite` block records why.
+- **`fonts/OFL-Newsreader.txt` stays** while that one glyph ships. An OFL notice
+  travels with the glyphs that ship, not with the ones that left.
+
 When subsetting, **narrow the codepoint set only.** The subsetter's default
 feature list drops `tnum`, and this site sets `font-variant-numeric:
-tabular-nums` in sixteen places — a default cut leaves every metric and proof
+tabular-nums` in fifteen places — a default cut leaves every metric and proof
 figure quietly failing to align. `subset-fonts.py` keeps all features and
 asserts `tnum` survived.
 
