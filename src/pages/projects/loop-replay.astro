@@ -16,100 +16,132 @@ import SiteNav from '../../components/SiteNav.astro';
        below. What's here is unique to this viewer: the demo-data banner, the
        stat tiles, the chart's series colors, and the iteration nav. */
 
-    /* Demo-data banner. Deliberately loud (amber, not the site's blue accent)
-       so it reads as a warning label, not a stylistic choice -- the whole
-       point is that this is not a measured result. */
+    /* Demo-data banner, set as a ruled folio line rather than a coloured pill.
+       The old construction was a rounded amber chip with a status dot, and the
+       amber was a FOURTH hue invented on this page -- against a palette that is
+       deliberately two, whose second hue carries exactly one meaning: "the
+       record of something that was built and then taken back" (style.css, the
+       reversal block). A "do not read these numbers as a result" mark is that
+       meaning in its sharpest form -- it withdraws the claim the figures below
+       would otherwise be making. So the badge takes the oxide it should always
+       have taken, and the invented hue goes with it.
+
+       The shape follows the rest of the journal: a 2px rule with a caps label
+       under it, the same grammar a .decision entry opens with. Where there is
+       room the label and the sentence share the line and read as a folio line;
+       at 320px the sentence wraps beneath it, which is the same idiom with less
+       margin to spend. No fill, no radius, no status dot. */
     .demo-badge {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      border: 1px solid var(--warn);
-      background: var(--warn-soft);
-      color: var(--warn);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 0.88rem;
-      font-weight: 600;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px 14px;
+      border-top: 2px solid var(--accent-warm);
+      padding: 9px 0 0;
       margin: 0 0 28px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
     }
-    .demo-badge .dot {
+    .demo-badge .demo-badge-label {
       flex: 0 0 auto;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--warn);
+      font-family: var(--font);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-warm);
     }
-    /* Real-run variant: same badge, drained of the warning colour. The amber
-       above means "do not read these numbers as a result"; once a measured run
-       is loaded that warning would be a lie, so the badge steps back to the
-       site's normal accent and just states what's loaded. Applied by
-       loop-replay.js when IS_DRY_RUN is false. */
-    .demo-badge.real-run {
-      border-color: var(--border);
-      background: var(--panel);
-      color: var(--muted);
-    }
-    .demo-badge.real-run .dot { background: var(--accent); }
+    /* 16rem basis: the sentence shares the label's line when the measure can
+       hold it and drops to its own line when it cannot, with no breakpoint. */
+    .demo-badge .demo-badge-text { flex: 1 1 16rem; }
+    /* Real-run variant: the same folio line, drained of the oxide. The oxide
+       above means "this is not a measured result"; once a measured run is
+       loaded that withdrawal would itself be the lie, so the rule goes back to
+       plain ink and the label simply states what is loaded. Applied by
+       loop-replay.js when isDryRun is false. */
+    .demo-badge.real-run { border-top-color: var(--rule-strong); }
+    .demo-badge.real-run .demo-badge-label { color: var(--muted); }
 
-    /* Run tabs: segmented control choosing which recorded run plays. Same
-       44px tap-target rule as the iteration nav; wraps rather than clips at
-       320px. aria-pressed carries the state for CSS and screen readers. */
+    /* Run tabs: which recorded run plays. Drawn as a running head -- the same
+       small tracked caps over a hairline that .doors uses for the site nav --
+       rather than as a segmented control of filled pills. The two are the same
+       object: a row of words, one of which is the one you are looking at. The
+       site already has a treatment for that, and a page that invents a second
+       one is claiming a distinction it does not have.
+
+       The selected tab is marked exactly the way .doors marks aria-current:
+       accent plus a 2px underline, so state never rests on colour alone. Here
+       aria-pressed is the attribute (these are buttons swapping content in
+       place, not links to another page), but it drives the identical pair.
+
+       Buttons do not inherit font-family, so it is declared rather than
+       assumed. min-height keeps the 44px tap target the caps type no longer
+       supplies on its own. */
     .run-tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 0 0 10px;
+      gap: 0 26px;
+      margin: 0 0 14px;
+      border-bottom: 1px solid var(--border);
     }
     .run-tabs button {
       min-height: 44px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--panel);
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 600;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      font-family: var(--font);
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
       cursor: pointer;
+      transition: color 0.15s ease;
     }
-    .run-tabs button:hover { border-color: var(--accent); color: var(--accent); }
+    .run-tabs button:hover { color: var(--accent); }
     .run-tabs button[aria-pressed="true"] {
-      border-color: var(--accent);
       color: var(--accent);
-      background: var(--accent-soft);
+      text-decoration: underline;
+      text-underline-offset: 6px;
+      text-decoration-thickness: 2px;
     }
     .run-intro { color: var(--muted); font-size: 0.92rem; margin: 0 0 18px; }
 
-    /* Run-summary stat tiles: same card language as the site's .repo-grid,
-       new class because the content (label + big number) is different. */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin: 18px 0;
-    }
-    .stat-grid > div {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      background: var(--panel);
-    }
-    .stat-grid .stat-label {
-      display: block;
+    /* Run-summary figures: the site's .stat-strip, not a local grid of cards.
+       This page used to draw its own bordered, filled, 10px-radius tiles on the
+       argument that "label + big number" was different content. It is not --
+       it is the same object the homepage presents its three headline accuracies
+       as, and .stat-strip already draws it: an ink rule over each figure, a
+       hairline under its label, no fill and no box, collapsing to a ruled list
+       on a phone. Adopting it deletes the local construction entirely; what is
+       left here is only what this page genuinely adds.
+
+       TWO THINGS IT ADDS. First, .stat-sub -- a qualifier under the label
+       ("iteration 2", "the honest number") that the homepage's three figures
+       have no need for. Second, the series colour on the figure itself.
+
+       The colour is deliberate and stays: --series-a/b/c are keyed to the
+       legend above the chart and to the split map at the top of the page, so
+       the colour on "Best C" is what tells a reader this figure is the gold
+       held-out number without re-reading the label. That is a legend, not
+       decoration, which is exactly the test the palette's restraint rule
+       applies -- and why the amber banner failed it while these pass. */
+    .stat-strip .stat-sub {
+      font-family: var(--font);
+      font-size: 0.8rem;
       color: var(--muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 4px;
     }
-    .stat-grid .stat-value {
-      display: block;
-      font-size: 1.35rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-    .stat-grid .stat-sub { color: var(--muted); font-size: 0.8rem; }
-    .stat-grid .stat-a .stat-value { color: var(--series-a); }
-    .stat-grid .stat-b .stat-value { color: var(--series-b); }
-    .stat-grid .stat-c .stat-value { color: var(--series-c); }
+    .stat-strip li.stat-a .stat-value { color: var(--series-a); }
+    .stat-strip li.stat-b .stat-value { color: var(--series-b); }
+    .stat-strip li.stat-c .stat-value { color: var(--series-c); }
+    /* The iteration strip re-renders on every scrub and carries three figures
+       that are being COMPARED with each other, not read one at a time. At the
+       global display size that row dominates the replay panel it is supposed to
+       annotate, so it steps down a size. The construction -- rule, figure,
+       label -- is unchanged, which is the part that had to match. */
+    #iter-stats .stat-value { font-size: clamp(1.4rem, 3vw, 1.6rem); }
+    #iter-stats { margin-top: 14px; }
 
     /* Chart series colors. Kept separate from --accent since three series
        need to stay distinguishable at once; tuned per theme for contrast.
@@ -138,16 +170,12 @@ import SiteNav from '../../components/SiteNav.astro';
       --series-b: #f2b84b; /* B: held-back split -- what drives the stop signal */
       --series-c: #4ac48a; /* C: gold held-out -- the honest number */
       --diff-del: #e5657a;
-      --warn: #f2b84b;
-      --warn-soft: rgba(242, 184, 75, 0.12);
     }
     html[data-theme="light"] {
       --series-a: #2563eb;
       --series-b: #b9790a;
       --series-c: #13724c;
       --diff-del: #be203a;
-      --warn: #b9790a;
-      --warn-soft: rgba(185, 121, 10, 0.10);
     }
 
     /* The A/B/C split map (portfolio ADR-004's third visual candidate). Lives
@@ -191,7 +219,7 @@ import SiteNav from '../../components/SiteNav.astro';
       color: var(--muted);
     }
     .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .chart-legend .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .chart-legend .swatch { width: 12px; height: 12px; border-radius: var(--radius-lg); display: inline-block; }
     .chart-legend .swatch.a { background: var(--series-a); }
     .chart-legend .swatch.b { background: var(--series-b); }
     .chart-legend .swatch.c { background: var(--series-c); }
@@ -219,12 +247,16 @@ import SiteNav from '../../components/SiteNav.astro';
       gap: 12px;
       margin: 18px 0 6px;
     }
+    /* Squared and unfilled, to match every other control on the site. A 50%
+       radius over a --panel fill is the circular icon button of an app
+       toolbar; what this actually is, is a pair of marks either side of a
+       position indicator. The 1px hairline is all the box it needs. */
     .iter-nav button {
       flex: 0 0 auto;
       width: 44px; height: 44px;
-      border-radius: 50%;
+      border-radius: var(--radius-sm);
       border: 1px solid var(--border);
-      background: var(--panel);
+      background: none;
       color: var(--text);
       font-size: 1.1rem;
       cursor: pointer;
@@ -260,11 +292,20 @@ import SiteNav from '../../components/SiteNav.astro';
     #iter-diff .diff-hunk { color: var(--muted); }
     #iter-diff .diff-meta { color: var(--muted); font-weight: 600; }
 
+    /* The honesty callout, un-carded like everything else. The rounded right
+       corners and the --accent-soft wash made this a tinted card with a stripe;
+       what carries the meaning is the rule, and the rule is in --series-c
+       because this sentence is about the gold held-out number. Dropping the
+       wash also takes the figure inside it off a second background -- the
+       page's --series-c value had to be darkened to clear 4.5:1 against this
+       fill specifically, and it is now read on plain paper.
+
+       Matches .iter-baseline-note directly below it, which was already the
+       system's answer to "an aside with a rule". */
     .honest-callout {
       border-left: 3px solid var(--series-c);
-      background: var(--accent-soft);
-      border-radius: 0 10px 10px 0;
-      padding: 12px 16px;
+      border-radius: 0;
+      padding: 6px 12px;
       margin: 18px 0;
     }
     .honest-callout strong { color: var(--series-c); }
@@ -351,14 +392,14 @@ import SiteNav from '../../components/SiteNav.astro';
     <p class="run-intro" id="run-intro"><!-- filled by JS --></p>
 
     <div class="demo-badge" id="demo-badge">
-      <span class="dot"></span>
-      <span id="demo-badge-text">Real run &mdash; claude-sonnet-5, 1,524,937 tokens, stopped on the <code>threshold</code> done-signal. Numbers below are a measured result, not a demo.</span>
+      <span class="demo-badge-label" id="demo-badge-label">Real run</span>
+      <span class="demo-badge-text" id="demo-badge-text">claude-sonnet-5, 1,524,937 tokens, stopped on the <code>threshold</code> done-signal. Numbers below are a measured result, not a demo.</span>
     </div>
 
     <h2>Run summary</h2>
-    <div class="stat-grid wide" id="summary-stats">
+    <ul class="stat-strip wide" id="summary-stats">
       <!-- filled by JS -->
-    </div>
+    </ul>
     <div class="honest-callout" id="honest-callout">
       <!-- filled by JS -->
     </div>
@@ -386,7 +427,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <div class="iter-detail">
-      <div class="stat-grid" id="iter-stats"><!-- filled by JS --></div>
+      <ul class="stat-strip" id="iter-stats"><!-- filled by JS --></ul>
 
       <div id="iter-baseline" class="iter-baseline-note" hidden>
         Iteration 0 is the baseline &mdash; scored before any edit, so there is
@@ -433,7 +474,8 @@ import SiteNav from '../../components/SiteNav.astro';
         a deterministic offline backend, zero API calls, every rationale field
         prefixed <code>[dry-run]</code> &mdash; because the viewer was the
         deliverable and a real run costs real money. The mock was labeled as a
-        mock in a loud amber banner rather than quietly presented as a result.
+        mock in a banner that named it, rather than quietly presented as a
+        result.
         The real run landed the next day, and the page now loads it: 1.5M
         tokens, <code>threshold</code> stop at iteration 2.</p>
       <p class="tradeoff"><strong>Why:</strong> a viewer that can only be built

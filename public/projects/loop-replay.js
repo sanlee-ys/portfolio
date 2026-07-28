@@ -210,16 +210,22 @@
   function renderBanner() {
     var badge = document.getElementById("demo-badge");
     var text = document.getElementById("demo-badge-text");
+    var label = document.getElementById("demo-badge-label");
     if (!badge || !text) return;
     var run = RUNS[activeRun];
     if (run.isDryRun) {
       badge.classList.remove("real-run");
-      text.textContent =
-        "Demo data — a labeled dry-run mock, not a measured result.";
+      // The state is carried by a WORD, not by a coloured dot. The oxide rule
+      // reinforces it; it is never the only thing saying so.
+      if (label) label.textContent = "Demo data";
+      // The label now carries the state, so the sentence no longer opens by
+      // repeating it -- it says what the state MEANS, which is its whole job.
+      text.textContent = "A labeled dry-run mock, not a measured result.";
       return;
     }
     badge.classList.add("real-run");
-    var bits = ["Real run — " + (log.metadata ? log.metadata.model : "live backend")];
+    if (label) label.textContent = "Real run";
+    var bits = [log.metadata ? log.metadata.model : "live backend"];
     if (summary && summary.total_tokens_spent != null) {
       bits.push(summary.total_tokens_spent.toLocaleString() + " tokens");
     }
@@ -233,13 +239,18 @@
   // 6. Run summary tiles + honesty callout
   // ---------------------------------------------------------------------
 
+  // A cell of the site's .stat-strip. Figure first, then label -- that order is
+  // the component's construction, not a preference: the ink rule sits over the
+  // figure and the hairline under the label, which is how a column head sits
+  // over a column in a printed results table. Emitting label-first would draw
+  // both rules against the wrong elements.
   function statTile(cls, label, value, sub) {
     return (
-      '<div class="' + cls + '">' +
-        '<span class="stat-label">' + label + "</span>" +
+      '<li class="' + cls + '">' +
         '<span class="stat-value">' + value + "</span>" +
+        '<span class="stat-label">' + label + "</span>" +
         (sub ? '<span class="stat-sub">' + sub + "</span>" : "") +
-      "</div>"
+      "</li>"
     );
   }
 
