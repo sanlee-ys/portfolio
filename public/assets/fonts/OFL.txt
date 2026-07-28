@@ -3,16 +3,28 @@ Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font)
 Files in this directory, and where each came from:
 
   geist-latin.woff2, geist-latin-ext.woff2
-      Geist Sans, variable weight axis 100-900. Google Fonts' own latin /
-      latin-ext subsets, taken verbatim so the subsetting behaviour matches
-      what the @import used to fetch.
-
   geist-mono-latin.woff2, geist-mono-latin-ext.woff2
-      Geist Mono, variable weight axis 100-900. Subset here from
-      GeistMono-Variable.woff2 as shipped in the `geist` npm package (v1.7.2)
-      using fontTools, to the same two unicode ranges as the sans files above.
-      The npm package is NOT a dependency of this site; only these two woff2
-      files were copied in.
+  geist-arrows.woff2
+      Geist Sans and Geist Mono, variable weight axis 100-900. All cut by
+      ../../../scripts/subset-fonts.py from Geist-Variable.ttf and
+      GeistMono-Variable.ttf as shipped in the `geist` npm package (v1.7.2),
+      using fontTools. The npm package is NOT a dependency of this site; only
+      the generated woff2 files are committed.
+
+      The latin / latin-ext ranges are Google Fonts' own, with one addition:
+      U+2190-2193 in the two latin files, where Google's latin range declares
+      only U+2191 and U+2193. The site's copy uses -> and <- throughout, and
+      leaving them out meant the platform drew them.
+
+      geist-arrows.woff2 is those four arrow glyphs alone, for the serif
+      stack: Newsreader has no arrows at any weight, so prose arrows borrow
+      Geist's. See the @font-face notes in ../style.css.
+
+      The sans latin files were previously Google's own prebuilt subsets,
+      taken verbatim. They are now generated here so that one script owns
+      every file in this directory and the ranges cannot drift from the
+      glyphs. Every OpenType feature present upstream is preserved; the only
+      thing the script narrows is the codepoint set.
 
 Both families are part of the Geist project and are covered by the license
 below. Vercel's own copyright line on the upstream package reads
