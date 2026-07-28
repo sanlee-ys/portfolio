@@ -15,6 +15,12 @@ export default defineConfig({
   site: SITE,
   build: { format: 'file' },
   trailingSlash: 'never',
+  // Astro 7 changed the default from `true` to `'jsx'`, which strips the
+  // whitespace between adjacent inline elements the way React does — on these
+  // prose-heavy pages that joins words across `<a>`/`<em>`/`<code>` boundaries.
+  // `true` is the pre-7 lossless behavior. Not a preference: the 5→7 upgrade
+  // was verified by diffing built output, which only holds with this pinned.
+  compressHTML: true,
   // Emits `sitemap.xml` from the build output. Not `@astrojs/sitemap`: that
   // always writes `sitemap-index.xml` + `sitemap-0.xml`, which would 404 the
   // live URL `robots.txt` advertises. See the integration's header comment.

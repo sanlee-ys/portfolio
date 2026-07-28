@@ -10,6 +10,6 @@
     "gates": "node scripts/gates.cjs"
   },
   "dependencies": {
-    "astro": "^5.14.1"
+    "astro": "^7.1.1"
   }
 }
