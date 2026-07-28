@@ -30,16 +30,28 @@ const PAGE = (body) => `<!doctype html><html><head><title>t</title>
 
 let fixtureSeq = 0;
 
-/* A minimal but REAL site root: the actual stylesheet, the actual fonts. */
-function makeFixture(pages) {
+/*
+ * The real fonts but NO stylesheet: pages here carry their own inline faces,
+ * the way resume.html does. Pages are written raw, not through PAGE().
+ */
+function makeBareFixture(pages) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), `fontcov-${fixtureSeq++}-`));
   fs.mkdirSync(path.join(dir, 'assets', 'fonts'), { recursive: true });
-  fs.copyFileSync(REAL_CSS, path.join(dir, 'assets', 'style.css'));
   for (const f of fs.readdirSync(REAL_FONTS)) {
     if (f.endsWith('.woff2')) {
       fs.copyFileSync(path.join(REAL_FONTS, f), path.join(dir, 'assets', 'fonts', f));
     }
   }
+  for (const [name, html] of Object.entries(pages)) {
+    fs.writeFileSync(path.join(dir, name), html);
+  }
+  return dir;
+}
+
+/* A minimal but REAL site root: the actual stylesheet, the actual fonts. */
+function makeFixture(pages) {
+  const dir = makeBareFixture({});
+  fs.copyFileSync(REAL_CSS, path.join(dir, 'assets', 'style.css'));
   for (const [name, body] of Object.entries(pages)) {
     fs.writeFileSync(path.join(dir, name), PAGE(body));
   }
@@ -163,6 +175,91 @@ test('a site with pages but no @font-face fails rather than reporting all-clear'
   const { status, out } = runGate(dir);
   assert.strictEqual(status, 1, out);
   assert.match(out, /no @font-face rules/);
+});
+
+/*
+ * Three inline faces in one <style>, each in a spelling CSS permits and the
+ * old `@font-face\s*\{([^}]*)\}` regex did not survive: the first minified,
+ * the second with a `}` inside a comment (which truncated `[^}]*` mid-body),
+ * the third with a comment between the at-keyword and its brace (which `\s*`
+ * never matched, so the face was invisible). Each face is the SOLE coverage
+ * for one glyph in the copy — é (face 1), œ (face 2), → (face 3) — so a
+ * parser that loses any one of them cannot pass this page.
+ */
+const THREE_FACES = (faces) => `<!doctype html><html><head><title>r</title><style>
+  ${faces}
+</style></head><body><p>Latin &#xe9;, extended &#x153;, arrow &rarr;.</p></body></html>`;
+
+const FACE_ONE = '@font-face{font-family:"Geist";src:url("assets/fonts/geist-latin.woff2") format("woff2");unicode-range:U+0000-00FF;}';
+const FACE_TWO = `@font-face {
+    /* the } in this comment ended the old regex's body capture early */
+    font-family: "Geist";
+    src: url("assets/fonts/geist-latin-ext.woff2") format("woff2");
+    unicode-range: U+0152-0153;
+  }`;
+const FACE_THREE = `@font-face/* this comment hid the whole face from the old regex */ {
+    font-family: "Geist";
+    src: url("assets/fonts/geist-latin.woff2") format("woff2");
+    unicode-range: U+2190-2193;
+  }`;
+
+test('three @font-face blocks in one inline style are all seen', () => {
+  const dir = makeBareFixture({
+    'resume.html': THREE_FACES(`${FACE_ONE}\n  ${FACE_TWO}\n  ${FACE_THREE}`),
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, out);
+  assert.match(out, /U\+00E9.*covered/);
+  assert.match(out, /U\+0153.*covered/);
+  assert.match(out, /U\+2192.*covered/);
+});
+
+test('...and that test has teeth: minus the third face, the page fails', () => {
+  // The control for the test above. If it ever passes with a face missing,
+  // the previous test is asserting nothing about the parser.
+  const dir = makeBareFixture({
+    'resume.html': THREE_FACES(`${FACE_ONE}\n  ${FACE_TWO}`),
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 1, out);
+  assert.match(out, /UNCOVERED/);
+  assert.match(out, /U\+2192/);
+});
+
+test('a face the gate cannot read fails rather than being skipped', () => {
+  // Single quotes are valid CSS the parser does not speak. The old code
+  // dropped such a face with `continue` — and with it every check on its
+  // file. The well-formed first face keeps this from failing for any other
+  // reason: without the hard failure, this page would pass.
+  const dir = makeBareFixture({
+    'resume.html': THREE_FACES(`${FACE_ONE}
+  @font-face { font-family: 'Geist'; src: url('assets/fonts/geist-latin-ext.woff2'); unicode-range: U+0152-0153; }
+  ${FACE_THREE}`),
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 1, out);
+  assert.match(out, /cannot read/);
+  assert.match(out, /resume\.html/);
+});
+
+test('a @font-face that opens and never closes is a failure, not a skip', () => {
+  const dir = makeBareFixture({
+    'resume.html': THREE_FACES(`${FACE_ONE}\n  @font-face { font-family: "Geist";`),
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 1, out);
+  assert.match(out, /never closes/);
+});
+
+test('a code sample showing @font-face is not read as a live face', () => {
+  // Only <style> bodies are CSS. A <pre> demonstrating an @font-face block
+  // must not be parsed as one — under the old whole-page scan it was, and a
+  // malformed sample would now redden the gate for a rule that styles nothing.
+  const dir = makeFixture({
+    'index.html': '<pre>@font-face { font-family: \'Demo\'; src: url(nope.woff2); }</pre><p>Plain.</p>',
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, out);
 });
 
 test('the recorded exceptions are still exercised, not silently dropped', () => {
