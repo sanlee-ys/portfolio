@@ -31,7 +31,7 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all eight checks:
+runs all ten checks:
 
 ```
 npm run qa
@@ -45,12 +45,12 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Three of the eight need no build, no browser and no network — the two
+Four of the ten need no build, no browser and no network — the three
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The five that walk the built site run after, slowest last.
+seconds. The six that walk the built site run after, slowest last.
 
-`npm run gates` runs the same eight against an existing `dist/` without
-rebuilding, and the build-independent three still run on a clone that has never
+`npm run gates` runs the same ten against an existing `dist/` without
+rebuilding, and the build-independent four still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
@@ -174,6 +174,42 @@ Exemptions are narrow and each one is a claim: SVG text, pseudo-element content,
 `aria-hidden="true"` subtrees, and `:disabled` controls. **Marking something `aria-hidden`
 to quiet the gate asserts it is decoration that no one reads.** Only do that when it is
 true — the résumé's `·` separators qualify; a label does not.
+
+## Fonts: one script owns `public/assets/fonts/`
+
+Every woff2 in that directory is cut by `scripts/subset-fonts.py` from pinned
+upstream sources. **Do not hand-place a font file there** — the coverage gate
+can only vouch for what that script recorded, and it fails on a stray file.
+
+The rule that catches the real bug: **a character with no self-hosted glyph
+still renders.** The browser borrows it from a platform face, so it looks
+correct on the machine that wrote it, survives every other gate, and changes
+shape on someone else's laptop. `U+2192` shipped that way for months, with the
+proof figures and the card links drawing two different arrows on one page.
+`scripts/font-coverage.cjs` fails the build on any such character.
+
+```
+npm run build && SITE_ROOT=dist node scripts/font-coverage.cjs
+```
+
+- It reads `scripts/font-coverage.json` (written by the subsetter) rather than
+  parsing woff2, which is what lets it run in CI with no font toolchain — and
+  it **re-hashes every woff2**, so a manifest that no longer describes the
+  files fails instead of being believed.
+- **Re-cut the fonts and you must refresh the manifest.** If the fonts
+  themselves are unchanged, use `--manifest-only`: cutting is not
+  byte-reproducible, so a full re-cut rewrites all nine binaries for nothing.
+- **An unrecognised HTML entity is a failure, not a skip** — otherwise the gate
+  goes silently blind on new copy. Add it to `ENTITIES` in the gate.
+- Uncovered characters are recorded in `EXPECTED` with a reason, not waved
+  through. Three qualify (`κ`, and the toggle's `☀`/`☽`), because no upstream
+  face here has them at all.
+
+When subsetting, **narrow the codepoint set only.** The subsetter's default
+feature list drops `tnum`, and this site sets `font-variant-numeric:
+tabular-nums` in sixteen places — a default cut leaves every metric and proof
+figure quietly failing to align. `subset-fonts.py` keeps all features and
+asserts `tnum` survived.
 
 ## Why 320px matters
 

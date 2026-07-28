@@ -43,6 +43,27 @@ jobs:
       - name: Review classify step (synthetic execution logs)
         run: node --test scripts/classify-review-outcome.test.cjs
 
+      # The font-coverage gate's own adversarial suite. It breaks a real fixture
+      # six ways — stray glyph, glyph hidden in a rendered attribute, a range
+      # widened without re-cutting, a tampered woff2, an unknown entity, an
+      # empty walk — and demands a non-zero exit for each. A gate whose passing
+      # run is its only evidence is how this repo shipped three checks that
+      # never checked anything.
+      - name: Font-coverage gate (adversarial suite)
+        run: node --test scripts/font-coverage.test.cjs
+
+      # Every character in the built copy must have a glyph in a font this site
+      # ships. A codepoint the fonts lack still RENDERS — borrowed from a
+      # platform face — so it survives every other gate, looks right on the
+      # machine that wrote it, and changes shape on someone else's. U+2192
+      # shipped that way for months (PR #169). Needs no font toolchain: it reads
+      # scripts/font-coverage.json, which subset-fonts.py writes, and re-hashes
+      # each woff2 so a stale manifest fails rather than being believed.
+      - name: Every character in the copy has a self-hosted glyph
+        run: node scripts/font-coverage.cjs
+        env:
+          SITE_ROOT: dist
+
       - name: Private-repo guard (never name/link/describe a private repo)
         run: node scripts/private-repo-check.cjs
         env:

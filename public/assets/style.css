@@ -331,7 +331,10 @@
      the judge page, and the ☀/☽ in the theme toggle. Geist, Geist Mono and
      Newsreader were each checked for those three and have none of them, so
      they are the platform's to draw and the tail is what keeps the three
-     stacks agreeing about them. Audit with `scripts/font-coverage.py`. */
+     stacks agreeing about them. `scripts/font-coverage.cjs` is the gate that
+     holds this line: it fails the build on any character in the copy without a
+     self-hosted glyph, so the exception list above stays a decision rather
+     than a description of whatever drifted in. */
   --symbol-tail: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2";
   /* The reading face. Prose, headings, the masthead — everything the reader is
      meant to read rather than operate. "Geist Arrows" sits second: it is
