@@ -92,7 +92,6 @@ LATIN_EXT = (
     "U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
 )
 ARROWS = "U+2190-2193"  # <- ^ -> v; Google's latin range has only ^ and v
-WON = "U+20A9"  # the won sign, for resume.html; Geist has none at any weight
 
 # nameID 5 of each source, asserted before cutting.
 EXPECT_VERSION = {
@@ -300,9 +299,6 @@ def main() -> None:
         ext_stem = stem.replace("-latin", "-latin-ext")
         cut(news, latin, f"{stem}.woff2")
         cut(news, latin_ext, f"{ext_stem}.woff2")
-        if family == "Newsreader":
-            # One glyph, for resume.html. See the "Won" @font-face there.
-            cut(news, parse_ranges(WON), "newsreader-won.woff2", must_have={0x20A9})
         news.close()
 
     write_manifest()
@@ -312,7 +308,6 @@ def main() -> None:
     print("  latin (Newsreader):         " + LATIN)
     print("  latin-ext (all):            " + LATIN_EXT)
     print("  geist-arrows.woff2:         " + ARROWS)
-    print("  newsreader-won.woff2:       " + WON)
 
 
 if __name__ == "__main__":
