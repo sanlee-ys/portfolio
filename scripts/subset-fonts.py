@@ -7,23 +7,34 @@ are Google Fonts' latin / latin-ext unicode ranges (copied verbatim, so
 subsetting behaviour matches what the old @import used to fetch), plus the
 arrow codepoints U+2190-2193 in the Geist faces: the site's copy uses "->" and
 "<-" (U+2192 / U+2190) in proof figures, card links and prose links, and
-Google's latin range skips them while including U+2191 / U+2193. Newsreader
-gets no arrow additions because the upstream typeface simply has no arrow
-glyphs; serif-context arrows are carried by geist-arrows.woff2, a four-glyph
-cut of Geist that sits second in the --serif stack (see the @font-face notes
-in public/assets/style.css).
+Google's latin range skips them while including U+2191 / U+2193.
+
+NEWSREADER IS GONE (2026-07-28), and it left in two steps by two different
+routes, which is worth recording because neither step alone would have removed
+it. It was the site's reading face, and this script cut four text subsets of it
+plus a one-glyph won cut for public/resume.html. First the résumé stopped
+setting the won sign, which retired that cut. Then the type pass removed the
+serif — prose, the masthead and every heading are Geist now — which retired the
+four text subsets AND geist-arrows.woff2 with them: that file existed ONLY
+because Newsreader has no arrow glyph at any weight, so a serif-context arrow
+had nowhere self-hosted to come from. With one text face left, the arrows
+already in the Geist latin subsets are the only arrows the site can reach.
+
+So this script now cuts four files from two Geist sources, and
+fonts/OFL-Newsreader.txt is gone too — an OFL notice travels with the glyphs
+that ship, and none do.
 
 Also NOT coverable from these faces, verified against the upstream cmaps:
-U+03BA kappa and the theme-toggle's U+2600 / U+263D sun and moon exist in none
-of the three upstreams, so they intentionally stay on the --symbol-tail /
-system fallback.
+U+03BA kappa and the theme-toggle's U+2600 / U+263D sun and moon exist in
+neither Geist nor Geist Mono, so they intentionally stay on the --symbol-tail
+/ system fallback. U+20A9 the won sign is a third: no copy sets one today, and
+if any ever did the coverage gate would report it UNCOVERED rather than let it
+fall to the platform.
 
 Fetching the sources (into any scratch directory):
 
     npm pack geist@1.7.2 --pack-destination <dir>
     tar -xzf <dir>/geist-1.7.2.tgz -C <dir>          # unpacks to <dir>/package
-    curl -sL -o <dir>/Newsreader.ttf        "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/Newsreader%5Bopsz,wght%5D.ttf"
-    curl -sL -o <dir>/Newsreader-Italic.ttf "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/Newsreader-Italic%5Bopsz,wght%5D.ttf"
 
 Then, from the repo root:
 
@@ -36,11 +47,10 @@ expected version here, re-run, and eyeball a before/after screenshot diff --
 then keep the unicode-range declarations in public/assets/style.css and
 public/resume.html in sync with what this prints.
 
-Newsreader upstream carries an optical-size axis (opsz 6-72) alongside weight;
-this script pins opsz at its fvar default (18) and keeps only the weight axis,
-reproducing the "wght instance" files the site originally took from
-@fontsource-variable/newsreader -- the opsz-bearing files are ~2.3x the bytes
-for an axis the site never varies. The Geist sources are already wght-only.
+Both Geist sources are wght-only, so there is no axis to pin: the whole weight
+range goes into each file and the CSS declares `font-weight: 100 900`. (The
+`instancer` machinery this script used to carry was for Newsreader's optical-
+size axis and went with it.)
 
 THE MANIFEST. Every run also writes scripts/font-coverage.json, recording each
 file's codepoints, OpenType features, byte count and sha256. That file is what
@@ -56,8 +66,10 @@ rebuilds the manifest from the woff2 files already in the repo, without
 re-cutting them. Prefer it whenever the fonts themselves have not changed:
 cutting is NOT byte-reproducible (brotli's output moved ~30 bytes per file
 between two runs on identical inputs, with codepoints and features identical),
-so a full re-cut rewrites all nine binaries and puts unexplained diffs in a PR
-that only needed a manifest refresh.
+so a full re-cut rewrites every binary and puts unexplained diffs in a PR that
+only needed a manifest refresh. Removing a font from the site is exactly that
+case: delete the woff2, run --manifest-only, and the surviving files keep their
+recorded digests instead of being churned for nothing.
 """
 
 import hashlib
@@ -68,7 +80,6 @@ from pathlib import Path
 
 from fontTools import subset
 from fontTools.ttLib import TTFont
-from fontTools.varLib import instancer
 
 REPO = Path(__file__).resolve().parent.parent
 OUT_DIR = REPO / "public" / "assets" / "fonts"
@@ -97,8 +108,6 @@ ARROWS = "U+2190-2193"  # <- ^ -> v; Google's latin range has only ^ and v
 EXPECT_VERSION = {
     "Geist": "Version 1.800",
     "Geist Mono": "Version 1.700",
-    "Newsreader": "Version 1.003",
-    "Newsreader Italic": "Version 1.003",
 }
 
 
@@ -149,7 +158,7 @@ def cut(font: TTFont, cps: set[int], out_name: str, must_have: set[int] = frozen
     # Keep every OpenType feature and name record the source ships: the ONLY
     # thing this script narrows is the codepoint set. A curated feature list is
     # a false economy -- fontTools' default silently drops `tnum`, and this site
-    # sets `font-variant-numeric: tabular-nums` in sixteen places, so the figures
+    # sets `font-variant-numeric: tabular-nums` in fifteen places, so the figures
     # in every metric, folio and proof row would quietly stop aligning.
     options.layout_features = ["*"]
     options.name_IDs = ["*"]
@@ -228,9 +237,9 @@ def manifest_only() -> None:
 
     Cutting a font is not byte-reproducible -- brotli's output moved by a few
     dozen bytes between two runs of this script on identical inputs, with the
-    codepoints and features identical. So a full re-cut rewrites all nine
-    binaries even when nothing about their CONTENT changed, and a PR that only
-    needed a manifest refresh would carry nine unexplained binary diffs.
+    codepoints and features identical. So a full re-cut rewrites every binary
+    even when nothing about their CONTENT changed, and a PR that only needed a
+    manifest refresh would carry a binary diff per file with no explanation.
 
     This mode reads the shipped files instead and records what they actually
     contain, which is the same information without the churn. Use it whenever
@@ -265,17 +274,14 @@ def main() -> None:
         raise SystemExit(__doc__)
     src = Path(sys.argv[1])
 
-    latin = parse_ranges(LATIN)
     latin_arrows = parse_ranges(LATIN, ARROWS)
     latin_ext = parse_ranges(LATIN_EXT)
-    arrows = parse_ranges(ARROWS)
     used_arrows = {0x2190, 0x2192}  # the two the copy actually uses today
 
     print("Geist (sans):")
     geist = load(src / "package/dist/fonts/geist-sans/Geist-Variable.ttf", "Geist")
     cut(geist, latin_arrows, "geist-latin.woff2", must_have=used_arrows)
     cut(geist, latin_ext, "geist-latin-ext.woff2")
-    cut(geist, arrows, "geist-arrows.woff2", must_have=used_arrows)
     geist.close()
 
     print("Geist Mono:")
@@ -284,30 +290,16 @@ def main() -> None:
     cut(mono, latin_ext, "geist-mono-latin-ext.woff2")
     mono.close()
 
-    for family, ttf, stem in (
-        ("Newsreader", "Newsreader.ttf", "newsreader-latin"),
-        ("Newsreader Italic", "Newsreader-Italic.ttf", "newsreader-latin-italic"),
-    ):
-        print(f"{family}:")
-        news = load(src / ttf, family)
-        opsz = next(a for a in news["fvar"].axes if a.axisTag == "opsz")
-        if opsz.defaultValue != 18.0:
-            raise SystemExit(f"{ttf}: opsz default moved from 18 to {opsz.defaultValue}; "
-                             "the pinned instance would no longer match the shipped files")
-        instancer.instantiateVariableFont(news, {"opsz": opsz.defaultValue},
-                                          inplace=True, updateFontNames=False)
-        ext_stem = stem.replace("-latin", "-latin-ext")
-        cut(news, latin, f"{stem}.woff2")
-        cut(news, latin_ext, f"{ext_stem}.woff2")
-        news.close()
+    # Newsreader is gone from this script entirely. It had already shrunk to a
+    # single won-sign cut when resume.html stopped setting that character; the
+    # serif removal took the four text subsets and geist-arrows.woff2 with it,
+    # and there is nothing Newsreader-derived left to generate or to license.
 
     write_manifest()
 
-    print("\nDeclared unicode-range must be (style.css AND resume.html for Geist):")
-    print("  latin (Geist, Geist Mono):  " + LATIN.replace("U+2191, U+2193", "U+2190-2193"))
-    print("  latin (Newsreader):         " + LATIN)
-    print("  latin-ext (all):            " + LATIN_EXT)
-    print("  geist-arrows.woff2:         " + ARROWS)
+    print("\nDeclared unicode-range must be (style.css AND resume.html both):")
+    print("  latin (Geist, Geist Mono):      " + LATIN.replace("U+2191, U+2193", "U+2190-2193"))
+    print("  latin-ext (Geist, Geist Mono):  " + LATIN_EXT)
 
 
 if __name__ == "__main__":

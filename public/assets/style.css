@@ -8,19 +8,37 @@
 
    Three consequences run through everything below.
 
-   1. LIGHT IS THE DEFAULT, and the ground is warm paper (#f6f2e8), not white.
+   1. LIGHT IS THE DEFAULT, and the ground is paper (#fafaf9), not white.
       Dark is not the primary state inverted; it is "night reading" — a warm
       near-black with lamp-lit ink. Both are declared here, light in :root so
       that a reader whose JavaScript never runs still gets paper.
-   2. THREE VOICES, and the split is semantic, not decorative.
-        serif (Newsreader) — prose and display: the argument, in the reading
-                             face. Everything a person is meant to READ.
-        sans  (Geist)      — chrome: nav, labels, kickers, chips, footer. The
-                             apparatus around the reading.
+   2. TWO VOICES, and the split is semantic, not decorative.
+        sans  (Geist)      — everything a person READS and everything they
+                             OPERATE: prose, the masthead, headings, and the
+                             chrome around them (nav, labels, kickers, chips,
+                             footer).
         mono  (Geist Mono) — data: metrics, IDs, dates, code, folios. Anything
                              measured or cited.
       A block that changes voice is making a claim about what kind of thing it
       is, which is why the voices are tokens and not hand-typed stacks.
+
+      There were THREE until the serif came out. The reading face carried
+      prose and display and the sans carried only the apparatus, so a reader
+      could tell an argument from a control by its shape alone. With one face
+      doing both, that distinction is carried by SIZE, WEIGHT and CASE
+      instead: prose runs 16px/400 at a 34rem measure, chrome runs ~11px/600
+      uppercase with 0.16em tracking, and headings run 700. Those are far
+      enough apart to keep the ranks legible — but it is one channel doing
+      the work of two, and that is the trade this direction accepts.
+   2b. NO ITALIC, ANYWHERE. Geist ships no italic cut, so `font-style: italic`
+      would be drawn by the engine as a SYNTHETIC oblique — the upright,
+      sheared, with the spacing and the joins of a face that was never drawn
+      to slant. Every italic in this file was therefore retired rather than
+      inherited, and emphasis moved onto WEIGHT, the one axis a grotesque
+      has: 600 for inline stress, 500 for the note voice that whole italic
+      blocks used to carry. See the `em, i, cite` block below — it is the one
+      place that idiom is defined, and it is also what neutralises the
+      BROWSER's own default italic on `<em>`/`<i>`/`<cite>`.
    3. MARGINALIA over boxes. At >=64rem the wide track of the breakout grid
       (ADR-008) becomes a true margin: decision kickers and their code-refs,
       the ledger's footnote numbers, section folios, and the ToC's label all
@@ -54,7 +72,7 @@
    upstream, and it keeps every OpenType feature the source ships: the only
    thing it narrows is the codepoint set. That last part is load-bearing. The
    subsetter's DEFAULT feature list drops `tnum`, and `font-variant-numeric:
-   tabular-nums` is set in sixteen places below, so a default cut would leave
+   tabular-nums` is set in fifteen places below, so a default cut would leave
    every metric, folio and proof figure quietly failing to align — a defect
    invisible in a diff and nearly invisible on screen. The script asserts
    `tnum` survives rather than trusting that it did.
@@ -109,111 +127,92 @@
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* The arrows, for the SERIF stack only — four glyphs, 1.7KB.
+/* NO SERIF. The four Newsreader @font-face rules that stood here, the four
+   woff2 files they pointed at, and the four-glyph "Geist Arrows" face that
+   existed only to lend them an arrow, are all gone.
 
-   Geist and Geist Mono now carry U+2190-2193 in their own latin subsets, so
-   the chrome and data voices draw arrows themselves. Newsreader cannot: the
-   upstream face has no arrow glyphs at any weight, verified against the
-   variable source rather than assumed. So a prose arrow has no self-hosted
-   face to come from, and would fall to whatever serif the platform supplies.
+   The reading face was the journal pass's central move: a text serif for
+   prose and display, a sans for the apparatus, a mono for the data. Once the
+   ground stopped being cream, a fair amount of what read as "printed record"
+   turned out to be the FACE doing an impression of print — and an impression
+   is exactly the thing this site's copy spends its time refusing to do
+   elsewhere. What is left is Geist for everything a person reads or operates
+   and Geist Mono for everything measured.
 
-   Hence this: a four-glyph cut of Geist Sans, sitting immediately after
-   Newsreader in --serif. unicode-range means it is only ever fetched by a
-   page that actually sets an arrow in prose, and it can never affect a letter.
+   WHAT THAT COST, on the wire and on the page:
 
-   A sans arrow inside a serif sentence is the deliberate call, not a
-   compromise. An arrow here is a pointer, not a letterform — it belongs to the
-   same family as the ones in the proof figures and the card links, and having
-   all three voices draw the SAME arrow is the point. */
-@font-face {
-  font-family: "Geist Arrows";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("fonts/geist-arrows.woff2") format("woff2");
-  unicode-range: U+2190-2193;
-}
+   - Two families on the critical path instead of three, and the one preloaded
+     file in Base.astro is now also the file the chrome always needed, so a
+     cold cache fetches strictly less than it did.
+   - "Geist Arrows" went with it. That face existed for one reason: Newsreader
+     has no arrow glyph at any weight, so a prose arrow had nowhere self-hosted
+     to come from. Geist and Geist Mono carry U+2190-2193 in their own latin
+     subsets (PR #169), so with the serif gone every arrow on the site is drawn
+     by the face the surrounding text is already set in. The construction that
+     needed a prosthetic is the construction that left.
+   - The italic went with it too, and that one is a real loss rather than a
+     tidy-up: Newsreader's italic was a true italic with its own drawing, and
+     Geist has none. Item 2b at the top of this file records what replaced it
+     and why a synthetic oblique was not an option.
 
-/* Newsreader — the reading face, added in the journal pass. Self-hosted for
-   the same reasons as Geist above: no third origin, no serialized discovery,
-   no third party watching every visitor. SIL OFL 1.1; the license and the
-   provenance of these four files are in fonts/OFL-Newsreader.txt.
-
-   WHY THIS FACE. Newsreader was drawn by Production Type for on-screen news
-   reading, so it is a text serif that survives being set at 17px on a phone
-   and still has enough contrast to carry a masthead at 60. Its italic is a
-   true italic rather than a slant, which is what makes the margin notes and
-   the hero's identity line work — they change voice, not just angle.
-
-   WHICH CUT. Newsreader ships an optical-size axis (opsz 6-72) alongside
-   weight. The full two-axis file is 132KB latin roman + 147KB italic; the
-   weight-only instance is 58KB + 65KB. Taking the smaller one is not a
-   shortcut, it is the same argument the Geist comment above spends three
-   paragraphs making — a site whose stylesheet lectures about webfont cost
-   does not get to quintuple its font payload for an optical grade most
-   readers will never consciously see. The display sizes get their tightening
-   from letter-spacing instead, declared with the type scale below.
-
-   Latin + latin-ext only, ranges copied verbatim from the upstream package
-   (@fontsource-variable/newsreader 5.3.0) so subsetting behaviour is
-   unchanged. latin-ext is never fetched unless a glyph needs it. */
-@font-face {
-  font-family: "Newsreader";
-  font-style: normal;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url("fonts/newsreader-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: "Newsreader";
-  font-style: italic;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url("fonts/newsreader-latin-italic.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: "Newsreader";
-  font-style: normal;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url("fonts/newsreader-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-@font-face {
-  font-family: "Newsreader";
-  font-style: italic;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url("fonts/newsreader-latin-ext-italic.woff2") format("woff2");
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
+   Newsreader is now out of the repo entirely, and it left by two routes on the
+   same day. A one-glyph won cut had survived here for public/resume.html —
+   that page self-hosts its own faces and is not styled by this file — until
+   the résumé stopped setting the character; this pass removed the rest.
+   fonts/OFL-Newsreader.txt went with the last file: an OFL notice travels with
+   the glyphs that ship, and none do. */
 
 :root {
   /* ---- Paper (the default) ----------------------------------------------
-     Light-first, and warm. The old default was a dark #0f1115 with a cool
-     near-white alternate; both were screen colours. This ground is paper:
-     a warm off-white with real chroma in it, and ink that is a warm near-black
-     rather than a grey. The difference is small per pixel and total in effect
-     — every hairline, every panel and every muted label inherits the warmth,
-     so the page reads as a printed thing rather than a lit one.
+     Light-first. The old default was a dark #0f1115 with a cool near-white
+     alternate; both were screen colours. This ground is paper: an off-white
+     that is perceptibly not white, with ink that is a near-black rather than
+     a flat grey. The difference is small per pixel and total in effect —
+     every hairline, every panel and every muted label inherits the same
+     temperature, so the page reads as a printed thing rather than a lit one.
 
-     Contrast measured against this theme's own ground, not assumed:
-       --text #1f1c17 on --bg .......... 15.9:1
-       --text-secondary #3a352c ........ 11.0:1
-       --muted #655d4f ................. 5.6:1   (labels, dates, captions)
-       --accent #1d4e73 ................ 7.6:1
-       --accent-warm #9c3b1b ........... 6.5:1
+     THE TEMPERATURE (2026-07-28). The ground was #f6f2e8 — a cream with real
+     yellow chroma in it (b* ≈ +14). On a calibrated display that is warm
+     paper; on a phone at night, or next to any white UI, it reads as a
+     screen with a blue-light filter left on, which is the one thing a record
+     meant to look PRINTED cannot afford. #fafaf9 keeps the off-white (it is
+     still 1.04:1 away from #ffffff, so a white card sitting on it is visibly
+     a card) and drops the cast.
+
+     What that cost, and how it was paid: the ground got LIGHTER, so holding
+     each ink token's luminance while dropping its chroma moves every ratio
+     UP and leaves every internal relationship — oxide against prose, rule
+     against hairline — exactly where it was tuned. The hairline is the one
+     token pinned by RATIO instead of luminance, because a hairline is defined
+     by its distance from the ground and nothing else.
+
+     Contrast measured against this theme's own ground, not assumed
+     (the parenthesised figure is the same token on the old cream):
+       --text #1e1c1b on --bg .......... 16.25:1  (was 15.19)
+       --text-secondary #383533 ........ 11.65:1  (was 10.89)
+       --muted #5f5c58 ................. 6.37:1   (was 5.81)  labels, dates
+       --accent #1d4e73 ................ 8.41:1   (was 7.86)  hex unchanged
+       --accent-quiet #3e6785 .......... 5.77:1   (was 5.39)  hex unchanged
+       --accent-warm #5e1f0d ........... 11.98:1  (was 11.20) hex unchanged
+       --rule-strong #423f3c ........... 10.01:1  (was 9.23)
+       --border #dedbd8 ................ 1.32:1   (was 1.32)  pinned by ratio
      All of them clear 4.5:1 for body text, which matters because both accents
-     are used ON TEXT here (tags, IDs, chips), not only on rules and markers. */
-  --bg: #f6f2e8;
-  --panel: #fffdf6;
-  --text: #1f1c17;
-  --muted: #655d4f;
+     are used ON TEXT here (tags, IDs, chips), not only on rules and markers.
+     The figures above were stale before this pass — they described the tokens
+     as first drafted, not as shipped — so they were re-measured rather than
+     re-copied. A documented ratio nobody re-derives is the same defect as an
+     undocumented one.
+
+     --panel is the one value that could not hold its old separation: it was
+     1.10:1 above a cream ground and the most a fill can be above #fafaf9 is
+     #ffffff at 1.04:1. That is fine here because --panel has exactly one
+     consumer, the .sango photo mat, and the mat's edge is drawn by --border,
+     not by the fill. A lifted-paper effect that depended on the fill alone
+     would have been the wrong construction on any near-white ground. */
+  --bg: #fafaf9;
+  --panel: #ffffff;
+  --text: #1e1c1b;
+  --muted: #5f5c58;
   /* Ink blue: the colour of a fountain pen, not of a hyperlink. It keeps the
      same job the old #2563eb had — links, focus, shipped — but at a value that
      belongs on paper. */
@@ -222,8 +221,9 @@
   /* The ink, one step back — for a mark that belongs to the link colour but
      should not compete with the words around it (currently the flow line's
      arrows). It is the value `--accent` at `opacity: 0.85` used to composite
-     to on this ground, written down instead of computed at paint time so a
-     checker can read it. 5.39:1. */
+     to on the old cream, written down instead of computed at paint time so a
+     checker can read it. The hex is unchanged by the ground change and reads
+     5.77:1 on this paper, up from 5.39:1 on the cream. */
   --accent-quiet: #3e6785;
   /* ---- The second hue: reversal ----------------------------------------
      A correction-ink counterpart to the blue, and it carries ONE meaning:
@@ -243,10 +243,12 @@
      revert, decline or retirement, it stays blue.
 
      THE VALUE IS SET BY THE PROSE IT MARKS, not by what looked like oxide.
-     At #9c3b1b it measured 6.15:1 on this ground while the prose it was
+     At #9c3b1b it measured 6.15:1 on the old cream while the prose it was
      marking ran 10.89:1 — an emphasis mark quieter than the thing it
      emphasises, which is an inversion however good the hue looks. #5e1f0d is
-     the same pigment taken to 11.20:1, level with --text-secondary.
+     the same pigment taken to parity with --text-secondary, and the pairing
+     survived the ground change untouched: on #fafaf9 it reads 11.98:1 against
+     prose at 11.65:1, the same half-step it was tuned to.
 
      What that costs, stated plainly: contrast is luminance, so a mark at
      parity with the prose is necessarily NEAR the prose in luminance — the
@@ -259,9 +261,9 @@
      signal, which is the right order for it. */
   --accent-warm: #5e1f0d;
   --accent-warm-soft: rgba(94, 31, 13, 0.10);
-  --border: #ddd4c1;
-  --btn-text: #fffdf6;
-  --shadow: rgba(60, 45, 20, 0.10);
+  --border: #dedbd8;
+  --btn-text: #ffffff;
+  --shadow: rgba(28, 25, 23, 0.10);
   /* ---- Two weights of rule ---------------------------------------------
      A printed page separates things with rules, and it uses more than one.
      --border is the hairline: row rules, block edges, the quiet stuff.
@@ -270,8 +272,12 @@
      boxes without going flat — the hierarchy moves into the LINES.
      --highlight is the one fill left in the system: the mark a diagram click
      leaves on the decision it sends you to. It is a highlighter swipe, which
-     is what a reader actually does to a page they are working through. */
-  --rule-strong: #46402f;
+     is what a reader actually does to a page they are working through — and
+     it is deliberately the ONE warm thing left on the light ground. A
+     highlighter is yellow; neutralising it alongside the paper would have
+     turned a pen mark into a grey smudge. It is transient and it is small,
+     which is exactly why it can carry the chroma the ground gave up. */
+  --rule-strong: #423f3c;
   --highlight: rgba(203, 160, 74, 0.26);
   /* Argument text. --muted was doing two jobs: genuinely secondary metadata
      (labels, dates, captions) AND the body of the actual arguments — the about
@@ -280,7 +286,7 @@
      half-step down from --text, enough to sit under a heading without reading
      as an aside; --muted is now reserved for metadata that really is quieter
      than the sentence next to it. */
-  --text-secondary: #3a352c;
+  --text-secondary: #383533;
   /* Corners, near enough to none. The old scale (6/10/14px) drew soft-cornered
      app surfaces; nothing on a printed page has a 14px radius. What is left is
      the minimum that keeps a 1px rule from looking chipped where it turns. */
@@ -308,7 +314,7 @@
   --margin-note: 9.5rem;
   --margin-gap: 1.75rem;
   /* ---- One arrow, everywhere ---------------------------------------------
-     U+2192 (→) used to be missing from all three self-hosted subsets. Found by
+     U+2192 (→) used to be missing from every self-hosted subset. Found by
      measuring the advance rather than by reading the spec: in Geist Mono every
      glyph advances 60 units at 100px and the arrow advanced 100, the signature
      of a fallback face. So every arrow on this site came from whatever the
@@ -323,28 +329,53 @@
      The first fix was one shared symbol tail on all three stacks, which made
      the three agree with each other but still left the drawing to the platform.
      The arrows are now IN the fonts: `scripts/subset-fonts.py` cuts U+2190-2193
-     into the Geist and Geist Mono latin subsets, and Newsreader — which has no
-     arrow glyphs upstream at all — borrows them from the four-glyph
-     "Geist Arrows" face above. One arrow, drawn by us, on every platform.
+     into the Geist and Geist Mono latin subsets.
+
+     Dropping the serif closed the rest of this on its own. There were three
+     family lists to keep in agreement and there are now two, and the one that
+     could not draw an arrow itself — Newsreader, which has no arrow glyph
+     upstream at any weight — is the one that left, taking the four-glyph
+     "Geist Arrows" prosthetic with it. Prose and data arrows are now the same
+     drawing because they come from the same foundry cut, not because two
+     stacks were talked into agreeing.
 
      The tail STAYS, for the glyphs no upstream here can supply: κ (U+03BA) on
-     the judge page, and the ☀/☽ in the theme toggle. Geist, Geist Mono and
-     Newsreader were each checked for those three and have none of them, so
-     they are the platform's to draw and the tail is what keeps the three
-     stacks agreeing about them. `scripts/font-coverage.cjs` is the gate that
-     holds this line: it fails the build on any character in the copy without a
-     self-hosted glyph, so the exception list above stays a decision rather
-     than a description of whatever drifted in. */
+     the judge page, and the ☀/☽ in the theme toggle. Geist and Geist Mono were
+     both checked for those three and have none of them, so they are the
+     platform's to draw and the tail is what keeps the two stacks agreeing
+     about them. `scripts/font-coverage.cjs` is the gate that holds this line:
+     it fails the build on any character in the copy without a self-hosted
+     glyph, so the exception list stays a decision rather than a description of
+     whatever drifted in. */
   --symbol-tail: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2";
-  /* The reading face. Prose, headings, the masthead — everything the reader is
-     meant to read rather than operate. "Geist Arrows" sits second: it is
-     unicode-ranged to U+2190-2193, so it is reached only by an arrow and never
-     by a letter. */
-  --serif: "Newsreader", "Geist Arrows", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, "Times New Roman", var(--symbol-tail), serif;
-  /* The chrome voice. Nav, labels, kickers, chips, buttons, the footer: the
-     apparatus around the reading. Kept deliberately screen-native — this is
-     the part of the page that is software, and it should not pretend. */
+  /* The one text voice. Prose, headings, the masthead, and also the nav,
+     labels, kickers, chips, buttons and footer — everything on this page that
+     is words rather than measurements. Kept deliberately screen-native: this
+     is software, and it should not pretend to be a press.
+
+     There is no --serif token any more. It was deleted rather than repointed
+     at this stack, because a token named --serif holding a grotesque is a
+     comment that lies, and nine rules quietly resolving "the reading face" to
+     the same value as "the chrome face" would hide the actual claim, which is
+     that there is only one voice now. */
   --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, var(--symbol-tail), sans-serif;
+  /* The rank the serif's stroke contrast used to supply, moved onto the
+     weight axis and held in one place.
+
+     Newsreader carried a heading at 600. A serif can, because its thick/thin
+     modulation reads as emphasis on its own; a grotesque has uniform stems
+     and has to buy the same presence with weight. Measured as ink coverage
+     per unit of advance x cap-height at 200px, Newsreader 600 = 0.317 and
+     Geist 600 = 0.374, so a naive 600 -> 600 carry-over would already be
+     1.18x heavier — and STILL read flatter, because the extra ink is spread
+     evenly instead of concentrated in the stems. 700 (1.31x) is where the
+     masthead gets nameplate presence back.
+
+     700 also does a second job. Chrome labels on this page are Geist 600
+     uppercase; with prose and chrome now sharing a face, a heading at 600
+     would sit at the same weight as the labels around it and the ranks would
+     collapse. 700 keeps headings plainly above the apparatus. */
+  --display-weight: 700;
   /* The data voice. Every measured thing on this site is set in it: metrics and
      stat values, ledger IDs and code-refs, dates, the flow line, rung IDs,
      pills, code blocks. One token so that stays a rule rather than six
@@ -569,24 +600,92 @@ html[data-theme="dark"] .theme-icon-light { display: none; }
   html { scroll-behavior: smooth; }
 }
 
-/* The reading default. Prose is the serif, at 17px with 1.62 leading — a
-   measure-and-leading pair chosen for a text face, not inherited from a UI
-   one. Root stays at 16px so every rem in the file keeps meaning what it
-   meant; only the body's own inherited size moves, and the handful of
-   component sizes that sat just under it were re-tuned rather than left to
-   drift below the new baseline.
+/* The reading default. Prose is the sans now, at 16px with 1.70 leading.
+   Root stays at 16px so every rem in the file keeps meaning what it meant;
+   the body's own inherited size simply comes back down to it.
 
-   font-smoothing is deliberately NOT forced to antialiased any more. It thins
-   a serif on macOS to the point where the hairlines start to disappear at
-   text sizes, which is the one thing this face is here to avoid. */
+   WHY 16 AND NOT THE 17 THE SERIF HAD. Measured in the engine rather than
+   read off a spec sheet: at the same font-size Geist renders an x-height
+   20.5% larger than Newsreader's, a cap-height 4.4% larger, and an advance
+   5.7% wider. Apparent text size tracks x-height, so keeping 17px would have
+   shipped prose reading a full step larger than the page it replaces — a
+   difference about the swap, not about the face.
+
+   16px does not fully close it. Geist at 16 has an 8.48px x-height against
+   the shipped 7.48px, still ~13% up, and the honest reason to stop there
+   rather than at the ~14px that would match exactly is that 14px is below the
+   size this site should set running prose at. So prose does read slightly
+   larger than the page before it, deliberately, and the residual is stated
+   rather than hidden.
+
+   The leading rises as the size falls: 1.62 x 17px was 27.5px of line box,
+   1.70 x 16px is 27.2px. Absolute leading is held while the ratio grows,
+   which is what a much taller lowercase wants.
+
+   The measure is the surprise. Geist at 16px advances 420px for the same
+   string Newsreader advanced 423px for at 17px, so the characters-per-line
+   the 34rem track produces is essentially unchanged and --content did not
+   need to move at all.
+
+   font-smoothing is deliberately NOT forced to antialiased. It was left alone
+   for the serif's hairlines; there is no reason to reintroduce it here. */
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--serif);
-  font-size: 1.0625rem;
-  line-height: 1.62;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.7;
   text-rendering: optimizeLegibility;
+}
+
+/* ---- Emphasis, with no italic to spend ----------------------------------
+   Geist ships no italic cut. The engine will happily fake one — `font-style:
+   italic` on a face with no italic gets a SYNTHETIC OBLIQUE, the upright
+   sheared about 12 degrees — and the result has the giveaways of a shear
+   rather than a drawing: the round letters go elliptical instead of being
+   redrawn, the joins and the spacing are the upright's, and at the ~0.85rem
+   this site sets most of its asides at, it reads as a rendering defect.
+
+   So the italic is retired site-wide rather than inherited, and the emphasis
+   it carried moves onto WEIGHT — which is the only axis a grotesque has to
+   spend. One channel, at two doses, everywhere on the site:
+
+     600  INLINE STRESS. `<em>` here is word-level: "accuracy <em>fell</em>",
+          "its <em>own</em> copy", "<em>not</em> a contract test". 600 against
+          the 400 of the sentence around it is the step that reads as stress
+          at prose size, and it stays clear of the 700 the browser gives
+          `<strong>`, so the two levels of emphasis this site's copy uses are
+          still two levels.
+     500  THE NOTE VOICE. Whole blocks that were italic because they are
+          asides rather than argument — the standfirsts, figure and chart
+          captions, the ledger's intro, the footer imprint. They were already
+          set apart by SIZE and by a quieter ink; the italic was a third,
+          redundant channel that existed only because the serif offered it for
+          free. A half-step of weight keeps a trace of it without claiming the
+          stress that 600 claims.
+
+   NO COLOUR CHANGE, and that is deliberate rather than an omission. Prose is
+   --text, already the darkest ink on the page, so any colour move for emphasis
+   is a move DOWN — an emphasis mark quieter than the thing it emphasises,
+   which is the exact inversion the --accent-warm note above spends a paragraph
+   rejecting. Leaving colour alone also means an `<em>` inside a link inherits
+   the link's colour and follows it through hover and focus, instead of pinning
+   one word while the rest of the sentence changes.
+
+   The element selectors matter as much as the class ones. `<em>`, `<i>` and
+   `<cite>` are italic in the BROWSER's default stylesheet, so a synthetic
+   oblique would survive every rule in this file that does not name them —
+   exactly the shape of bug this site keeps finding: correct in the stylesheet,
+   wrong on the rendered page. Twenty-eight `<em>`s across nine pages depend on
+   this rule, so it is load-bearing, not defensive.
+
+   `address` and `dfn` are not included: neither appears in this site's markup,
+   and a rule for an element nobody emits is a claim that has never been
+   checked. Add them with the copy that needs them. */
+em, i, cite {
+  font-style: normal;
+  font-weight: 600;
 }
 
 /* The inner wrap of the full-bleed bands (hero, doors, footer). It is the
@@ -637,38 +736,56 @@ body {
    mobile gate measures that rather than trusting it.
    Letter-spacing tightens as size grows, which is the standard correction:
    tracking that reads as airy at 1rem reads as loose at 3.8. */
-/* The masthead. Set in the reading face at 600, which is where Newsreader's
-   stems get the weight a nameplate needs without turning into a display cut.
-   It runs a step larger than the old sans masthead because a serif at the same
-   optical size reads smaller — the letterforms give more of their height to
-   the serifs and less to the x-height.
+/* The masthead, and it came back down a step. The serif ran a step LARGER
+   than the sans masthead it replaced, on the argument that a serif at the same
+   optical size reads smaller — its letterforms give more of their height to
+   the serifs and less to the x-height. Reverse the face and that argument
+   reverses with it: Geist's cap-height measures 4.4% larger than Newsreader's
+   at the same font-size, so 4.2rem / 1.044 = 4.02rem is the size that leaves
+   the nameplate physically where it was. 4rem, and every stop on the clamp
+   scaled by the same factor rather than eyeballed.
 
-   The negative tracking is doing the job the optical-size axis would have done
-   if this build carried it (see the Newsreader note above): a text-grade
-   drawing set at 60px is very slightly too loose, and -0.025em is the amount
-   that costs nothing and fixes it. */
+   The weight went the other way, to --display-weight (700). The serif bought
+   presence with stroke contrast; a grotesque has none to spend, so it buys
+   the same presence with mass. See the token for the ink measurement.
+
+   The tracking tightens from -0.025em to -0.035em. Same correction as before,
+   larger dose: Geist's counters are more open and its sidebearings more even
+   than a text serif's, so the same string set at 64px looks looser at the
+   same tracking. This is the amount that closes it without the letters
+   touching at the clamp ceiling. */
 .hero h1 {
-  font-family: var(--serif);
-  font-size: clamp(2.7rem, 7vw, 4.2rem);
-  font-weight: 600;
+  font-family: var(--font);
+  font-size: clamp(2.6rem, 6.7vw, 4rem);
+  font-weight: var(--display-weight);
   line-height: 1.02;
   margin: 0 0 20px;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.035em;
 }
 
-/* Hero identity line: the warm, first-person "who I am" statement. In the
-   italic, which is the single most journal-shaped decision in the hero — the
-   standfirst under a masthead is set in italic in every printed record I was
-   thinking about while building this, and Newsreader's is a true italic with
-   its own drawing rather than a slanted roman. */
+/* Hero identity line: the warm, first-person "who I am" statement, and the
+   standfirst under the masthead. It was the italic — the single most
+   journal-shaped decision in the hero, because the sentence under a nameplate
+   is italic in every printed record this design was drawn from.
+
+   With no italic to spend it takes the note voice from the `em, i, cite`
+   block above: weight 500, a half-step over the 400 of the prose below and
+   well under the 700 of the masthead above, so the sentence is plainly
+   neither the title nor the body — which is the whole job the italic was
+   doing. The ink steps back to --text-secondary in the same move, which is
+   the one place a colour shift is safe: a standfirst is genuinely subordinate
+   to the nameplate over it, so quieter here is a rank, not an inversion.
+
+   The measure moves with it. 40ch was set against a serif italic; the same
+   token in Geist is a wider line, so 36ch holds the two-line shape the hero
+   was composed around instead of letting it run to one long line at desktop. */
 .tagline {
-  font-family: var(--serif);
-  font-style: italic;
+  font-family: var(--font);
   font-size: clamp(1.2rem, 3.2vw, 1.5rem);
-  color: var(--text);
-  font-weight: 400;
+  color: var(--text-secondary);
+  font-weight: 500;
   line-height: 1.4;
-  max-width: 40ch;
+  max-width: 36ch;
   margin: 0 0 14px;
   letter-spacing: 0;
 }
@@ -703,10 +820,13 @@ body {
    sound about the VOICE and was wrong about the WEIGHT: reading "apparatus"
    as "quiet" made the one fact this site's reader actually needs — what San
    does, and where — the most suppressed text on the first screen. Measured on
-   paper it sat at 5.81:1 while the thesis paragraph directly beneath it ran
-   10.89:1 and the nav ran 15.19:1; every one of six independent reviewers
-   found it, from four different lenses, which is as clear a signal as this
-   kind of round produces.
+   the cream ground it was found on, it sat at 5.81:1 while the thesis
+   paragraph directly beneath it ran 10.89:1 and the nav ran 15.19:1; every one
+   of six independent reviewers found it, from four different lenses, which is
+   as clear a signal as this kind of round produces. Those three figures are
+   the ones that were measured at the time and are kept as such: on today's
+   paper the same tokens read 6.37, 11.65 and 16.25, and the RELATIONSHIP that
+   made this a finding is identical.
 
    So the voice stays (sans, small, tracked — it is still a dateline) and the
    weight moves to --text-secondary, the tier this file already reserves for
@@ -918,16 +1038,20 @@ body {
 
    The rest-state rule is --muted, and that is a measurement rather than a
    taste call. --border was the obvious choice and it is the wrong one: it is
-   the hairline token, #ddd4c1 on #f6f2e8 paper and #332d24 on the night
+   the hairline token, #dedbd8 on #fafaf9 paper and #332d24 on the night
    ground, which is about 1.3:1 in BOTH themes — an underline nobody can see
    is the same as no underline, so drawing one would have let this ship
-   looking fixed. --muted lands near 5.6:1 on paper and 6.0:1 at night:
-   plainly visible, still a step quieter than the claim above it. */
+   looking fixed. --muted lands near 6.4:1 on paper and 6.0:1 at night:
+   plainly visible, still a step quieter than the claim above it.
+
+   0.94rem rather than the 1rem the serif ran at: the same /1.044 cap-height
+   correction the headings took, so the three claims in the proof band keep
+   the size they had relative to everything around them. */
 .proof a {
   display: block;
-  font-family: var(--serif);
-  font-size: 1rem;
-  line-height: 1.46;
+  font-family: var(--font);
+  font-size: 0.94rem;
+  line-height: 1.5;
   color: var(--text-secondary);
   text-decoration: underline;
   text-decoration-color: var(--muted);
@@ -953,7 +1077,11 @@ body {
   color: var(--text);
   white-space: nowrap;
 }
-.proof a em { font-style: italic; }
+/* The stressed word inside a claim ("accuracy <em>fell</em>"). It used to be
+   spelled out here because the band is a link and a link is where an inherited
+   italic is easiest to lose; the global `em, i, cite` rule now carries it, at
+   600, and inherits the link's colour so the whole claim still goes to --text
+   together on hover. */
 .proof a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
@@ -1113,16 +1241,27 @@ body {
    thing starts here, without drawing a box around the thing. It is also the
    move that makes the homepage and the project pages read as one document —
    .section-title and .article-body h2 are ruled identically, so a section is
-   a section wherever you are in the site. */
+   a section wherever you are in the site.
+
+   THE DISPLAY RETUNE, stated once here and applied identically to every
+   heading below. Three moves, all mechanical, none eyeballed:
+     size    divided by 1.044, Geist's measured cap-height advantage over
+             Newsreader, so each heading stays physically the size it was;
+     weight  -> --display-weight, because stroke contrast is gone and mass has
+             to replace it (see the token);
+     track   about 0.008em more negative at each step, because a grotesque's
+             even sidebearings read looser than a serif's at the same
+             tracking, and the correction has to grow with the size.
+   Nothing else about the ruled-head construction moved. */
 .section-title {
-  font-family: var(--serif);
-  font-size: clamp(1.85rem, 4.5vw, 2.3rem);
-  font-weight: 600;
+  font-family: var(--font);
+  font-size: clamp(1.75rem, 4.3vw, 2.2rem);
+  font-weight: var(--display-weight);
   line-height: 1.15;
   margin: 76px 0 8px;
   padding-top: 18px;
   border-top: 2px solid var(--rule-strong);
-  letter-spacing: -0.018em;
+  letter-spacing: -0.026em;
 }
 
 .section-sub {
@@ -1348,11 +1487,13 @@ main.wrap > .measure { grid-column: full; }
   align-items: center;
 }
 
-/* The two lines that close the page are the colophon's own voice: the reading
-   face, in italic, small. A printer's imprint, not a legal footer. */
+/* The two lines that close the page are the colophon's own voice: small, set
+   apart, a printer's imprint rather than a legal footer. They were the italic;
+   they are now the note voice at weight 500 (see `em, i, cite`), which is what
+   keeps them reading as an imprint rather than as the last paragraph. */
 .footer .disclaimer {
   margin: 12px 0 0;
-  font-style: italic;
+  font-weight: 500;
   font-size: 0.84rem;
   color: var(--muted);
   text-align: center;
@@ -1360,7 +1501,7 @@ main.wrap > .measure { grid-column: full; }
 
 .last-updated {
   margin: 28px 0 0;
-  font-style: italic;
+  font-weight: 500;
   font-size: 0.84rem;
   color: var(--muted);
   text-align: center;
@@ -1680,12 +1821,12 @@ main.wrap > .measure { grid-column: full; }
   background: none;
 }
 .decision h3 {
-  font-family: var(--serif);
-  font-weight: 600;
+  font-family: var(--font);
+  font-weight: var(--display-weight);
   margin: 0 0 10px;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   line-height: 1.3;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.016em;
 }
 .decision p { margin: 8px 0; }
 /* The entry label on the project pages. It does the job .kicker does on the
@@ -1755,7 +1896,7 @@ main.wrap > .measure { grid-column: full; }
 
    `opacity: 0.8` composited the code-ref to roughly #827b6e on paper — 3.80:1,
    under the AA floor — and it did it INVISIBLY, because the declared colour
-   still reads 5.81:1 in devtools and in the stylesheet. Nothing that inspects
+   still reads its full ratio in devtools and in the stylesheet. Nothing that inspects
    colour tokens can see an opacity applied on top of them. The ADR and SYS
    numbers are the receipts that these decisions are documented and traceable,
    and they were the faintest text in the whole composition. If something
@@ -1806,8 +1947,9 @@ main.wrap > .measure { grid-column: full; }
    it is tracked, it is sans among mono figures, and it sits above an ink
    rule. Colour was doing no work the other four were not already doing — and
    it was the only one with an accessibility price, leaving the sole key to
-   five columns of numbers at 5.81:1 beside data at 15.9:1. A reader could
-   read every value and not which experiment produced it. */
+   five columns of numbers at 5.81:1 beside data at 15.19:1 — the figures as
+   measured on the cream ground, 6.37 and 16.25 on today's paper. A reader
+   could read every value and not which experiment produced it. */
 .article-body th,
 .measure th {
   font-family: var(--font);
@@ -1996,19 +2138,26 @@ main.wrap > .measure { grid-column: full; }
    reader can tell a page title from a section from a subsection by size
    alone. */
 .article-body h1 {
-  font-family: var(--serif);
-  font-size: clamp(2.3rem, 5.4vw, 3.2rem);
-  font-weight: 600;
+  font-family: var(--font);
+  font-size: clamp(2.2rem, 5.2vw, 3.05rem);
+  font-weight: var(--display-weight);
   line-height: 1.06;
   margin: 20px 0 10px;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.033em;
 }
-/* The article's standfirst, in the same italic as the homepage tagline. Two
-   pages, one gesture: the sentence directly under a title is always the
-   italic on this site. */
+/* The article's standfirst, and the same gesture as the homepage tagline. Two
+   pages, one rule: the sentence directly under a title is the note voice —
+   weight 500, ink one step back. It was the italic on both, and both moved
+   together, which is what keeps it a gesture rather than two coincidences.
+
+   The ink goes UP here, from --muted to --text-secondary. As the italic it
+   could afford to be faint because the slant was doing the work of marking it;
+   without the slant, a standfirst set in the metadata tone reads as a caption
+   that wandered above the fold. --text-secondary is the argument tone, which
+   is what this sentence actually is. */
 .article-body .subtitle {
-  font-style: italic;
-  color: var(--muted);
+  font-weight: 500;
+  color: var(--text-secondary);
   font-size: 1.15rem;
   line-height: 1.45;
   margin: 0 0 34px;
@@ -2029,14 +2178,14 @@ main.wrap > .measure { grid-column: full; }
 .article-body h2 {
   position: relative;
   counter-increment: folio;
-  font-family: var(--serif);
-  font-weight: 600;
+  font-family: var(--font);
+  font-weight: var(--display-weight);
   margin: 56px 0 14px;
   padding-top: 20px;
   border-top: 2px solid var(--rule-strong);
-  font-size: clamp(1.55rem, 3.5vw, 1.9rem);
+  font-size: clamp(1.5rem, 3.35vw, 1.82rem);
   line-height: 1.2;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.022em;
 }
 .article-body h2::before {
   content: counter(folio);
@@ -2050,10 +2199,10 @@ main.wrap > .measure { grid-column: full; }
   vertical-align: 0.28em;
 }
 .article-body h3 {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.15rem;
-  letter-spacing: -0.005em;
+  font-family: var(--font);
+  font-weight: var(--display-weight);
+  font-size: 1.1rem;
+  letter-spacing: -0.011em;
 }
 .article-body p, .article-body li { color: var(--text); }
 /* Inline code sat on --accent-soft, which put a blue wash behind every label
@@ -2116,11 +2265,13 @@ main.wrap > .measure { grid-column: full; }
 /* A note about the artifact above it. The 3px accent stripe is now the
    decision card's signature and nothing else's, so this gets the quiet
    version: one hairline, an indent, no fill. */
-/* A note about the artifact above it: set as a note — reading face, italic,
-   a size down, hanging off one hairline. Same object as .ci-caption below. */
+/* A note about the artifact above it: set as a note — the note voice, a size
+   down, hanging off one hairline. Same object as .ci-caption below. The
+   hairline was always the stronger of the two signals here, which is why
+   losing the slant costs this one the least. */
 .ex-caption {
   color: var(--text-secondary);
-  font-style: italic;
+  font-weight: 500;
   font-size: 0.95rem;
   border-left: 1px solid var(--border);
   padding: 2px 0 2px 14px;
@@ -2163,7 +2314,10 @@ main.wrap > .measure { grid-column: full; }
 }
 .tl-title { font-weight: 600; margin-top: 2px; }
 .tl-body { color: var(--text-secondary); font-size: 0.95rem; margin: 4px 0 0; }
-.tl-quote { color: var(--text); font-style: italic; }
+/* A quoted line inside a timeline entry. The colour is already doing the
+   quoting — --text against the entry's --text-secondary, so the quote is the
+   darker thing on the row — and the note voice replaces the slant. */
+.tl-quote { color: var(--text); font-weight: 500; }
 
 /* ---- The autonomy ladder, drawn as a climb ----------------------------
    Replaces a four-row table (portfolio/ADR-004). Same spine construction as
@@ -2290,9 +2444,9 @@ main.wrap > .measure { grid-column: full; }
 .subrungs li[data-done="no"]::before { content: "\25CB"; color: var(--muted); }
 /* No opacity, for the reason given at .decision[data-outcome="reversal"]
    .kicker .code-ref above — this was the second instance of that same bug and
-   it was live. --muted at 0.85 composited to #7b7366 on paper: 4.19:1, under
-   the floor, while the stylesheet and devtools both went on reporting --muted's
-   declared 5.81:1. It is plain --muted now. The sub-rung note was already the
+   it was live. --muted at 0.85 composited to #7b7366 on the cream: 4.19:1,
+   under the floor, while the stylesheet and devtools both went on reporting
+   --muted's declared ratio. It is plain --muted now. The sub-rung note was already the
    quietest thing in the ladder by size and position; it did not also need to
    be faded. */
 .subrungs li span { color: var(--muted); }
@@ -2354,7 +2508,7 @@ main.wrap > .measure { grid-column: full; }
 /* The n=300 scaled interval: accent and heavier -- the tightened result. */
 .ci-plot .ci-scaled { stroke: var(--accent); stroke-width: 3; }
 .ci-plot .ci-dot-scaled { fill: var(--accent); }
-.ci-caption { color: var(--muted); font-style: italic; font-size: 0.95rem; margin: 0 0 4px; }
+.ci-caption { color: var(--muted); font-weight: 500; font-size: 0.95rem; margin: 0 0 4px; }
 
 /* Inline links inside prose. Without this they fall back to the browser's
    default deep blue, which is nearly unreadable on the dark background. Accent
@@ -2508,7 +2662,7 @@ main.wrap > .measure { grid-column: full; }
   padding: 8px 0 7px;
   border-bottom: 1px solid var(--border);
 }
-.muted-line { color: var(--muted); font-size: 0.92rem; font-style: italic; }
+.muted-line { color: var(--muted); font-size: 0.92rem; font-weight: 500; }
 
 /* Glossary filter. A ruled field rather than a boxed one: the glossary's
    entries ARE decision cards, so a second bordered rectangle sitting above
@@ -2628,7 +2782,7 @@ main.wrap > .measure { grid-column: full; }
   margin-top: 10px;
   color: var(--muted);
   font-size: 0.85rem;
-  font-style: italic;
+  font-weight: 500;
 }
 
 /* ---------------------------------------------------------------------------
@@ -2638,13 +2792,15 @@ main.wrap > .measure { grid-column: full; }
    <table>: a table of one-line summaries is the shape most likely to overflow
    at 320px, and ADR-001 makes that a contract, not a preference.
 --------------------------------------------------------------------------- */
-/* Reads as a note to the reader, so it is set as one: reading face, italic,
-   a size down. It was briefly tracked caps to match the other block labels
-   and that was wrong — the other labels are two or three words, and this is a
-   whole sentence. A sentence in caps is a sign, not a note. */
+/* Reads as a note to the reader, so it is set as one: the note voice, a size
+   down. It was briefly tracked caps to match the other block labels and that
+   was wrong — the other labels are two or three words, and this is a whole
+   sentence. A sentence in caps is a sign, not a note. That reasoning is why
+   the italic became a weight rather than a letter-spacing when the serif left:
+   tracking a sentence is the same mistake in a quieter register. */
 .ledger-intro {
   margin: 34px 0 14px;
-  font-style: italic;
+  font-weight: 500;
   font-size: 0.95rem;
   color: var(--muted);
 }
@@ -3019,9 +3175,12 @@ main.wrap > .measure { grid-column: full; }
     padding-top: 20px;
     padding-bottom: 14px;
   }
-  /* The masthead still leads the page; it just stops being 4.2rem of it. */
+  /* The masthead still leads the page; it just stops being 4rem of it. 2.06rem
+     is the desktop correction applied here too — 2.15 / 1.044, Geist's
+     cap-height advantage — so the phone nameplate keeps the physical size the
+     budget above was measured against. */
   .hero h1 {
-    font-size: 2.15rem;
+    font-size: 2.06rem;
     margin-bottom: 8px;
   }
   .tagline {
