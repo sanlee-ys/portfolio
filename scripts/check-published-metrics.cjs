@@ -135,9 +135,24 @@ function claimFiles(root, exts, dir = '.', out = []) {
  * is the only way to notice. Same lesson as `ADR-005`'s denial counter, which
  * read a field that did not exist and reported zero for ten days.
  */
+/*
+ * Markdown used to `return 0` here, which exempted it from the backstop
+ * entirely: a Markdown marker that parsed to nothing raised no complaint and was
+ * indistinguishable from a file making no claims. Both live failures are shapes
+ * the value pattern cannot read — `<!-- metric:x -->` followed by a backticked
+ * figure, or by one with a `~` in front of it — and both counted as zero markers
+ * and zero problems. Marking a number wrong was therefore quieter than not
+ * marking it at all, which is the wrong way round.
+ *
+ * The raw counts differ per syntax because the marker does: HTML carries the
+ * name in an attribute, Markdown in a comment. What is symmetrical is the
+ * question — how many did the author intend, and how many could the pattern
+ * read.
+ */
 function unparsedMarkers(text, file) {
-  if (file.endsWith('.md')) return 0;
-  const raw = (text.match(/\bdata-metric=/g) || []).length;
+  const raw = file.endsWith('.md')
+    ? (text.match(/<!--\s*metric:/g) || []).length
+    : (text.match(/\bdata-metric=/g) || []).length;
   return raw - markersIn(text, file).length;
 }
 
@@ -266,4 +281,13 @@ function main() {
   });
 }
 
-main().then((code) => process.exit(code));
+/*
+ * Guarded so the suite can require this file and exercise the two pure functions
+ * without the gate running, and without needing the network the artifact fetch
+ * wants. The CLI path is unchanged: run directly, it still walks and exits.
+ */
+if (require.main === module) {
+  main().then((code) => process.exit(code));
+}
+
+module.exports = { markersIn, unparsedMarkers };

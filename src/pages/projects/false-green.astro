@@ -241,12 +241,22 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p class="tradeoff">
-      <strong>One of them still does not.</strong> The metrics guard skips its
-      parity check on Markdown files, so a Markdown marker that parses to nothing
-      is indistinguishable from a file making no claims. There are three such
-      markers in this repository&rsquo;s README right now. I know about it, it is
-      on the list, and leaving it named here is more useful than quietly fixing
-      it before publishing.
+      <strong>One of them did not, and this page said so first.</strong> The
+      metrics guard skipped its parity check on Markdown, so a Markdown marker
+      that parsed to nothing was indistinguishable from a file making no claims
+      &mdash; and marking a number wrong was therefore quieter than not marking
+      it at all. It was named here while it was still live, deliberately, because
+      a list of solved problems is a weaker claim than an open one.
+    </p>
+
+    <p>
+      It is closed now. The Markdown branch counts its own markers, and a suite
+      asserts the counter reports a gap for each shape the value pattern cannot
+      read. That second half is the part that matters: a parity counter that
+      returns zero and a parity counter that is correct produce identical output
+      on a clean tree, so the fix was unfalsifiable until something made it fail
+      on purpose. Reverting the one-line exemption turns exactly three of those
+      tests red.
     </p>
 
   </main>
