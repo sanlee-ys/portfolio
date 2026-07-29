@@ -2385,6 +2385,95 @@ main.wrap > .measure { grid-column: full; }
 /* Colophon ledger, drawn as a vertical timeline. The spine is one absolutely
    positioned line behind the items; each item draws its own dot as a ::before
    ring, centered on the spine. Vertical so it stays readable on a phone. */
+/* ---- The provisioning cycle ---------------------------------------------
+   Built on the colophon timeline's skeleton below, because a vertical spine
+   with a marker per step is already this site's idiom for an ordered thing and
+   vertical is what survives 320px. No SVG and no script: the payload is an
+   order and one distinction, which is a list.
+
+   The distinction IS the reason this replaced a paragraph. In prose, "one
+   command on the Pi, then pull the power" buries the only fact that matters to
+   someone judging whether this is really zero-touch: exactly one of five steps
+   needs a person, and it is not the one people assume. So the actor is carried
+   two ways, never by colour alone -- a filled marker instead of a hollow one,
+   and the words "by hand" in the step itself.
+
+   Notes are only present where they add a fact the step line does not already
+   carry. A note restating its own step is the same defect as trimming substance
+   from prose, in the other direction. */
+.cycle {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+  position: relative;
+  counter-reset: cyc;
+}
+.cycle::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--border);
+}
+.cycle > li {
+  position: relative;
+  padding: 0 0 22px 30px;
+  counter-increment: cyc;
+}
+.cycle > li:last-child { padding-bottom: 0; }
+.cycle > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+}
+/* The one step with a hand in it. Filled rather than hollow, so the difference
+   reads at a glance and still reads with colour removed. */
+.cycle > li[data-actor="hand"]::before { background: var(--accent); }
+
+.cycle-step {
+  margin: 0;
+  font-weight: 500;
+}
+.cycle-num {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  margin-right: 0.6em;
+}
+.cycle-actor {
+  font-family: var(--font);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-left: 0.6em;
+  white-space: nowrap;
+}
+.cycle-note {
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+/* The loop. The last step arms the next run, so the sequence closes rather than
+   ending -- which is the whole claim, and the one thing a straight list cannot
+   say on its own. */
+.cycle-close {
+  margin: 14px 0 0 30px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
 .timeline { list-style: none; padding: 0; margin: 24px 0 0; position: relative; }
 .timeline::before {
   content: "";
