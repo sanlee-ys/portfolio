@@ -31,7 +31,7 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all eleven checks:
+runs all fourteen checks:
 
 ```
 npm run qa
@@ -45,12 +45,15 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Five of the eleven need no build, no browser and no network — the four
+Six of the fourteen need no build, no browser and no network — five
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The six that walk the built site run after, slowest last.
+seconds. The eight that walk the built site or launch a browser run after,
+slowest last. (`hit-target.test.cjs` is a `node --test` suite but is **not**
+one of the cheap six: it spawns the gate, which launches Chromium, so it sits
+at the bottom with the browser work.)
 
-`npm run gates` runs the same eleven against an existing `dist/` without
-rebuilding, and the build-independent five still run on a clone that has never
+`npm run gates` runs the same fourteen against an existing `dist/` without
+rebuilding, and the build-independent six still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
@@ -124,7 +127,8 @@ Before committing any layout / style / markup change:
      within the viewport. A table scrolls inside its **own** box (`display:
      block; overflow-x: auto`), it never widens the page.
    - Nav and footer link rows **wrap**, never clip.
-   - Tap targets ≥ 44px.
+   - Tap targets ≥ 44px. (`hit-target.cjs` now enforces this for SVG controls
+     at 390px; for everything else it is still on you.)
    - If you change colors, check **both** light and dark themes.
 
 3. **Actually look at it.** For anything visual, screenshot the affected page at
@@ -139,6 +143,45 @@ Before committing any layout / style / markup change:
    host that ships a prebuilt Chromium, `PW_CHROMIUM` is the way to point at it —
    and if it's set to a path that doesn't exist the script fails rather than
    quietly using a different browser.
+
+## SVG controls: `fill: none` is not clickable
+
+**An SVG shape is a hit target only where it is PAINTED.** That is the
+`visiblePainted` default, and it means `fill: none` leaves a shape untouchable
+everywhere except its stroke. So **any SVG shape that carries `role="button"`,
+`tabindex`, or a click handler needs `pointer-events: all` or a transparent
+fill** — `fill: none` plus a hairline stroke is a control you cannot press.
+
+The diagram's nodes shipped exactly that way. `.node rect` was `fill: none` and
+`.node text` was `pointer-events: none`; each line was reasonable, and together
+they left a 171×57 box with a **1.8%** hit target. Everything else about it was
+correct — `role`, `tabindex`, `aria-label`, click and keydown handlers, all
+attached synchronously with the shapes — so no gate and no code reading could
+see it.
+
+**It presents as a timing bug, and it is not one.** It was reported as
+"couldn't click … seems to be a bit of a delay." Nothing is ever late:
+`.node:hover rect` paints a fill, a painted fill *is* hit-testable, so grazing
+the 1px border brings the whole box to life for as long as the pointer stays on
+it. Dead, then working, with no code running late. Don't go looking for a
+`DOMContentLoaded` or a `defer` — measure the geometry.
+
+```
+npm run build && SITE_ROOT=dist node scripts/hit-target.cjs
+```
+
+- It hit-tests every element that **claims to be a control** — `role="button"`,
+  `role="link"`, or focusable — at 1280 and 390px, and fails if the centre is
+  dead, if under 60% of the box is a target, or if the box is under 44px at
+  phone width.
+- **`cursor: pointer` is deliberately not part of that test.** The cursor
+  inherits, so decorative shapes inside a real control report it; keying on it
+  failed four correct pages, including `#score-chart`, whose `.series-dot`
+  markers are decoration over a `fill: transparent` hit column.
+- Coverage is measured over the element's box **intersected with its `<svg>`'s**,
+  because an SVG clips at its viewport and un-claimable area is not a defect.
+- **Finding zero interactive SVG elements is a failure, not a clean run** — the
+  figures are script-drawn, so "none found" most likely means a renderer broke.
 
 ## Contrast: opacity never dims text
 

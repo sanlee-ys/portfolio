@@ -141,3 +141,24 @@ jobs:
         run: node scripts/mobile-qa.cjs
         env:
           SITE_ROOT: dist
+
+      # Anything claiming to be a control must be clickable across its box.
+      # SVG hit-testing defaults to `visiblePainted`, so `fill: none` leaves a
+      # shape untouchable in its middle while every other signal — role,
+      # tabindex, aria-label, handlers, the stylesheet read line by line —
+      # stays correct. The diagram's nodes shipped that way: 171x57 boxes with
+      # a real hit target of 1.8%, reported as "couldn't click ... seems to be
+      # a bit of a delay" because `:hover` paints a fill and a painted fill IS
+      # hittable. Only visible as rendered geometry, hence a browser gate.
+      - name: Hit targets (a control is clickable across its box)
+        run: node scripts/hit-target.cjs
+        env:
+          SITE_ROOT: dist
+
+      # The gate's own adversarial suite: it builds a node with the original
+      # defect and demands a non-zero exit, then the two legitimate fixes and
+      # demands a pass. It also pins the false positives that the gate's first
+      # draft produced by keying on the inherited `cursor: pointer`. Runs here,
+      # after the Playwright step, because it spawns the gate.
+      - name: Hit-target gate (adversarial suite)
+        run: node --test scripts/hit-target.test.cjs

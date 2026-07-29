@@ -140,12 +140,17 @@ function runSiteGate(label, script) {
 }
 
 /*
- * Ordered cheapest-first, which is also build-independent-first. The five
- * checks above the line need no `dist/`, no browser and no network, and finish
- * in seconds; the six below walk the built site, and the last two launch a
- * browser — contrast-check renders every page in both themes, mobile-qa renders
- * 64 page-widths. A missing ADR section should redden in two seconds, not after
- * a full render pass.
+ * Ordered cheapest-first, which is also build-independent-first. The six checks
+ * above the line need no `dist/`, no browser and no network, and finish in
+ * seconds; the eight below either walk the built site or launch a browser —
+ * contrast-check renders every page in both themes, mobile-qa renders 64
+ * page-widths, hit-target hit-tests every control at two widths. A missing ADR
+ * section should redden in two seconds, not after a full render pass.
+ *
+ * The hit-target SUITE sits at the bottom with the browser work rather than up
+ * with the other `node --test` suites: it spawns the gate, which launches
+ * Chromium, so it is not one of the cheap build-independent checks even though
+ * it never reads `dist/`.
  */
 const CHECKS = [
   {
@@ -207,6 +212,16 @@ const CHECKS = [
     label: 'mobile QA (no horizontal overflow at 320/360/390/430)',
     needsSite: true,
     run: () => runSiteGate('mobile-qa', 'scripts/mobile-qa.cjs'),
+  },
+  {
+    label: 'hit targets (a control is clickable across its box, rendered)',
+    needsSite: true,
+    run: () => runSiteGate('hit-target', 'scripts/hit-target.cjs'),
+  },
+  {
+    label: 'hit-target gate (adversarial suite)',
+    needsSite: false,
+    run: () => runNodeTest('hit-target suite', ['scripts/hit-target.test.cjs']),
   },
 ];
 
