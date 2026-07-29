@@ -14,7 +14,8 @@
   // ---- The data: the system as nodes + edges. No coordinates here; the active
   // layout supplies those, so the same data renders wide or stacked. Each node
   // also carries `anchor` (the decision-log entry it governs) and `adr` (the IDs
-  // to surface in the caption), so selecting a box jumps to the decision behind it.
+  // to surface in the caption), so selecting a box offers a link to the decision
+  // behind it. Offers — it does not travel there for you; see `select()` below.
   var nodes = [
     { id: "notes-api", label: "notes-api",
       anchor: "decision-rightsized", adr: ["SYS-005"],
@@ -82,6 +83,41 @@
   var detail = document.getElementById("diagram-detail");
   var active = null;
 
+  // ---- The second beat: the decision behind a node is OFFERED, not taken ----
+  // Selecting a node used to scrollIntoView + focus the matching decision entry,
+  // which carried the reader away from the figure with no way back; on a phone
+  // the map went entirely off screen, so exploring a second node meant scrolling
+  // up and finding it again. The caption already carries the node's full
+  // description, so the jump was mostly redundant — and on the homepage it was
+  // worse than redundant: two of the three anchors there are one-line ledger
+  // footnotes, strictly LESS than the caption is already showing.
+  //
+  // What replaces it is an ordinary same-page link in the caption. Native anchor
+  // navigation supplies three things the scripted jump had to fake or simply
+  // lacked: the browser's own scroll (already reduced-motion-aware via
+  // `html { scroll-behavior }` in the stylesheet, so no media query here), a
+  // history entry — so Back IS the return path — and a hash, so where the reader
+  // landed is linkable. See `decisions/ADR-010`.
+
+  // The highlighter swipe has to still be there ON ARRIVAL. It was 1300ms timed
+  // from the CLICK, and the smooth scroll to these anchors measures up to ~1000ms
+  // (2,700px at 390px width), so the mark meaning "you landed here" had ~300ms
+  // left by the time anyone landed. Survivable while the page jumped at you
+  // unasked; not survivable now that the swipe is the whole feedback for a
+  // navigation the reader chose. 2400 leaves ~1400ms after the longest travel,
+  // and the full 2400 for a reduced-motion reader, whose scroll is instant.
+  var MARK_MS = 2400;
+
+  function markTarget(target) {
+    // Focus follows the reader's OWN navigation, which is why it is still
+    // correct here: they asked to go, so the reading position goes too.
+    // preventScroll because the browser's hash navigation owns the scroll.
+    target.setAttribute("tabindex", "-1");
+    target.classList.add("target");
+    target.focus({ preventScroll: true });
+    setTimeout(function () { target.classList.remove("target"); }, MARK_MS);
+  }
+
   function render(L) {
     svg.setAttribute("viewBox", L.viewBox);
     edgesG.textContent = "";
@@ -138,22 +174,26 @@
         if (active) active.classList.remove("active");
         g.classList.add("active");
         active = g;
+
+        // The caption is aria-live="polite" aria-atomic="true", and THAT is what
+        // announces the change to assistive tech — not the focus move that used
+        // to follow it. Rebuilding it in one synchronous pass keeps it to a
+        // single announcement, and an atomic region re-reads the link text too.
         detail.textContent =
           n.label + ": " + n.desc + (n.adr ? "  ·  " + n.adr.join(", ") : "");
-        // Second beat: jump to, focus, and briefly highlight the decision behind
-        // this node. Focus move + the live-region caption announce it to AT.
-        if (n.anchor) {
-          var target = document.getElementById(n.anchor);
-          if (target) {
-            var reduce = window.matchMedia &&
-              window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
-            target.classList.add("target");
-            target.setAttribute("tabindex", "-1");
-            target.focus({ preventScroll: true });
-            setTimeout(function () { target.classList.remove("target"); }, 1300);
-          }
-        }
+
+        var target = n.anchor && document.getElementById(n.anchor);
+        if (!target) return;
+        var a = document.createElement("a");
+        a.className = "card-link";
+        a.href = "#" + n.anchor;
+        a.appendChild(document.createTextNode("The decision behind it "));
+        var arrow = document.createElement("span");
+        arrow.className = "arrow";
+        arrow.textContent = "→";
+        a.appendChild(arrow);
+        a.addEventListener("click", function () { markTarget(target); });
+        detail.appendChild(a);
       }
       g.addEventListener("click", select);
       g.addEventListener("keydown", function (ev) {

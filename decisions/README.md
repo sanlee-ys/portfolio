@@ -14,6 +14,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-007](ADR-007-split-dont-trim.md) | Split, don't trim — the two-speed reader | Accepted |
 | [ADR-008](ADR-008-breakout-grid.md) | A breakout grid — two deliberate edges, not one honest column. **Reverses the "One content column" rule** | Accepted |
 | [ADR-009](ADR-009-rendered-contrast-gate.md) | Contrast is checked on the rendered pixel, not the declared token | Accepted |
+| [ADR-010](ADR-010-the-figure-offers-the-jump.md) | A figure offers the jump, it does not take it | Accepted |
 
 ## Why this tier was missing
 
@@ -290,6 +291,33 @@ no light-theme value at all, and a chart colour tuned against a 3:1 stroke bar t
 as body text on backgrounds nobody had measured it against. The convention this ADR also
 adopts — never fade text with opacity — would have caught neither, which is precisely why
 the convention alone was not accepted as the answer.
+
+[`ADR-010`](ADR-010-the-figure-offers-the-jump.md) is the second record in two PRs about the
+same figure, and both defects had the same symptom: **nothing visible happening.** The first
+was the 1.8% hit target, which read as lag. The second is what this record answers — selecting
+a node scroll-hijacked the reader to the matching decision entry with no return path, so on a
+phone the map went off screen and browsing the second node meant scrolling back to find it.
+
+The complaint is the small part. Weighing it turned up two things that were not in the report
+and that decided it: the caption under the figure **already carries** the node's full
+description, so the jump re-delivered information 1,200px further down; and on the homepage two
+of the three anchors are one-line `<li>` footnotes rather than `.decision` blocks, so the
+reader was carried from a paragraph to a sentence — **less** than they were already reading —
+and `.decision.target`, the highlighter swipe built to say *you landed here*, **did not match
+an `<li>` at all.** On two nodes out of three it had been firing into an empty selector, below
+the fold, at the end of a jump that had already disoriented you. Nobody reported it because
+there was nothing to see.
+
+The resolution is one sentence — *the figure offers the jump, it does not take it* — and the
+part worth reading is what it does **not** do. It does not delete the route to the decision,
+which is a real claim the figure makes. It does not add a "back to the map" control, which
+keeps the displacement and then builds machinery to undo it. And it does not remove the focus
+move because the focus move looked like the culprit: the announcement to assistive tech was
+never coming from focus, it comes from `aria-live="polite" aria-atomic="true"` on the caption,
+which is why the focus move could be relocated onto the reader's own click rather than dropped.
+Handing the navigation to an ordinary `<a href="#…">` then buys three things the script had
+faked or simply lacked — the browser's own reduced-motion-aware scroll, a hash, and **a history
+entry, so Back is the return path** the complaint was actually asking for.
 
 `classifier/ADR-006` (adopt the autonomy ladder as the portfolio spine) was considered for
 this tier and **deliberately not moved**. Its inbound citations and its living spec
