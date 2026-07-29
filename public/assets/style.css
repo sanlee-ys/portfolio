@@ -2159,11 +2159,33 @@ main.wrap > .measure { grid-column: full; }
 .edge-label-bg { fill: var(--bg); }
 /* Squared and unfilled, to match the plate. The 9px radius came from the
    generator's defaults and was the only 9px corner on the site. */
+/* `pointer-events: all` is load-bearing, and removing it makes the figure
+   almost unclickable while changing nothing you can see.
+
+   SVG hit-testing defaults to `visiblePainted`: a shape is a target only where
+   it is actually PAINTED. `fill: none` paints no interior, so the box's middle
+   is not a target — and `.node text` below sets `pointer-events: none`, so the
+   label is not one either. Between them the only hit target left on a 171x57
+   node was its 1px stroke: measured at 1.8% of the box, versus 100% now.
+
+   That is the bug San hit on 2026-07-28 ("couldn't click ... seems to be a bit
+   of a delay"). It was never a delay — nothing was ever late, since the
+   renderer draws and wires each node in one synchronous pass. It was
+   geometry. The illusion of a delay comes from the hover rule further down:
+   graze the hairline border, `:hover` paints `--accent-soft`, a painted fill
+   IS hit-testable, and the box springs to life for as long as you stay on it.
+   So it reads as "dead, then it warmed up."
+
+   `all` rather than a transparent fill because it keeps the declared paint
+   honest — the plate really is unfilled. `#score-chart .hit-col` on the
+   loop-replay page solves the same problem the other way, with
+   `fill: transparent`; either works, and neither is optional. */
 .node rect {
   fill: none;
   stroke: var(--rule-strong);
   stroke-width: 1;
   cursor: pointer;
+  pointer-events: all;
   transition: stroke 0.15s ease, fill 0.15s ease;
 }
 /* The node label is drawn AS A LINK, and that is the whole affordance fix.
