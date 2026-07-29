@@ -46,11 +46,35 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <h2 id="the-result">The result</h2>
     <p>
-      One command on the Pi, then pull the router&rsquo;s power and plug it back
-      in. About ninety seconds later the router has a fresh OS, a management
-      address, a firewall, an SSH key it has never seen before, and it has
-      re-armed itself so the next cycle works the same way. No console cable, no
+      One command, one power cycle, about ninety seconds. No console cable, no
       serial adapter, no reset-button timing.
+    </p>
+
+    <ol class="cycle" aria-label="One wipe-to-provisioned cycle">
+      <li>
+        <p class="cycle-step"><span class="cycle-num">1</span>Start Netinstall on the Pi</p>
+        <p class="cycle-note">It carries its own BOOTP and TFTP server, so nothing else has to be running.</p>
+      </li>
+      <li data-actor="hand">
+        <p class="cycle-step"><span class="cycle-num">2</span>Pull the power, plug it back in<span class="cycle-actor">by hand</span></p>
+      </li>
+      <li>
+        <p class="cycle-step"><span class="cycle-num">3</span>The router offers itself, Netinstall answers</p>
+        <p class="cycle-note">It tries Ethernet once on boot, then falls through to its own flash if nothing answers.</p>
+      </li>
+      <li>
+        <p class="cycle-step"><span class="cycle-num">4</span>Fresh OS, then our default configuration</p>
+        <p class="cycle-note">A management address, a firewall, and an SSH key it has never seen before.</p>
+      </li>
+      <li>
+        <p class="cycle-step"><span class="cycle-num">5</span>It re-arms itself for the next run</p>
+        <p class="cycle-note">The last statement in the config script, deliberately: if it is refused, everything else has already applied.</p>
+      </li>
+    </ol>
+    <p class="cycle-close">
+      Step 5 is what makes step 1 work next time, so the sequence closes rather
+      than ends. Exactly one of the five needs a person, and it is not the one
+      you would expect.
     </p>
     <p>
       The provisioning host is the Pi rather than my desktop, which matters more
