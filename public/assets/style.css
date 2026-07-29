@@ -589,9 +589,11 @@ html[data-theme="dark"] .theme-icon-light { display: none; }
    technique is no longer used here. */
 
 /* Smooth scrolling is a preference, not a default. Every in-page jump on this
-   site — proof band to its decision, ToC to its heading, the diagram's node to
-   the entry it lights — animated for a reader who had asked the OS for less
-   motion. Two far smaller effects (the card arrow's nudge, the decision's
+   site — proof band to its decision, ToC to its heading, the diagram's caption
+   to the entry it lights — animated for a reader who had asked the OS for less
+   motion. (The diagram's case became an ordinary anchor in ADR-010, which is
+   what puts it under this rule rather than under a scripted `behavior:` choice
+   the script had to make for itself.) Two far smaller effects (the card arrow's nudge, the decision's
    highlight transition) were already correctly inside a reduced-motion query;
    this one sat outside every one of them and was by far the largest movement
    on the site. Written as `no-preference` rather than as a `reduce` override so
@@ -2234,6 +2236,13 @@ main.wrap > .measure { grid-column: full; }
   color: var(--text-secondary);
 }
 
+/* The caption's route to the decision behind the selected node — the offer that
+   replaced the scripted jump (ADR-010). It is the inline .card-link case the
+   block above describes, so it takes that treatment as-is and needs only to be
+   held off the sentence it follows. No `white-space: nowrap`: the phrase runs
+   ~150px and must be free to wrap at 320. */
+.diagram-detail .card-link { margin-left: 0.4em; }
+
 /* Writeup headings, rebalanced against the homepage scale above. These were
    flat values (2.2 / 1.3rem) while the homepage clamped, so a project page's
    title was smaller than the homepage's section titles at desktop width —
@@ -2707,9 +2716,9 @@ main.wrap > .measure { grid-column: full; }
   font-family: var(--mono);
 }
 
-/* Click a diagram node and its matching decision glows. This is one of the
-   two interactions the motion cut KEPT, and it got stronger rather than
-   quieter: a 2px ring alone was easy to miss when the card you were sent to
+/* Follow the diagram caption's route to a decision and the entry you land on
+   glows. This is one of the two interactions the motion cut KEPT, and it got
+   stronger rather than quieter: a 2px ring alone was easy to miss when the card
    was already below the fold, so it now carries a soft halo outside the ring.
    That is feedback answering an action, which is the test the removed effects
    failed.
@@ -2720,13 +2729,30 @@ main.wrap > .measure { grid-column: full; }
    negative margins so it cannot disturb the grid. It is the mark a reader
    actually leaves on a page they are working through, it needs no border to
    exist, and it is unmistakable even when the entry it lands on is below the
-   fold. */
-.decision { transition: background-color 0.3s ease, box-shadow 0.3s ease; }
-.decision.target {
+   fold.
+
+   It now answers the reader's own click on the caption's "The decision behind
+   it" link rather than firing at them from the node (ADR-010), which is what
+   makes a landing mark the right object: they asked to go, and this is where
+   they arrived.
+
+   `.ledger li` is on this rule and was not, which is the bug that hid inside
+   the old behaviour. Two of the homepage's three node anchors —
+   decision-contracts and decision-rightsized — are one-line ledger footnotes,
+   not .decision blocks, so the highlight the jump existed to deliver matched
+   nothing on two nodes out of three. It fired into an empty selector, below the
+   fold, on a page where nobody could see it not happening. */
+.decision,
+.ledger li { transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+.decision.target,
+.ledger li.target {
   background: var(--highlight);
   box-shadow: -14px 0 0 var(--highlight), 14px 0 0 var(--highlight);
 }
-@media (prefers-reduced-motion: reduce) { .decision { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .decision,
+  .ledger li { transition: none; }
+}
 
 /* In-place evidence via native <details>: keyboard + find-in-page for free. */
 .decision details { margin-top: 14px; }

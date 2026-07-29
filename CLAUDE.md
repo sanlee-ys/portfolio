@@ -183,6 +183,43 @@ npm run build && SITE_ROOT=dist node scripts/hit-target.cjs
 - **Finding zero interactive SVG elements is a failure, not a clean run** — the
   figures are script-drawn, so "none found" most likely means a renderer broke.
 
+## A figure offers the jump, it does not take it
+
+*Reasoning and alternatives: [`decisions/ADR-010`](decisions/ADR-010-the-figure-offers-the-jump.md).
+This section is canonical for what to **do**.*
+
+**No interaction on this site moves the reader's viewport on its behalf.** A
+figure, a chart, or a control may change what it says about itself; it may not
+scroll the page away from itself. Selecting a diagram node used to
+`scrollIntoView` the matching decision entry, which on a phone put the map
+entirely off screen with nothing offering a way back, so exploring a second node
+meant scrolling up and finding it again.
+
+Where a control should lead somewhere on the page, **write an ordinary
+`<a href="#id">` and let the browser navigate.** That is not a stylistic
+preference — it is three behaviours you otherwise have to build and will get
+wrong:
+
+- a **history entry**, so Back is the return path;
+- a **hash**, so where the reader landed is linkable;
+- **reduced-motion-aware scrolling for free**, because
+  `html { scroll-behavior: smooth }` already sits inside a
+  `prefers-reduced-motion: no-preference` query. A script that calls
+  `scrollIntoView` has to re-derive that for itself, and a second copy of a
+  media query is a second thing to keep in step.
+
+`tabindex="-1"` + `focus({ preventScroll: true })` on the destination stays
+correct **on the reader's own click** — focus should follow a navigation they
+asked for. It is not correct as an unrequested side effect of selecting
+something.
+
+**Do not remove a focus move on the theory that it is the scroll.** The two are
+separable, and the announcement to assistive tech usually is not coming from
+focus at all: the diagram's caption is `aria-live="polite" aria-atomic="true"`,
+so an atomic region re-reads its whole contents — including any link text —
+on every change. Check where the announcement actually comes from before
+deleting anything, and keep an AT-equivalent announcement either way.
+
 ## Contrast: opacity never dims text
 
 *Reasoning and alternatives: [`decisions/ADR-009`](decisions/ADR-009-rendered-contrast-gate.md).
