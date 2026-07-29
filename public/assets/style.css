@@ -843,62 +843,6 @@ em, i, cite {
   margin: 0 0 22px;
 }
 
-/* Content-first hero: a quiet row of social icons instead of big buttons. The
-   work itself sits right below, so the hero points to it by proximity, not a CTA.
-   Icons rest in the muted tone and warm to the accent on hover. */
-.hero-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px;
-  /* The icons stay 22px, but each link is a 44px tap target (padded hit area)
-     for comfortable thumbing on a phone. The negative left margin pulls the
-     first icon back so it still lines up with the text above rather than being
-     inset by its own padding. */
-  margin: 2px 0 0 -11px;
-}
-.hero-links a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  color: var(--muted);
-  transition: color 0.15s ease, transform 0.12s ease;
-}
-.hero-links a:hover { color: var(--accent); transform: translateY(-1px); }
-
-/* ---- The résumé says "Résumé" -------------------------------------------
-   It was an unlabeled generic-document glyph, second of six, sitting between
-   an envelope and the GitHub mark and visually near-identical to both — the
-   single highest-intent link for the audience this site is built for, and the
-   only way to know what it was was to hover it or to find RÉSUMÉ again in the
-   nav. Every reviewer flagged it; two called it "demoted twice".
-
-   So one of the six carries its name. That is the whole change: the row keeps
-   its height and its 44px targets, the other five stay glyphs, and the one
-   that matters is legible without a pointer. A single labeled item among five
-   marks does not read as an inconsistency — it reads as emphasis, which is
-   what it is. */
-.hero-links a.hero-resume {
-  width: auto;
-  min-width: 44px;
-  gap: 7px;
-  padding: 0 10px;
-  color: var(--accent);
-}
-.hero-links a.hero-resume span {
-  font-family: var(--font);
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.11em;
-}
-/* 19px, not 22. The masthead and the standfirst above these got finer with the
-   serif, and a row of 22px glyphs under them read as a toolbar bolted to a
-   title page. The 44px tap target is unchanged — only the drawn mark shrank. */
-.hero-links a svg { width: 19px; height: 19px; display: block; }
-
 /* "What the record shows" — the 60-second layer.
 
    This slot used to hold five keywords: eval-driven development, contract-first
@@ -1495,7 +1439,6 @@ main.wrap > .measure { grid-column: full; }
    you click a button, but full visibility when you Tab. Accessibility, done right. */
 .btn:focus-visible,
 .card-link:focus-visible,
-.hero-links a:focus-visible,
 .doors a:focus-visible,
 .decision summary:focus-visible,
 .measure a:focus-visible,
@@ -3417,10 +3360,6 @@ main.wrap > .measure { grid-column: full; }
     line-height: 1.52;
     margin-bottom: 12px;
   }
-  /* The icon row keeps its 44px targets — they are the reason it is 46px tall
-     and that is not a saving worth taking. Only the slack above it closes. */
-  .hero-links { margin-top: 0; }
-
   /* ---- The nav, packed to two rows -------------------------------------
      The hit-area half of this lives in its own block below, at 900px, because
      a tablet needs thumbable targets too. What belongs HERE is the packing:
