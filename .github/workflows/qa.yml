@@ -63,6 +63,16 @@ jobs:
       - name: resume.pdf embeds its glyphs (adversarial suite)
         run: node --test scripts/resume-pdf.test.cjs
 
+      # The parity counter that backs up the published-metrics gate. It exempted
+      # Markdown entirely until 2026-07-28, so a Markdown marker the value
+      # pattern could not read raised no complaint and looked exactly like a file
+      # making no claims. The fix is unfalsifiable without this suite: a parity
+      # counter that returns 0 and one that is correct are identical on a clean
+      # tree, so each hole is exercised by a marker the pattern genuinely cannot
+      # parse.
+      - name: published-metrics marker parity (adversarial suite)
+        run: node --test scripts/check-published-metrics.test.cjs
+
       # Every character in the built copy must have a glyph in a font this site
       # ships. A codepoint the fonts lack still RENDERS — borrowed from a
       # platform face — so it survives every other gate, looks right on the

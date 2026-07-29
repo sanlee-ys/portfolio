@@ -172,6 +172,12 @@ const CHECKS = [
     run: () => runNodeTest('resume-pdf suite', ['scripts/resume-pdf.test.cjs']),
   },
   {
+    label: 'published-metrics marker parity (adversarial suite)',
+    needsSite: false,
+    run: () =>
+      runNodeTest('published-metrics suite', ['scripts/check-published-metrics.test.cjs']),
+  },
+  {
     label: 'ADRs list their downstream surfaces',
     needsSite: false,
     run: runAdrLint,
