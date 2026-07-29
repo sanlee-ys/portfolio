@@ -1,0 +1,253 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+---
+<Base
+  title="False Green · San Lee"
+  description="Six checks I built, wired into CI, and later caught reporting success for work that had not happened. What they have in common is not that they broke — it is that they passed."
+  canonical="https://sanlee.me/projects/false-green.html"
+  ogType="article"
+>
+
+  <SiteNav />
+
+  <main class="wrap article-body" id="main" tabindex="-1">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <h1>False Green</h1>
+    <p class="subtitle">Six checks I built, wired into CI, and later caught reporting success for work that had not happened. What they have in common is not that they broke. It is that they passed.</p>
+
+    <h2>Two ways to fail</h2>
+
+    <p>
+      The first agentic review lane I put into CI broke three times before it
+      worked.
+    </p>
+
+    <p>
+      The first break was a missing OIDC permission. It went red in minutes,
+      which is what a broken thing is supposed to do.
+    </p>
+
+    <p>
+      The second break was a missing tool grant. It went green in thirty-six
+      seconds, having spent $0.14 across seven turns. The agent had read the
+      diff, formed a review, attempted to post it six times, been refused each
+      time, and exited zero. The run recorded
+      <code>permission_denials_count: 6</code>. A tool denial is not a job
+      failure, so the job did not fail.
+    </p>
+
+    <p>
+      The third break was a pull request that edited the lane&rsquo;s own
+      workflow file. Green. The job never executed at all.
+    </p>
+
+    <p class="tradeoff">
+      <strong>The shape:</strong> a deterministic tool fails loudly when it does
+      nothing. An agentic one succeeds quietly &mdash; the same green appears
+      whether the work happened, was denied, crashed, or was never attempted.
+      That was the lesson I wrote down, and I thought it was a lesson about
+      agents.
+    </p>
+
+    <p>
+      It was not. The same shape was already sitting in gates I had written by
+      hand, and it took me another four months to find them.
+    </p>
+
+    <h2>The check that measured the wrong thing</h2>
+
+    <div class="decision" data-outcome="reversal">
+      <p class="tag"><span class="sr-only">Reversed. </span>The gate that tested an invisible page</p>
+      <h3>Mobile overflow, measured on unstyled pages</h3>
+      <p>
+        The mobile QA gate renders every page at four widths and fails on
+        horizontal overflow. It opened the built files directly, over
+        <code>file:</code> URLs. The layout emits root-absolute asset paths, and
+        those do not resolve over <code>file:</code>, so every page it measured
+        rendered unstyled.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> an unstyled page does not overflow. The gate
+        ran, produced numbers for sixteen pages at four widths, and the numbers
+        described a page no visitor would ever see. It now serves the build over
+        HTTP.
+      </p>
+    </div>
+
+    <div class="decision" data-outcome="reversal">
+      <p class="tag"><span class="sr-only">Reversed. </span>The proof that proved something else</p>
+      <h3>&ldquo;Fonts embedded: Geist&rdquo;</h3>
+      <p>
+        The r&eacute;sum&eacute; PDF script printed that line and I believed it
+        for months. It read the value from <code>document.fonts</code>, which
+        proves a woff2 loaded into the <em>browser</em> and says nothing about
+        the bytes written to the PDF.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> it read as evidence. It cost me a round of
+        investigating a font defect that did not exist. It now asserts against
+        the raw bytes of the file it just wrote.
+      </p>
+    </div>
+
+    <p>
+      Both of these are worse than a check that crashes, because both produced
+      output. There is no moment where you look at a passing gate and wonder
+      what it measured.
+    </p>
+
+    <h2>The check that could not see what it was looking for</h2>
+
+    <div class="decision" data-outcome="reversal">
+      <p class="tag"><span class="sr-only">Reversed. </span>Every deep link, unverified</p>
+      <h3>The link checker split the fragment off first</h3>
+      <p>
+        One line: split the URL on <code>#</code>, split on <code>?</code>, then
+        ask whether the file exists. So a link to a real page with a dead anchor
+        was a good link, and the reader lands at the top of the page with no sign
+        anything went wrong.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> it had done this since the checker was
+        written, so every deep link on the site had been reported valid without
+        the anchor ever being confirmed to exist. It mattered the moment I
+        started moving sections between pages, which is to say for the three pull
+        requests immediately before I found it.
+      </p>
+    </div>
+
+    <div class="decision" data-outcome="reversal">
+      <p class="tag"><span class="sr-only">Reversed. </span>A face the gate cannot see</p>
+      <h3>The font gate&rsquo;s regular expression</h3>
+      <p>
+        The coverage gate matches font declarations with
+        <code>@font-face\s*&#123;([^&#125;]*)&#125;</code>. A comment sitting
+        between <code>@font-face</code> and its opening brace hides the block
+        from <code>\s*</code>. A closing brace inside a comment truncates the
+        body early.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> either way the face falls out of the scan
+        through a silent <code>continue</code>, and the count of declared faces
+        the gate expects is standing by to turn that gap into a quiet pass.
+        Against the fixture I wrote afterward, the old pattern sees one face out
+        of three.
+      </p>
+    </div>
+
+    <h2>What each one was actually measuring</h2>
+
+    <table class="metrics">
+      <thead>
+        <tr>
+          <th scope="col">The check</th>
+          <th scope="col">Appeared to measure</th>
+          <th scope="col">Actually measured</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Mobile overflow</th>
+          <td>Every page at four widths</td>
+          <td>Unstyled pages, which cannot overflow</td>
+        </tr>
+        <tr>
+          <th scope="row">R&eacute;sum&eacute; fonts</th>
+          <td>Fonts embedded in the PDF</td>
+          <td>Fonts loaded into the browser</td>
+        </tr>
+        <tr>
+          <th scope="row">Link checker</th>
+          <td>Every link resolves</td>
+          <td>Every link&rsquo;s page exists</td>
+        </tr>
+        <tr>
+          <th scope="row">Font coverage</th>
+          <td>Every declared face</td>
+          <td>The faces its pattern could see</td>
+        </tr>
+        <tr>
+          <th scope="row">Review lane</th>
+          <td>A code review happened</td>
+          <td>The job exited zero</td>
+        </tr>
+        <tr>
+          <th scope="row">Denial counter</th>
+          <td>Tool denials in the run</td>
+          <td>A key that does not exist</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>The check watching the check</h2>
+
+    <div class="decision" data-outcome="reversal">
+      <p class="tag"><span class="sr-only">Reversed. </span>The instrument that read a missing field</p>
+      <h3>A counter that was structurally always zero</h3>
+      <p>
+        The review workflow was supposed to warn me about exactly the failure
+        that started this page. If a run hit tool denials, the classify step
+        would flag it, so a green check with no comment could never again be
+        mistaken for a clean review.
+      </p>
+      <p>
+        It read <code>permission_denials_count</code> from the saved execution
+        log. That key does not exist. The log is the raw message stream, and its
+        result message carries the array <code>permission_denials</code>.
+        Reading an absent key returns undefined, and the code defaulted it to
+        zero.
+      </p>
+      <p>
+        On one pull request the step logged <code>denials=0</code> while
+        reporting <code>turns</code> as 8 and <code>cost</code> as 0.1447, both
+        matching the run summary to the digit. The same result object, one field
+        silently misread.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> that review agent held four tools, none of
+        which could open a file. On a diff whose meaning lived in the markup it
+        burned five denied reads and posted nothing. The instrument that existed
+        to surface those denials was reading a field that was never there. The
+        two defects concealed each other.
+      </p>
+      <p>
+        The lane&rsquo;s earlier configuration was worse in a way that is almost
+        funny in hindsight: for ten days it had no publish channel at all, and
+        posted zero comments on zero pull requests, which looked exactly like a
+        quiet stretch with nothing to say.
+      </p>
+    </div>
+
+    <h2>The question</h2>
+
+    <p>
+      None of these were subtle. Each is one line, and each survived because a
+      passing check and a check that cannot fail look identical from the outside.
+      The only thing that ever found one was asking a specific question of a
+      specific gate.
+    </p>
+
+    <p class="flow-line">
+      What is this green measuring <span class="flow-arrow">&rarr;</span> and can
+      it tell &ldquo;passed&rdquo; from &ldquo;never ran&rdquo;?
+    </p>
+
+    <p>
+      The cheapest form of that question is to reconcile the guard&rsquo;s own
+      reported count against a raw grep, once. Every gate on this site now
+      asserts a non-zero count of the thing it walked, because a gate pointed at
+      an empty directory finds nothing and reports that as success.
+    </p>
+
+    <p class="tradeoff">
+      <strong>One of them still does not.</strong> The metrics guard skips its
+      parity check on Markdown files, so a Markdown marker that parses to nothing
+      is indistinguishable from a file making no claims. There are three such
+      markers in this repository&rsquo;s README right now. I know about it, it is
+      on the list, and leaving it named here is more useful than quietly fixing
+      it before publishing.
+    </p>
+
+  </main>
+</Base>
