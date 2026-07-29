@@ -70,6 +70,13 @@ import SiteNav from '../components/SiteNav.astro';
       <li data-outcome="reversal"><a href="#decision-grounding"><span class="sr-only">Reversed. </span><span class="proof-claim">Added retrieval grounding, cut it</span> <strong>fixed 0, broke 4</strong></a></li>
       <li data-outcome="reversal"><a href="#decision-model"><span class="sr-only">Reversed. </span><span class="proof-claim">Built the premium-model upgrade, declined it</span> <strong>0 rows at 1.97&times; the cost</strong></a></li>
       <li><a href="#decision-eval"><span class="proof-claim">Rebuilt the eval until accuracy <em>fell</em></span> <strong>97.3% &rarr; 88.9%</strong></a></li>
+      <!-- The one entry that resolves to a page rather than to a card below.
+           The band is otherwise an index into the decision log, so this breaks
+           that pattern deliberately: the claim is about the instruments rather
+           than about one decision, and its proof is six incidents, which is a
+           page and not a card. Kept last so the three classifier claims still
+           read as a set. -->
+      <li class="proof-span"><a href="projects/false-green.html"><span class="proof-claim">Found six of my own checks passing on work that never ran</span> <strong>green in 36s, nothing posted</strong></a></li>
     </ul>
     <p class="mark-legend"><span class="mark-swatch" aria-hidden="true"></span>A doubled rule marks a decision that was reversed.</p>
   </div>

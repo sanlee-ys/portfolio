@@ -997,6 +997,13 @@ em, i, cite {
 /* A column, not a block of text. The cell is a flex column so the claim can
    hang from the rule and the figure can be pinned to the foot of it — see the
    `.proof a strong` note below for why the figure needs a floor to land on. */
+/* The band was built for three, and a fourth cell would orphan itself under
+   column one at any width that fits three. So the entry that is not one of the
+   three classifier claims takes the full measure instead: it reads as a second
+   beat under the set rather than as a short column that ran out of siblings.
+   No-op at one column, which is what a phone gets. */
+.proof li.proof-span { grid-column: 1 / -1; }
+
 .proof li {
   position: relative;
   counter-increment: proof;
