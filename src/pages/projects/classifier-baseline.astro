@@ -11,6 +11,229 @@ import SiteNav from '../../components/SiteNav.astro';
 
   <SiteNav />
 
+  <style is:inline>
+    /* ----- Page-specific styles only: the "run the loser" demo -------------
+       Nothing here is reusable yet, so none of it goes in assets/style.css.
+       Two constraints shaped it. First, the palette is two hues and the second
+       one (--accent-warm) means "the record of something that was taken back"
+       -- which is exactly what a baseline's wrong answer is, so the wrong class
+       gets the warm token and nothing else invents a colour. Second, no text is
+       ever dimmed with opacity (ADR-009): quieter text takes a quieter TOKEN,
+       and opacity is reserved for the bar tracks, which carry no text. */
+
+    .bdemo { margin: 26px 0 8px; }
+
+    .bdemo-kicker {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    /* Chips. A 44px minimum on both axes is the mobile tap contract, and it is
+       set here rather than left to the text's line-height, which would shrink
+       with the font. */
+    .bdemo-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 22px;
+    }
+    .bdemo-chip {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      min-height: 44px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .bdemo-chip:hover { border-color: var(--muted); }
+    .bdemo-chip.is-on {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .bdemo-chip:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    /* The free-text field, ruled rather than boxed, matching .glossary-filter. */
+    .bdemo-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    .bdemo-input {
+      display: block;
+      width: 100%;
+      /* border-box or the 1px border and the padding push this past the grid
+         track and the page scrolls sideways on a phone. */
+      box-sizing: border-box;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 10px 12px;
+      min-height: 106px;
+      resize: vertical;
+      transition: border-color 0.15s ease;
+    }
+    .bdemo-input::placeholder { color: var(--muted); }
+    .bdemo-input:hover { border-color: var(--muted); }
+    .bdemo-input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-color: var(--accent);
+    }
+
+    .bdemo-status {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin: 10px 0 24px;
+      min-height: 1.5em;
+    }
+
+    /* Two panels, collapsing to one column with no breakpoint. */
+    .bdemo-cols {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+      gap: 28px 34px;
+    }
+    .bdemo-panel {
+      border-top: 2px solid var(--rule-strong);
+      padding-top: 14px;
+      min-width: 0;
+    }
+    .bdemo-h {
+      font-family: var(--font);
+      font-weight: var(--display-weight);
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      margin: 0 0 16px;
+    }
+
+    .bdemo-axis { margin: 0 0 22px; }
+    .bdemo-axis-name {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin: 0 0 2px;
+      overflow-wrap: anywhere;
+    }
+    .bdemo-verdict {
+      font-family: var(--mono);
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0 0 10px;
+      overflow-wrap: anywhere;
+    }
+    .bdemo-verdict.is-wrong { color: var(--accent-warm); }
+    .bdemo-verdict.is-right { color: var(--accent); }
+
+    /* Bars. The track is the only place opacity appears, and it carries no
+       text -- see the block header. */
+    .bdemo-bar-row {
+      display: grid;
+      grid-template-columns: minmax(0, 7.6em) 1fr 3.4em;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 5px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .bdemo-bar-name {
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+    .bdemo-bar-name.is-top { color: var(--accent); font-weight: 500; }
+    .bdemo-bar-name.is-wrong { color: var(--accent-warm); font-weight: 500; }
+    .bdemo-bar-track {
+      display: block;
+      height: 9px;
+      min-width: 0;
+      background: var(--border);
+    }
+    .bdemo-bar-fill {
+      display: block;
+      height: 100%;
+      background: var(--rule-strong);
+    }
+    .bdemo-bar-fill.is-top { background: var(--accent); }
+    .bdemo-bar-fill.is-wrong { background: var(--accent-warm); }
+    .bdemo-bar-val { color: var(--text-secondary); text-align: right; }
+
+    .bdemo-nosignal {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent-warm);
+      margin: 0;
+    }
+
+    .bdemo-missing,
+    .bdemo-ref-note,
+    .bdemo-ref-empty {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin: 0 0 10px;
+    }
+    .bdemo-ref-prov,
+    .bdemo-prov {
+      font-size: 0.82rem;
+      line-height: 1.55;
+      font-weight: 500;
+      color: var(--muted);
+      margin: 14px 0 0;
+    }
+    .bdemo-prov { margin-top: 26px; }
+
+    /* The recorded strip. Three columns, no <table>: the site's table rules are
+       tuned for the wide comparison tables and would fight a three-cell strip
+       inside an already-narrow panel. */
+    .bdemo-ref-grid { margin: 0 0 14px; }
+    .bdemo-ref-row {
+      display: grid;
+      /* The key column is the widest of the three because one of its two values
+         is the 18-character `operational_domain`; at 1fr it broke mid-word. */
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text);
+    }
+    .bdemo-ref-row.is-head { color: var(--muted); border-bottom-color: var(--rule-strong); }
+    .bdemo-ref-k { color: var(--muted); overflow-wrap: anywhere; }
+    .bdemo-ref-row.is-head .bdemo-ref-k { color: var(--muted); }
+    .bdemo-ref-v { overflow-wrap: anywhere; }
+    .bdemo-ref-row.is-head .bdemo-ref-v { color: var(--muted); }
+    .bdemo-ref-v.is-wrong { color: var(--accent-warm); }
+  </style>
+
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="defense-news-classifier.html">&larr; Back to the classifier</a>
     <h1>Why an LLM at All</h1>
@@ -34,7 +257,7 @@ import SiteNav from '../../components/SiteNav.astro';
       in reverse.
     </p>
 
-    <table class="metrics">
+    <table class="metrics" id="bakeoff">
       <thead>
         <tr><th>Against human gold, n=54</th><th>Classical baseline</th><th>The LLM</th></tr>
       </thead>
@@ -98,7 +321,69 @@ import SiteNav from '../../components/SiteNav.astro';
         the caveats still get stated.</p>
     </div>
 
+    <h2 id="try-it">Run the loser</h2>
+    <p>
+      Everything above is a recorded number. This is the same fit, running in
+      your tab: the model exported as data, about 208&nbsp;KB over the wire, no
+      server and no key. It is the arm that <a href="#bakeoff">lost the
+      bake-off</a>, which is exactly why it can run here at all &mdash; and
+      watching the wrong class light up is a faster route to the claim above
+      than the confusion matrix that produced it.
+    </p>
+
+    <div class="wide bdemo" id="baseline-demo">
+      <p class="bdemo-kicker">A row from the gold set, or your own sentence</p>
+      <div class="bdemo-chips" id="bdemo-chips" role="group" aria-label="Example rows from the human gold set"></div>
+
+      <label class="bdemo-label" for="bdemo-input">Text to classify</label>
+      <textarea id="bdemo-input" class="bdemo-input" rows="3" autocomplete="off" spellcheck="false" placeholder="Paste a defense-news sentence&hellip;"></textarea>
+      <p class="bdemo-status" id="bdemo-status" role="status" aria-live="polite">Pick an example, or type a sentence.</p>
+
+      <div class="bdemo-cols">
+        <section class="bdemo-panel" aria-labelledby="bdemo-live-h">
+          <h3 class="bdemo-h" id="bdemo-live-h">Baseline, live in this tab</h3>
+          <div class="bdemo-axis">
+            <p class="bdemo-axis-name">category</p>
+            <p class="bdemo-verdict" id="bdemo-verdict-category">&mdash;</p>
+            <div class="bdemo-bars" id="bdemo-bars-category" role="img" aria-label="Per-class probabilities for category"></div>
+          </div>
+          <div class="bdemo-axis">
+            <p class="bdemo-axis-name">operational_domain</p>
+            <p class="bdemo-verdict" id="bdemo-verdict-operational_domain">&mdash;</p>
+            <div class="bdemo-bars" id="bdemo-bars-operational_domain" role="img" aria-label="Per-class probabilities for operational domain"></div>
+          </div>
+          <p class="bdemo-missing"><strong>region: not covered.</strong> The
+            shipped classifier assigns a third axis. The baseline never had
+            region labels to train on, so there is nothing to draw here &mdash;
+            which is a truer answer than a bar you would have to know to
+            ignore.</p>
+        </section>
+
+        <section class="bdemo-panel" aria-labelledby="bdemo-ref-h">
+          <h3 class="bdemo-h" id="bdemo-ref-h">Recorded, not run</h3>
+          <div id="bdemo-reference"></div>
+        </section>
+      </div>
+
+      <p class="bdemo-prov">The model is vendored from
+        <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/web/README.md">the
+        classifier repo</a> at commit <code>7b61315</code> &mdash; the export
+        and its inference module travel as a pair, and the repo&rsquo;s parity
+        gate asserts this JavaScript reproduces scikit-learn&rsquo;s own
+        decision function to 1e-6. The gold and LLM columns are read out of
+        committed artifacts
+        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/data/gold/gold.csv"><code>data/gold/gold.csv</code></a>,
+        <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/gold_predictions_v3.csv"><code>evals/gold_predictions_v3.csv</code></a>).
+        No API is called from this page.</p>
+
+      <noscript><p class="bdemo-prov">This demo needs JavaScript. Without it the
+        numbers above the fold still stand on their own.</p></noscript>
+    </div>
+
   </main>
+
+
   <script is:inline src="../assets/theme.js"></script>
   <script is:inline src="../assets/last-updated.js"></script>
+  <script is:inline type="module" src="baseline-demo.js"></script>
 </Base>
