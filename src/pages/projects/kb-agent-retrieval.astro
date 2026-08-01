@@ -1,0 +1,323 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+---
+<Base
+  title="Retrieval, Measured · San Lee"
+  description="kb-agent had never measured its own retrieval. A 27-query gold set, three changes each run through a paired A/B, and the most useful result is the one I did not ship."
+  canonical="https://sanlee.me/projects/kb-agent-retrieval.html"
+  ogType="article"
+>
+
+  <SiteNav current="kb-agent-retrieval" />
+
+
+  <main class="wrap article-body" id="main" tabindex="-1">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <h1>Retrieval, Measured</h1>
+    <p class="subtitle">kb-agent had never measured its own retrieval. Three changes later, the most useful result is the one I did not ship.</p>
+
+    <p class="lead">
+      kb-agent is the RAG agent in <a href="the-system.html">the system</a>: it
+      answers questions about my own projects out of a small knowledge base. Its
+      second milestone was supposed to be a shared retrieval backbone, with the
+      classifier calling it over HTTP instead of standing up its own vector
+      store. That consumer went its own way and shipped its own lexical
+      retriever, so the backbone had nobody left to serve. Retiring it exposed
+      the assumption sitting underneath: the plan had taken for granted that
+      kb-agent&rsquo;s retrieval was good enough to be another project&rsquo;s
+      substrate, and nothing had ever measured it. My own kickoff note is blunt
+      about it. Every quality claim about the search tool was a vibe.
+    </p>
+
+    <p>
+      So the milestone turned inward: measure retrieval first, then decide
+      whether it needs to change at all.
+    </p>
+
+    <nav class="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+        <li><a href="#the-baseline">The baseline, and the two suspicions it named</a></li>
+        <li><a href="#three-changes">Three changes, each one A/B&rsquo;d</a></li>
+        <li><a href="#the-negative-result">The one I built and did not ship</a></li>
+        <li><a href="#what-the-numbers-support">What the numbers actually support</a></li>
+        <li><a href="#what-this-does-not-establish">What this does not establish</a></li>
+        <li><a href="#stack">Stack</a></li>
+        <li><a href="#what-it-demonstrates">What it demonstrates</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="the-baseline">The baseline, and the two suspicions it named</h2>
+
+    <p>
+      27 queries, hand-labeled, weighted to the corpus rather than split evenly:
+      8 about projects, 5 about libraries, 10 about my plain-language notes, and
+      4 adversarial. The corpus is lopsided, so an even split would have
+      misrepresented what retrieval actually searches. Each label is a query
+      paired with the source file or files that should come back, and the metrics
+      are recall at 1, 3 and 5 plus MRR, with k=5 chosen to match the search
+      tool&rsquo;s own default.
+    </p>
+
+    <p>
+      There is deliberately <strong>no LLM judge at this layer</strong>. The
+      label is an objective path match, so a judge would be adjudicating a
+      question a person has already answered exactly, at the cost of variance and
+      a validation burden. The second reason matters more: retrieval quality is
+      kept separate from answer quality on purpose, because conflating the two is
+      how a RAG system hides bad retrieval behind a capable model. If answer
+      quality gets measured here later, that layer may well want a judge. It must
+      not merge into this one.
+    </p>
+
+    <p>
+      The tool takes an optional <code>kind</code> filter, and the gap between
+      running with it and running without it turned out to be the whole story.
+    </p>
+
+    <table class="metrics">
+      <thead>
+        <tr><th scope="col">Baseline setting</th><th scope="col">recall@1</th><th scope="col">recall@5</th><th scope="col">MRR</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Unfiltered</th><td>0.630</td><td>0.889</td><td>0.744</td></tr>
+        <tr><th scope="row">With the kind filter</th><td>0.852</td><td>1.000</td><td>0.920</td></tr>
+      </tbody>
+    </table>
+
+    <p>
+      The retriever is good when it knows the kind. Real usage sat on the top
+      row, because the model mostly did not supply one.
+    </p>
+
+    <p>
+      The first run also turned two vague suspicions into named misses. I had
+      left repo boilerplate and generated report files indexed as notes on
+      purpose, on the argument that whether it hurt retrieval was a question for
+      a number rather than an opinion. It was sitting in the top five of the
+      misses. And I had assumed the model usually passed the kind filter. It did
+      not.
+    </p>
+
+    <h2 id="three-changes">Three changes, each one A/B&rsquo;d</h2>
+
+    <p>
+      Every change ran through a paired comparison layer vendored from the
+      classifier&rsquo;s eval rather than re-derived: same queries both arms,
+      per-query win, loss and tie counts, McNemar&rsquo;s exact test on the
+      discordant pairs, and a harness-health section that reports dropped or
+      unpairable rows. That last part is the one I would keep if I could only
+      keep one, because a comparison that quietly shrinks its own denominator
+      still prints a confident number.
+    </p>
+
+    <div class="decision">
+      <p class="tag">Change 1<span class="code-ref">PR #71</span></p>
+      <h3>Filter the boilerplate out of the notes ingest</h3>
+      <p>
+        The notes sweep globbed whole repositories for Markdown, so README
+        files, <code>CLAUDE.md</code> files and generated reports were indexed
+        alongside real content and crowded it out of the top results. The filter
+        excludes those from the notes sweep only, and logs what it skipped rather
+        than dropping files silently. The index went from 47 source files to 44.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> hit@5 rose from 88.9% to 92.6%, recall@1
+        from 0.630 to 0.741, MRR from 0.744 to 0.807, and the kind-filtered arm
+        went from 0.852 to 0.963 at recall@1. Per query that is one win, zero
+        losses, 26 ties. The honest sentence is &ldquo;recovered one miss and
+        regressed nothing,&rdquo; not the percentage.
+      </p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Change 2<span class="code-ref">PR #74</span></p>
+      <h3>Steer the model to pass the kind filter</h3>
+      <p>
+        Not a retrieval change at all. It is prompt and tool-description text,
+        aimed at the gap in the table above, and it needed a different
+        instrument: a harness that makes one real model call per gold query with
+        the real system prompt and the real tool list, then grades the first tool
+        call. Did it reach for the search tool with a kind, and was the kind
+        right. No tools execute and no loop runs, so the measurement is model
+        behaviour rather than retrieval.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> the rate at which the model supplies a kind
+        went from 0.370 to 0.889, and the rate at which that kind is also correct
+        from 0.370 to 0.852. 15 wins, zero losses, 12 ties. This model rejects
+        the temperature parameter as deprecated, so sampling cannot be pinned;
+        each arm was run three times and the figures are medians. The baseline
+        spread was 0.333 to 0.407 and the candidate 0.889 to 0.926, which do not
+        overlap. That non-overlap is what makes a median of three worth quoting.
+      </p>
+      <p>
+        What it does not show is that answers got better. It shows the agent now
+        lands more often on the setting the retrieval eval had already measured
+        as the stronger one.
+      </p>
+    </div>
+
+    <h2 id="the-negative-result">The one I built and did not ship</h2>
+
+    <div class="decision" data-outcome="reversal">
+      <p class="tag"><span class="sr-only">Reversed. </span>Change 3<span class="code-ref">PR #73 &middot; ADR-010</span></p>
+      <h3>Hybrid lexical and dense retrieval</h3>
+      <p>
+        This was the change the whole milestone was pointed at, and the
+        hypothesis was concrete enough to be wrong. Four of the 27 queries exist
+        for this decision: two pairs, each an exact-jargon phrasing against a
+        paraphrase of the same need, placed where lexical and dense retrieval
+        ought to disagree. One of them was still a miss after change 1, and it
+        was the paraphrase half. That is the textbook dense failure a lexical leg
+        is supposed to rescue.
+      </p>
+      <p>
+        So I built it properly. BM25 over the same chunk corpus already in the
+        vector store, fused with the dense ranking by Reciprocal Rank Fusion at
+        k=60, left at the canonical value rather than tuned, because tuning k on
+        the same 27 queries that judge the outcome is fitting on the test set.
+        Ranks fuse; scores do not, since a cosine distance and a BM25 score share
+        no scale and any weighted blend needs a constant fitted on that same
+        data.
+      </p>
+      <table class="metrics">
+        <thead>
+          <tr><th scope="col">Unfiltered</th><th scope="col">recall@1</th><th scope="col">recall@5</th><th scope="col">MRR</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Dense only</th><td>0.741</td><td>0.926</td><td>0.807</td></tr>
+          <tr><th scope="row">Hybrid</th><td>0.704</td><td>0.963</td><td>0.807</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Hit@5 went from 92.6% to 96.3%. That is the number I would have led with,
+        and it is one query.
+      </p>
+      <p>
+        <strong>The one thing hybrid was built to fix, it does not fix.</strong>
+        That paraphrase query is still a miss under hybrid. Running the lexical
+        leg on its own explains why: BM25&rsquo;s own top three results for it are
+        all the same notes file, with the project stub it should have found only
+        fourth. The paraphrase&rsquo;s surface terms point at the notes file just
+        as hard as the embedding does.
+      </p>
+      <p>
+        Both retrievers prefer the same wrong file. So the query was never a
+        lexical-versus-dense failure. It is corpus crowding, a topically adjacent
+        notes file out-competing a project stub, and no fusion of two retrievers
+        that agree can repair it. The other surviving miss reads the same way.
+        That falsifies the premise the experiment was built on, which is worth
+        more to me than the 3.7 points would have been.
+      </p>
+      <p class="tradeoff">
+        <strong>The result:</strong> the default stayed dense only. MRR is
+        identical to four decimal places across both arms, recall@1 drops, and
+        under the kind filter, the setting change 2 steers the model toward,
+        hybrid is strictly worse on every metric that moved. Against that, the
+        lexical leg is a second retriever, a second dependency, an in-memory
+        index and a cache-invalidation surface carried on every search. A default
+        should not change on a wash.
+      </p>
+      <p>
+        Both paths stay in the tree behind one constant, and one flag re-runs the
+        losing arm from the same checkout. A negative result nobody can re-run is
+        an assertion.
+      </p>
+    </div>
+
+    <h2 id="what-the-numbers-support">What the numbers actually support</h2>
+
+    <p>
+      n = 27. At that size a single query is worth 3.7 percentage points, which
+      is exactly why the significance line matters more than the recall deltas.
+      Two of the three changes rest on <strong>one discordant pair</strong>, at
+      McNemar p = 1.0000. That cuts both ways, and it is the same sentence in
+      both directions: p = 1.0000 does not mean hybrid is worse, it means the
+      experiment did not clear the bar to change a default. It also does not mean
+      change 1 is proven, which is why its claim is written as
+      &ldquo;regressed nothing&rdquo; rather than as a percentage.
+    </p>
+
+    <p class="flow-line">
+      One query moved <span class="flow-arrow">&rarr;</span> at n=27 that is 3.7
+      points <span class="flow-arrow">&rarr;</span> and it is still one query.
+    </p>
+
+    <p>
+      The kind-steering result is the largest effect on the page and the least
+      comparable to the other two. It is a model-behaviour measurement over three
+      unpinned runs against a corpus-independent instrument, not a retrieval
+      measurement, and I have kept the two reported separately rather than
+      folding them into one headline about the agent getting better.
+    </p>
+
+    <h2 id="what-this-does-not-establish">What this does not establish</h2>
+    <p>
+      Stated here rather than at the bottom, because a measurement is only useful
+      if you say where it gives out.
+    </p>
+    <ul>
+      <li><strong>This is a per-KB measurement.</strong> 260 chunks across 44
+        files, one embedding model, one corpus. Nothing here is a claim that
+        hybrid retrieval is useless in general, only that on this knowledge base
+        at this size it did not earn a default.</li>
+      <li><strong>Retrieval, not answers.</strong> recall@k and MRR say the right
+        chunk was retrievable. They say nothing about whether the agent&rsquo;s
+        final answer was good. There is no answer-quality eval in this repo, and
+        the separation is deliberate rather than an omission.</li>
+      <li><strong>One labeler, and the labels were drafted before they were
+        reviewed.</strong> Queries and proposed labels were drafted against the
+        actual stub contents and I reviewed every entry before merge, which is
+        the hand-label pass. One label is arguably wrong: a question about a
+        packaging tool is labeled as a note where the library slice is
+        defensible, and it is the residual miss on the kind-correct axis.
+        Changing it after seeing the result would be tuning the answer key to the
+        outcome, so it stands as labeled.</li>
+      <li><strong>The remaining misses point somewhere I have not gone.</strong>
+        Both are corpus crowding, which is a question about chunking and about
+        what the stubs say, not about which retriever runs. That is the
+        measurement that would actually move them, and it is not built.</li>
+      <li><strong>The knowledge base drifts.</strong> The first baseline, taken
+        two weeks earlier, no longer reproduced when the A/B ran, so both arms of
+        every comparison were re-measured on the same day against the same index.
+        Figures from different weeks on this project are not comparable, and the
+        ones on this page are same-day pairs.</li>
+    </ul>
+
+    <h2 id="stack">Stack</h2>
+    <p>
+      Python, ChromaDB with the local <code>all-MiniLM-L6-v2</code> embedding
+      model so retrieval needs no API key and no network, <code>rank-bm25</code>
+      for the lexical leg, a hand-written recall@k and MRR harness, and a
+      paired-comparison layer vendored from the classifier&rsquo;s eval rather
+      than rewritten. The repo is public:
+      <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a>.
+      The gold set, both eval harnesses, the decision record for the negative
+      result and the per-query rank tables behind every figure above are all
+      checkable:
+      <a href="https://github.com/sanlee-ys/kb-agent/blob/main/eval/gold_set.yaml">the gold set</a>,
+      <a href="https://github.com/sanlee-ys/kb-agent/blob/main/decisions/ADR-010-hybrid-bm25-retrieval-measured-and-not-defaulted.md">ADR-010</a>,
+      and the three pull requests
+      (<a href="https://github.com/sanlee-ys/kb-agent/pull/71">#71</a>,
+      <a href="https://github.com/sanlee-ys/kb-agent/pull/74">#74</a>,
+      <a href="https://github.com/sanlee-ys/kb-agent/pull/73">#73</a>)
+      each carry their own numbers.
+    </p>
+
+    <h2 id="what-it-demonstrates">What it demonstrates</h2>
+    <p>
+      The same discipline as the <a href="defense-news-classifier.html">classifier</a>,
+      applied to a different problem: build the measurement before the change,
+      then let it decide. What I want read here is the third change. It was
+      designed around a specific hypothesis, built to completion rather than
+      sketched, and reported as falsifying its own premise. The most valuable
+      thing it produced was not the 3.7 points it could have claimed. It was
+      finding out that the failure I had spent the milestone aiming at was a
+      different failure entirely.
+    </p>
+  </main>
+  <script is:inline src="../assets/theme.js"></script>
+  <script is:inline src="../assets/last-updated.js"></script>
+</Base>
