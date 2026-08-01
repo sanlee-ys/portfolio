@@ -58,6 +58,40 @@
     },
   };
 
+  // ---- Legibility floor: a viewBox font size is not a font size ----
+  // The `font` and `edgeFont` numbers above are USER-SPACE units, and the plate
+  // is `width: 100%` over a viewBox, so the browser scales the whole drawing to
+  // fit. That scale is under 1 on every phone: at 390px the figure gets 342
+  // CSS px for a 440-unit viewBox (0.777), so the 15-unit edge labels painted
+  // at 11.7px, and at 320px they painted at 9.3px. Legible if you stop and
+  // zoom, easy to skip past while scanning — which is exactly what issue #50
+  // reported.
+  //
+  // Raising the constants is the wrong fix: it hard-codes one phone width and
+  // still drifts on every other one. The size the reader gets is
+  // `userFont * scale`, so the honest move is to solve for the user-space value
+  // that lands on a floor of RENDERED pixels, and take it only when it is
+  // larger than the layout's own figure. Wide screens are unaffected — their
+  // scale sits at or above 1, so the floor never binds and the desktop plate
+  // renders exactly as before.
+  var MIN_EDGE_PX = 13;
+  var MIN_NODE_PX = 15;
+
+  function fontsFor(L) {
+    var box = svg.getBoundingClientRect().width;
+    var vbW = parseFloat(L.viewBox.split(/\s+/)[2]);
+    // A zero width means the plate is not laid out yet (display:none, a
+    // detached tree). Falling back to scale 1 renders the layout's own sizes,
+    // which is the pre-clamp behaviour rather than a division by zero.
+    var scale = box > 0 && vbW > 0 ? box / vbW : 1;
+    // Rounded so a one-pixel container change does not produce a "new" size and
+    // trip the re-render guard in `apply()` below.
+    function solve(base, floorPx) {
+      return Math.round(Math.max(base, floorPx / scale) * 10) / 10;
+    }
+    return { edge: solve(L.edgeFont, MIN_EDGE_PX), node: solve(L.font, MIN_NODE_PX) };
+  }
+
   var byId = {};
   nodes.forEach(function (n) { byId[n.id] = n; });
 
@@ -118,18 +152,22 @@
     setTimeout(function () { target.classList.remove("target"); }, MARK_MS);
   }
 
-  function render(L) {
+  function render(L, F) {
     svg.setAttribute("viewBox", L.viewBox);
     edgesG.textContent = "";
     nodesG.textContent = "";
     active = null;
 
-    // Size + place each node from the layout.
+    // Size + place each node from the layout. `charW` is an estimate of the
+    // mono advance width AT `L.font`, so when the floor raises the node type it
+    // has to travel with it — otherwise the box keeps its old width and the
+    // bigger label runs out through the hairline.
+    var charW = L.charW * (F.node / L.font);
     nodes.forEach(function (n) {
       var p = L.pos[n.id];
       n.x = p[0];
       n.y = p[1];
-      n.w = Math.max(L.minW, n.label.length * L.charW + 26);
+      n.w = Math.max(L.minW, n.label.length * charW + 26);
       n.h = L.h;
     });
 
@@ -145,14 +183,14 @@
 
       var mx = (start.x + end.x) / 2;
       var my = (start.y + end.y) / 2;
-      var w = e.label.length * (L.edgeFont * 0.62) + 10;
+      var w = e.label.length * (F.edge * 0.62) + 10;
       // No rx: the label knockout is a squared patch like everything else.
       edgesG.appendChild(el("rect", {
-        class: "edge-label-bg", x: mx - w / 2, y: my - L.edgeFont / 2 - 3,
-        width: w, height: L.edgeFont + 6,
+        class: "edge-label-bg", x: mx - w / 2, y: my - F.edge / 2 - 3,
+        width: w, height: F.edge + 6,
       }));
-      var t = el("text", { class: "edge-label", x: mx, y: my + L.edgeFont / 3, "text-anchor": "middle" });
-      t.style.fontSize = L.edgeFont + "px";
+      var t = el("text", { class: "edge-label", x: mx, y: my + F.edge / 3, "text-anchor": "middle" });
+      t.style.fontSize = F.edge + "px";
       t.textContent = e.label;
       edgesG.appendChild(t);
     });
@@ -165,8 +203,8 @@
       g.appendChild(el("rect", {
         x: n.x - n.w / 2, y: n.y - n.h / 2, width: n.w, height: n.h,
       }));
-      var t = el("text", { x: n.x, y: n.y + L.font / 3, "text-anchor": "middle" });
-      t.style.fontSize = L.font + "px";
+      var t = el("text", { x: n.x, y: n.y + F.node / 3, "text-anchor": "middle" });
+      t.style.fontSize = F.node + "px";
       t.textContent = n.label;
       g.appendChild(t);
 
@@ -206,9 +244,31 @@
 
   // Pick a layout by width, and re-render when crossing the breakpoint
   // (so a phone rotation or a window resize re-lays-out cleanly).
+  //
+  // The breakpoint alone is no longer enough to know when to redraw: the type
+  // sizes are now solved against the MEASURED plate width, which moves
+  // continuously inside a breakpoint. So resize is watched too — but a redraw
+  // clears the reader's selected node, so it is gated on the solved sizes
+  // ACTUALLY changing. Everything else (a scroll that collapses the URL bar, a
+  // vertical-only resize) leaves the figure alone.
   var mq = window.matchMedia("(max-width: 600px)");
-  function apply() { render(mq.matches ? LAYOUTS.narrow : LAYOUTS.wide); }
+  var shown = null;
+
+  function apply() {
+    var L = mq.matches ? LAYOUTS.narrow : LAYOUTS.wide;
+    var F = fontsFor(L);
+    if (shown && shown.L === L && shown.F.edge === F.edge && shown.F.node === F.node) return;
+    shown = { L: L, F: F };
+    render(L, F);
+  }
+
   apply();
   if (mq.addEventListener) mq.addEventListener("change", apply);
   else if (mq.addListener) mq.addListener(apply);
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(apply, 150);
+  });
 })();
