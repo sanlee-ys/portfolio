@@ -9,7 +9,7 @@
  * names, and putting those in this public repo — even hashed — is itself a
  * disclosure (a low-entropy name is brute-force-confirmable). So the name list
  * lives machine-local and gitignored, and the check runs at commit time on your
- * machine. This is the claude-ops redline-guard pattern.
+ * machine. This is the agent-ops redline-guard pattern.
  *
  * Setup (per clone), both one-liners:
  *   1. Generate the gitignored name list from your own gh auth (never commit it):
