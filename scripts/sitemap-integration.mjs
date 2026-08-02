@@ -32,9 +32,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
-// 404 is `noindex`; listing it in a sitemap asks a crawler to index the page
-// that exists to say there is nothing here.
-const EXCLUDE = new Set(['404.html']);
+// Built pages that stay in the output but are not put forward for indexing.
+// A sitemap is a list of what the site RECOMMENDS a crawler spend its time on,
+// not an inventory of what exists — so de-listing here never removes a page or
+// breaks a URL.
+//   - `404.html` is `noindex`; listing it asks a crawler to index the page that
+//     exists to say there is nothing here.
+//   - `projects/netops-lab.html` was retired from the site nav (page stays
+//     live, so nothing inbound 404s) and is no longer a destination the site
+//     offers, so it stops being one it advertises.
+const EXCLUDE = new Set(['404.html', 'projects/netops-lab.html']);
 
 const escapeXml = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
