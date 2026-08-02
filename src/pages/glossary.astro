@@ -68,6 +68,19 @@ import SiteNav from '../components/SiteNav.astro';
           <a href="projects/the-system.html#decision-rightsized">Full decision &rarr;</a></p>
       </div>
 
+      <div class="decision" id="term-baseline" data-term="baseline bake-off tf-idf sklearn logistic regression">
+        <p class="tag">EVAL</p>
+        <h3>Baseline</h3>
+        <p>The simplest credible alternative, measured first, so the fancier
+          approach has a number to beat instead of a vibe.</p>
+        <p class="tradeoff"><strong>Here:</strong> I built a TF-IDF +
+          logistic-regression baseline and ran it against the LLM classifier
+          on the same gold rows. The LLM won decisively &mdash; and the losing
+          baseline now runs live in your browser on the demo page, so the
+          comparison is inspectable rather than asserted.
+          <a href="projects/classifier-baseline.html">Full demo &rarr;</a></p>
+      </div>
+
       <div class="decision" id="term-bm25" data-term="bm25 keyword search lexical retrieval">
         <p class="tag">EVAL</p>
         <h3>BM25</h3>
@@ -143,6 +156,20 @@ import SiteNav from '../components/SiteNav.astro';
           <a href="index.html#work">Full table &rarr;</a></p>
       </div>
 
+      <div class="decision" id="term-false-green" data-term="false green check gate ci success verification">
+        <p class="tag">EVAL</p>
+        <h3>False green</h3>
+        <p>A check that reports success without being able to fail &mdash;
+          green whether the work happened or not. A check that cannot fail is
+          indistinguishable from a check that passes.</p>
+        <p class="tradeoff"><strong>Here:</strong> I audited my own repos and
+          found six, including a mobile gate measuring unstyled pages and a
+          counter logging zero denials off a key the log never carried. The
+          diagnostic that catches them: what is this green measuring, and can
+          it tell &ldquo;passed&rdquo; from &ldquo;never ran&rdquo;?
+          <a href="projects/false-green.html">Full writeup &rarr;</a></p>
+      </div>
+
       <div class="decision" id="term-gold-set" data-term="gold set hand-labeled reference answer key">
         <p class="tag">EVAL</p>
         <h3>Gold set</h3>
@@ -164,6 +191,20 @@ import SiteNav from '../components/SiteNav.astro';
           guarantees. The tags I write are derived and idempotent, so
           re-running the step just re-arrives at the same state.
           <a href="projects/the-system.html#decision-rightsized">Full decision &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-kappa" data-term="kappa cohen inter-rater agreement judge grading">
+        <p class="tag">EVAL</p>
+        <h3>Inter-rater agreement (Cohen's &kappa;)</h3>
+        <p>How often two graders agree, after subtracting the agreement
+          they&rsquo;d reach by chance. Raw agreement flatters graders on
+          unbalanced sets; &kappa; doesn&rsquo;t.</p>
+        <p class="tradeoff"><strong>Here:</strong> it&rsquo;s how I scored the
+          faithfulness judge against my own labels &mdash; Opus at 0.751,
+          Sonnet at 0.716, with overlapping intervals, so the data
+          doesn&rsquo;t crown either judge. Trusting a judge starts with
+          measuring the judge.
+          <a href="projects/faithfulness-judge.html">Full writeup &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-judge-model" data-term="judge model llm judge opus judge grading">
@@ -188,6 +229,21 @@ import SiteNav from '../components/SiteNav.astro';
         <p class="tradeoff"><strong>Here:</strong> kb-agent is the RAG
           layer, retrieving from the knowledge base before it answers a
           query. <a href="index.html#work">Full system &rarr;</a></p>
+      </div>
+
+      <div class="decision" id="term-recall-mrr" data-term="recall mrr retrieval rank hit rate search quality">
+        <p class="tag">EVAL</p>
+        <h3>Recall@k / MRR</h3>
+        <p>Retrieval scores: recall@k asks whether the right document showed
+          up in the top k; MRR asks how far down the list it sat. Together
+          they say whether the retriever found it, and whether anyone would
+          have seen it.</p>
+        <p class="tradeoff"><strong>Here:</strong> kb-agent&rsquo;s retrieval
+          eval runs on these. Filtering boilerplate out of the index lifted
+          recall@1 from 0.630 to 0.741; the same harness then scored the
+          hybrid-retrieval experiment as a wash, so dense-only stayed the
+          default. The harness gets to say no.
+          <a href="projects/kb-agent-retrieval.html">Full writeup &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-tool-use" data-term="tool use structured output schema function calling">
