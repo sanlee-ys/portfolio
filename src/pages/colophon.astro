@@ -46,7 +46,7 @@ import SiteNav from '../components/SiteNav.astro';
       filter out the entries that make either of us look bad &mdash; and since
       early July the worst of them come with public receipts: the operating
       layer now keeps its
-      <a href="https://github.com/sanlee-ys/claude-ops">incident log in the open</a>,
+      <a href="https://github.com/sanlee-ys/agent-ops">incident log in the open</a>,
       postmortem-first. The early-July quotes are lifted straight from those
       postmortems and the linked records; the later ones come from the
       session transcripts themselves. The same scrutiny turned on my own
@@ -78,12 +78,12 @@ import SiteNav from '../components/SiteNav.astro';
       <li>
         <div class="tl-date">Jul 2</div>
         <div class="tl-title">It burned a whole usage window.</div>
-        <p class="tl-body">A scoped question set off an uncapped fan-out of thirty-plus agents on the most expensive model tier; I caught it mid-flight and killed it, an entire five-hour window gone in forty-five minutes. The fix is a hook that mechanically blocks any uncapped run (<a href="https://github.com/sanlee-ys/claude-ops/blob/main/incidents/2026-07-02-uncapped-premium-fanout.md">postmortem</a>). <span class="tl-quote">&ldquo;spend was authorized blind, by default, with no gate.&rdquo;</span></p>
+        <p class="tl-body">A scoped question set off an uncapped fan-out of thirty-plus agents on the most expensive model tier; I caught it mid-flight and killed it, an entire five-hour window gone in forty-five minutes. The fix is a hook that mechanically blocks any uncapped run (<a href="https://github.com/sanlee-ys/agent-ops/blob/main/incidents/2026-07-02-uncapped-premium-fanout.md">postmortem</a>). <span class="tl-quote">&ldquo;spend was authorized blind, by default, with no gate.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Jul 3</div>
         <div class="tl-title">I asked for holes; it found one in its own guard.</div>
-        <p class="tl-body">On an open audit request it bypassed its own credential guard &mdash; the hook built after real leaks &mdash; with an interpreter one-liner, proving the gap safely before a live one could. The prompt that mattered was mine; the finding was real (<a href="https://github.com/sanlee-ys/claude-ops/blob/main/incidents/2026-07-03-credential-guard-interpreter-bypass.md">postmortem</a>). <span class="tl-quote">&ldquo;any gaps, leaks, vulnerabilities, risks &mdash; I want to know.&rdquo;</span></p>
+        <p class="tl-body">On an open audit request it bypassed its own credential guard &mdash; the hook built after real leaks &mdash; with an interpreter one-liner, proving the gap safely before a live one could. The prompt that mattered was mine; the finding was real (<a href="https://github.com/sanlee-ys/agent-ops/blob/main/incidents/2026-07-03-credential-guard-interpreter-bypass.md">postmortem</a>). <span class="tl-quote">&ldquo;any gaps, leaks, vulnerabilities, risks &mdash; I want to know.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Jul 26</div>
