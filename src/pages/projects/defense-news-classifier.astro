@@ -61,12 +61,12 @@ import SiteNav from '../../components/SiteNav.astro';
         <tr><th>Metric</th><th>v1 synthetic</th><th>v2 real (Sonnet 4.6)</th><th>v2 + Sonnet 5</th><th>v2 + prompt fix</th><th>v3 three-axis (current)</th></tr>
       </thead>
       <tbody>
-        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td><span data-metric="category_accuracy">92.6%</span></td></tr>
-        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td><span data-metric="category_macro_f1">0.911</span></td></tr>
-        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td><span data-metric="domain_accuracy">92.6%</span></td></tr>
-        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td><span data-metric="domain_macro_f1">0.933</span></td></tr>
-        <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_accuracy">87.0%</span></td></tr>
-        <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_macro_f1">0.927</span></td></tr>
+        <tr><td>Category accuracy</td><td>79.0%</td><td>88.9%</td><td>88.9%</td><td>94.4%</td><td><span data-metric="category_accuracy">94.4%</span></td></tr>
+        <tr><td>Category macro-F1</td><td>0.765</td><td>0.906</td><td>0.888</td><td>0.950</td><td><span data-metric="category_macro_f1">0.930</span></td></tr>
+        <tr><td>Domain accuracy</td><td>97.3%</td><td>88.9%</td><td>94.4%</td><td>92.6%</td><td><span data-metric="domain_accuracy">98.1%</span></td></tr>
+        <tr><td>Domain macro-F1</td><td>0.973</td><td>0.894</td><td>0.947</td><td>0.932</td><td><span data-metric="domain_macro_f1">0.982</span></td></tr>
+        <tr><td>Region accuracy</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_accuracy">94.4%</span></td></tr>
+        <tr><td>Region macro-F1</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td><span data-metric="region_macro_f1">0.975</span></td></tr>
       </tbody>
     </table>
     <p>
@@ -201,10 +201,12 @@ import SiteNav from '../../components/SiteNav.astro';
            than "[89.9, 95.6]" in prose does. The bracket numbers move to the
            caption so no precision is lost. The n=54 baseline here is the two-
            axis gold the scaled run was measured against (category 94.4%), which
-           is why it reads higher than this page's current v3 headline (92.6%);
-           the caption names it so the difference reads as two measurements, not
-           a contradiction. SVG geometry generated from evals/scale_eval.txt, not
-           hand-placed. -->
+           at the time read higher than the v3 headline of 92.6%; the caption
+           names it so the difference reads as two measurements, not a
+           contradiction. (v3.2.1 later moved that headline to 94.4% as well --
+           this plot is a frozen v2.1.0-era measurement and is deliberately not
+           re-baselined against it.) SVG geometry generated from
+           evals/scale_eval.txt, not hand-placed. -->
       <svg class="ci-plot" viewBox="0 0 232 196" role="img"
            aria-label="Confidence-interval comparison. For category accuracy, the n=54 human-graded interval spans 84.9 to 98.1 percent; the n=300 judge-graded interval spans 89.9 to 95.6, about half as wide. For domain accuracy, n=54 spans 82.5 to 97.1 and n=300 spans 86.5 to 93.2. Scaling the eval roughly halves each interval.">
         <line class="ci-grid" x1="16.0" y1="24" x2="16.0" y2="150" />
@@ -292,23 +294,44 @@ import SiteNav from '../../components/SiteNav.astro';
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/014-region-field-design.md">ADR-014</a>.
     </p>
     <p>
-      Region landed at <strong><span data-metric="region_accuracy">87.0%</span></strong> against fresh hand labels. The
-      more interesting number is that the misses aren&rsquo;t noise:
-      <strong>all seven</strong> are stories whose true label is
+      Region landed at 87.0% against fresh hand labels when the axis shipped.
+      The more interesting number was that the misses weren&rsquo;t noise:
+      <strong>all seven</strong> were stories whose true label is
       <code>global</code> that the model pulled to a specific region, usually
       <code>americas</code>. The rule says label the theater the activity
-      happens in, and only when the text says so. The model keeps seeing a US
+      happens in, and only when the text says so. The model kept seeing a US
       actor and inferring a US theater, which is the no-guessing rule being hard
       rather than the model being sloppy. One named failure mode beats a
       scattered 13%, because a named one can be worked on.
     </p>
     <p>
-      Adding the axis cost about one category row (94.4% to 92.6%, inside the
-      noise on a set this size) while domain held. That trade is stated rather
-      than smoothed over. The scaled region eval is gated behind one measured
-      condition, judge-versus-human agreement on region, which came in at
-      <strong>100.0%</strong> &mdash; so the gate is clear and the scaled run is
-      earned, not assumed.
+      It was worked on, and region now reads
+      <strong><span data-metric="region_accuracy">94.4%</span></strong>. The fix
+      is one bullet of prompt telling the model that naming a US command or
+      contractor identifies the actor, not a place. Getting it shipped took two
+      rounds and is the part worth reading: measured once and
+      <em>reverted</em> at p=0.0522 against a pre-registered p&lt;0.05, then
+      re-run against a ruler twice the size, where the identical clause landed
+      at <strong>p=0.0002</strong> and shipped. The bar never moved. The first
+      experiment simply never had the power to decide &mdash; about a coin
+      flip&rsquo;s worth &mdash; so the honest reading of the revert is
+      <em>underpowered</em>, not <em>wrong</em>.
+    </p>
+    <p>
+      Three region misses remain instead of seven, and the error mode inverted:
+      only one is still the old cluster, and the other two are the converse
+      &mdash; <code>americas</code> rows the clause over-called to
+      <code>global</code>. That collateral was priced before the run rather than
+      discovered after it. Five under-calls traded for two over-calls is the
+      shape of the win, and it is a trade, not a free fix.
+    </p>
+    <p>
+      One number went the other way and is worth stating rather than burying:
+      judge-versus-human agreement on region, the measured condition that gated
+      the scaled eval in the first place, fell from a perfect
+      <strong>100.0%</strong> to <strong>96.3%</strong>. That is 2 disagreements
+      in 54 against a CI floor budgeting 3 &mdash; the number that would have
+      stopped the release, and the reason the floor exists.
     </p>
 
 

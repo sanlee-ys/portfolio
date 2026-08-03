@@ -78,9 +78,9 @@ and gets skipped, leaving CI as the only thing catching mobile regressions.
   independent repos operate as one system, recorded via a two-tier ADR convention.
 - **Defense News Classifier** (`projects/defense-news-classifier.html`) — an LLM
   classifier that enriches notes via an in-process FastAPI BackgroundTask, scored on a
-  real hand-labeled eval (<!-- metric:category_accuracy -->92.6%
-  category, <!-- metric:domain_accuracy -->92.6% operational
-  domain, <!-- metric:region_accuracy -->87.0% region).
+  real hand-labeled eval (<!-- metric:category_accuracy -->94.4%
+  category, <!-- metric:domain_accuracy -->98.1% operational
+  domain, <!-- metric:region_accuracy -->94.4% region).
 - **Product & Program** (`projects/product-and-program.html`) — the same system read as
   product and program work: scope cuts, risk reasoning, and decision framing.
 - **Loop replay** (`projects/loop-replay.html`) — a recorded-replay viewer for the
