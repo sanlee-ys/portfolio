@@ -34,7 +34,7 @@ import SiteNav from '../../components/SiteNav.astro';
         <tr><th>Judge</th><th>Binary &kappa;</th><th>Raw agreement (95% CI)</th><th>Unsupported recall</th></tr>
       </thead>
       <tbody>
-        <tr><td>Opus</td><td>0.751</td><td>89.4% [84.2, 93.0]</td><td>97.9%</td></tr>
+        <tr><td>Opus</td><td>0.762</td><td>89.9% [84.8, 93.5]</td><td>97.9%</td></tr>
         <tr><td>Sonnet</td><td>0.716</td><td>88.4% [83.0, 92.2]</td><td>89.6%</td></tr>
       </tbody>
     </table>
@@ -47,21 +47,42 @@ import SiteNav from '../../components/SiteNav.astro';
       Reporting it as a win would be a soft number dressed up as a solid one.
     </p>
     <p>
-      The tempting second headline is the fabrication class, catching claims the
-      source doesn&rsquo;t back, where recall is <strong>97.9% versus
-      89.6%</strong>. It doesn&rsquo;t survive either. Those percentages are 47
-      versus 43 catches out of 48, and only the claims where the judges disagree
-      carry information. There are four, all in the premium judge&rsquo;s favor.
-      McNemar&rsquo;s exact test on those pairs gives
+      Those figures are measured against a gold set I audited in August, blind,
+      under a selection rule committed before I looked at a single label. It
+      held: <strong>28 of the 30 claims it pulled came back unchanged</strong>.
+      That consistency is the finding. The audit also moved Opus from 0.751 to
+      0.762, and <strong>that rise is not evidence the judge got better</strong>
+      &mdash; restricted to the corrections that landed on claims neither judge
+      had gotten wrong, it is 0.752, flat. The audit had reached one claim both
+      judges failed, and removing it lifts agreement arithmetically rather than
+      because anything about the judges changed. I pre-registered that check
+      precisely so I couldn&rsquo;t talk myself into the more flattering reading
+      afterward, and it is
+      <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/002-solid-tier-call.md#phase-2-result-2026-08-02">published both ways</a>.
+    </p>
+    <p>
+      The tempting second headline is recall on unsupported claims, where the
+      split is <strong>97.9% versus 89.6%</strong>. It doesn&rsquo;t survive
+      either, and the class it&rsquo;s measured over isn&rsquo;t the one the name
+      suggests. Those percentages are 47 versus 43 catches out of 48, and that 48
+      folds in hedged half-claims alongside outright fabrications. Restrict it to
+      fabrication proper, the 36 claims the source flatly doesn&rsquo;t back, and
+      the two tiers are <strong>identical</strong>: 35 of 36 each, missing the
+      same claim, nothing between them. All four of the disagreeing pairs behind
+      the gap are hedged claims, which the rubric itself calls the least crisp
+      call a labeler makes. McNemar&rsquo;s exact test on those four gives
       <strong>p&nbsp;=&nbsp;0.125</strong>: the direction is consistent, with no
       reversals in 48 chances, but four pairs can&rsquo;t size an effect. An
       earlier version of this page reported that gap as the reason to pay for the
-      premium tier; the test is the correction.
+      premium tier, and called it recall on the fabrication class. The test and
+      the restriction are the two corrections.
     </p>
     <p>
-      So <strong>neither axis separates the tiers on this set</strong>. The cheap
-      tier is good enough and escalation isn&rsquo;t evidenced. Showing the recall
-      gap, if it&rsquo;s real, needs a larger fabrication class than 48.
+      So <strong>neither axis separates the tiers on this set</strong>. Paired
+      across all 189 claims, the premium judge is right where the cheap one is
+      wrong six times and wrong where it&rsquo;s right three times, which is
+      <strong>p&nbsp;=&nbsp;0.51</strong>. The cheap tier is good enough and
+      escalation isn&rsquo;t evidenced.
     </p>
 
     <h2>The result I almost published instead</h2>
@@ -144,18 +165,26 @@ import SiteNav from '../../components/SiteNav.astro';
       <li><strong>One labeler.</strong> The gold set is my labels alone, with no
         inter-annotator agreement measured. That makes the ground truth one
         person&rsquo;s consistent reading of a written rubric, not a validated
-        consensus. A judge agreeing with this gold at 0.751 has not been shown
-        to agree with humans in general at 0.751, and adding a second labeler is
-        the single thing that would upgrade the claim.</li>
-      <li><strong>The gold set has been corrected once.</strong> Two claims
-        labeled supported were filler with no factual assertion, an offer to help
-        and a suggestion to check the source, which the rubric excludes.
-        Re-labeling and re-scoring moved the numbers on this page slightly.
-        Single-labeler ground truth is worth auditing, not just declaring.</li>
+        consensus. A judge agreeing with this gold at 0.762 has not been shown
+        to agree with humans in general at 0.762, and adding a second labeler is
+        the single thing that would upgrade the claim. <strong>The August audit
+        does not change this.</strong> It was the same person re-reading his own
+        labels, blind to the verdicts, which measures whether the gold is
+        self-consistent and cannot measure whether it is right. A consistency
+        audit is never inter-annotator agreement.</li>
+      <li><strong>The gold set has been audited twice, and moved both times.</strong>
+        The first pass caught two claims labeled supported that were filler with
+        no factual assertion, which the rubric excludes. The second, the blind
+        one, found a third instance the first pass had missed &mdash; and
+        reversed one of the first pass&rsquo;s own calls, where the claim does
+        assert that the source omits a detail and so is a correct refusal rather
+        than filler. The second audit is also the evidence that the first was
+        incomplete. Single-labeler ground truth is worth auditing, not just
+        declaring, and one audit is not obviously enough either.</li>
       <li><strong>189 scored claims</strong> out of 193, with four excluded as
         non-claims. The intervals are about nine points wide. Any difference
         smaller than that is noise, and that includes both the tier gap in
-        &kappa; and the fabrication-recall gap.</li>
+        &kappa; and the recall gap, whose denominator is only 48.</li>
       <li><strong>Floor tier by design.</strong> One pass, no judge prompt
         tuning, no ensembles, no retrieval. This measures the ruler as built,
         not the best ruler obtainable.</li>
