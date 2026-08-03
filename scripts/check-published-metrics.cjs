@@ -22,6 +22,27 @@
  * are deliberately NOT marked — they are frozen records of past runs and must not
  * track the latest artifact.
  *
+ * WHERE A MARKDOWN MARKER MAY GO. Anywhere except the start of a line. The comment
+ * is invisible *mid-line*; a line that BEGINS with `<!--` opens a CommonMark/GFM
+ * HTML block, which closes the paragraph above it and suspends inline markdown
+ * parsing until the next blank line. So a line-initial marker splits a paragraph
+ * on the rendered page and leaves `**` and backticks as literal characters — while
+ * the source looks fine and this gate reports a clean pass.
+ *
+ * Two markers in README.md were written that way (2026-08-02). The visible damage
+ * here was mild — the affected span carried no bold or code, so it lost only its
+ * line breaks — but the defect is the same one that shipped literal `**` on the
+ * architecture repo's one-pager and literal backticks on faithfulness-judge's
+ * README. Verified both ways through GitHub's own /markdown API, then fixed.
+ *
+ * Indentation does not save it, which is why this is a rule and not a habit: an
+ * HTML block opens on up to three spaces, and inside a list item the marker is
+ * indented to the item's content column, so it never *looks* line-initial. Both
+ * offences here were that shape.
+ *
+ * This applies to Markdown only. The HTML surface marks figures with a
+ * `data-metric` span, which has no block-vs-inline ambiguity to get wrong.
+ *
  * WHY MARKDOWN IS SCANNED AT ALL. This script originally walked only .html, so
  * README.md sat two versions stale — "88.9% category, 94.4% operational domain" —
  * while this very check reported green. A guard whose scope is narrower than the
@@ -35,6 +56,9 @@
  *   - zero marked figures-> exit 1. A check that verifies nothing reads as a pass.
  *   - unknown metric key -> exit 1. A typo'd key would otherwise be checked
  *                           against nothing and silently pass forever.
+ *   - marker starting a
+ *     Markdown line      -> exit 1. It silently breaks the rendered page while
+ *                           leaving this gate green.
  *
  * Run:  node scripts/check-published-metrics.cjs
  */
@@ -191,6 +215,36 @@ function markersIn(text, file) {
 }
 
 /*
+ * Fenced blocks and inline code spans. A marker written inside backticks is
+ * DOCUMENTATION OF the convention, not a use of it — the natural way to explain a
+ * placement rule is to show the shape it forbids, and that must not trip the rule.
+ */
+const CODE = /```[\s\S]*?```|`[^`\n]*`/g;
+
+/*
+ * Markdown markers that are the first non-whitespace thing on their line, returned
+ * as 1-based line numbers. See "WHERE A MARKDOWN MARKER MAY GO" above.
+ *
+ * Matched loosely — any `metric:` comment, well-formed or not — because the damage
+ * is done by the `<!--` opening the line, whatever follows it. That also means this
+ * catches the malformed shapes `markersIn` cannot read, which are exactly the ones
+ * the parity counter exists for; a figure can be broken in both ways at once.
+ *
+ * Markdown only. In an .html file the same comment is just a comment.
+ */
+function lineInitialMarkers(text, file) {
+  if (!file.endsWith('.md')) return [];
+  // Blank out code rather than deleting it, so every line number below is still the
+  // one an editor shows. Newlines are preserved for the same reason.
+  const masked = text.replace(CODE, (m) => m.replace(/[^\n]/g, ' '));
+  const lines = [];
+  masked.split('\n').forEach((line, i) => {
+    if (/^[ \t]*<!--\s*metric:/.test(line)) lines.push(i + 1);
+  });
+  return lines;
+}
+
+/*
  * Compare numerically, not as strings. JSON serialises 87.0 as `87`, so a string
  * compare against the page's "87.0%" reports a mismatch that is not one — and a
  * false positive here is as corrosive as a miss, because a check that cries wolf
@@ -231,6 +285,17 @@ function main() {
             `inside: <span data-metric="key">92.6%</span> (other attributes are fine).\n` +
             `  This fails loudly because the alternative is a green run that checked ` +
             `fewer numbers than you think it did.`
+        );
+      }
+
+      for (const line of lineInitialMarkers(text, file)) {
+        problems.push(
+          `${safe(file)}:${line}: a metric marker is the first thing on this line.\n` +
+            `  That opens a Markdown HTML block, which closes the paragraph above it ` +
+            `and stops inline formatting until the next blank line — so the rendered ` +
+            `page breaks (literal ** and backticks) while the source looks fine.\n` +
+            `  Move the marker onto the end of the previous line and re-wrap. It must ` +
+            `always follow text; indenting it inside a list item does not help.`
         );
       }
 
@@ -290,4 +355,4 @@ if (require.main === module) {
   main().then((code) => process.exit(code));
 }
 
-module.exports = { markersIn, unparsedMarkers };
+module.exports = { markersIn, unparsedMarkers, lineInitialMarkers };
