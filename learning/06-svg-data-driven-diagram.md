@@ -1,7 +1,7 @@
 # Lesson 06 — A data-driven SVG diagram
 
 **Tier 3 (SVG + dataviz) · an interactive map of the system, generated from data.**
-On the [The System](../projects/the-system.html) writeup.
+On the [The System](https://sanlee.me/projects/the-system.html) writeup.
 
 ## The new idea
 
