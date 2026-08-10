@@ -7,7 +7,92 @@ import SiteNav from '../../components/SiteNav.astro';
   description="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device."
   canonical="https://sanlee.me/projects/netops-lab.html"
   ogType="article"
+  ogImage="/assets/og-netops-lab.png"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Wipe-to-provision topology (portfolio ADR-004). Page-scoped: the
+       argument is this lab's closed loop, not a shared diagram type. Max-width
+       260 keeps viewBox units 1:1 with CSS px on every gate width (same
+       measured discipline as .backedge / .split-map). */
+    .lab-topo {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .lab-topo .lt-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .lab-topo .lt-id {
+      fill: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .lab-topo .lt-role {
+      fill: var(--text-secondary);
+      font-family: var(--font);
+      font-size: 11px;
+    }
+    .lab-topo .lt-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Sole human edge: solid accent, dual-encoded with a filled mark + BY HAND
+       (matches .cycle [data-actor=hand] / .cycle-actor). Not oxide — oxide is
+       reversal on this site. */
+    .lab-topo .lt-hand {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+    }
+    .lab-topo .lt-hand-mark { fill: var(--accent); stroke: none; }
+    .lab-topo .lt-hand-label {
+      fill: var(--accent);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .lab-topo .lt-hand-noun {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+    }
+    /* Return edge: re-arm closes the loop. Accent + dasharray like L4's
+       be-back so it reads as the load-bearing cycle, not another cable. */
+    .lab-topo .lt-return {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .lab-topo .lt-note {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 12px;
+    }
+    .lab-topo .lt-link-label {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+    .lab-topo marker path { fill: var(--muted); }
+    .lab-topo marker path.lt-head-hand { fill: var(--accent); }
+    .lab-topo marker path.lt-head-return { fill: var(--accent); }
+    .lab-topo-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 6px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav current="netops-lab" />
 
@@ -50,6 +135,70 @@ import SiteNav from '../../components/SiteNav.astro';
       serial adapter, no reset-button timing.
     </p>
 
+    <!-- Topology of the wipe-to-provision lab. The ordered list below still
+         carries the five steps; this figure's job is the closed loop a
+         straight list cannot draw: re-arm returns into the next wipe, and
+         power is the only hand in the apparatus. No 1–5 numbering here —
+         sequence stays on ol.cycle (ADR-004 Decision 5 floor). -->
+    <svg class="lab-topo" viewBox="0 0 260 150" role="img"
+         aria-label="Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.">
+      <title>Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.</title>
+      <defs>
+        <marker id="lt-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="lt-arrow-start" viewBox="0 0 10 10" refX="1" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="lt-arrow-hand" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path class="lt-head-hand" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="lt-arrow-return" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path class="lt-head-return" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <!-- Sole human edge: Power → Router. Filled mark + BY HAND dual-encode
+           actor=hand the same way the cycle list does. Labels sit left of the
+           mark so the tracked uppercase does not overflow the 260 viewBox. -->
+      <text class="lt-hand-noun" x="196" y="12" text-anchor="end">Power</text>
+      <circle class="lt-hand-mark" cx="204" cy="10" r="4" />
+      <path class="lt-hand" d="M 204 15 L 204 36" marker-end="url(#lt-arrow-hand)" />
+      <text class="lt-hand-label" x="196" y="30" text-anchor="end">By hand</text>
+
+      <!-- Two boxes only — schematic hosts, not photoreal hardware. rx matches
+           --radius-sm (2px); at max-width 260 viewBox units are CSS px 1:1. -->
+      <rect class="lt-box" x="6" y="40" width="100" height="48" rx="2" />
+      <text class="lt-id" x="56" y="60" text-anchor="middle">Pi</text>
+      <text class="lt-role" x="56" y="76" text-anchor="middle">Netinstall</text>
+
+      <rect class="lt-box" x="154" y="40" width="100" height="48" rx="2" />
+      <text class="lt-id" x="204" y="60" text-anchor="middle">Router</text>
+      <text class="lt-role" x="204" y="76" text-anchor="middle">wipe &#8594; cfg</text>
+
+      <!-- Isolated Ethernet: Pi ↔ Router carries BOOTP/TFTP. Muted automated
+           stroke — not the hand edge, not the return. -->
+      <path class="lt-edge" d="M 108 64 L 150 64"
+            marker-start="url(#lt-arrow-start)"
+            marker-end="url(#lt-arrow)" />
+      <text class="lt-link-label" x="129" y="56" text-anchor="middle">BOOTP / TFTP</text>
+
+      <!-- Return edge under the pair: router re-arm → next wipe on the Pi
+           side. Same closed-loop pattern as split-map A-return / L4 be-back. -->
+      <path class="lt-return" d="M 204 90 C 204 128, 56 128, 56 92"
+            marker-end="url(#lt-arrow-return)" />
+      <text class="lt-note" x="130" y="144" text-anchor="middle">re-arm closes the next wipe</text>
+    </svg>
+    <p class="lab-topo-caption">
+      Power is the only hand in the loop. Netinstall, the blank-router offer,
+      OS and default config, and re-arm are automated; re-arm is the return
+      edge that makes the next wipe start without rebuilding the host.
+    </p>
+
     <ol class="cycle" aria-label="One wipe-to-provisioned cycle">
       <li>
         <p class="cycle-step"><span class="cycle-num">1</span>Start Netinstall on the Pi</p>
@@ -72,9 +221,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </li>
     </ol>
     <p class="cycle-close">
-      Step 5 is what makes step 1 work next time, so the sequence closes rather
-      than ends. Exactly one of the five needs a person, and it is not the one
-      you would expect.
+      Exactly one of the five needs a person, and it is not the one you would
+      expect.
     </p>
     <p>
       The provisioning host is the Pi rather than my desktop, which matters more
