@@ -9,6 +9,88 @@ import SiteNav from '../../components/SiteNav.astro';
   ogType="article"
   ogImage="/assets/og-faithfulness-judge.png"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Claim-vs-source plate (portfolio ADR-004). Page-scoped: the unit of the
+       study, not a metrics chart (the κ table already carries the numbers).
+       Max-width 260 keeps viewBox units 1:1 with CSS px on every gate width
+       (same measured discipline as .two-fail / .jtbd-strip / .lab-topo). */
+    .judge-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .judge-plate .jp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .judge-plate .jp-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .judge-plate .jp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .judge-plate .jp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    /* Schematic passage marks — not a real quote, not UI chrome. */
+    .judge-plate .jp-glyph {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.25;
+      stroke-linecap: round;
+    }
+    .judge-plate .jp-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Supported: ink solid — the ordinary pass. Dual-encoded by word + stroke. */
+    .judge-plate .jp-ok {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .judge-plate .jp-ok-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    /* Unsupported: oxide — the class the study is built to catch. Word + oxide
+       dual-encode; not colour-only. Oxide is for the negative finding, same
+       as .two-fail FAIL (not a "red means bad UI"). */
+    .judge-plate .jp-bad {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .judge-plate .jp-bad-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .judge-plate marker path { fill: var(--muted); }
+    .judge-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 6px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav current="faithfulness-judge" />
 
@@ -27,6 +109,51 @@ import SiteNav from '../../components/SiteNav.astro';
       model tiers to do the same job blind. The deliverable is not a working
       product. It is a number for how far the judge can be trusted, and an
       explicit statement of where it can&rsquo;t.
+    </p>
+
+    <!-- Unit of the study: one claim read against its cited source, labeled
+         supported or unsupported. Not a κ chart — the metrics table below
+         already has the numbers. Schematic only; no invented sample text as
+         a real quote, no fake screenshots. ADR-010 N/A — no interactive nodes. -->
+    <svg class="judge-plate" viewBox="0 0 260 132" role="img"
+         aria-label="The unit of the faithfulness study: a claim is read against its cited source and labeled supported or unsupported. Source passage flows into a claim sentence; the binary verdict is supported or unsupported.">
+      <title>The unit of the faithfulness study: a claim is read against its cited source and labeled supported or unsupported. Source passage flows into a claim sentence; the binary verdict is supported or unsupported.</title>
+      <defs>
+        <marker id="jp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <!-- Top row: Source → Claim. Glyph lines stand for a passage, not a real quote. -->
+      <text class="jp-lane" x="4" y="12">SOURCE</text>
+      <rect class="jp-box" x="4" y="18" width="100" height="48" rx="2" />
+      <g class="jp-glyph" aria-hidden="true">
+        <path d="M 16 32 H 90" />
+        <path d="M 16 40 H 82" />
+        <path d="M 16 48 H 70" />
+      </g>
+      <text class="jp-micro" x="54" y="60" text-anchor="middle">cited passage</text>
+
+      <path class="jp-edge" d="M 106 42 L 122 42" marker-end="url(#jp-arrow)" aria-hidden="true" />
+
+      <text class="jp-lane" x="126" y="12">CLAIM</text>
+      <rect class="jp-box" x="126" y="18" width="130" height="48" rx="2" />
+      <text class="jp-title" x="191" y="42" text-anchor="middle">asserted sentence</text>
+      <text class="jp-micro" x="191" y="58" text-anchor="middle">one gold unit</text>
+
+      <!-- Bottom row: binary verdict under the pair. Word + stroke dual-encode;
+           oxide only on unsupported (the class the study is built to catch). -->
+      <path class="jp-edge" d="M 130 68 L 130 84" marker-end="url(#jp-arrow)" aria-hidden="true" />
+      <text class="jp-lane" x="4" y="100">VERDICT</text>
+      <rect class="jp-ok" x="4" y="106" width="122" height="22" rx="2" />
+      <text class="jp-ok-text" x="65" y="121" text-anchor="middle">SUPPORTED</text>
+      <rect class="jp-bad" x="134" y="106" width="122" height="22" rx="2" />
+      <text class="jp-bad-text" x="195" y="121" text-anchor="middle">UNSUPPORTED</text>
+    </svg>
+    <p class="judge-plate-caption">
+      One claim, one cited source, one binary label. The table below measures
+      how often the model judge matches the human gold on that unit.
     </p>
 
     <h2>The result</h2>
