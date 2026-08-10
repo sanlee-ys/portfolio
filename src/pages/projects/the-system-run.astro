@@ -8,6 +8,69 @@ import SiteNav from '../../components/SiteNav.astro';
   canonical="https://sanlee.me/projects/the-system-run.html"
   ogType="article"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* One-note run plate (portfolio ADR-004). Page-scoped companion to the
+       system diagram: a single note through notes-api, classifier, writeback,
+       and kb-agent. Max-width 260 keeps viewBox units 1:1 with CSS px on every
+       gate width (same measured discipline as .jtbd-strip / .lab-topo). */
+    .run-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .run-plate .rn-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .run-plate .rn-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .run-plate .rn-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .run-plate .rn-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Dropped field: dashed oxide — dual-encoded by dash + oxide + label, not
+       colour alone. The consumer never mapped region (prose step 3). */
+    .run-plate .rn-drop {
+      fill: none;
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+      stroke-dasharray: 3 2.5;
+    }
+    .run-plate .rn-drop-box {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+      stroke-dasharray: 3 2.5;
+    }
+    .run-plate .rn-drop-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .run-plate marker path { fill: var(--muted); }
+    .run-plate marker path.rn-head-drop { fill: var(--accent-warm); }
+    .run-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 6px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav />
 
@@ -27,6 +90,61 @@ import SiteNav from '../../components/SiteNav.astro';
       both the hand label and the LLM judge on every axis. The note's title,
       <code>id</code>, and timestamps are illustrative placeholders.
     </p>
+
+    <!-- Run companion to the-system diagram: one note through the four seams.
+         region is the load-bearing asymmetry (dashed oxide drop off classifier).
+         Ordered list below still carries the five steps and real payloads.
+         ADR-010 N/A — no interactive nodes. -->
+    <svg class="run-plate" viewBox="0 0 260 118" role="img"
+         aria-label="One note end to end: notes-api creates the note, the classifier returns three labels, writeback keeps two as tags and drops region unmapped, then kb-agent can search by tag.">
+      <title>One note end to end: notes-api creates the note, the classifier returns three labels, writeback keeps two as tags and drops region unmapped, then kb-agent can search by tag.</title>
+      <defs>
+        <marker id="rn-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="rn-arrow-drop" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path class="rn-head-drop" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <!-- Four stage boxes L→R. rx matches --radius-sm (2px). -->
+      <rect class="rn-box" x="2" y="8" width="56" height="40" rx="2" />
+      <text class="rn-title" x="30" y="26" text-anchor="middle">notes-api</text>
+      <text class="rn-micro" x="30" y="38" text-anchor="middle">POST</text>
+
+      <rect class="rn-box" x="68" y="8" width="56" height="40" rx="2" />
+      <text class="rn-title" x="96" y="26" text-anchor="middle">classifier</text>
+      <text class="rn-micro" x="96" y="38" text-anchor="middle">3 fields</text>
+
+      <rect class="rn-box" x="134" y="8" width="56" height="40" rx="2" />
+      <text class="rn-title" x="162" y="26" text-anchor="middle">writeback</text>
+      <text class="rn-micro" x="162" y="38" text-anchor="middle">2 tags</text>
+
+      <rect class="rn-box" x="200" y="8" width="56" height="40" rx="2" />
+      <text class="rn-title" x="228" y="26" text-anchor="middle">kb-agent</text>
+      <text class="rn-micro" x="228" y="38" text-anchor="middle">search</text>
+
+      <!-- Three L→R muted edges — open pipeline through the run. -->
+      <path class="rn-edge" d="M 58 28 L 66 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
+      <path class="rn-edge" d="M 124 28 L 132 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
+      <path class="rn-edge" d="M 190 28 L 198 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
+
+      <!-- Dropped region: branches down from classifier, never reaches writeback.
+           Dashed oxide + label dual-encode the unmapped field. -->
+      <path class="rn-drop" d="M 96 50 L 96 72" marker-end="url(#rn-arrow-drop)" aria-hidden="true" />
+      <rect class="rn-drop-box" x="58" y="76" width="76" height="22" rx="2" />
+      <text class="rn-drop-text" x="96" y="91" text-anchor="middle">region dropped</text>
+
+      <text class="rn-micro" x="162" y="70" text-anchor="middle">cat + domain only</text>
+      <text class="rn-micro" x="130" y="112" text-anchor="middle">same note, real schemas</text>
+    </svg>
+    <p class="run-plate-caption">
+      Create, classify, write two tags, search. The dashed branch is the field
+      the consumer never mapped &mdash; step&nbsp;3 below names it.
+    </p>
+
     <ol class="example-run">
       <li>
         <p class="ex-step">A note is created</p>

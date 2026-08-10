@@ -9,6 +9,94 @@ import SiteNav from '../../components/SiteNav.astro';
   ogType="article"
   ogImage="/assets/og-kb-agent-retrieval.png"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Retrieval measured plate (portfolio ADR-004). Page-scoped: the unit is
+       query → ranked chunks → objective gold path-match, not a metrics chart
+       (the tables below carry the numbers). Max-width 260 keeps viewBox units
+       1:1 with CSS px on every gate width (same measured discipline as
+       .judge-plate / .two-fail / .lab-topo). */
+    .retr-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .retr-plate .rp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .retr-plate .rp-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .retr-plate .rp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .retr-plate .rp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    /* Rank rows: schematic list, not real chunk text. */
+    .retr-plate .rp-rank {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.25;
+      stroke-linecap: round;
+    }
+    .retr-plate .rp-rank-num {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+    }
+    .retr-plate .rp-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Hit: ink solid — the ordinary path match. Dual-encoded by word + stroke. */
+    .retr-plate .rp-hit {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .retr-plate .rp-hit-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    /* Miss: oxide — the class the eval is built to surface. Word + oxide
+       dual-encode; not colour-only. Same oxide-for-negative as .two-fail FAIL
+       and .judge-plate UNSUPPORTED. */
+    .retr-plate .rp-miss {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .retr-plate .rp-miss-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .retr-plate marker path { fill: var(--muted); }
+    .retr-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 6px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav current="kb-agent-retrieval" />
 
@@ -34,6 +122,61 @@ import SiteNav from '../../components/SiteNav.astro';
     <p>
       So the milestone turned inward: measure retrieval first, then decide
       whether it needs to change at all.
+    </p>
+
+    <!-- Unit of the retrieval eval: one query, ranked chunks, objective path
+         match against a hand-labeled gold set. Not a recall chart — the tables
+         below carry the numbers. No LLM judge at this layer (prose below).
+         Schematic only; no invented query text as a real quote. ADR-010 N/A. -->
+    <svg class="retr-plate" viewBox="0 0 260 132" role="img"
+         aria-label="The unit of the retrieval eval: a query returns ranked chunks, then each result is judged by an objective path match against a hand-labeled gold set. Verdict is hit or miss. No LLM judge at this layer.">
+      <title>The unit of the retrieval eval: a query returns ranked chunks, then each result is judged by an objective path match against a hand-labeled gold set. Verdict is hit or miss. No LLM judge at this layer.</title>
+      <defs>
+        <marker id="rp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <!-- Top row: Query → Ranks. Rank rows are schematic list marks, not real paths. -->
+      <text class="rp-lane" x="4" y="12">QUERY</text>
+      <rect class="rp-box" x="4" y="18" width="88" height="48" rx="2" />
+      <text class="rp-title" x="48" y="42" text-anchor="middle">question</text>
+      <text class="rp-micro" x="48" y="56" text-anchor="middle">gold unit</text>
+
+      <path class="rp-edge" d="M 94 42 L 110 42" marker-end="url(#rp-arrow)" aria-hidden="true" />
+
+      <text class="rp-lane" x="114" y="12">RANKS</text>
+      <rect class="rp-box" x="114" y="18" width="72" height="48" rx="2" />
+      <g class="rp-rank" aria-hidden="true">
+        <path d="M 134 30 H 174" />
+        <path d="M 134 40 H 168" />
+        <path d="M 134 50 H 160" />
+      </g>
+      <text class="rp-rank-num" x="124" y="33">1</text>
+      <text class="rp-rank-num" x="124" y="43">2</text>
+      <text class="rp-rank-num" x="124" y="53">3</text>
+
+      <path class="rp-edge" d="M 188 42 L 204 42" marker-end="url(#rp-arrow)" aria-hidden="true" />
+
+      <text class="rp-lane" x="208" y="12">GOLD</text>
+      <rect class="rp-box" x="208" y="18" width="48" height="48" rx="2" />
+      <text class="rp-title" x="232" y="40" text-anchor="middle">path</text>
+      <text class="rp-micro" x="232" y="54" text-anchor="middle">match</text>
+
+      <!-- Bottom: binary path-match verdict. Word + stroke dual-encode;
+           oxide only on miss (the class the eval surfaces). -->
+      <path class="rp-edge" d="M 232 68 L 232 84" marker-end="url(#rp-arrow)" aria-hidden="true" />
+      <text class="rp-lane" x="4" y="100">VERDICT</text>
+      <rect class="rp-hit" x="4" y="106" width="122" height="22" rx="2" />
+      <text class="rp-hit-text" x="65" y="121" text-anchor="middle">HIT</text>
+      <rect class="rp-miss" x="134" y="106" width="122" height="22" rx="2" />
+      <text class="rp-miss-text" x="195" y="121" text-anchor="middle">MISS</text>
+    </svg>
+    <p class="retr-plate-caption">
+      One query, a ranked list, an objective path match. The tables below
+      measure how often the right source file lands in the top&nbsp;k &mdash;
+      with no LLM judge at this layer.
     </p>
 
     <nav class="toc" aria-labelledby="toc-heading">
