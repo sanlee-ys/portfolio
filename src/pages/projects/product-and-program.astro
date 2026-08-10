@@ -7,7 +7,57 @@ import SiteNav from '../../components/SiteNav.astro';
   description="The same system read as product and program work: the user and job, success metrics in two registers, a Now/Next/Later roadmap, and an honest risk register."
   canonical="https://sanlee.me/projects/product-and-program.html"
   ogType="article"
+  ogImage="/assets/og-product-and-program.png"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* JTBD pipeline strip (portfolio ADR-004). Page-scoped: open four-stage
+       flow for this product framing, not a shared diagram type. Max-width 260
+       keeps viewBox units 1:1 with CSS px on every gate width (same measured
+       discipline as .backedge / .lab-topo / .two-fail). */
+    .jtbd-strip {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .jtbd-strip .jtbd-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .jtbd-strip .jtbd-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .jtbd-strip .jtbd-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .jtbd-strip .jtbd-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Stacked feed marks into Firehose — schematic only, not a UI chrome. */
+    .jtbd-strip .jtbd-glyph {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.25;
+      stroke-linecap: round;
+    }
+    .jtbd-strip marker path { fill: var(--muted); }
+    .jtbd-strip-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 6px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav current="product-and-program" />
 
@@ -30,10 +80,60 @@ import SiteNav from '../../components/SiteNav.astro';
     <p>
       Defense developments are scattered across many sources and arrive faster than
       one person can triage. An analyst spends a disproportionate share of time
-      finding and sorting, judging relevance and assigning a category, before any
-      real analysis begins. No lightweight, personal system ingests the firehose,
-      classifies it by topic, and makes the result queryable, so the analyst starts
-      from a raw feed instead of a triaged knowledge base.
+      finding and sorting before any real analysis begins.
+    </p>
+
+    <!-- Open pipeline, not a second copy of the JTBD when/so card: Firehose →
+         Triage → Queryable KB → Brief. Three L→R muted edges only; no return,
+         no oxide (not a failure/reversal claim). ADR-010 N/A — no interactive
+         nodes. -->
+    <svg class="jtbd-strip" viewBox="0 0 260 72" role="img"
+         aria-label="Defense-news firehose is triaged by relevance and category into a queryable knowledge base so the analyst can brief from a prepared store instead of a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.">
+      <title>Defense-news firehose is triaged by relevance and category into a queryable knowledge base so the analyst can brief from a prepared store instead of a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.</title>
+      <defs>
+        <marker id="jtbd-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <!-- Four stage boxes. rx matches --radius-sm (2px); at max-width 260
+           viewBox units are CSS px 1:1. Queryable KB is two lines so the short
+           labels fit without horizontal overflow at 320. -->
+      <rect class="jtbd-box" x="2" y="6" width="56" height="40" rx="2" />
+      <!-- Stacked feed marks: raw multi-source stream into Firehose. -->
+      <g class="jtbd-glyph" aria-hidden="true">
+        <path d="M 12 14 H 28" />
+        <path d="M 12 18 H 32" />
+        <path d="M 12 22 H 26" />
+      </g>
+      <text class="jtbd-title" x="30" y="36" text-anchor="middle">Firehose</text>
+
+      <rect class="jtbd-box" x="68" y="6" width="56" height="40" rx="2" />
+      <text class="jtbd-title" x="96" y="30" text-anchor="middle">Triage</text>
+
+      <rect class="jtbd-box" x="134" y="6" width="56" height="40" rx="2" />
+      <text class="jtbd-title" x="162" y="24" text-anchor="middle">Queryable</text>
+      <text class="jtbd-title" x="162" y="36" text-anchor="middle">KB</text>
+
+      <rect class="jtbd-box" x="200" y="6" width="56" height="40" rx="2" />
+      <text class="jtbd-title" x="228" y="30" text-anchor="middle">Brief</text>
+
+      <!-- Three L→R muted arrows only — open pipeline, no return edge. -->
+      <path class="jtbd-edge" d="M 58 26 L 66 26" marker-end="url(#jtbd-arrow)" aria-hidden="true" />
+      <path class="jtbd-edge" d="M 124 26 L 132 26" marker-end="url(#jtbd-arrow)" aria-hidden="true" />
+      <path class="jtbd-edge" d="M 190 26 L 198 26" marker-end="url(#jtbd-arrow)" aria-hidden="true" />
+
+      <!-- Geist Mono microcopy under each stage. Kept short so adjacent
+           labels do not collide at 260 viewBox width (centers ~66 apart). -->
+      <text class="jtbd-micro" x="30" y="60" text-anchor="middle">raw feed</text>
+      <text class="jtbd-micro" x="96" y="60" text-anchor="middle">rel+category</text>
+      <text class="jtbd-micro" x="162" y="60" text-anchor="middle">ask store</text>
+      <text class="jtbd-micro" x="228" y="60" text-anchor="middle">analyze</text>
+    </svg>
+    <p class="jtbd-strip-caption">
+      Firehose in; brief out. Triage and a queryable knowledge base sit in the
+      middle so analysis time is not spent sorting.
     </p>
 
     <h2>Who it is for</h2>

@@ -111,6 +111,58 @@ const CARDS = [
       { claim: 'Independent ingress paths enumerated', fig: '3 back doors', reversed: false },
     ],
   },
+  {
+    slug: 'the-system',
+    filename: 'og-the-system.png',
+    dateline: 'sanlee.me · the system',
+    title: 'The System',
+    standfirst:
+      'One classifier became four repos. The work was the seams: freeze the contract, make the loop idempotent, write the decision down.',
+    proof: [
+      { claim: 'Four public repos, independently deployable', fig: '4 repos', reversed: false },
+      { claim: 'Contract tests agreed while shapes diverged', fig: 'both CI stayed green', reversed: true },
+      { claim: 'Premium escalation measured, declined', fig: '3 times · 0 shipped', reversed: true },
+    ],
+  },
+  {
+    slug: 'product-and-program',
+    filename: 'og-product-and-program.png',
+    dateline: 'sanlee.me · product & program',
+    title: 'Product & Program',
+    standfirst:
+      'The same system from above: user and job, two metric registers, a Now/Next/Later roadmap, and an honest risk register.',
+    proof: [
+      { claim: 'Category accuracy on human-labeled text', fig: '94.4% · n=300', reversed: false },
+      { claim: 'Premium model moved nothing', fig: '0 rows at 1.97×', reversed: true },
+      { claim: 'Silent contract drift actually happened', fig: 'High · both CI green', reversed: true },
+    ],
+  },
+  {
+    slug: 'loop-replay',
+    filename: 'og-loop-replay.png',
+    dateline: 'sanlee.me · loop replay',
+    title: 'Loop Replay',
+    standfirst:
+      'A recorded-replay of the autonomous loop: A improved, held-out gold did not, and the gap is the whole point.',
+    proof: [
+      { claim: 'Training rose while gold held-out fell', fig: 'A +0.179, C -0.025', reversed: true },
+      { claim: 'Overfitting gap, baseline to best', fig: '+0.204', reversed: true },
+      { claim: 'Real run, threshold stop', fig: '1.5M tokens · iter 2', reversed: false },
+    ],
+  },
+  {
+    slug: 'kb-agent-retrieval',
+    filename: 'og-kb-agent-retrieval.png',
+    dateline: 'sanlee.me · retrieval, measured',
+    title: 'Retrieval, Measured',
+    standfirst:
+      'kb-agent had never measured its own retrieval. Three A/B\'d changes later, the most useful result is the one I did not ship.',
+    proof: [
+      { claim: 'Model kind-pass rate after steering', fig: '0.370 → 0.889', reversed: false },
+      { claim: 'Hybrid built for one miss, declined', fig: 'recall@1 0.741 → 0.704', reversed: true },
+      { claim: 'At n=27, one query is the whole lift', fig: '3.7 pts · p=1.0', reversed: true },
+    ],
+  },
 ];
 
 // Same two-step browser resolution the other Playwright scripts use: PW_CHROMIUM
