@@ -9,6 +9,69 @@ import SiteNav from '../../components/SiteNav.astro';
   ogType="article"
 >
 
+  <Fragment slot="head">
+  <style is:inline>
+    /* Baseline vs LLM fork (portfolio ADR-004). Page-scoped: why an LLM at
+       all is the decision, not the bake-off percentages (the table below
+       carries those). Max-width 260 keeps viewBox units 1:1 with CSS px on
+       every gate width (same measured discipline as .two-fail / .judge-plate). */
+    .bake-fork {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .bake-fork .bf-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .bake-fork .bf-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .bake-fork .bf-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .bake-fork .bf-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .bake-fork .bf-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Gold target: ink solid — both arms face the same human set. Dual-
+       encoded by word + stroke weight, not colour alone. */
+    .bake-fork .bf-gold {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .bake-fork .bf-gold-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .bake-fork marker path { fill: var(--muted); }
+    .bake-fork-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 6px;
+    }
+  </style>
+  </Fragment>
+
   <SiteNav />
 
   <style is:inline>
@@ -255,6 +318,58 @@ import SiteNav from '../../components/SiteNav.astro';
       else on this page. Deliberately standard, not tuned. A clever baseline invites
       &ldquo;you rigged it,&rdquo; and a hobbled one invites the same accusation
       in reverse.
+    </p>
+
+    <!-- Decision fork: same text, two arms, one human gold set. Percentages
+         stay in the table below (ADR-004 Decision 5 floor — the figure carries
+         topology, prose keeps the numbers). No oxide: this is a bake-off, not
+         a reversal claim. ADR-010 N/A — no interactive nodes. -->
+    <svg class="bake-fork" viewBox="0 0 260 148" role="img"
+         aria-label="Decision fork for the classifier bake-off: the same defense-news snippet is scored by a classical TF-IDF logistic-regression baseline and by the LLM, both against the same 54-row human gold set.">
+      <title>Decision fork for the classifier bake-off: the same defense-news snippet is scored by a classical TF-IDF logistic-regression baseline and by the LLM, both against the same 54-row human gold set.</title>
+      <defs>
+        <marker id="bf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <!-- Shared input on the left. -->
+      <text class="bf-lane" x="4" y="12">INPUT</text>
+      <rect class="bf-box" x="4" y="48" width="70" height="40" rx="2" />
+      <text class="bf-title" x="39" y="68" text-anchor="middle">snippet</text>
+      <text class="bf-micro" x="39" y="80" text-anchor="middle">one row</text>
+
+      <!-- Split: classical above, LLM below — both face the same gold. -->
+      <path class="bf-edge" d="M 74 68 L 90 68 L 90 40 L 106 40"
+            marker-end="url(#bf-arrow)" aria-hidden="true" />
+      <path class="bf-edge" d="M 90 68 L 90 96 L 106 96"
+            marker-end="url(#bf-arrow)" aria-hidden="true" />
+
+      <text class="bf-lane" x="110" y="12">ARMS</text>
+      <rect class="bf-box" x="110" y="22" width="78" height="36" rx="2" />
+      <text class="bf-title" x="149" y="38" text-anchor="middle">TF-IDF + LR</text>
+      <text class="bf-micro" x="149" y="50" text-anchor="middle">classical</text>
+
+      <rect class="bf-box" x="110" y="78" width="78" height="36" rx="2" />
+      <text class="bf-title" x="149" y="94" text-anchor="middle">LLM</text>
+      <text class="bf-micro" x="149" y="106" text-anchor="middle">forced tool</text>
+
+      <!-- Merge into shared gold. -->
+      <path class="bf-edge" d="M 188 40 L 204 40 L 204 68 L 218 68"
+            marker-end="url(#bf-arrow)" aria-hidden="true" />
+      <path class="bf-edge" d="M 188 96 L 204 96 L 204 68" aria-hidden="true" />
+
+      <text class="bf-lane" x="200" y="12">GOLD</text>
+      <rect class="bf-gold" x="222" y="48" width="34" height="40" rx="2" />
+      <text class="bf-gold-text" x="239" y="68" text-anchor="middle">n=54</text>
+      <text class="bf-micro" x="239" y="80" text-anchor="middle">human</text>
+
+      <text class="bf-micro" x="130" y="140" text-anchor="middle">same rows both arms &middot; paired McNemar</text>
+    </svg>
+    <p class="bake-fork-caption">
+      One snippet, two arms, one human gold set. The table below is the score;
+      the fork is why the comparison is fair.
     </p>
 
     <table class="metrics" id="bakeoff">
