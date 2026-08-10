@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 /*
- * Render public/assets/og-cover.png (1200x630) from scripts/og-cover.html.
+ * Render OG cards (1200x630) from HTML templates into public/assets/.
+ *
+ * Homepage card (unchanged contract):
+ *     scripts/og-cover.html  →  public/assets/og-cover.png
+ *
+ * Per-project cards (same pipeline, parameterized template):
+ *     scripts/og-cover-project.html + CARDS below
+ *       → public/assets/og-<slug>.png
  *
  * WHY THIS EXISTS AS A SCRIPT. The card that shipped until 2026-07-28 was a
  * hand-made PNG from the site's previous identity: cool near-black ground,
@@ -28,6 +35,10 @@
  *
  * Run from the repo root, after `npm run build`:
  *     node scripts/og-cover.cjs
+ *     node scripts/og-cover.cjs --only=false-green
+ *
+ * `--only=<slug>` regenerates one project card (or `home` for the homepage
+ * PNG) without rewriting the others.
  *
  * It is deliberately NOT part of `npm run qa`. The gates check the built site;
  * this writes a source asset. Wiring a generator into a gate is how a check
@@ -38,9 +49,69 @@ const path = require('path');
 const { serve } = require('./static-server.cjs');
 
 const REPO = path.resolve(__dirname, '..');
-const SRC = path.join(__dirname, 'og-cover.html');
-const OUT = path.join(REPO, 'public', 'assets', 'og-cover.png');
+const HOME_SRC = path.join(__dirname, 'og-cover.html');
+const PROJECT_SRC = path.join(__dirname, 'og-cover-project.html');
+const OUT_DIR = path.join(REPO, 'public', 'assets');
 const DIST = path.join(REPO, 'dist');
+
+/**
+ * Project cards. Numbers are locked to the page/spec — do not invent figures.
+ * `reversed: true` paints the oxide double-rule (li.rev) used for denials.
+ */
+const CARDS = [
+  {
+    slug: 'false-green',
+    filename: 'og-false-green.png',
+    dateline: 'sanlee.me · false green',
+    title: 'False Green',
+    standfirst:
+      'Six gates I built and wired into CI, later caught passing for work that never ran.',
+    proof: [
+      { claim: 'Review lane green, nothing posted', fig: '36s · 6 denials', reversed: true },
+      { claim: 'Font gate saw only what its regex could', fig: '1 of 3 faces', reversed: true },
+      { claim: 'Denial counter read a key that never existed', fig: 'denials=0 always', reversed: true },
+    ],
+  },
+  {
+    slug: 'faithfulness-judge',
+    filename: 'og-faithfulness-judge.png',
+    dateline: 'sanlee.me · faithfulness judge',
+    title: 'Faithfulness Judge',
+    standfirst:
+      'How far an LLM judge can be trusted — and the harness bug that nearly shipped a false gap.',
+    proof: [
+      { claim: 'Nearly published a false tier gap', fig: '39 of 191 cut off', reversed: false },
+      { claim: 'Opus binary agreement with gold', fig: 'κ 0.762', reversed: false },
+      { claim: 'Premium escalation not evidenced', fig: 'p = 0.51', reversed: false },
+    ],
+  },
+  {
+    slug: 'defense-news-classifier',
+    filename: 'og-defense-news-classifier.png',
+    dateline: 'sanlee.me · defense news classifier',
+    title: 'Defense News Classifier',
+    standfirst:
+      'An LLM classifier, and the eval harness that kept me honest about every upgrade.',
+    proof: [
+      { claim: 'Added retrieval grounding, cut it', fig: 'fixed 0, broke 4', reversed: true },
+      { claim: 'Built the premium-model upgrade, declined it', fig: '0 rows at 1.97× the cost', reversed: true },
+      { claim: 'Rebuilt the eval until accuracy fell', fig: '97.3% → 88.9%', reversed: false },
+    ],
+  },
+  {
+    slug: 'netops-lab',
+    filename: 'og-netops-lab.png',
+    dateline: 'sanlee.me · zero-touch',
+    title: 'Zero-Touch Provisioning',
+    standfirst:
+      'A factory-blank router configures itself on one power cycle. The hard part was the host.',
+    proof: [
+      { claim: 'Wipe to provisioned, one command', fig: '~90s · one cycle', reversed: false },
+      { claim: 'Forced password change was interactive-only', fig: 'script never hits it', reversed: false },
+      { claim: 'Independent ingress paths enumerated', fig: '3 back doors', reversed: false },
+    ],
+  },
+];
 
 // Same two-step browser resolution the other Playwright scripts use: PW_CHROMIUM
 // if set, else Playwright's own. No hard-coded path — see CLAUDE.md for the
@@ -50,20 +121,96 @@ function chromium() {
   return c;
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Typographic entities that match the homepage card's hand-written HTML. */
+function formatFig(fig) {
+  return escapeHtml(fig)
+    .replace(/×/g, '&times;')
+    .replace(/→/g, '&rarr;')
+    .replace(/—/g, '&mdash;');
+}
+
+function formatClaim(claim) {
+  return escapeHtml(claim).replace(/—/g, '&mdash;');
+}
+
+function buildProofHtml(proof) {
+  return proof
+    .map((item, i) => {
+      const n = String(i + 1).padStart(2, '0');
+      const rev = item.reversed ? ' class="rev"' : '';
+      return (
+        `    <li${rev}><span class="idx">${n}</span>` +
+        `<span class="claim">${formatClaim(item.claim)} &mdash; ` +
+        `<span class="fig">${formatFig(item.fig)}</span></span></li>`
+      );
+    })
+    .join('\n');
+}
+
+function fillProjectTemplate(template, card) {
+  return template
+    .replace(/DATELINE/g, escapeHtml(card.dateline).replace(/ · /g, ' &nbsp;·&nbsp; '))
+    .replace(/TITLE/g, escapeHtml(card.title))
+    .replace(/STANDFIRST/g, formatClaim(card.standfirst))
+    .replace(/PROOF_HTML/g, buildProofHtml(card.proof));
+}
+
+function parseOnly() {
+  const arg = process.argv.find((a) => a.startsWith('--only='));
+  if (!arg) return null;
+  return arg.slice('--only='.length).trim() || null;
+}
+
+async function renderCard(page, html, outPath, label) {
+  const staged = path.join(__dirname, `.og-cover.${label}.staged.html`);
+  fs.writeFileSync(staged, html);
+  try {
+    await page.goto('file:///' + staged.replace(/\\/g, '/'), { waitUntil: 'networkidle' });
+    // Without this the card can render in the fallback face on a cold cache,
+    // which is the one failure mode that looks fine until you compare it.
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: outPath, clip: { x: 0, y: 0, width: 1200, height: 630 } });
+  } finally {
+    if (fs.existsSync(staged)) fs.unlinkSync(staged);
+  }
+
+  const buf = fs.readFileSync(outPath);
+  const w = buf.readUInt32BE(16);
+  const h = buf.readUInt32BE(20);
+  if (w !== 1200 || h !== 630) {
+    throw new Error(`${path.basename(outPath)}: wrote ${w}x${h}, expected 1200x630.`);
+  }
+  console.log(`OK - ${path.basename(outPath)} ${w}x${h}, ${buf.length} bytes.`);
+  return outPath;
+}
+
 (async () => {
   if (!fs.existsSync(DIST)) {
     console.error('✗ og-cover: dist/ does not exist. Run `npm run build` first —');
-    console.error('  the card loads the site\'s own font files from the built output.');
+    console.error("  the card loads the site's own font files from the built output.");
     process.exit(1);
   }
 
+  const only = parseOnly();
+  if (only) {
+    const known = new Set(['home', ...CARDS.map((c) => c.slug)]);
+    if (!known.has(only)) {
+      console.error(`✗ og-cover: unknown --only=${only}. Known: home, ${CARDS.map((c) => c.slug).join(', ')}`);
+      process.exit(1);
+    }
+  }
+
   const site = await serve(DIST);
-  // The source keeps a FONTDIR placeholder rather than a hard-coded origin, so
-  // the file stays openable in a browser for editing and the script supplies
-  // the ephemeral port at render time.
-  const html = fs.readFileSync(SRC, 'utf8').replace(/FONTDIR/g, site.origin + '/assets/fonts');
-  const staged = path.join(__dirname, '.og-cover.staged.html');
-  fs.writeFileSync(staged, html);
+  const fontOrigin = site.origin + '/assets/fonts';
 
   const launchOpts = process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {};
   const browser = await chromium().launch(launchOpts);
@@ -72,23 +219,25 @@ function chromium() {
     deviceScaleFactor: 1,
   });
   const page = await ctx.newPage();
-  await page.goto('file:///' + staged.replace(/\\/g, '/'), { waitUntil: 'networkidle' });
-  // Without this the card can render in the fallback face on a cold cache,
-  // which is the one failure mode that looks fine until you compare it.
-  await page.evaluate(() => document.fonts.ready);
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: OUT, clip: { x: 0, y: 0, width: 1200, height: 630 } });
 
-  await browser.close();
-  await site.close();
-  fs.unlinkSync(staged);
+  try {
+    const doHome = !only || only === 'home';
+    if (doHome) {
+      const html = fs.readFileSync(HOME_SRC, 'utf8').replace(/FONTDIR/g, fontOrigin);
+      await renderCard(page, html, path.join(OUT_DIR, 'og-cover.png'), 'home');
+    }
 
-  const buf = fs.readFileSync(OUT);
-  const w = buf.readUInt32BE(16);
-  const h = buf.readUInt32BE(20);
-  if (w !== 1200 || h !== 630) {
-    console.error(`✗ og-cover: wrote ${w}x${h}, expected 1200x630.`);
-    process.exit(1);
+    const projectTpl = fs.readFileSync(PROJECT_SRC, 'utf8');
+    const cards = only && only !== 'home' ? CARDS.filter((c) => c.slug === only) : only === 'home' ? [] : CARDS;
+    for (const card of cards) {
+      const filled = fillProjectTemplate(projectTpl, card).replace(/FONTDIR/g, fontOrigin);
+      await renderCard(page, filled, path.join(OUT_DIR, card.filename), card.slug);
+    }
+  } catch (err) {
+    console.error('✗ og-cover:', err.message || err);
+    process.exitCode = 1;
+  } finally {
+    await browser.close();
+    await site.close();
   }
-  console.log(`OK - og-cover.png ${w}x${h}, ${buf.length} bytes.`);
 })();

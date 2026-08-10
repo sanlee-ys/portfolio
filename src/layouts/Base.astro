@@ -19,6 +19,9 @@ const {
   ogType = 'article',
   ogTitle = title,
   ogDescription = description,
+  // Absolute path under the site root. Project pages pass a per-card PNG
+  // (e.g. /assets/og-false-green.png); everything else keeps the homepage card.
+  ogImage = '/assets/og-cover.png',
   social = canonical != null,
   // Where the skip link lands. Every page's <main> carries `id="main"` except
   // the homepage, whose <main> has been `id="work"` since before this existed
@@ -26,6 +29,7 @@ const {
   // would 404 those anchors, so the homepage overrides the target instead.
   skipTo = '#main',
 } = Astro.props;
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${ogImage}`;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -43,13 +47,13 @@ const {
       <meta property="og:url" content={canonical} />
       <meta property="og:title" content={ogTitle} />
       <meta property="og:description" content={ogDescription} />
-      <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
+      <meta property="og:image" content={ogImageUrl} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={ogTitle} />
       <meta name="twitter:description" content={ogDescription} />
-      <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
+      <meta name="twitter:image" content={ogImageUrl} />
     </Fragment>
   )}
   <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />

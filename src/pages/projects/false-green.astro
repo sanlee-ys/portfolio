@@ -7,7 +7,103 @@ import SiteNav from '../../components/SiteNav.astro';
   description="Six checks I built, wired into CI, and later caught reporting success for work that had not happened. What they have in common is not that they broke — it is that they passed."
   canonical="https://sanlee.me/projects/false-green.html"
   ogType="article"
+  ogImage="/assets/og-false-green.png"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Two-ways-to-fail schematic (portfolio ADR-004). Page-scoped: the oxide
+       FAIL vs ink PASS encoding is unique to this claim, and the diagram does
+       not borrow series colours the way the loop-replay split map does. */
+    .two-fail {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 8px 0 10px;
+    }
+    /* Neutral step boxes — fill ground so they sit in the page, not on a card. */
+    .two-fail .tf-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    /* Shared empty middle: hollow + dashed. Same geometry on both lanes so the
+       only difference that reads is the outcome badge and the final edge. */
+    .two-fail .tf-hollow {
+      fill: var(--bg);
+      stroke: var(--muted);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .two-fail .tf-fail {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .two-fail .tf-pass {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .two-fail .tf-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .two-fail .tf-step {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 12px;
+    }
+    .two-fail .tf-hollow-label {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 11.5px;
+    }
+    .two-fail .tf-fail-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .two-fail .tf-pass-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .two-fail .tf-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Loud break into FAIL: oxide stroke, short segments with a real gap. */
+    .two-fail .tf-edge-break {
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+      fill: none;
+    }
+    .two-fail .tf-edge-pass {
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .two-fail .tf-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+    .two-fail marker path { fill: var(--muted); }
+    .two-fail marker path.tf-head-fail { fill: var(--accent-warm); }
+    .two-fail marker path.tf-head-pass { fill: var(--text); }
+    .two-fail-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 22px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav />
 
@@ -42,10 +138,63 @@ import SiteNav from '../../components/SiteNav.astro';
       workflow file. Green. The job never executed at all.
     </p>
 
-    <p class="tradeoff">
-      <strong>The shape:</strong> a deterministic tool fails loudly when it does
-      nothing. An agentic one succeeds quietly &mdash; the same green appears
-      whether the work happened, was denied, crashed, or was never attempted.
+    <!-- Argument: same empty middle, opposite report. State is word + geometry
+         first (FAIL/PASS, broken vs intact edge), oxide/ink second — not a
+         colour-only reading, and no invented CI green. -->
+    <svg class="two-fail" viewBox="0 0 260 188" role="img"
+         aria-label="Two parallel CI outcomes when no work ran. Top: a deterministic tool exits non-zero and reports FAIL. Bottom: an agentic or hand-written gate exits zero and reports PASS — the same success mark whether the work was denied, crashed, or never attempted.">
+      <defs>
+        <marker id="tf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="tf-arrow-fail" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path class="tf-head-fail" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="tf-arrow-pass" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto">
+          <path class="tf-head-pass" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <!-- Top lane: deterministic tool — loud FAIL when nothing ran. -->
+      <text class="tf-lane" x="6" y="14">DETERMINISTIC TOOL</text>
+      <rect class="tf-box" x="6" y="24" width="64" height="36" rx="2" />
+      <text class="tf-step" x="38" y="46" text-anchor="middle">run tool</text>
+      <path class="tf-edge" d="M 70 42 L 84 42" marker-end="url(#tf-arrow)" />
+      <rect class="tf-hollow" x="88" y="24" width="74" height="36" rx="2" />
+      <text class="tf-hollow-label" x="125" y="46" text-anchor="middle">nothing ran</text>
+      <!-- Broken final edge: gap is the loud break into FAIL. -->
+      <path class="tf-edge-break" d="M 162 42 L 170 42" />
+      <path class="tf-edge-break" d="M 180 42 L 188 42" marker-end="url(#tf-arrow-fail)" />
+      <!-- ASCII exit code + word badge only: ≠ / ✕ / ✓ are not in Geist, and
+           FAIL/PASS + broken edge already dual-encode outcome (font-coverage). -->
+      <text class="tf-micro" x="175" y="72" text-anchor="middle">exit != 0</text>
+      <rect class="tf-fail" x="192" y="24" width="62" height="36" rx="2" />
+      <text class="tf-fail-text" x="223" y="46" text-anchor="middle">FAIL</text>
+
+      <!-- Bottom lane: agentic / hand gate — quiet PASS on the same empty middle. -->
+      <text class="tf-lane" x="6" y="104">AGENTIC / HAND GATE</text>
+      <rect class="tf-box" x="6" y="114" width="64" height="36" rx="2" />
+      <text class="tf-step" x="38" y="136" text-anchor="middle">run check</text>
+      <path class="tf-edge" d="M 70 132 L 84 132" marker-end="url(#tf-arrow)" />
+      <rect class="tf-hollow" x="88" y="114" width="74" height="36" rx="2" />
+      <text class="tf-hollow-label" x="125" y="136" text-anchor="middle">nothing ran</text>
+      <!-- Intact final edge: quiet false success. -->
+      <path class="tf-edge tf-edge-pass" d="M 162 132 L 188 132" marker-end="url(#tf-arrow-pass)" />
+      <text class="tf-micro" x="175" y="162" text-anchor="middle">exit 0</text>
+      <rect class="tf-pass" x="192" y="114" width="62" height="36" rx="2" />
+      <text class="tf-pass-text" x="223" y="136" text-anchor="middle">PASS</text>
+    </svg>
+    <p class="two-fail-caption">
+      Same empty middle, opposite report. A deterministic tool fails loudly
+      when it does nothing; an agentic or hand-written gate can still go PASS
+      &mdash; green whether the work happened, was denied, crashed, or was
+      never attempted.
+    </p>
+
+    <p>
       That was the lesson I wrote down, and I thought it was a lesson about
       agents.
     </p>

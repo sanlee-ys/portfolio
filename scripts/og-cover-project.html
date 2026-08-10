@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: "Geist";
+    src: url("FONTDIR/geist-latin.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "Geist Mono";
+    src: url("FONTDIR/geist-mono-latin.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; }
+  /* Same light tokens as og-cover.html / public/assets/style.css:
+     ground #fafaf9, ink #1e1c1b, argument #383533, metadata #5f5c58,
+     ink rule #423f3c, oxide #5e1f0d. Geist only — no synthetic italic. */
+  body {
+    background: #fafaf9;
+    color: #1e1c1b;
+    font-family: "Geist", system-ui, sans-serif;
+    padding: 62px 72px 54px;
+    display: flex;
+    flex-direction: column;
+  }
+  em { font-style: normal; font-weight: 600; }
+  .dateline {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: #383533;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #423f3c;
+  }
+  /* Project titles are multi-word; 72px keeps the display weight without
+     blowing the 630px frame the way the homepage's 103px nameplate would. */
+  h1 {
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.032em;
+    margin-top: 28px;
+    max-width: 14ch;
+  }
+  .standfirst {
+    font-weight: 500;
+    color: #383533;
+    font-size: 28px;
+    line-height: 1.32;
+    margin-top: 16px;
+    max-width: 36ch;
+  }
+  .proof {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 40px;
+  }
+  .proof li { list-style: none; position: relative; border-top: 2px solid #423f3c; padding-top: 13px; }
+  .proof li.rev { border-top-color: #5e1f0d; }
+  .proof li.rev::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 3px;
+    height: 1px;
+    background: #5e1f0d;
+  }
+  .idx {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: #5f5c58;
+    margin-bottom: 9px;
+  }
+  .rev .idx { color: #5e1f0d; }
+  .claim { font-size: 20px; line-height: 1.4; color: #383533; }
+  .fig {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    font-size: 0.94em;
+    letter-spacing: -0.015em;
+    color: #1e1c1b;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+  <div class="dateline">DATELINE</div>
+  <h1>TITLE</h1>
+  <p class="standfirst">STANDFIRST</p>
+  <ul class="proof">
+PROOF_HTML
+  </ul>
+</body>
+</html>
