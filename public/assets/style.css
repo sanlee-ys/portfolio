@@ -2994,11 +2994,10 @@ main.wrap > .measure { grid-column: full; }
   color: var(--muted);
 }
 
-/* Sango: one small frame, not a gallery — and now a MOUNTED one. The photo
-   sits on a paper mat with the caption printed on the mount below it, which is
-   how a single picture appears in a notebook: pasted in, not floated. It is
-   the only photographic object on the page, so it is the one place a mat is
-   an accent rather than another box in a page full of boxes. */
+/* Sango: a mounted print the same width as the contact sheet above it.
+   The photo sits on a paper mat with the caption printed on the mount
+   below it. Width is the content track, not a 300px thumbnail — the four
+   frames above set the measure, and this print has to share that edge. */
 /* Contact sheet under the photography claim. Square crops, hairline gaps,
    the journal's plate language — not the gallery's masonry, which is a
    different page with a different job. Each cell is a real link to the
@@ -3034,7 +3033,8 @@ main.wrap > .measure { grid-column: full; }
 
 .sango {
   margin: 26px 0 0;
-  max-width: 300px;
+  width: 100%;
+  max-width: none;
   background: var(--panel);
   border: 1px solid var(--border);
   padding: 11px;
