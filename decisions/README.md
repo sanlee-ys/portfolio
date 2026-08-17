@@ -15,6 +15,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-008](ADR-008-breakout-grid.md) | A breakout grid — two deliberate edges, not one honest column. **Reverses the "One content column" rule** | Accepted |
 | [ADR-009](ADR-009-rendered-contrast-gate.md) | Contrast is checked on the rendered pixel, not the declared token | Accepted |
 | [ADR-010](ADR-010-the-figure-offers-the-jump.md) | A figure offers the jump, it does not take it | Accepted |
+| [ADR-011](ADR-011-career-story-ceiling.md) | The public career tell stays short | Accepted |
 
 ## Why this tier was missing
 
