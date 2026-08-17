@@ -9,6 +9,87 @@ import SiteNav from '../../components/SiteNav.astro';
   ogType="article"
   ogImage="/assets/og-the-system.png"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Contract-seam plate (portfolio ADR-004). Page-scoped: both sides
+       report GREEN against their own copy of the shape, and the wire
+       between them is broken. Not a second system diagram (the interactive
+       map below already is that). Max-width 260 keeps viewBox units 1:1
+       with CSS px (same discipline as .two-fail / .judge-plate). */
+    .seam-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .seam-plate .sp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .seam-plate .sp-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .seam-plate .sp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .seam-plate .sp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .seam-plate .sp-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .seam-plate .sp-edge-break {
+      fill: none;
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    /* GREEN: ink solid — the report each side believed. Word + stroke. */
+    .seam-plate .sp-ok {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .seam-plate .sp-ok-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    /* BROKEN: oxide — the seam. Word + oxide, not colour-only. */
+    .seam-plate .sp-bad {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .seam-plate .sp-bad-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .seam-plate marker path { fill: var(--muted); }
+    .seam-plate marker path.sp-head-bad { fill: var(--accent-warm); }
+    .seam-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav current="the-system" />
 
@@ -24,6 +105,49 @@ import SiteNav from '../../components/SiteNav.astro';
       there were four repos that had to talk to each other, I had a choice: let
       them fuse into one tangled codebase, or impose discipline on the seams
       between them. I chose discipline and recorded why at each step.
+    </p>
+
+    <!-- Argument: each side's test is green against its own copy of the
+         shape; the wire between them is broken. Word + geometry first
+         (GREEN / GREEN / BROKEN), oxide only on the seam. ADR-010 N/A. -->
+    <svg class="seam-plate" viewBox="0 0 260 148" role="img"
+         aria-label="Contract seam: the provider tests its own fixture and reports GREEN. The consumer tests its own stub and reports GREEN. The wire between them is BROKEN, because each side asserted against its own copy of the shape.">
+      <title>Both sides report GREEN against their own copy of the shape. The wire between them is BROKEN.</title>
+      <defs>
+        <marker id="sp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="sp-arrow-bad" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path class="sp-head-bad" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <text class="sp-lane" x="4" y="12">PROVIDER</text>
+      <rect class="sp-box" x="4" y="18" width="110" height="36" rx="2" />
+      <text class="sp-title" x="59" y="40" text-anchor="middle">own fixture</text>
+      <rect class="sp-ok" x="4" y="60" width="110" height="22" rx="2" />
+      <text class="sp-ok-text" x="59" y="75" text-anchor="middle">GREEN</text>
+
+      <text class="sp-lane" x="146" y="12">CONSUMER</text>
+      <rect class="sp-box" x="146" y="18" width="110" height="36" rx="2" />
+      <text class="sp-title" x="201" y="40" text-anchor="middle">own stub</text>
+      <rect class="sp-ok" x="146" y="60" width="110" height="22" rx="2" />
+      <text class="sp-ok-text" x="201" y="75" text-anchor="middle">GREEN</text>
+
+      <path class="sp-edge" d="M 59 82 L 59 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
+      <path class="sp-edge" d="M 201 82 L 201 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
+      <path class="sp-edge-break" d="M 59 96 L 118 96" aria-hidden="true" />
+      <path class="sp-edge-break" d="M 142 96 L 201 96" marker-end="url(#sp-arrow-bad)" aria-hidden="true" />
+
+      <text class="sp-lane" x="4" y="116">THE WIRE</text>
+      <rect class="sp-bad" x="4" y="122" width="252" height="22" rx="2" />
+      <text class="sp-bad-text" x="130" y="137" text-anchor="middle">BROKEN</text>
+    </svg>
+    <p class="seam-plate-caption">
+      Two unit tests that happen to agree are not a contract test. Each side
+      was green. The seam was not.
     </p>
 
     <nav class="toc" aria-labelledby="toc-heading">

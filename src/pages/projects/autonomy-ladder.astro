@@ -8,6 +8,65 @@ import SiteNav from '../../components/SiteNav.astro';
   canonical="https://sanlee.me/projects/autonomy-ladder.html"
   ogType="article"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Ladder-verdict plate (portfolio ADR-004). Page-scoped: four rungs,
+       two shipped, two taken back. The ol.ladder below carries the full
+       telling; this plate is the scoreboard. Max-width 260, viewBox 1:1. */
+    .rung-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .rung-plate .rp-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .rung-plate .rp-id {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .rung-plate .rp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .rung-plate .rp-ok {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .rung-plate .rp-ok-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .rung-plate .rp-cut {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .rung-plate .rp-cut-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .rung-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav />
 
@@ -22,6 +81,38 @@ import SiteNav from '../../components/SiteNav.astro';
       self-direction, not a separate demo. The axis is who drives &mdash;
       reaching for a tool doesn&rsquo;t move you up a level; deciding for
       yourself does.
+    </p>
+
+    <!-- Four rungs, two taken back. Word + stroke first; oxide only on the
+         rungs that were retired or declined. ADR-010 N/A. -->
+    <svg class="rung-plate" viewBox="0 0 260 132" role="img"
+         aria-label="Autonomy ladder scoreboard. L1 single call: shipped. L2 augmented: retired. L3 autonomous loop: shipped. L4 multi-agent: declined.">
+      <title>L1 shipped, L2 retired, L3 shipped, L4 declined. Two of four rungs shipped a no.</title>
+      <text class="rp-lane" x="4" y="12">THE CLIMB</text>
+
+      <text class="rp-id" x="4" y="28">L1</text>
+      <rect class="rp-ok" x="4" y="34" width="122" height="36" rx="2" />
+      <text class="rp-title" x="65" y="48" text-anchor="middle">single call</text>
+      <text class="rp-ok-text" x="65" y="62" text-anchor="middle">SHIPPED</text>
+
+      <text class="rp-id" x="134" y="28">L2</text>
+      <rect class="rp-cut" x="134" y="34" width="122" height="36" rx="2" />
+      <text class="rp-title" x="195" y="48" text-anchor="middle">augmented</text>
+      <text class="rp-cut-text" x="195" y="62" text-anchor="middle">RETIRED</text>
+
+      <text class="rp-id" x="4" y="84">L3</text>
+      <rect class="rp-ok" x="4" y="90" width="122" height="36" rx="2" />
+      <text class="rp-title" x="65" y="104" text-anchor="middle">loop</text>
+      <text class="rp-ok-text" x="65" y="118" text-anchor="middle">SHIPPED</text>
+
+      <text class="rp-id" x="134" y="84">L4</text>
+      <rect class="rp-cut" x="134" y="90" width="122" height="36" rx="2" />
+      <text class="rp-title" x="195" y="104" text-anchor="middle">multi-agent</text>
+      <text class="rp-cut-text" x="195" y="118" text-anchor="middle">DECLINED</text>
+    </svg>
+    <p class="rung-plate-caption">
+      Every rung was written down before it was built. Two of the four
+      shipped a no, and the measurement is why.
     </p>
     <!-- The ladder as a climb rather than a table. Same payload the four-row
          table carried (what it gains / who drives / state), but two things a

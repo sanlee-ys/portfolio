@@ -26,6 +26,45 @@ import SiteNav from '../components/SiteNav.astro';
     ]
   }
   </script>
+  <style is:inline>
+    /* Method plate (portfolio ADR-004). Page-scoped: the three-part way
+       the work is run. Not a second system diagram (that sits below).
+       Max-width 260, viewBox 1:1, same grammar as .jtbd-strip. */
+    .method-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .method-plate .mp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .method-plate .mp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .method-plate .mp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .method-plate .mp-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .method-plate marker path { fill: var(--muted); }
+    .method-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0;
+    }
+  </style>
   </Fragment>
 
   <header class="hero">
@@ -70,6 +109,31 @@ import SiteNav from '../components/SiteNav.astro';
         <li><a href="projects/false-green.html"><span class="door-name">False Green</span><span class="door-why">Six checks that passed on work that never ran</span></a></li>
         <li><a href="projects/product-and-program.html"><span class="door-name">Product &amp; Program</span><span class="door-why">The same system, read as a program</span></a></li>
       </ul>
+
+      <!-- How the work is run. Open pipeline, no oxide: this is the method,
+           not a reversal. ADR-010 N/A. -->
+      <svg class="method-plate" viewBox="0 0 260 72" role="img"
+           aria-label="How the work is run: set the direction, freeze the contracts between the parts, then gate every change on evidence.">
+        <title>Direction, then contracts, then an evidence gate.</title>
+        <defs>
+          <marker id="mp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+        <rect class="mp-box" x="2" y="6" width="76" height="40" rx="2" />
+        <text class="mp-title" x="40" y="24" text-anchor="middle">Direction</text>
+        <text class="mp-micro" x="40" y="38" text-anchor="middle">set the aim</text>
+        <path class="mp-edge" d="M 78 26 L 90 26" marker-end="url(#mp-arrow)" aria-hidden="true" />
+        <rect class="mp-box" x="92" y="6" width="76" height="40" rx="2" />
+        <text class="mp-title" x="130" y="24" text-anchor="middle">Contracts</text>
+        <text class="mp-micro" x="130" y="38" text-anchor="middle">freeze seams</text>
+        <path class="mp-edge" d="M 168 26 L 180 26" marker-end="url(#mp-arrow)" aria-hidden="true" />
+        <rect class="mp-box" x="182" y="6" width="76" height="40" rx="2" />
+        <text class="mp-title" x="220" y="24" text-anchor="middle">Evidence</text>
+        <text class="mp-micro" x="220" y="38" text-anchor="middle">gate the merge</text>
+        <text class="mp-micro" x="130" y="64" text-anchor="middle">nothing here was one-shotted</text>
+      </svg>
     </section>
 
     <h2 class="section-title">The system</h2>
