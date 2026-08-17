@@ -107,7 +107,8 @@ import SiteNav from '../components/SiteNav.astro';
     <h2>The ledger</h2>
     <p>
       This is a sample from the actual session transcripts, spanning the whole
-      build. Dates and quotes are real, tightened for readability. I didn&rsquo;t
+      build. Dates are real. Quotes are tightened to the site&rsquo;s writing
+      standard. I didn&rsquo;t
       filter out the entries that make either of us look bad &mdash; and since
       early July the worst of them come with public receipts: the operating
       layer now keeps its
@@ -133,22 +134,22 @@ import SiteNav from '../components/SiteNav.astro';
       <li>
         <div class="tl-date">Jun 21</div>
         <div class="tl-title">Sometimes its case won.</div>
-        <p class="tl-body">It pushed back on my docs format, Markdown over RST; I weighed the reasoning and took it. Steering cuts both ways &mdash; the point isn&rsquo;t that I&rsquo;m always right, it&rsquo;s that someone is deciding. <span class="tl-quote">&ldquo;if you feel it&rsquo;s overkill, so be it.&rdquo;</span></p>
+        <p class="tl-body">It pushed back on my docs format, Markdown over RST; I weighed the reasoning and took it. Steering cuts both ways &mdash; the point isn&rsquo;t that I&rsquo;m always right, it&rsquo;s that someone is deciding. <span class="tl-quote">&ldquo;If you decide the format is more than we need, keep that decision.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Jun 27</div>
         <div class="tl-title">It insisted the system still used Kafka.</div>
-        <p class="tl-body">The local clone it trusted was out of date, so it argued a fact that had changed. That became a standing rule: verify before asserting. <span class="tl-quote">&ldquo;it&rsquo;s not even using Kafka anymore. No?&rdquo;</span></p>
+        <p class="tl-body">The local clone it trusted was out of date, so it argued a fact that had changed. That became a standing rule: verify before asserting. <span class="tl-quote">&ldquo;The system does not use Kafka now. Confirm this.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Jul 2</div>
         <div class="tl-title">It burned a whole usage window.</div>
-        <p class="tl-body">A scoped question set off an uncapped fan-out of thirty-plus agents on the most expensive model tier; I caught it mid-flight and killed it, an entire five-hour window gone in forty-five minutes. The fix is a hook that mechanically blocks any uncapped run (<a href="https://github.com/sanlee-ys/agent-ops/blob/main/incidents/2026-07-02-uncapped-premium-fanout.md">postmortem</a>). <span class="tl-quote">&ldquo;spend was authorized blind, by default, with no gate.&rdquo;</span></p>
+        <p class="tl-body">A scoped question set off an uncapped fan-out of thirty-plus agents on the most expensive model tier; I caught it mid-flight and killed it, an entire five-hour window gone in forty-five minutes. The fix is a hook that mechanically blocks any uncapped run (<a href="https://github.com/sanlee-ys/agent-ops/blob/main/incidents/2026-07-02-uncapped-premium-fanout.md">postmortem</a>). <span class="tl-quote">&ldquo;Spend was authorized with no review, by default, and with no gate.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Jul 3</div>
         <div class="tl-title">I asked for holes; it found one in its own guard.</div>
-        <p class="tl-body">On an open audit request it bypassed its own credential guard &mdash; the hook built after real leaks &mdash; with an interpreter one-liner, proving the gap safely before a live one could. The prompt that mattered was mine; the finding was real (<a href="https://github.com/sanlee-ys/agent-ops/blob/main/incidents/2026-07-03-credential-guard-interpreter-bypass.md">postmortem</a>). <span class="tl-quote">&ldquo;any gaps, leaks, vulnerabilities, risks &mdash; I want to know.&rdquo;</span></p>
+        <p class="tl-body">On an open audit request it bypassed its own credential guard &mdash; the hook built after real leaks &mdash; with an interpreter one-liner, proving the gap safely before a live one could. The prompt that mattered was mine; the finding was real (<a href="https://github.com/sanlee-ys/agent-ops/blob/main/incidents/2026-07-03-credential-guard-interpreter-bypass.md">postmortem</a>). <span class="tl-quote">&ldquo;Tell me every gap, leak, vulnerability, and risk.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Jul 26</div>
@@ -158,12 +159,12 @@ import SiteNav from '../components/SiteNav.astro';
       <li>
         <div class="tl-date">Jul 28</div>
         <div class="tl-title">Its whole pipeline approved a design. I didn&rsquo;t.</div>
-        <p class="tl-body">A redesign had survived five direction prototypes, a judging panel, and an adversarial review &mdash; and still looked wrong on my screen. Instead of arguing taste, I asked for variants: a three-way screenshot A/B settled it, and the serif came out <a href="https://github.com/sanlee-ys/portfolio/pull/182">the same day</a>. Process blesses; it doesn&rsquo;t decide. <span class="tl-quote">&ldquo;Idk if I like this font. And what&rsquo;s with the night light-ish background?&rdquo;</span></p>
+        <p class="tl-body">A redesign had survived five direction prototypes, a judging panel, and an adversarial review &mdash; and still looked wrong on my screen. Instead of arguing taste, I asked for variants: a three-way screenshot A/B settled it, and the serif came out <a href="https://github.com/sanlee-ys/portfolio/pull/182">the same day</a>. Process blesses; it doesn&rsquo;t decide. <span class="tl-quote">&ldquo;I do not know if I accept this font. Explain the night-light background.&rdquo;</span></p>
       </li>
       <li>
         <div class="tl-date">Aug 2</div>
         <div class="tl-title">I made it read this site cold.</div>
-        <p class="tl-body">I had it review the site as a hiring manager who knows nothing about me &mdash; no context, no credit for effort. The verdict was blunt and correct: the homepage explained how I work before it said who I am. The positioning was <a href="https://github.com/sanlee-ys/portfolio/pull/200">re-cut the same day</a>. <span class="tl-quote">&ldquo;Pretend you know NOTHING about me.&rdquo;</span></p>
+        <p class="tl-body">I had it review the site as a hiring manager who knows nothing about me &mdash; no context, no credit for effort. The verdict was blunt and correct: the homepage explained how I work before it said who I am. The positioning was <a href="https://github.com/sanlee-ys/portfolio/pull/200">re-cut the same day</a>. <span class="tl-quote">&ldquo;Assume you know nothing about me.&rdquo;</span></p>
       </li>
     </ol>
   </main>
