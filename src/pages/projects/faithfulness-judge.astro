@@ -89,6 +89,74 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 6px;
     }
+
+    /* Truncation plate: the false gap. Cheap tier cut before the verdict
+       word; scoring counted each empty as a miss. Oxide on the false gap. */
+    .trunc-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .trunc-plate .tp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .trunc-plate .tp-hollow {
+      fill: var(--bg);
+      stroke: var(--muted);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .trunc-plate .tp-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .trunc-plate .tp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .trunc-plate .tp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .trunc-plate .tp-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .trunc-plate .tp-edge-break {
+      fill: none;
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .trunc-plate .tp-bad {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .trunc-plate .tp-bad-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .trunc-plate marker path { fill: var(--muted); }
+    .trunc-plate marker path.tp-head-bad { fill: var(--accent-warm); }
+    .trunc-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
   </style>
   </Fragment>
 
@@ -214,6 +282,38 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <h2>The result I almost published instead</h2>
+
+    <svg class="trunc-plate" viewBox="0 0 260 132" role="img"
+         aria-label="A token cap cut the cheap judge before its verdict on 20 percent of claims. Scoring counted each empty as a disagreement, which invented a tier gap of 0.70 versus 0.43. The gap was a harness bug.">
+      <title>max_tokens cut the cheap tier before the verdict. The 0.70 vs 0.43 gap was a bug.</title>
+      <defs>
+        <marker id="tp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker id="tp-arrow-bad" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path class="tp-head-bad" d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <text class="tp-lane" x="4" y="12">PREMIUM</text>
+      <rect class="tp-box" x="4" y="18" width="110" height="36" rx="2" />
+      <text class="tp-title" x="59" y="40" text-anchor="middle">verdict word</text>
+      <text class="tp-micro" x="59" y="68" text-anchor="middle">finished</text>
+      <text class="tp-lane" x="146" y="12">CHEAP TIER</text>
+      <rect class="tp-box" x="146" y="18" width="50" height="36" rx="2" />
+      <text class="tp-micro" x="171" y="40" text-anchor="middle">reason</text>
+      <path class="tp-edge-break" d="M 196 36 L 206 36" aria-hidden="true" />
+      <path class="tp-edge-break" d="M 214 36 L 224 36" marker-end="url(#tp-arrow-bad)" aria-hidden="true" />
+      <rect class="tp-hollow" x="226" y="18" width="30" height="36" rx="2" />
+      <text class="tp-lane" x="4" y="92">SCORED AS</text>
+      <rect class="tp-bad" x="4" y="98" width="252" height="26" rx="2" />
+      <text class="tp-bad-text" x="130" y="115" text-anchor="middle">FALSE GAP  0.70 vs 0.43</text>
+    </svg>
+    <p class="trunc-plate-caption">
+      A token cap cut the cheap tier before the verdict on 20% of the set.
+      Scoring counted each empty as a miss. The gap was my harness.
+    </p>
 
     <div class="decision">
       <p class="tag">A truncation setting that looked like a finding</p>

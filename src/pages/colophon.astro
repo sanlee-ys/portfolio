@@ -8,6 +8,46 @@ import SiteNav from '../components/SiteNav.astro';
   canonical="https://sanlee.me/colophon.html"
   ogType="article"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* How-it-was-made plate. I set, it types, I check. Open pipeline,
+       no oxide: this is the method, not a reversal. */
+    .made-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .made-plate .md-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .made-plate .md-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .made-plate .md-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .made-plate .md-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .made-plate marker path { fill: var(--muted); }
+    .made-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav />
 
@@ -18,6 +58,31 @@ import SiteNav from '../components/SiteNav.astro';
     <p class="lead">
       How this site was built, because a site about being honest should be honest
       about how it was made.
+    </p>
+    <svg class="made-plate" viewBox="0 0 260 72" role="img"
+         aria-label="How this site was built: I set the direction, an agent did most of the typing, I verified the output against the real repos before it shipped.">
+      <title>I set the aim. The agent types. I check the output.</title>
+      <defs>
+        <marker id="md-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <rect class="md-box" x="2" y="6" width="76" height="40" rx="2" />
+      <text class="md-title" x="40" y="24" text-anchor="middle">I set</text>
+      <text class="md-micro" x="40" y="38" text-anchor="middle">direction</text>
+      <path class="md-edge" d="M 78 26 L 90 26" marker-end="url(#md-arrow)" aria-hidden="true" />
+      <rect class="md-box" x="92" y="6" width="76" height="40" rx="2" />
+      <text class="md-title" x="130" y="24" text-anchor="middle">It types</text>
+      <text class="md-micro" x="130" y="38" text-anchor="middle">the agent</text>
+      <path class="md-edge" d="M 168 26 L 180 26" marker-end="url(#md-arrow)" aria-hidden="true" />
+      <rect class="md-box" x="182" y="6" width="76" height="40" rx="2" />
+      <text class="md-title" x="220" y="24" text-anchor="middle">I check</text>
+      <text class="md-micro" x="220" y="38" text-anchor="middle">then it ships</text>
+    </svg>
+    <p class="made-plate-caption">
+      I orchestrated. Claude implemented. The record below is the honest
+      version of that split.
     </p>
     <p>
       This site was built the way I would run any small project with an agent: I

@@ -8,6 +8,53 @@ import SiteNav from '../components/SiteNav.astro';
   canonical="https://sanlee.me/glossary.html"
   ogType="website"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Used-here plate. Textbook vs this system's meaning. No oxide:
+       this is a glossary, not a reversal. */
+    .gloss-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .gloss-plate .gp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .gloss-plate .gp-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .gloss-plate .gp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .gloss-plate .gp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .gloss-plate .gp-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .gloss-plate marker path { fill: var(--muted); }
+    .gloss-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav current="glossary" />
 
@@ -18,6 +65,27 @@ import SiteNav from '../components/SiteNav.astro';
     <p class="lead">
       Terms I use across this site, defined the way I actually use them &mdash;
       not textbook definitions, but why each one mattered here.
+    </p>
+    <svg class="gloss-plate" viewBox="0 0 260 72" role="img"
+         aria-label="These are not textbook definitions. Each term is defined the way it was used in this system, and why it mattered here.">
+      <title>Textbook meaning on the left. How I used it here on the right.</title>
+      <defs>
+        <marker id="gp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <text class="gp-lane" x="4" y="12">TEXTBOOK</text>
+      <rect class="gp-box" x="4" y="18" width="110" height="36" rx="2" />
+      <text class="gp-title" x="59" y="40" text-anchor="middle">generic def</text>
+      <path class="gp-edge" d="M 114 36 L 134 36" marker-end="url(#gp-arrow)" aria-hidden="true" />
+      <text class="gp-lane" x="138" y="12">HERE</text>
+      <rect class="gp-box" x="138" y="18" width="118" height="36" rx="2" />
+      <text class="gp-title" x="197" y="40" text-anchor="middle">why it mattered</text>
+    </svg>
+    <p class="gloss-plate-caption">
+      Filter below. Each entry is the local meaning, tied back to a
+      decision on this site.
     </p>
 
     <input
