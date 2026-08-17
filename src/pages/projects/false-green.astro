@@ -102,6 +102,39 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 22px;
     }
+
+    /* Six-pass plate: the count, not the mechanism (two-fail is that).
+       Six identical PASS marks. Oxide + word: they passed. ADR-010 N/A. */
+    .six-pass {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .six-pass .sx-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .six-pass .sx-ok {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .six-pass .sx-ok-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .six-pass-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 22px;
+    }
   </style>
   </Fragment>
 
@@ -111,6 +144,28 @@ import SiteNav from '../../components/SiteNav.astro';
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>False Green</h1>
     <p class="subtitle">Six checks I built, wired into CI, and later caught reporting success for work that had not happened. What they have in common is not that they broke. It is that they passed.</p>
+
+    <svg class="six-pass" viewBox="0 0 260 100" role="img"
+         aria-label="Six checks. Each one reported PASS for work that had not happened.">
+      <title>Six PASS marks. The shared fact is that they passed.</title>
+      <text class="sx-lane" x="4" y="12">SIX CHECKS</text>
+      <rect class="sx-ok" x="4" y="22" width="80" height="28" rx="2" />
+      <text class="sx-ok-text" x="44" y="40" text-anchor="middle">PASS</text>
+      <rect class="sx-ok" x="90" y="22" width="80" height="28" rx="2" />
+      <text class="sx-ok-text" x="130" y="40" text-anchor="middle">PASS</text>
+      <rect class="sx-ok" x="176" y="22" width="80" height="28" rx="2" />
+      <text class="sx-ok-text" x="216" y="40" text-anchor="middle">PASS</text>
+      <rect class="sx-ok" x="4" y="58" width="80" height="28" rx="2" />
+      <text class="sx-ok-text" x="44" y="76" text-anchor="middle">PASS</text>
+      <rect class="sx-ok" x="90" y="58" width="80" height="28" rx="2" />
+      <text class="sx-ok-text" x="130" y="76" text-anchor="middle">PASS</text>
+      <rect class="sx-ok" x="176" y="58" width="80" height="28" rx="2" />
+      <text class="sx-ok-text" x="216" y="76" text-anchor="middle">PASS</text>
+    </svg>
+    <p class="six-pass-caption">
+      Six greens. The shared fact is not that they broke. It is that they
+      passed.
+    </p>
 
     <h2>Two ways to fail</h2>
 

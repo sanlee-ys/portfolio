@@ -6,6 +6,70 @@ import SiteNav from '../components/SiteNav.astro';
   title="404 · San Lee"
   robots="noindex"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Missing-page plate (portfolio ADR-004). Asked path, empty record.
+       Dashed box + oxide NOT LOGGED. Max-width 260, viewBox 1:1. */
+    .miss-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .miss-plate .ms-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .miss-plate .ms-hollow {
+      fill: var(--bg);
+      stroke: var(--muted);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .miss-plate .ms-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .miss-plate .ms-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .miss-plate .ms-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .miss-plate .ms-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .miss-plate .ms-bad {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .miss-plate .ms-bad-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .miss-plate marker path { fill: var(--muted); }
+    .miss-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav />
 
@@ -15,6 +79,28 @@ import SiteNav from '../components/SiteNav.astro';
     <p class="lead">
       The page you asked for isn't here &mdash; a stale link, or a path that
       never existed. No decision was logged for it.
+    </p>
+    <svg class="miss-plate" viewBox="0 0 260 118" role="img"
+         aria-label="The path you asked for is not in the record. No decision was logged for it.">
+      <title>Asked path, empty record. Not logged.</title>
+      <defs>
+        <marker id="ms-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <text class="ms-lane" x="4" y="12">ASKED</text>
+      <rect class="ms-box" x="4" y="18" width="100" height="36" rx="2" />
+      <text class="ms-title" x="54" y="40" text-anchor="middle">a path</text>
+      <path class="ms-edge" d="M 104 36 L 124 36" marker-end="url(#ms-arrow)" aria-hidden="true" />
+      <text class="ms-lane" x="128" y="12">RECORD</text>
+      <rect class="ms-hollow" x="128" y="18" width="128" height="36" rx="2" />
+      <text class="ms-micro" x="192" y="40" text-anchor="middle">no entry</text>
+      <rect class="ms-bad" x="4" y="66" width="252" height="28" rx="2" />
+      <text class="ms-bad-text" x="130" y="84" text-anchor="middle">NOT LOGGED</text>
+    </svg>
+    <p class="miss-plate-caption">
+      A stale link, or a path that never existed. Nothing was filed here.
     </p>
     <p>Here is the way back:</p>
     <ul>

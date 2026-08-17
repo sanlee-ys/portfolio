@@ -56,6 +56,49 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 6px;
     }
+
+    /* Now / Next / Later plate. Page-scoped: sequence, not the item list
+       (the three columns below carry those). Solid / hairline / dashed
+       dual-encode horizon. No oxide: this is a roadmap, not a reversal. */
+    .nnl-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .nnl-plate .nn-now {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .nnl-plate .nn-next {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .nnl-plate .nn-later {
+      fill: var(--bg);
+      stroke: var(--muted);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .nnl-plate .nn-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .nnl-plate .nn-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .nnl-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 12px;
+    }
   </style>
   </Fragment>
 
@@ -173,6 +216,24 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <h2>Roadmap (program framing)</h2>
     <p>Sequenced Now / Next / Later, harvested from real delivery rather than wishful planning.</p>
+    <svg class="nnl-plate" viewBox="0 0 260 72" role="img"
+         aria-label="Program sequence: Now is shipped work, Next is queued work, Later is deferred work including explicit non-goals.">
+      <title>Now shipped, Next queued, Later deferred.</title>
+      <rect class="nn-now" x="2" y="6" width="80" height="40" rx="2" />
+      <text class="nn-title" x="42" y="24" text-anchor="middle">Now</text>
+      <text class="nn-micro" x="42" y="38" text-anchor="middle">shipped</text>
+      <rect class="nn-next" x="90" y="6" width="80" height="40" rx="2" />
+      <text class="nn-title" x="130" y="24" text-anchor="middle">Next</text>
+      <text class="nn-micro" x="130" y="38" text-anchor="middle">queued</text>
+      <rect class="nn-later" x="178" y="6" width="80" height="40" rx="2" />
+      <text class="nn-title" x="218" y="24" text-anchor="middle">Later</text>
+      <text class="nn-micro" x="218" y="38" text-anchor="middle">deferred</text>
+      <text class="nn-micro" x="130" y="64" text-anchor="middle">harvested from delivery</text>
+    </svg>
+    <p class="nnl-plate-caption">
+      Solid is shipped. Hairline is queued. Dashed is deferred, including
+      the things I will not build.
+    </p>
     <div class="roadmap">
       <div>
         <h3>Now</h3>
