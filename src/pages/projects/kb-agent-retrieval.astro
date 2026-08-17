@@ -95,6 +95,66 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 6px;
     }
+
+    /* Hybrid declined plate. MRR identical; the miss it was built for
+       is still a miss. Oxide on DECLINED. */
+    .hyb-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .hyb-plate .hp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .hyb-plate .hp-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .hyb-plate .hp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .hyb-plate .hp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .hyb-plate .hp-ok {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .hyb-plate .hp-ok-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .hyb-plate .hp-cut {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .hyb-plate .hp-cut-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .hyb-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
   </style>
   </Fragment>
 
@@ -304,6 +364,28 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <h2 id="the-negative-result">The one I built and did not ship</h2>
+
+    <svg class="hyb-plate" viewBox="0 0 260 118" role="img"
+         aria-label="Hybrid retrieval versus dense-only. MRR is identical to four decimals. The paraphrase miss the hybrid was built to rescue is still a miss. Dense-only stayed the default.">
+      <title>MRR identical. The miss hybrid was built to fix is still a miss. Declined.</title>
+      <text class="hp-lane" x="4" y="12">DENSE ONLY</text>
+      <rect class="hp-box" x="4" y="18" width="122" height="40" rx="2" />
+      <text class="hp-title" x="65" y="36" text-anchor="middle">MRR same</text>
+      <text class="hp-micro" x="65" y="50" text-anchor="middle">kept</text>
+      <rect class="hp-ok" x="4" y="64" width="122" height="22" rx="2" />
+      <text class="hp-ok-text" x="65" y="79" text-anchor="middle">DEFAULT</text>
+      <text class="hp-lane" x="134" y="12">HYBRID</text>
+      <rect class="hp-box" x="134" y="18" width="122" height="40" rx="2" />
+      <text class="hp-title" x="195" y="36" text-anchor="middle">MRR same</text>
+      <text class="hp-micro" x="195" y="50" text-anchor="middle">miss still a miss</text>
+      <rect class="hp-cut" x="134" y="64" width="122" height="22" rx="2" />
+      <text class="hp-cut-text" x="195" y="79" text-anchor="middle">DECLINED</text>
+      <text class="hp-micro" x="130" y="108" text-anchor="middle">built it, measured it, did not ship it</text>
+    </svg>
+    <p class="hyb-plate-caption">
+      MRR identical to four decimals. The one miss it was built to rescue
+      is still a miss.
+    </p>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>Change 3<span class="code-ref">PR #73 &middot; ADR-010</span></p>
