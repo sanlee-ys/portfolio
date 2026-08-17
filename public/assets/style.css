@@ -1868,8 +1868,18 @@ main.wrap > .measure { grid-column: full; }
   font-weight: 600;
   margin: 0 0 10px;
 }
-/* The tradeoff line is the punchline of the entry, not a footnote to it. */
-.decision .tradeoff { color: var(--text-secondary); }
+/* The tradeoff line is the punchline of the entry, not a footnote to it.
+   A hairline over it plates the result the way a results table plates a
+   figure: the claim sits above, the measured outcome sits under its own
+   rule. Ink, not --text-secondary — whispering the result was the defect
+   "Stop whispering the parts that carry the proof" already named. */
+.decision .tradeoff {
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  margin-top: 14px;
+  padding-top: 12px;
+}
+.decision .tradeoff strong { font-weight: 600; }
 
 /* ---- Reversal cards ---------------------------------------------------
    data-outcome="reversal" marks a decision whose OUTCOME was to take
@@ -2884,6 +2894,71 @@ main.wrap > .measure { grid-column: full; }
 }
 .orientation-routes { margin: 0; font-size: 0.95rem; color: var(--text-secondary); }
 
+/* Four doors, drawn as the proof band's little sibling: ruled cells, a
+   counter, a name, a why. The old shape was a paragraph of four sentences
+   with the destinations buried mid-line. A 90-second reader should be able
+   to pick a door without parsing a paragraph. Same grammar as .proof —
+   per-cell top rule, auto-fit collapse, no breakpoint — so it is a second
+   use of a device the page already taught, not a new card grid.
+
+   Kept inside .orientation (content track), not promoted to wide: four
+   short cells fit the measure, and a 2×2 at 34rem still reads as a table
+   of contents rather than a poster. */
+.doors-index {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  counter-reset: door;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+  gap: 18px 28px;
+}
+.doors-index li {
+  position: relative;
+  counter-increment: door;
+  border-top: 2px solid var(--rule-strong);
+  min-width: 0;
+}
+.doors-index a {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 6px;
+  min-height: 44px;
+  padding: 10px 0 4px;
+  color: inherit;
+  text-decoration: none;
+}
+.doors-index a::before {
+  content: counter(door, decimal-leading-zero);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+.doors-index a:hover .door-name,
+.doors-index a:focus-visible .door-name { color: var(--accent); }
+.doors-index a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.door-name {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.016em;
+  color: var(--text);
+  line-height: 1.25;
+}
+.door-why {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
 /* ---- The routing links were browser default blue ------------------------
    #0000EE, underlined — the UA stylesheet's anchor colour, on the one
    paragraph whose whole job is to route the reader to the three writeups.
@@ -2924,6 +2999,39 @@ main.wrap > .measure { grid-column: full; }
    how a single picture appears in a notebook: pasted in, not floated. It is
    the only photographic object on the page, so it is the one place a mat is
    an accent rather than another box in a page full of boxes. */
+/* Contact sheet under the photography claim. Square crops, hairline gaps,
+   the journal's plate language — not the gallery's masonry, which is a
+   different page with a different job. Each cell is a real link to the
+   gallery, so the strip is the proof of "the good frames live there"
+   rather than a second gallery. Stays on the content track on purpose:
+   it is the sentence's contact sheet, not a breakout plate. */
+.frame-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 8px;
+  margin: 8px 0 8px;
+}
+.frame-strip .frame {
+  display: block;
+  min-width: 0;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  line-height: 0;
+}
+.frame-strip .frame img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
+.frame-strip .frame:hover,
+.frame-strip .frame:focus-visible { border-color: var(--text); }
+.frame-strip .frame:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .sango {
   margin: 26px 0 0;
   max-width: 300px;
