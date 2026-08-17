@@ -37,7 +37,9 @@ down carries the full reasoning for each item.
 
 - [x] **Custom `404.html`.** *Shipped — on-brand "not in the record" page.*
 - [x] **`sitemap.xml` + `robots.txt`.** *Shipped.*
-- [ ] **Career-story depth.** Needs San to decide how much to tell first.
+- [x] **Career-story depth.** *Closed 2026-08-17 as a ceiling, not a memoir
+      (`ADR-011`). About holds a three-sentence tell. The résumé keeps the
+      facts. No further public biography.*
 - [ ] **Voice pass** (soften the relentlessness). Stylistic, optional.
 
 ### Later — strategic or deliberately deferred
@@ -120,11 +122,9 @@ These have no tradeoffs worth debating. None were previously planned.
 
 ### Positioning — needs a decision from San, not just execution
 
-- [ ] **Career story has one sentence behind it.** "Network operations →
-      software engineering → product" + "Seven years at JPMorganChase" is a
-      strong hook with nothing behind it. No roles, no what-shipped. The "About,
-      honestly" section is about the side project, not the career. Decide how
-      much of the real career to tell.
+- [x] **Career story has one sentence behind it.** *Decided 2026-08-17
+      (`ADR-011`): keep it short. About now holds the locked three-sentence
+      tell. Do not grow it. Longer stories stay private.*
 - [ ] **No résumé link and no contact path** beyond social icons. For a
       job-relevant site, an easy "email me / résumé" is a cheap, obvious add.
 - [ ] **The voice is relentless.** Nearly every paragraph lands an aphorism.

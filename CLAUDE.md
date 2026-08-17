@@ -351,6 +351,35 @@ First codified as a standing rule 2026-07-01 (adversarial round,
 `ROADMAP.md`); promoted here 2026-07-03 after the same leak recurred in a
 cross-repo write-up in the `architecture` repo.
 
+## Career-story ceiling: short, not a memoir (voice rule)
+
+*Reasoning: [`decisions/ADR-011`](decisions/ADR-011-career-story-ceiling.md).
+This section is canonical for what to write.*
+
+Public career copy stays at résumé facts plus the locked About tell. Do not
+add Army color, employer internals, or a claim that the seat was rare.
+
+Locked About tell (2026-08-17):
+
+> Seven years in infra and operations at the same firm, then a product seat
+> on a collaboration platform. I was one person in a large machine. I built
+> the public system to own a full loop I did not own at work.
+
+Hard stops:
+
+- Army: résumé facts only. No unit, no mission color, no implied special
+  operations.
+- Employer: title, platform, firm-wide scale, and the résumé's
+  merchant-command line. No team names, no feature list, no "I uniquely
+  did X."
+- Do not add a career page, a photo essay, or extra About paragraphs that
+  thicken the biography.
+- Longer stories stay in the private narrative bank. They are spoken, not
+  indexed.
+
+A later session that expands this "to help a hiring manager" is out of
+bounds. The résumé and the room hold the rest.
+
 ## Reading the Claude Review check
 
 How to interpret the `Claude Review` check on a PR — it runs only when you comment
