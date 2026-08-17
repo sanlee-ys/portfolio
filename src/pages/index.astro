@@ -44,7 +44,7 @@ import SiteNav from '../components/SiteNav.astro';
 
 
   <div class="wrap proof-band">
-    <p class="log-intro band-intro">The real calls behind the system. The ones that went the wrong way are here too, set with the same care as the wins, because that is the part worth reading.</p>
+    <p class="log-intro band-intro">The real calls. The ones that went the wrong way are here too, set with the same care as the wins.</p>
     <ul class="proof" aria-label="What the record shows">
       <li data-outcome="reversal"><a href="#decision-grounding"><span class="sr-only">Reversed. </span><span class="proof-claim">Added retrieval grounding, cut it</span> <strong>fixed 0, broke 4</strong></a></li>
       <li data-outcome="reversal"><a href="#decision-model"><span class="sr-only">Reversed. </span><span class="proof-claim">Built the premium-model upgrade, declined it</span> <strong>0 rows at 1.97&times; the cost</strong></a></li>
@@ -63,8 +63,13 @@ import SiteNav from '../components/SiteNav.astro';
   <main class="wrap" id="work" tabindex="-1">
     <section class="orientation" aria-label="What this record demonstrates">
       <p class="kicker">Start here</p>
-      <p class="orientation-lede">A small AI system, built by directing Claude and run like a program: every change planned, built, reviewed, and iterated, with an eval gating the merge. If you have one minute, take one of these doors.</p>
-      <p class="orientation-routes">The measurement that lied to me: the <a href="projects/faithfulness-judge.html">Judge</a>. The numbers, and how they were made honest: the <a href="projects/defense-news-classifier.html">Classifier</a>. Six of my own checks reporting success for work that never ran: <a href="projects/false-green.html">False Green</a>. The program view: <a href="projects/product-and-program.html">Product &amp; Program</a>.</p>
+      <p class="orientation-lede">A small AI system, built by directing Claude and run like a program: every change planned, built, reviewed, and iterated, with an eval gating the merge. One minute: pick a door.</p>
+      <ul class="doors-index" aria-label="Four ways in">
+        <li><a href="projects/faithfulness-judge.html"><span class="door-name">Judge</span><span class="door-why">The measurement that lied to me</span></a></li>
+        <li><a href="projects/defense-news-classifier.html"><span class="door-name">Classifier</span><span class="door-why">The numbers, and how they were made honest</span></a></li>
+        <li><a href="projects/false-green.html"><span class="door-name">False Green</span><span class="door-why">Six checks that passed on work that never ran</span></a></li>
+        <li><a href="projects/product-and-program.html"><span class="door-name">Product &amp; Program</span><span class="door-why">The same system, read as a program</span></a></li>
+      </ul>
     </section>
 
     <h2 class="section-title">The system</h2>
@@ -141,10 +146,8 @@ import SiteNav from '../components/SiteNav.astro';
         <li><span class="stat-value" data-metric="region_accuracy">94.4%</span><span class="stat-label">Region</span></li>
       </ul>
       <p class="stat-note">Category and domain land on the same figure here. Two axes, scored separately, not a copied cell.</p>
-      <p>Those are the numbers after the eval got harder, not before. The full trajectory &mdash; synthetic self-graded, then real hand-labeled, a model migration, a prompt fix and a third axis, with the ceiling I called wrongly and the misses that clustered on one boundary &mdash; is the table on the classifier page. <a href="projects/defense-news-classifier.html">See the full eval &rarr;</a></p>
-      <p>The classical baseline that lost the case for using an LLM at all is
-        vendored into this site and runs in your browser, on the same rows.
-        <a href="projects/classifier-baseline.html#try-it">Run it yourself &rarr;</a></p>
+      <p>Those are the numbers after the eval got harder. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+      <p>The classical baseline that lost the case for an LLM is vendored here and runs in the browser, on the same rows. <a href="projects/classifier-baseline.html#try-it">Run it yourself &rarr;</a></p>
     </section>
 
     <section class="measure">
@@ -191,6 +194,20 @@ import SiteNav from '../components/SiteNav.astro';
         Fold named Sango who supervises. The good frames live in
         <a href="lab/gallery.html">the gallery</a>.
       </p>
+      <div class="frame-strip" aria-label="A few frames from the gallery">
+        <a class="frame" href="lab/gallery.html">
+          <img src="assets/img/photo-pavilion-spring.jpeg" alt="A pavilion over a pond in spring bloom" loading="lazy" width="160" height="160" />
+        </a>
+        <a class="frame" href="lab/gallery.html">
+          <img src="assets/img/photo-jeju.jpeg" alt="Basalt sea cliffs on Jeju Island" loading="lazy" width="160" height="160" />
+        </a>
+        <a class="frame" href="lab/gallery.html">
+          <img src="assets/img/photo-lanterns.jpeg" alt="Lotus lanterns at a temple" loading="lazy" width="160" height="160" />
+        </a>
+        <a class="frame" href="lab/gallery.html">
+          <img src="assets/img/photo-trail.jpeg" alt="A trail overlook in the mountains" loading="lazy" width="160" height="160" />
+        </a>
+      </div>
       <figure class="sango">
         <img src="assets/img/sango-boop.jpeg" alt="Sango, a Scottish Fold, asleep" loading="lazy" width="240" height="240" />
         <figcaption>Sango, Chief Nap Officer.</figcaption>

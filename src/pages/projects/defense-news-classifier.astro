@@ -9,6 +9,90 @@ import SiteNav from '../../components/SiteNav.astro';
   ogType="article"
   ogImage="/assets/og-defense-news-classifier.png"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* Eval-rebuild plate (portfolio ADR-004). Page-scoped: the argument of
+       this page is that the number fell when the gold got real, and that
+       the lower figure is the trustworthy one. Not a metrics chart — the
+       table below already carries every column. Max-width 260 keeps viewBox
+       units 1:1 with CSS px on every gate width (same measured discipline
+       as .judge-plate / .two-fail / .lab-topo). */
+    .eval-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .eval-plate .ep-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .eval-plate .ep-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .eval-plate .ep-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .eval-plate .ep-figure {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .eval-plate .ep-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .eval-plate .ep-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Flattering: ink solid — the ordinary (and wrong) reading. Dual-encoded
+       by word + stroke. */
+    .eval-plate .ep-ok {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .eval-plate .ep-ok-text {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    /* Trustworthy: oxide — the drop is the finding. Word + oxide dual-encode;
+       not colour-only. Oxide is for the negative result, same as .two-fail
+       FAIL and .judge-plate UNSUPPORTED. */
+    .eval-plate .ep-drop {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .eval-plate .ep-drop-text {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .eval-plate marker path { fill: var(--muted); }
+    .eval-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 18px;
+    }
+  </style>
+  </Fragment>
 
   <SiteNav current="defense-news-classifier" />
 
@@ -26,6 +110,43 @@ import SiteNav from '../../components/SiteNav.astro';
       harness is the interesting part, and it&rsquo;s where data-driven decision
       making actually gets tested: more than once it caught me being wrong, and I
       went with what it showed instead of my own instinct.
+    </p>
+
+    <!-- Argument: the number fell when the gold got real, and that drop is
+         the trustworthy reading. State is word + geometry first (FLATTERING
+         vs TRUSTWORTHY, ink vs oxide), numbers second — not a colour-only
+         chart, and not a second metrics table. ADR-010 N/A. -->
+    <svg class="eval-plate" viewBox="0 0 260 132" role="img"
+         aria-label="The eval rebuild: v1 graded the model on 300 self-generated snippets and reported 97.3 percent domain accuracy. v2 replaced that with 54 hand-labeled real snippets and domain fell to 88.9 percent. The lower number is the trustworthy one.">
+      <title>The eval rebuild: v1 self-graded 97.3 percent domain; v2 hand-labeled 88.9 percent. The drop is the trustworthy reading.</title>
+      <defs>
+        <marker id="ep-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      <text class="ep-lane" x="4" y="12">V1 SYNTHETIC</text>
+      <rect class="ep-box" x="4" y="18" width="110" height="48" rx="2" />
+      <text class="ep-figure" x="59" y="40" text-anchor="middle">97.3%</text>
+      <text class="ep-micro" x="59" y="56" text-anchor="middle">domain, self-graded</text>
+
+      <path class="ep-edge" d="M 116 42 L 140 42" marker-end="url(#ep-arrow)" aria-hidden="true" />
+
+      <text class="ep-lane" x="146" y="12">V2 REAL</text>
+      <rect class="ep-box" x="146" y="18" width="110" height="48" rx="2" />
+      <text class="ep-figure" x="201" y="40" text-anchor="middle">88.9%</text>
+      <text class="ep-micro" x="201" y="56" text-anchor="middle">domain, 54 gold</text>
+
+      <text class="ep-lane" x="4" y="88">READING</text>
+      <rect class="ep-ok" x="4" y="94" width="110" height="28" rx="2" />
+      <text class="ep-ok-text" x="59" y="112" text-anchor="middle">FLATTERING</text>
+      <rect class="ep-drop" x="146" y="94" width="110" height="28" rx="2" />
+      <text class="ep-drop-text" x="201" y="112" text-anchor="middle">TRUSTWORTHY</text>
+    </svg>
+    <p class="eval-plate-caption">
+      The number fell when the gold got real. Same model, harder test &mdash;
+      the lower figure is the one I trust.
     </p>
 
     <nav class="toc" aria-labelledby="toc-heading">
