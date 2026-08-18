@@ -1,0 +1,317 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+---
+<Base
+  title="Context Architecture &middot; San Lee"
+  description="The payload my agent sessions load before they read a line of code, scored against five published context-quality criteria. It failed three of them, and only one of the fixes is a hook rather than a paragraph."
+  canonical="https://sanlee.me/projects/context-architecture.html"
+  ogType="article"
+>
+  <SiteNav />
+
+  <main class="wrap article-body" id="main" tabindex="-1">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <h1>Context Architecture</h1>
+    <p class="subtitle">The payload my agent sessions load before they read a line of my code is a surface I designed. I scored it against five published criteria and failed three of them.</p>
+
+    <h2>The surface nobody draws</h2>
+
+    <p>
+      Every session I start reads a fixed payload first: an index of about sixty
+      memories, eight rule files, the working agreement for whichever repo it
+      landed in, and a list of skill descriptions. Only after all of that does it
+      open a source file.
+    </p>
+
+    <p>
+      I did not design that payload. It accreted, one &ldquo;remember this&rdquo;
+      at a time, over months and across five agent vendors. Nothing crashed. The
+      payload just got bigger, and a bigger payload is not free in three separate
+      currencies: <strong>money</strong>, because every resident token is re-sent
+      on every turn; <strong>attention</strong>, because a model reading sixty
+      facts weights each one less than a model reading six; and
+      <strong>trust</strong>, because a fact with no date cannot be told apart
+      from a fact that used to be true. The third is the expensive one. A stale
+      instruction does not read as stale. It reads as an instruction.
+    </p>
+
+    <p>
+      What I was missing was the vocabulary to audit it. A paper I read this month
+      supplied it: <em>Context Engineering: From Prompts to Corporate Multi-Agent
+      Architecture</em> (<a href="https://arxiv.org/abs/2603.09619">arXiv:2603.09619</a>)
+      proposes five quality criteria for an agent&rsquo;s context &mdash;
+      <strong>relevance, sufficiency, isolation, economy, and provenance</strong>
+      &mdash; and frames context as the agent&rsquo;s operating system. The framing
+      is the useful part. An operating system is something you architect and then
+      audit. It is not something you accumulate.
+    </p>
+
+    <h2>What was already there</h2>
+
+    <p>
+      Four structures, all of which predate my having any of those words for them.
+      I am describing them in the paper&rsquo;s terms after the fact, not claiming
+      I built to its spec.
+    </p>
+
+    <div class="decision">
+      <p class="tag">Economy, traded against sufficiency</p>
+      <h3>A resident index, with bodies on demand</h3>
+      <p>
+        Only the index is resident. Each line is a pointer: a name, one clause of
+        what that memory settles, and a trigger phrase where one is load-bearing
+        (&ldquo;read before any font subsetting&rdquo;, &ldquo;never re-queue
+        this&rdquo;). The body is a separate file that loads when the pointer
+        fires.
+      </p>
+      <p class="tradeoff">
+        <strong>The tradeoff:</strong> a session does not know the fact. It knows
+        the fact exists and where to get it. That is strictly worse for
+        sufficiency and much better for economy, and it is the right side of the
+        trade only as long as the pointers are good enough to fire. A pointer that
+        does not trigger is a fact I paid to store and never read.
+      </p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Provenance, at the rule layer</p>
+      <h3>Dated rules, each carrying its founding case</h3>
+      <p>
+        A rule in my setup is not an assertion, it is an assertion plus the
+        incident that produced it, with a date. The rule that findings default to
+        deferred rather than to a mid-session question carries this: a scheduled
+        audit finished in one paragraph, then a stale lock file noticed in passing
+        became a three-hour project across three repositories, with two pull
+        requests and a postmortem. Every step of that was consented to. Every
+        consent was requested at the moment I was least able to refuse.
+      </p>
+      <p class="tradeoff">
+        <strong>Why the case travels with the rule:</strong> a bare rule invites
+        an agent to reason about whether it applies; a rule with its founding case
+        hands over the shape of the failure, which is what recognising the next
+        instance actually takes. It also keeps the rule falsifiable by me. If I
+        cannot remember why a constraint exists, I cannot tell whether it has
+        expired.
+      </p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">Isolation</p>
+      <h3>Deferred work is a self-contained prompt, not a conversation</h3>
+      <p>
+        When a session finds a real problem outside its scope, it does not raise
+        it. It files a prompt for a fresh session, and that prompt must lead with
+        its <strong>blast radius</strong> (the repository, and the files it
+        expects to touch) and close with an <strong>origin line</strong> (the date
+        it was filed, the repository at a specific commit, and the evidence).
+      </p>
+      <p class="tradeoff">
+        <strong>What each half buys:</strong> the blast radius lets the
+        <em>next</em> session check for a duplicate before filing another one, so
+        two queued sessions cannot silently collide on the same file. The origin
+        line is provenance for work picked up cold, weeks later, possibly on
+        another machine. A deferred task whose evidence has gone stale should be
+        discoverable as stale, not re-executed on faith.
+      </p>
+    </div>
+
+    <div class="decision">
+      <p class="tag">The same shape, one level up</p>
+      <h3>Skills: description resident, body on demand</h3>
+      <p>
+        A skill is a packaged procedure. Only its one-line description sits in
+        context; the procedure loads when the description matches the work. It is
+        the memory-index trade repeated at the level of behaviour rather than
+        fact, which is why reference material needed only while reasoning
+        <em>about</em> a rule lives in a skill while the rule itself stays
+        resident.
+      </p>
+    </div>
+
+    <h2>The audit, and the three it failed</h2>
+
+    <p>
+      I scored each surface against all five criteria. Isolation and sufficiency
+      held. The other three did not.
+    </p>
+
+    <table class="metrics">
+      <thead>
+        <tr>
+          <th scope="col">Criterion</th>
+          <th scope="col">Verdict</th>
+          <th scope="col">The finding</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Relevance</th>
+          <td>Failed</td>
+          <td>Every rule file loads into every session, unconditionally</td>
+        </tr>
+        <tr>
+          <th scope="row">Sufficiency</th>
+          <td>Held</td>
+          <td>Pointers fired; bodies carried the detail</td>
+        </tr>
+        <tr>
+          <th scope="row">Isolation</th>
+          <td>Held</td>
+          <td>Deferred prompts stand alone; one concern per session</td>
+        </tr>
+        <tr>
+          <th scope="row">Economy</th>
+          <td>Failed</td>
+          <td>Index lines had grown into changelogs</td>
+        </tr>
+        <tr>
+          <th scope="row">Provenance</th>
+          <td>Failed</td>
+          <td>Not one index line carried a date</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <strong>Provenance was the worst of them, and it was total.</strong> Not a
+      single index line said when it was written or last touched. So a session
+      reading the index had no way to tell a fact recorded yesterday from one
+      recorded in June and quietly superseded in July. Every line asserted itself
+      with exactly the same confidence.
+    </p>
+
+    <p>
+      <strong>Economy failed in a way that fed the first.</strong> Three lines had
+      absorbed body-file detail rather than pointing at it, the worst of them
+      running to roughly 230 words in a file whose entire job is to be pointers.
+      An index line that reads like a changelog is not a pointer that got long. It
+      is a different artifact wearing the index&rsquo;s clothes, and it is the
+      shape most likely to go stale, because appending to it is easier than
+      editing the body.
+    </p>
+
+    <p>
+      <strong>Relevance failed too, and I did not fix it.</strong> None of the
+      rule files are path-scoped, so a session renaming a CSS token still reads
+      the multi-vendor routing doctrine in full. I left it alone because the
+      alternative failure is silent and worse: scope a rule to a path, guess the
+      path wrong, and the session that most needed the rule is the one that never
+      loaded it. A rule that fails to load looks exactly like a rule that was
+      followed. I would rather pay tokens than take that trade before I can
+      measure it.
+    </p>
+
+    <h2>What shipped this week</h2>
+
+    <p>Three conventions and one hook.</p>
+
+    <p>
+      Every index line now ends with a compact date stamp, and says so rather
+      than guessing where no date is determinable. Every line is capped at 25
+      words, with displaced text merged down into the body file rather than
+      deleted, under one explicit carve-out: <strong>compression removes detail,
+      never a verdict and never a trigger.</strong> &ldquo;Read before touching
+      X&rdquo; is the load-bearing part of a line, and a shorter line that dropped
+      it is worse than the long one. Deferred prompts now close with the origin
+      line above.
+    </p>
+
+    <p>
+      All three of those are prose. Which brings me to the fourth, and the reason
+      it is the one worth reading about.
+    </p>
+
+    <div class="decision" data-outcome="reversal">
+      <p class="tag"><span class="sr-only">Reversed. </span>A prose rule promoted to a mechanism</p>
+      <h3>The guard that covered the surface its author enumerated</h3>
+      <p>
+        One of my oldest rules is that an agent stages explicit paths and never
+        <code>git add -A</code>, because parallel sessions leave dirty working
+        trees and a wildcard stage scoops up another session&rsquo;s in-flight
+        work. Prose is a weak place for that rule to live, so it had already been
+        promoted to a hook that inspects the command before it runs.
+      </p>
+      <p>
+        Auditing the hook found two commands that walked straight past it. Both
+        stage the entire tree. Both were driven through the guard on standard
+        input, and both were allowed.
+      </p>
+      <ul>
+        <li><code>git stage -A</code> &mdash; <code>stage</code> is a built-in synonym for <code>add</code>, taking the same options to the same effect. Only the spelling <code>add</code> was matched.</li>
+        <li><code>git add -Au</code> &mdash; a valid combined short flag. The matcher compared whole tokens, read <code>-Au</code> as an unfamiliar flag, and passed it through.</li>
+      </ul>
+      <p class="tradeoff">
+        <strong>The sharp part:</strong> the same guard&rsquo;s commit branch had
+        <em>already</em> solved the combined-flag problem, because it scans the
+        letters of a flag like <code>-am</code> individually. The two branches were
+        written on the same day. The second one never got the treatment the first
+        one had. A matcher covers the surface its author enumerated, not the
+        surface that exists.
+      </p>
+      <p>
+        The fix matches the operation rather than the spelling, and the widening
+        is bounded rather than eyeballed: no other <code>git add</code> short
+        option uses those letters, so a letter match cannot collide. The test
+        suite went from 24 cases to 32, and the added ones are split deliberately
+        between closing the bypasses and pinning the near misses that prove it did
+        not widen too far. <a href="https://github.com/sanlee-ys/agent-ops/pull/102">The change is public</a>.
+      </p>
+    </div>
+
+    <p>
+      I want to be precise about what that upgrade did and did not buy, because
+      the honest version is less tidy. The staging rule is now enforced by
+      something that cannot be persuaded. The three conventions that shipped
+      alongside it are not. <strong>Nothing fails if a date stamp is wrong, or
+      absent, or invented.</strong> I have made the context legible; I have not
+      made it checkable. That gap is the same one I have written about elsewhere
+      on this site, and naming it while it is still open is the only version of
+      this page worth publishing.
+    </p>
+
+    <h2>What this is called outside my repositories</h2>
+
+    <p>
+      LangChain&rsquo;s <a href="https://www.langchain.com/state-of-agent-engineering">State
+      of Agent Engineering</a> survey puts numbers on where teams running agents
+      in production are actually stuck. <strong>32% name quality</strong> &mdash;
+      accuracy, consistency, hallucination &mdash; as their top barrier. Among
+      organisations over 2,000 people, <strong>security is second at
+      24.9%</strong>. And the adoption gap in the same report is the one I
+      recognise most: around 89% have implemented observability, while 52% have
+      implemented evaluations.
+    </p>
+
+    <p>
+      Those map onto this architecture more directly than I expected.
+      <strong>Quality</strong> is what provenance and economy are for. An agent
+      acting on a fact that expired in July produces a confident, well-formed,
+      wrong answer, and no amount of model capability fixes an input that is no
+      longer true. <strong>Security</strong> is what isolation is for, and the
+      part that generalises is not the prompt format. It is that the redlines in
+      my setup are enforced per vendor, mechanically, at tool-call time. A
+      constraint written in a document is a request, and five vendors with
+      different harnesses will honour a request differently.
+    </p>
+
+    <p>
+      And the observability-versus-evaluation gap is the exact shape of the
+      weakness I just named in my own work. I can read my context. I cannot yet
+      fail a build over it.
+    </p>
+
+    <p class="flow-line">
+      A context payload with no dates <span class="flow-arrow">&rarr;</span> is a
+      codebase with no history.
+    </p>
+
+    <p>
+      You can still read it. You just cannot tell which parts you are allowed to
+      believe.
+    </p>
+
+  </main>
+  <script is:inline src="../assets/theme.js"></script>
+  <script is:inline src="../assets/last-updated.js"></script>
+</Base>
