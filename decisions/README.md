@@ -205,12 +205,6 @@ and denial-saturated and look like an agent discovering its permissions by hitti
 walls; and pointedly **does not widen the grant**, because doing so on this evidence
 would have been the fourth guess in a record whose first three each cost a cycle.
 
-The thread running through all four: a counter that could not count, then a name that
-could not distinguish. Both were the right kind of fix and both stopped one field short
-of being usable, and neither shortfall showed until someone tried to make a decision
-from the output. **An instrument is validated by someone acting on what it said, not by
-it firing.**
-
 A fifth amendment (2026-07-25) answered the question the fourth had declared
 unanswerable. Amendment 4 concluded there was "no path to confirming any hypothesis
 about these six runs" — but every input to the review is committed to this repo, so it
@@ -267,6 +261,20 @@ became the only path), and Amendment 3's verdict probe — which assumed "the re
 once, on open" — now filters comments by a timestamp taken before the run, so a
 re-review that gets silenced still reddens. The classify suite's fourteen fixtures pass
 unchanged, which is Amendment 6's investment paying off on the first change after it.
+
+The thread running through all seven: a counter that could not count, then a name that
+could not distinguish, then a sharper name queued *ahead of* the diagnosis it was built
+to serve. The first two were the right kind of fix and both stopped one field short of
+being usable, and neither shortfall showed until someone tried to make a decision from
+the output. The third was subtler — a better instrument standing in for an investigation
+that was already possible — and the sixth found that same shape one layer out, in a
+classify step that was ordinary bash and testable from the first day nobody tested it.
+Underneath all of them sat one inherited question: every amendment asked *which tool is
+missing*, none asked *why did it stop*, and the answer was in the agent's own closing
+sentence the whole time. The seventh could only retire the lane because the six before
+it had made it work first, which is the condition the original *Alternatives* table set.
+**An instrument is validated by someone acting on what it said, not by it firing — and
+no amount of sharpening substitutes for reading what you already have.**
 
 [`ADR-009`](ADR-009-rendered-contrast-gate.md) is the fourth record in a row of the same
 shape, and the shape is now the point. A provenance subline was rendering at **3.80:1**
