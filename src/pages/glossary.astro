@@ -4,7 +4,7 @@ import SiteNav from '../components/SiteNav.astro';
 ---
 <Base
   title="Glossary · San Lee"
-  description="Terms I use across this site, defined the way I actually use them, tied back to why each one mattered in this system."
+  description="Terms used on this site, each defined as it is used here and tied to a decision."
   canonical="https://sanlee.me/glossary.html"
   ogType="website"
 >
@@ -63,8 +63,8 @@ import SiteNav from '../components/SiteNav.astro';
     <a class="back" href="index.html">&larr; Back</a>
     <h1>Glossary</h1>
     <p class="lead">
-      Terms I use across this site, defined the way I actually use them &mdash;
-      not textbook definitions, but why each one mattered here.
+      Terms used on this site, each defined as it is used here and tied to a
+      decision.
     </p>
     <svg class="gloss-plate" viewBox="0 0 260 72" role="img"
          aria-label="These are not textbook definitions. Each term is defined the way it was used in this system, and why it mattered here.">
@@ -84,8 +84,7 @@ import SiteNav from '../components/SiteNav.astro';
       <text class="gp-title" x="197" y="40" text-anchor="middle">why it mattered</text>
     </svg>
     <p class="gloss-plate-caption">
-      Filter below. Each entry is the local meaning, tied back to a
-      decision on this site.
+      Filter the list. Each entry points at a decision on this site.
     </p>
 
     <input
@@ -184,8 +183,7 @@ import SiteNav from '../components/SiteNav.astro';
           (SYS-004, SYS-005, SYS-006) and wrote tests on both sides of each.
           I described that as &ldquo;contract tests in CI&rdquo; and said a
           renamed field would fail the build. An audit of my own decision log
-          in July 2026 showed that was wrong, and I&rsquo;d rather correct it
-          here than leave the tidier claim up.</p>
+          in July 2026 showed that was wrong.</p>
         <p class="tradeoff"><strong>What was actually true:</strong> each side
           asserted against its <em>own</em> copy of the shape. When the
           classifier added a third field, the provider&rsquo;s test fixture was

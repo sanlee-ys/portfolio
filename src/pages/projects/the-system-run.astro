@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="One Note, End to End · San Lee"
-  description="The same loop the system diagram describes, carrying a real note through real schemas: what each service sends, what comes back, and the field the consumer never mapped."
+  description="One gold note through notes-api, the classifier, writeback, and kb-agent. Real schemas. The consumer maps two labels and drops region."
   canonical="https://sanlee.me/projects/the-system-run.html"
   ogType="article"
 >
@@ -77,13 +77,7 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="the-system.html">&larr; Back to The System</a>
     <h1>One Note, End to End</h1>
-    <p class="subtitle">The loop from the system page, carrying a real note through real schemas &mdash; including the field a consumer quietly never mapped.</p>
-
-    <p>
-      "How it flows" in words is one thing. Here is the same loop carrying real
-      data. Every request and response field below is the actual schema from the
-      repos, and the classification is a real model prediction, not a mock-up.
-    </p>
+    <p class="subtitle">One gold note through the real schemas. Writeback maps two labels and drops region.</p>
     <p class="ex-caption">
       The article text and all three predicted labels are real: gold row
       <code>g002</code> from the classifier's eval set, a prediction that matches
@@ -193,18 +187,15 @@ import SiteNav from '../../components/SiteNav.astro';
           of assuming the response shape. Wiring <code>region:</code> through is
           pending work, and until it lands this page shows two tags because two
           tags is what actually gets written.</p>
-        <p class="ex-note"><strong>I originally wrote that this was the
-          contract doing its job. That was too generous to me.</strong> Tolerating
-          an unknown field is good consumer hygiene, but it isn't a guard, and
-          the guard I implied turned out not to exist. The frozen contract for
-          this seam requires a provider change to land with a coordinated
-          consumer update, and when the classifier shipped <code>region</code>
-          that update didn't happen and no build went red &mdash; because each
-          repo's &ldquo;contract test&rdquo; asserts against its own copy of the
-          shape rather than a shared one. Nothing broke here, and nothing would
-          have noticed if it had. That's written up honestly in the
+        <p class="ex-note">Tolerating an unknown field is consumer hygiene, not
+          a guard. The frozen contract for this seam requires a provider change
+          to land with a coordinated consumer update. When the classifier
+          shipped <code>region</code>, that update did not happen and no build
+          went red &mdash; each repo's &ldquo;contract test&rdquo; asserts
+          against its own copy of the shape rather than a shared one. Nothing
+          broke here, and nothing would have noticed if it had. The
           <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-004-classify-http-contract.md">SYS-004 amendment</a>
-          rather than quietly fixed.</p>
+          records it.</p>
         <pre><code>classifier_tags(&#123;
     "category": "operations",
     "operational_domain": "air",

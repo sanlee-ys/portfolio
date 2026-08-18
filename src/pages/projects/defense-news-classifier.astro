@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Defense News Classifier · San Lee"
-  description="An LLM classifier and the eval harness that kept me honest: real hand-labeled data over synthetic, negative results kept in, measurement over intuition."
+  description="An LLM classifier for public defense news, graded on 54 hand-labeled rows. Domain accuracy fell from 97.3% to 88.9% when the gold got real; the upgrades that failed that gold were cut."
   canonical="https://sanlee.me/projects/defense-news-classifier.html"
   ogType="article"
   ogImage="/assets/og-defense-news-classifier.png"
@@ -167,16 +167,14 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Defense News Classifier</h1>
-    <p class="subtitle">An LLM classifier, and the eval harness that kept me honest about it.</p>
+    <p class="subtitle">An LLM classifier for defense news, and the eval that graded every change.</p>
 
     <p class="lead">
-      This labels defense-news text on three axes: category (procurement,
+      This labels public defense-news text on three axes: category (procurement,
       operations, policy, technology, industry), operational domain (air, land,
       sea, cyber, space, multi), and region (indo-pacific, europe, middle-east,
-      africa, americas, global). That part is a single model call. The eval
-      harness is the interesting part, and it&rsquo;s where data-driven decision
-      making actually gets tested: more than once it caught me being wrong, and I
-      went with what it showed instead of my own instinct.
+      africa, americas, global). One model call does the labeling. This page is
+      the eval: what the gold set did to the numbers, and which upgrades failed it.
     </p>
 
     <!-- Argument: the number fell when the gold got real, and that drop is
@@ -212,37 +210,30 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="ep-drop-text" x="201" y="112" text-anchor="middle">TRUSTWORTHY</text>
     </svg>
     <p class="eval-plate-caption">
-      The number fell when the gold got real. Same model, harder test &mdash;
-      the lower figure is the one I trust.
+      The number fell when the gold got real. Same model, harder test.
     </p>
 
     <nav class="toc" aria-labelledby="toc-heading">
       <p class="toc-heading" id="toc-heading">On this page</p>
       <ol>
-      <li><a href="#why-the-numbers-can-be-trusted">Why the numbers can be trusted</a></li>
+      <li><a href="#why-the-numbers-can-be-trusted">Gold and versions</a></li>
       <li><a href="#what-the-eval-caught">What the eval caught</a></li>
       <li><a href="#why-an-llm-at-all">Why an LLM at all</a></li>
-      <li><a href="#two-ways-of-not-fooling-myself">Two ways of not fooling myself</a></li>
+      <li><a href="#two-ways-of-not-fooling-myself">Scale and routing</a></li>
       <li><a href="#the-third-axis">The third axis</a></li>
       <li><a href="#the-decisions">The decisions</a></li>
-      <li><a href="#autonomy-ladder">The ladder it&rsquo;s climbing</a></li>
+      <li><a href="#autonomy-ladder">Autonomy ladder</a></li>
       <li><a href="#stack">Stack</a></li>
       <li><a href="#what-it-demonstrates">What it demonstrates</a></li>
       </ol>
     </nav>
 
-    <h2 id="why-the-numbers-can-be-trusted">Why the numbers can be trusted</h2>
+    <h2 id="why-the-numbers-can-be-trusted">Gold and versions</h2>
     <p>
-      The eval has been rebuilt more than once, and the gaps between the versions
-      are the honest part. v1 graded the model on 300 snippets it generated itself. Those numbers
-      measure consistency, not correctness, and they hid a real hole:
-      <code>industry</code> recall was 0.217, the model catching one in five. v2
-      replaced that with 54 hand-labeled real snippets (DoD news wire plus SEC
-      filings), cross-checked by an Opus judge. On real financial text with actual
-      vocabulary, <code>industry</code> went to an F1 of 1.000. A model graded on
-      its own output only tells you it&rsquo;s internally consistent. To know
-      whether it&rsquo;s actually correct, you need real data that a person
-      labeled.
+      v1 graded the model on 300 snippets it generated itself.
+      <code>industry</code> recall was 0.217. v2 replaced that set with 54
+      hand-labeled real snippets (DoD news wire plus SEC filings), cross-checked
+      by an Opus judge. On that gold, <code>industry</code> F1 went to 1.000.
     </p>
 
     <table class="metrics">
@@ -259,56 +250,37 @@ import SiteNav from '../../components/SiteNav.astro';
       </tbody>
     </table>
     <p>
-      Every column after the first is the same 54 hand-labeled snippets, so the
-      numbers are comparable across the whole row. The domain numbers <em>drop</em>
-      from v1 to v2, which is the expected result once the test got harder.
-      Synthetic text the model wrote was easy to grade. Real text is harder and
-      the lower number is the trustworthy one.
-    </p>
-    <p>
-      The middle column is the migration chapter. In July 2026 the workhorse moved
-      from Sonnet 4.6 to Sonnet 5, and the swap went through the same gate as
-      every other change here: run the eval before and after, on the same
-      snippets. Domain rose to 94.4%; category didn&rsquo;t move. I read that as a
-      ceiling made of label ambiguity, which a stronger model can&rsquo;t un-blur.
-      I was half right, and the next column is where I found out.
+      Every column after the first is the same 54 hand-labeled snippets. In July
+      2026 the workhorse moved from Sonnet 4.6 to Sonnet 5 on that set: domain
+      rose to 94.4%; category did not move.
     </p>
 
     <div class="decision">
       <p class="tag">The ceiling that wasn&rsquo;t</p>
-      <p>Calling category a ceiling was a comfortable conclusion, so I went
-        looking for the shape of the misses instead of accepting it. A
-        per-cell confusion breakdown showed they weren&rsquo;t scattered at all:
-        they clustered on one boundary, <code>technology</code> read as
-        <code>operations</code> whenever a new system was tested or demoed in an
-        operational setting, plus a habit of over-assigning <code>land</code>.
+      <p>A per-cell confusion breakdown showed the remaining misses were not
+        scattered. They clustered on one boundary: <code>technology</code> read
+        as <code>operations</code> whenever a new system was tested or demoed in
+        an operational setting, plus a habit of over-assigning <code>land</code>.
         Two targeted rubric clauses moved category from 90.7% to
         <strong>94.4%</strong> and domain from 90.7% to 92.6%, with
         <code>technology</code> recall reaching 1.000 and nothing regressing.</p>
-      <p class="tradeoff"><strong>The lesson:</strong> &ldquo;that&rsquo;s the
-        ceiling&rdquo; is a hypothesis, not a finding, and it happens to be the
-        one that excuses you from more work. It was a prompt problem wearing a
-        ceiling&rsquo;s clothes. Note what it wasn&rsquo;t: a bigger model.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> the misses were a prompt
+        problem. A stronger model did not move that boundary.</p>
     </div>
 
 
     <h2 id="what-the-eval-caught">What the eval caught</h2>
-    <p>
-      Two moments show why the eval mattered at all.
-    </p>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>The prompt that read better and performed worse</p>
       <p>I sharpened the system prompt to draw a cleaner line between
         <code>procurement</code> (a purchase, the buyer's view) and
-        <code>industry</code> (a company's own business news). It read better to
-        me. Then the numbers came in: category accuracy fell from 79.0% to 76.7%,
-        and <code>industry</code> recall dropped from 0.217 to 0.100. The sharper
-        rule gave the model an even cleaner excuse to dump borderline company
-        stories into <code>procurement</code>. I reverted it.</p>
-      <p class="tradeoff"><strong>The lesson:</strong> sounding better and
-        performing better aren&rsquo;t the same thing. My gut couldn&rsquo;t tell
-        the difference here; the numbers could.</p>
+        <code>industry</code> (a company's own business news). Category accuracy
+        fell from 79.0% to 76.7%, and <code>industry</code> recall dropped from
+        0.217 to 0.100. The sharper rule gave the model a cleaner excuse to dump
+        borderline company stories into <code>procurement</code>. I reverted it.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> the prompt read cleaner.
+        The numbers did not. Reverted.</p>
     </div>
 
     <div class="decision" id="decision-grounding" data-outcome="reversal">
@@ -316,74 +288,61 @@ import SiteNav from '../../components/SiteNav.astro';
       <p>I added BM25 lexical retrieval to ground each classification in similar
         documents, expecting a clear win. Measured lift: +1.9% category accuracy
         (a net of one correct call in 54) and +0.0% on domain, where grounding
-        fixed three calls and broke three. Lexical retrieval doesn&rsquo;t earn
-        the cost of moving to embeddings here.</p>
-      <p>Then it got worse for grounding, and the way I found out is the part
-        worth telling. The comparison itself had a bug: I was scoring the
+        fixed three calls and broke three. Lexical retrieval does not earn the
+        cost of moving to embeddings here.</p>
+      <p>The comparison itself had a bug: I was scoring the
         <em>new-prompt</em> grounded arm against an <em>old-prompt</em> frozen
-        baseline, which quietly inflated the lift. Rebuilding the baseline so
-        both arms ran the same prompt killed the advantage outright. A
-        three-pass confirm settled it: across 162 grounded classifications,
-        grounding fixed a domain call <strong>zero</strong> times and broke
-        four.</p>
+        baseline, which inflated the lift. Rebuilding the baseline so both arms
+        ran the same prompt killed the advantage. A three-pass confirm settled
+        it: across 162 grounded classifications, grounding fixed a domain call
+        <strong>zero</strong> times and broke four.</p>
       <p>So I retired it
         (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>):
         out of the shipped path, out of the CI gate. The retrieval code, the
         corpus, and the measurement scripts stay in the repo, dormant and
-        reproducible, because the built-it-measured-it-cut-it trail is the
-        artifact. The verdict hardened from &ldquo;BM25 doesn&rsquo;t justify
-        upgrading to embeddings&rdquo; to &ldquo;BM25 doesn&rsquo;t justify
-        itself.&rdquo;</p>
-      <p class="tradeoff"><strong>The lesson:</strong> an unfair baseline
-        flatters whatever you are hoping for. The first measurement said
-        don&rsquo;t bother; a fair one said cut it. Comparing two things means
-        changing exactly one of them.</p>
+        reproducible. The verdict: BM25 does not justify itself.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> the first measurement said
+        skip embeddings. A fair baseline said cut BM25. The comparison only
+        holds if exactly one thing changes.</p>
     </div>
 
 
     <h2 id="why-an-llm-at-all">Why an LLM at all</h2>
     <p>
-      For most of this project&rsquo;s life there was no answer to the question a
-      skeptical reader asks in the first thirty seconds &mdash; does this task
-      need an LLM? &mdash; which is a conspicuous hole in a repo whose whole
-      argument is measure before you spend. So I built the boring baseline:
-      TF-IDF into logistic regression, deliberately standard and untuned, scored
-      against the same 54 hand-labeled rows as everything else on this page.
+      Does this task need an LLM? I built the boring baseline: TF-IDF into
+      logistic regression, standard and untuned, scored against the same 54
+      hand-labeled rows as everything else on this page.
     </p>
     <p>
       <strong>The LLM won by 20 points on category and 26 on domain</strong>
-      (paired exact McNemar, p=0.013 and p=0.0005). The more useful finding is
-      <em>where</em> the baseline broke: it collapses toward whichever class is
-      lexically loud, so the LLM is not buying accuracy in general, it is buying
-      the boundaries that need reading comprehension. <strong>Two handicaps cut
-      against the baseline and both flatter that conclusion</strong> &mdash; its
-      training labels came from a judge that itself disagrees with humans 5&ndash;6%
-      of the time, and <code>industry</code> had exactly one training row. A
-      margin this size survives them; they still get stated.
+      (paired exact McNemar, p=0.013 and p=0.0005). The baseline collapses toward
+      whichever class is lexically loud, so the spend is for the boundaries that
+      need reading comprehension. Two handicaps cut against the baseline: its
+      training labels came from a judge that disagrees with humans 5&ndash;6% of
+      the time, and <code>industry</code> had exactly one training row. A margin
+      this size survives them.
       <a class="card-link" href="classifier-baseline.html">The full bake-off, handicaps included <span class="arrow">&rarr;</span></a>
     </p>
     <p>
-      That claim is the one thing on this page you can check yourself. The
-      baseline runs with no key and no server, so it is vendored into this site
-      and classifies live in your tab &mdash; pick a row it gets wrong and watch
-      which class lights up instead.
+      The baseline runs with no key and no server. It is vendored into this site
+      and classifies live in your tab. Pick a row it gets wrong and watch which
+      class lights up instead.
       <a class="card-link" href="classifier-baseline.html#try-it">Run the losing baseline <span class="arrow">&rarr;</span></a>
     </p>
 
-    <h2 id="two-ways-of-not-fooling-myself">Two ways of not fooling myself</h2>
+    <h2 id="two-ways-of-not-fooling-myself">Scale and routing</h2>
     <p>
-      Fifty-four hand-labeled snippets is a small set, and a small set has a wide
-      error bar. Two follow-ups exist to keep that honest.
+      Fifty-four hand-labeled snippets is a small set. The 95% interval on that
+      gold is about 13 points wide. Two follow-ups sit on that.
     </p>
 
     <div class="decision">
-      <p class="tag">Scaling the eval before trusting it</p>
-      <p>The 54-snippet gold set carries a 95% confidence interval about 13
-        points wide, which is wide enough that a couple of lucky rows look like
-        progress. So I scaled to <strong>300</strong> real snippets graded by the
-        Opus judge, which roughly halves each interval &mdash; category to
+      <p class="tag">Scaling the eval</p>
+      <p>A couple of lucky rows can look like progress on n=54. So I scaled to
+        <strong>300</strong> real snippets graded by the Opus judge, which
+        roughly halves each interval &mdash; category to
         <strong>93.3%</strong>, domain to <strong>90.3%</strong>. Those
-        corroborate the hand-graded numbers rather than replacing them.</p>
+        corroborate the hand-graded numbers.</p>
 
       <!-- The scaled-eval Wilson CIs, drawn (portfolio ADR-004 candidate 2).
            A plot shows a confidence interval as what it is -- a width -- better
@@ -437,12 +396,11 @@ import SiteNav from '../../components/SiteNav.astro';
         Narrow bar: the <strong>n=300</strong> judge-graded run &mdash; category
         [89.9, 95.6], domain [86.5, 93.2]. The point estimates barely move; the
         interval is what halves.</p>
-      <p class="tradeoff"><strong>The caveat that stays attached:</strong> the
-        judge is the answer key here, so this measures agreement with a model
-        and inherits its roughly 5&ndash;6% disagreement with humans. The source
-        wire is also operations-heavy, which makes the category macro-F1
-        uninformative &mdash; the report says so in the report, not in a footnote
-        I can quietly drop.</p>
+      <p class="tradeoff"><strong>The caveat:</strong> the judge is the answer
+        key here, so this measures agreement with a model and inherits its
+        roughly 5&ndash;6% disagreement with humans. The source wire is also
+        operations-heavy, which makes the category macro-F1 uninformative. The
+        report says so.</p>
     </div>
 
     <div class="decision" data-outcome="reversal">
@@ -454,18 +412,16 @@ import SiteNav from '../../components/SiteNav.astro';
         escalations on the gold set it fixed zero and broke one, and even
         sending <em>everything</em> to the premium model scored the same 94.4%
         category, so there was no headroom for any router to capture.</p>
-      <p class="tradeoff"><strong>Why it&rsquo;s worth the build:</strong> the
-        earlier prompt fix had already taken the ground routing was aimed at.
-        The cheapest fix won, and now that&rsquo;s measured rather than
-        asserted. One more finding stayed in the record because it was
-        inconvenient: adding a field to the schema flipped one benign snippet
-        into a model refusal, so the measurement apparatus itself changed the
-        behavior being measured. Full verdict in
+      <p class="tradeoff"><strong>Why it shipped as a no:</strong> the earlier
+        prompt fix had already taken the ground routing was aimed at. One more
+        finding stayed in the record: adding a field to the schema flipped one
+        benign snippet into a model refusal, so the measurement apparatus itself
+        changed the behavior being measured. Full verdict in
         <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/013-decline-tiered-routing.md">ADR-013</a>.
         A separate project, measuring
         <a href="faithfulness-judge.html">how reliable an LLM judge is</a>,
-        later landed on the same verdict from a different direction &mdash;
-        three independent measurements now say escalation barely pays.</p>
+        later landed on the same verdict. Three independent measurements now
+        say escalation barely pays.</p>
     </div>
 
 
@@ -501,9 +457,8 @@ import SiteNav from '../../components/SiteNav.astro';
       v3 added <code>region</code>, which breaks the output contract on purpose:
       callers that expected two fields now get three. Six labels, with
       <code>global</code> as the single catch-all for stories with no
-      geographic anchor and stories spanning several. That catch-all was the
-      real design decision, and the alternative (splitting &ldquo;no
-      geography&rdquo; from &ldquo;worldwide&rdquo;) would have put the fuzziest
+      geographic anchor and stories spanning several. Splitting &ldquo;no
+      geography&rdquo; from &ldquo;worldwide&rdquo; would have put the fuzziest
       boundary on the most common kind of story in the corpus. The label set,
       the boundary rules, and the scope limits were written down before the
       build in
@@ -511,43 +466,34 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
     <p>
       Region landed at 87.0% against fresh hand labels when the axis shipped.
-      The more interesting number was that the misses weren&rsquo;t noise:
-      <strong>all seven</strong> were stories whose true label is
-      <code>global</code> that the model pulled to a specific region, usually
+      <strong>All seven</strong> first-pass misses were stories whose true label
+      is <code>global</code> that the model pulled to a specific region, usually
       <code>americas</code>. The rule says label the theater the activity
       happens in, and only when the text says so. The model kept seeing a US
-      actor and inferring a US theater, which is the no-guessing rule being hard
-      rather than the model being sloppy. One named failure mode beats a
-      scattered 13%, because a named one can be worked on.
+      actor and inferring a US theater.
     </p>
     <p>
-      It was worked on, and region now reads
+      Region now reads
       <strong><span data-metric="region_accuracy">94.4%</span></strong>. The fix
       is one bullet of prompt telling the model that naming a US command or
-      contractor identifies the actor, not a place. Getting it shipped took two
-      rounds and is the part worth reading: measured once and
-      <em>reverted</em> at p=0.0522 against a pre-registered p&lt;0.05, then
-      re-run against a ruler twice the size, where the identical clause landed
-      at <strong>p=0.0002</strong> and shipped. The bar never moved. The first
-      experiment simply never had the power to decide &mdash; about a coin
-      flip&rsquo;s worth &mdash; so the honest reading of the revert is
-      <em>underpowered</em>, not <em>wrong</em>.
+      contractor identifies the actor, not a place. It shipped in two rounds:
+      measured once and <em>reverted</em> at p=0.0522 against a pre-registered
+      p&lt;0.05, then re-run against a ruler twice the size, where the identical
+      clause landed at <strong>p=0.0002</strong> and shipped. The bar never
+      moved. The first experiment did not have the power to decide.
     </p>
     <p>
       Three region misses remain instead of seven, and the error mode inverted:
       only one is still the old cluster, and the other two are the converse
       &mdash; <code>americas</code> rows the clause over-called to
-      <code>global</code>. That collateral was priced before the run rather than
-      discovered after it. Five under-calls traded for two over-calls is the
-      shape of the win, and it is a trade, not a free fix.
+      <code>global</code>. That collateral was priced before the run. Five
+      under-calls traded for two over-calls is the shape of the win.
     </p>
     <p>
-      One number went the other way and is worth stating rather than burying:
-      judge-versus-human agreement on region, the measured condition that gated
-      the scaled eval in the first place, fell from a perfect
-      <strong>100.0%</strong> to <strong>96.3%</strong>. That is 2 disagreements
-      in 54 against a CI floor budgeting 3 &mdash; the number that would have
-      stopped the release, and the reason the floor exists.
+      Judge-versus-human agreement on region, the measured condition that gated
+      the scaled eval, fell from a perfect <strong>100.0%</strong> to
+      <strong>96.3%</strong>. That is 2 disagreements in 54 against a CI floor
+      budgeting 3. Three disagreements would have stopped the release.
     </p>
 
 
@@ -559,7 +505,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <p>The model is called with a forced tool schema (all three fields required,
         strict enums), so an invalid label is rejected at the API layer before it
         reaches application code. When v3 added <code>region</code>, it was one
-        more required strict enum &mdash; the schema is where a new axis goes.</p>
+        more required strict enum. The schema is where a new axis goes.</p>
       <p class="tradeoff"><strong>Why:</strong> the schema becomes the contract, and
         the app code stays free of defensive parsing. <strong>Tradeoff:</strong>
         tool-use costs a few extra tokens and a more verbose call signature than
@@ -572,10 +518,9 @@ import SiteNav from '../../components/SiteNav.astro';
       <h3>One model call, not a multi-step pipeline</h3>
       <p>Classification is a single call, not a generate-reasoning-then-classify
         chain.</p>
-      <p class="tradeoff"><strong>Why:</strong> the goal was to measure classifier
-        quality honestly, and a simpler baseline makes the eval cleaner to reason
-        about. <strong>Tradeoff:</strong> gives up any lift a reasoning step might
-        add, which the eval can always be used to revisit later.</p>
+      <p class="tradeoff"><strong>Why:</strong> a single call is a cleaner
+        baseline for the eval. <strong>Tradeoff:</strong> gives up any lift a
+        reasoning step might add, which the eval can revisit later.</p>
     </div>
 
     <div class="decision">
@@ -583,10 +528,10 @@ import SiteNav from '../../components/SiteNav.astro';
       <h3>Implement the metrics by hand</h3>
       <p>Precision, recall, F1, and confusion matrices are computed directly with
         pandas and arithmetic, no ML framework.</p>
-      <p class="tradeoff"><strong>Why:</strong> the call here was to hold off on
-        ML tooling until it earns its place, not to default to it because it&rsquo;s
-        there. It keeps the dependency surface to <code>anthropic</code> plus
-        <code>pandas</code>. <strong>Tradeoff:</strong> about 40 lines that
+      <p class="tradeoff"><strong>Why:</strong> hold off on ML tooling until it
+        earns its place. It keeps the dependency surface to
+        <code>anthropic</code> plus <code>pandas</code>.
+        <strong>Tradeoff:</strong> about 40 lines that
         <code>sklearn.metrics</code> would replace, accepted for clarity.</p>
     </div>
 
@@ -598,19 +543,18 @@ import SiteNav from '../../components/SiteNav.astro';
         with replace semantics, so reprocessing the same note converges instead of
         piling up duplicate tags.</p>
       <p class="tradeoff"><strong>Why:</strong> replace semantics make reprocessing
-        safe by design, so idempotency is a requirement, not a nicety.
+        safe by design, so idempotency is a requirement.
         <strong>Tradeoff:</strong> the background task carries real retry and
         error-handling logic. See <a href="the-system.html">The System</a> for the
         full loop.</p>
     </div>
 
 
-    <h2 id="autonomy-ladder">The ladder it&rsquo;s climbing</h2>
+    <h2 id="autonomy-ladder">Autonomy ladder</h2>
     <p>
-      This classifier is also the protagonist of the portfolio&rsquo;s roadmap: an
-      autonomy ladder. Each level is the <em>same system</em> handed more
-      self-direction, not a separate demo. The axis is who drives &mdash; reaching
-      for a tool doesn&rsquo;t move you up a level; deciding for yourself does.
+      This classifier is also the portfolio&rsquo;s autonomy ladder. Each level
+      is the <em>same system</em> handed more self-direction. The axis is who
+      drives. Reaching for a tool does not move a level; deciding does.
     </p>
     <p class="flow-line">
       L1 a human runs it <span class="flow-arrow">&rarr;</span> L2 + a tool
@@ -618,15 +562,14 @@ import SiteNav from '../../components/SiteNav.astro';
       <span class="flow-arrow">&rarr;</span> L4 agents coordinate
     </p>
     <p>
-      <strong>Every level&rsquo;s story ends with the measurement getting the last
-      word.</strong> L2 was climbed and then climbed back down &mdash; the retrieval
-      grounding above is that rung, retired. L3&rsquo;s optimisation loop improved
-      against the split it could see while giving ground on held-out gold, so it
-      was vetoed by the set it never saw. L4 fixed six of the seven rows it was
-      aimed at and <em>was still declined</em>: outside its target it broke more
-      than it fixed, the repo&rsquo;s first statistically significant harm
-      (p=0.016) at four times the cost. Two of the four levels shipped a
-      &ldquo;no,&rdquo; and each was written down before it was built.
+      L2 was climbed and then climbed back down: the retrieval grounding above
+      is that rung, retired. L3&rsquo;s optimisation loop improved against the
+      split it could see while giving ground on held-out gold, so it was vetoed
+      by the set it never saw. L4 fixed six of the seven rows it was aimed at
+      and <em>was still declined</em>: outside its target it broke more than it
+      fixed, the repo&rsquo;s first statistically significant harm (p=0.016) at
+      four times the cost. Two of the four levels shipped a &ldquo;no,&rdquo;
+      and each was written down before it was built.
       <a class="card-link" href="autonomy-ladder.html">The full ladder, level by level <span class="arrow">&rarr;</span></a>
     </p>
 
@@ -638,24 +581,18 @@ import SiteNav from '../../components/SiteNav.astro';
       eval dependencies only, for the classical baseline the model was measured
       against; nothing in the shipped path uses it. Tested with pytest on mocked
       calls. The repo is
-      public: <a href="https://github.com/sanlee-ys/defense-news-classifier">github.com/sanlee-ys/defense-news-classifier</a>
-      &mdash; the eval harness, gold set, and ADRs are all checkable, including the
+      public: <a href="https://github.com/sanlee-ys/defense-news-classifier">github.com/sanlee-ys/defense-news-classifier</a>.
+      The eval harness, gold set, and ADRs are checkable, including the
       experiments that were measured and cut.
     </p>
 
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
-      The dataset is small and the scale is personal. The transferable part is the
-      method: evals work like unit tests for an LLM system &mdash; you find out
-      before it ships, not after. Over the ladder&rsquo;s climb that method
-      measured and declined every escalation offered to it &mdash; retrieval
-      three ways, premium-model routing, and a multi-agent review pipeline
-      &mdash; so the production system stayed a single well-prompted call, and
-      each &ldquo;no&rdquo; is a checkable artifact rather than a taste
-      decision. The one &ldquo;yes&rdquo; got the same treatment: the free
-      classical baseline that would have made the whole model unnecessary was
-      built and measured too, and it lost by 20 points. Declining every
-      upgrade is only credible if you also checked the floor.
+      The gold set is 54 rows. An eval gates the merge. That method declined
+      retrieval three ways, premium-model routing, and a multi-agent review
+      pipeline. The production system stayed a single well-prompted call, and
+      each &ldquo;no&rdquo; is a checkable artifact. The floor got the same
+      treatment: the classical baseline lost by 20 points.
     </p>
   </main>
   <script is:inline src="../assets/theme.js"></script>

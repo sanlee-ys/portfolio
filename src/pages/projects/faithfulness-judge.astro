@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Faithfulness Judge · San Lee"
-  description="Measuring the measurer: can an LLM judge be trusted to catch made-up claims? 193 hand-labeled claims, and the truncation bug that nearly shipped a false result."
+  description="Can an LLM judge catch a made-up claim? 193 hand-labeled claims over public defense text, and the max_tokens bug that invented a 0.70 versus 0.43 tier gap."
   canonical="https://sanlee.me/projects/faithfulness-judge.html"
   ogType="article"
   ogImage="/assets/og-faithfulness-judge.png"
@@ -166,17 +166,15 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Faithfulness Judge</h1>
-    <p class="subtitle">Measuring the measurer: can an LLM be trusted to tell you when an answer is making things up?</p>
+    <p class="subtitle">Can an LLM judge catch a made-up claim?</p>
 
     <p class="lead">
-      Every LLM system I build is graded by another LLM at some point. That
-      raises a question the grading quietly depends on and rarely answers: how
-      good is the grader? This project measures that directly. It takes answers
-      generated over public defense text, breaks them into individual claims,
-      has a person label each one against its cited source, and then asks two
-      model tiers to do the same job blind. The deliverable is not a working
-      product. It is a number for how far the judge can be trusted, and an
-      explicit statement of where it can&rsquo;t.
+      Every LLM system I build is graded by another LLM at some point. This
+      project measures the grader. It takes answers generated over public
+      defense text, breaks them into individual claims, has a person label each
+      one against its cited source, and then asks two model tiers to do the same
+      job blind. The deliverable is a number for how far the judge can be
+      trusted, and where it cannot.
     </p>
 
     <!-- Unit of the study: one claim read against its cited source, labeled
@@ -236,40 +234,33 @@ import SiteNav from '../../components/SiteNav.astro';
     </table>
     <p>
       Both tiers land in what the statistics literature calls substantial
-      agreement, which makes either usable as an automated faithfulness check.
-      The tempting headline is that the premium tier wins. I didn&rsquo;t write
-      that headline, because the confidence intervals overlap heavily at this
-      sample size, so the gap in &kappa; isn&rsquo;t resolvable from this data.
-      Reporting it as a win would be a soft number dressed up as a solid one.
+      agreement. Either is usable as an automated faithfulness check. The
+      premium tier edges the cheap one on &kappa;, and the confidence intervals
+      overlap at this sample size. The gap is not resolvable from this data.
     </p>
     <p>
       Those figures are measured against a gold set I audited in August, blind,
-      under a selection rule committed before I looked at a single label. It
-      held: <strong>28 of the 30 claims it pulled came back unchanged</strong>.
-      That consistency is the finding. The audit also moved Opus from 0.751 to
-      0.762, and <strong>that rise is not evidence the judge got better</strong>
-      &mdash; restricted to the corrections that landed on claims neither judge
-      had gotten wrong, it is 0.752, flat. The audit had reached one claim both
-      judges failed, and removing it lifts agreement arithmetically rather than
-      because anything about the judges changed. I pre-registered that check
-      precisely so I couldn&rsquo;t talk myself into the more flattering reading
-      afterward, and it is
+      under a selection rule committed before I looked at a single label.
+      <strong>28 of the 30 claims it pulled came back unchanged</strong>. That
+      consistency is the finding. The audit also moved Opus from 0.751 to 0.762.
+      Restricted to the corrections that landed on claims neither judge had
+      gotten wrong, it is 0.752, flat. The audit had reached one claim both
+      judges failed, and removing it lifts agreement arithmetically. The check
+      was pre-registered. It is
       <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/002-solid-tier-call.md#phase-2-result-2026-08-02">published both ways</a>.
     </p>
     <p>
-      The tempting second headline is recall on unsupported claims, where the
-      split is <strong>97.9% versus 89.6%</strong>. It doesn&rsquo;t survive
-      either, and the class it&rsquo;s measured over isn&rsquo;t the one the name
-      suggests. Those percentages are 47 versus 43 catches out of 48, and that 48
-      folds in hedged half-claims alongside outright fabrications. Restrict it to
-      fabrication proper, the 36 claims the source flatly doesn&rsquo;t back, and
-      the two tiers are <strong>identical</strong>: 35 of 36 each, missing the
-      same claim, nothing between them. All four of the disagreeing pairs behind
-      the gap are hedged claims, which the rubric itself calls the least crisp
-      call a labeler makes. McNemar&rsquo;s exact test on those four gives
+      Unsupported recall is <strong>97.9% versus 89.6%</strong>. Those
+      percentages are 47 versus 43 catches out of 48, and that 48 folds in
+      hedged half-claims alongside outright fabrications. Restrict it to
+      fabrication proper, the 36 claims the source flatly does not back, and the
+      two tiers are <strong>identical</strong>: 35 of 36 each, missing the same
+      claim. All four of the disagreeing pairs behind the gap are hedged claims,
+      which the rubric itself calls the least crisp call a labeler makes.
+      McNemar&rsquo;s exact test on those four gives
       <strong>p&nbsp;=&nbsp;0.125</strong>: the direction is consistent, with no
-      reversals in 48 chances, but four pairs can&rsquo;t size an effect. An
-      earlier version of this page reported that gap as the reason to pay for the
+      reversals in 48 chances, but four pairs cannot size an effect. An earlier
+      version of this page reported that gap as the reason to pay for the
       premium tier, and called it recall on the fabrication class. The test and
       the restriction are the two corrections.
     </p>
@@ -278,7 +269,7 @@ import SiteNav from '../../components/SiteNav.astro';
       across all 189 claims, the premium judge is right where the cheap one is
       wrong six times and wrong where it&rsquo;s right three times, which is
       <strong>p&nbsp;=&nbsp;0.51</strong>. The cheap tier is good enough and
-      escalation isn&rsquo;t evidenced.
+      escalation is not evidenced.
     </p>
 
     <h2>The result I almost published instead</h2>
@@ -318,9 +309,8 @@ import SiteNav from '../../components/SiteNav.astro';
     <div class="decision">
       <p class="tag">A truncation setting that looked like a finding</p>
       <p>The first scoring run showed Opus at 0.70 and Sonnet at
-        <strong>0.43</strong>. A dramatic, clean tier gap, and a far more
-        satisfying story than the one above: the expensive model is simply
-        better at judging. It was one commit from shipping.</p>
+        <strong>0.43</strong>. A clean tier gap. It was one commit from
+        shipping.</p>
       <p>It was false. I had set <code>max_tokens=10</code> to force a one-word
         verdict out of the judge. Opus complied. Sonnet tended to open with a
         short clause of reasoning first, so on <strong>39 of the 191 claims
@@ -330,64 +320,56 @@ import SiteNav from '../../components/SiteNav.astro';
         Sonnet&rsquo;s answers were scored as wrong when they were simply
         missing. On the 152 claims it actually finished, Sonnet was already at
         about 0.70, which is where it sits today.</p>
-      <p>What caught it was reading the misjudgment log before publishing rather
-        than after. Sonnet&rsquo;s failures didn&rsquo;t look like judgment
-        errors, which are scattered and arguable. They looked
-        <em>empty</em>. Errors have a shape, and that shape was wrong.</p>
-      <p class="tradeoff"><strong>The lesson:</strong> when a model scores
-        unexpectedly badly, inspect the raw outputs before believing the metric.
-        A number can be perfectly reproducible and still be measuring your own
-        harness. The generalization I actually changed my practice on: constrain
-        a critical output <em>structurally</em>, not with a token budget.</p>
+      <p>What caught it was reading the misjudgment log before publishing.
+        Sonnet&rsquo;s failures did not look like judgment errors, which are
+        scattered and arguable. They looked <em>empty</em>.</p>
+      <p class="tradeoff"><strong>The lesson:</strong> inspect the raw outputs
+        before believing a surprising metric. A number can be reproducible and
+        still measure the harness. Constrain a critical output
+        <em>structurally</em>, not with a token budget.</p>
     </div>
 
     <p>
-      The fix took two tries, and the failed one is worth recording. Prefilling
-      the assistant&rsquo;s reply, seeding the response so the model continues
-      from a fixed token, is the standard trick for forcing a format, and these
-      models reject it. What works is a forced tool call: a
-      <code>record_verdict</code> tool whose schema constrains the verdict to
-      the label set, with the tool choice pinned so the model has to use it. The
-      model can reason as long as it likes, and the verdict arrives in a
-      structured block that cannot be truncated into ambiguity. That is the same
-      pattern the classifier uses to guarantee valid labels, applied to a second
-      problem.
+      The fix took two tries. Prefilling the assistant&rsquo;s reply, seeding
+      the response so the model continues from a fixed token, is the standard
+      trick for forcing a format, and these models reject it. What works is a
+      forced tool call: a <code>record_verdict</code> tool whose schema
+      constrains the verdict to the label set, with the tool choice pinned so
+      the model has to use it. The model can reason as long as it likes, and the
+      verdict arrives in a structured block that cannot be truncated into
+      ambiguity. That is the same pattern the classifier uses to guarantee
+      valid labels.
     </p>
     <p>
-      One scoring convention did the real work here, and it was tempting to
-      change it. Counting unparsed verdicts as disagreements is harsh; dropping
-      them would have been defensible and would have quietly discarded 20% of
-      the set, hiding the truncation entirely and shipping the false gap. The
-      strict rule is what made the bug visible. Full decision record in
+      Counting unparsed verdicts as disagreements is harsh. Dropping them would
+      have discarded 20% of the set and hidden the truncation. The strict rule
+      is what made the bug visible. Full decision record in
       <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/001-both-tiers-substantial.md">ADR-001</a>.
     </p>
 
-    <h2>Why this is a different problem from the classifier</h2>
+    <h2>What this grades against</h2>
     <p>
       The <a href="defense-news-classifier.html">classifier</a> is graded
-      against cheap, objective labels: a story is about procurement or it
-      isn&rsquo;t, and two careful people will mostly agree. This project grades
-      against expensive, subjective ones. Deciding whether a specific sentence
-      is supported by a specific cited passage takes real reading, the
-      boundaries are genuinely arguable, and a hedged half-claim is a judgment
-      call rather than a lookup. It reuses the classifier&rsquo;s machinery, the
-      judge harness, the Wilson intervals, the gold-set discipline, and points
-      it at the opposite ground-truth regime.
+      against cheap, objective labels: a story is about procurement or it is
+      not, and two careful people will mostly agree. This project grades against
+      expensive, subjective ones. Deciding whether a specific sentence is
+      supported by a specific cited passage takes real reading. The boundaries
+      are arguable, and a hedged half-claim is a judgment call. It reuses the
+      classifier&rsquo;s machinery, the judge harness, the Wilson intervals, the
+      gold-set discipline, and points it at the opposite ground-truth regime.
     </p>
     <p>
-      It also produced the third verdict in a row on the same question. The
-      classifier retired BM25 grounding after measuring it, then declined tiered
-      model routing after measuring that. Here the cheap tier is again close
-      enough that escalation is hard to justify on overall agreement. Three
-      independent measurements, all landing on <em>escalation barely pays</em>,
-      is no longer a one-off result. It is the reason the default across this
-      system is the cheaper model until an eval says otherwise.
+      The classifier retired BM25 grounding after measuring it, then declined
+      tiered model routing after measuring that. Here the cheap tier is again
+      close enough that escalation is hard to justify on overall agreement.
+      Three independent measurements land on <em>escalation barely pays</em>.
+      That is why the default across this system is the cheaper model until an
+      eval says otherwise.
     </p>
 
     <h2>What this number does not establish</h2>
     <p>
-      The limits are on the repo&rsquo;s front page rather than buried at the
-      bottom, because a floor is only useful if you state where it gives out.
+      The limits, also stated on the repo&rsquo;s front page:
     </p>
     <ul>
       <li><strong>One labeler.</strong> The gold set is my labels alone, with no
@@ -407,8 +389,7 @@ import SiteNav from '../../components/SiteNav.astro';
         reversed one of the first pass&rsquo;s own calls, where the claim does
         assert that the source omits a detail and so is a correct refusal rather
         than filler. The second audit is also the evidence that the first was
-        incomplete. Single-labeler ground truth is worth auditing, not just
-        declaring, and one audit is not obviously enough either.</li>
+        incomplete.</li>
       <li><strong>189 scored claims</strong> out of 193, with four excluded as
         non-claims. The intervals are about nine points wide. Any difference
         smaller than that is noise, and that includes both the tier gap in
@@ -420,10 +401,10 @@ import SiteNav from '../../components/SiteNav.astro';
         reporting, skewed toward operations and procurement. Faithfulness
         judging over long documents or technical specifications is untested
         here.</li>
-      <li><strong>A floor I&rsquo;ll say out loud:</strong> below about 0.6 I
-        wouldn&rsquo;t trust an automated verdict unreviewed. Both judges clear
-        that. Neither clears the bar for treating a verdict as final without a
-        human in the loop on anything consequential.</li>
+      <li><strong>A floor:</strong> below about 0.6 I would not trust an
+        automated verdict unreviewed. Both judges clear that. Neither clears the
+        bar for treating a verdict as final without a human in the loop on
+        anything consequential.</li>
     </ul>
 
     <h2>Stack</h2>
@@ -433,17 +414,17 @@ import SiteNav from '../../components/SiteNav.astro';
       intervals computed directly, pytest on mocked calls. Source text is public
       DVIDS reporting; nothing proprietary or non-public is used anywhere in the
       project. The repo is public:
-      <a href="https://github.com/sanlee-ys/faithfulness-judge">github.com/sanlee-ys/faithfulness-judge</a>
-      &mdash; the gold set, the labeling guide, the misjudgment log, and the ADR
-      that documents the bug are all checkable.
+      <a href="https://github.com/sanlee-ys/faithfulness-judge">github.com/sanlee-ys/faithfulness-judge</a>.
+      The gold set, the labeling guide, the misjudgment log, and the ADR that
+      documents the bug are checkable.
     </p>
 
     <h2>What it demonstrates</h2>
     <p>
-      Anyone can run an eval and report the number it prints. The transferable
-      skill is knowing when the number is lying to you, and being willing to
-      publish the boring true result after you&rsquo;ve seen the exciting false
-      one.
+      The first scoring run printed a dramatic tier gap. The misjudgment log
+      showed the cheap tier had been cut off. The published result is the one
+      that survived that check: both judges are good enough, and escalation is
+      not evidenced.
     </p>
   </main>
   <script is:inline src="../assets/theme.js"></script>

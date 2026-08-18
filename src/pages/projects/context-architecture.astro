@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Context Architecture &middot; San Lee"
-  description="The payload my agent sessions load before they read a line of code, scored against five published context-quality criteria. It failed three of them, and only one of the fixes is a hook rather than a paragraph."
+  description="The payload my agent sessions load before they open a source file, scored against five published context-quality criteria. Relevance, economy, and provenance failed. Three fixes are conventions; one is a hook."
   canonical="https://sanlee.me/projects/context-architecture.html"
   ogType="article"
 >
@@ -13,9 +13,9 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Context Architecture</h1>
-    <p class="subtitle">The payload my agent sessions load before they read a line of my code is a surface I designed. I scored it against five published criteria and failed three of them.</p>
+    <p class="subtitle">The payload my agent sessions load before they open a source file. Scored against five published criteria; three failed.</p>
 
-    <h2>The surface nobody draws</h2>
+    <h2>The resident payload</h2>
 
     <p>
       Every session I start reads a fixed payload first: an index of about sixty
@@ -25,34 +25,31 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p>
-      I did not design that payload. It accreted, one &ldquo;remember this&rdquo;
-      at a time, over months and across five agent vendors. Nothing crashed. The
-      payload just got bigger, and a bigger payload is not free in three separate
-      currencies: <strong>money</strong>, because every resident token is re-sent
-      on every turn; <strong>attention</strong>, because a model reading sixty
-      facts weights each one less than a model reading six; and
+      The payload accreted, one &ldquo;remember this&rdquo; at a time, over months
+      and across five agent vendors. Nothing crashed. The payload just got
+      bigger, and a bigger payload is not free in three currencies:
+      <strong>money</strong>, because every resident token is re-sent on every
+      turn; <strong>attention</strong>, because a model reading sixty facts
+      weights each one less than a model reading six; and
       <strong>trust</strong>, because a fact with no date cannot be told apart
-      from a fact that used to be true. The third is the expensive one. A stale
-      instruction does not read as stale. It reads as an instruction.
+      from a fact that used to be true. A stale instruction still reads as an
+      instruction.
     </p>
 
     <p>
-      What I was missing was the vocabulary to audit it. A paper I read this month
-      supplied it: <em>Context Engineering: From Prompts to Corporate Multi-Agent
-      Architecture</em> (<a href="https://arxiv.org/abs/2603.09619">arXiv:2603.09619</a>)
-      proposes five quality criteria for an agent&rsquo;s context &mdash;
+      A paper I read this month gave me the criteria to audit it:
+      <em>Context Engineering: From Prompts to Corporate Multi-Agent
+      Architecture</em> (<a href="https://arxiv.org/abs/2603.09619">arXiv:2603.09619</a>).
+      Five quality criteria for an agent&rsquo;s context &mdash;
       <strong>relevance, sufficiency, isolation, economy, and provenance</strong>
-      &mdash; and frames context as the agent&rsquo;s operating system. The framing
-      is the useful part. An operating system is something you architect and then
-      audit. It is not something you accumulate.
+      &mdash; and a frame of context as the agent&rsquo;s operating system.
     </p>
 
     <h2>What was already there</h2>
 
     <p>
-      Four structures, all of which predate my having any of those words for them.
-      I am describing them in the paper&rsquo;s terms after the fact, not claiming
-      I built to its spec.
+      Four structures, all of which predate those words. I am describing them
+      in the paper&rsquo;s terms after the fact.
     </p>
 
     <div class="decision">
@@ -185,9 +182,8 @@ import SiteNav from '../../components/SiteNav.astro';
       <strong>Economy failed in a way that fed the first.</strong> Three lines had
       absorbed body-file detail rather than pointing at it, the worst of them
       running to roughly 230 words in a file whose entire job is to be pointers.
-      An index line that reads like a changelog is not a pointer that got long. It
-      is a different artifact wearing the index&rsquo;s clothes, and it is the
-      shape most likely to go stale, because appending to it is easier than
+      An index line that reads like a changelog is no longer a pointer. It is
+      the shape most likely to go stale, because appending to it is easier than
       editing the body.
     </p>
 
@@ -218,8 +214,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p>
-      All three of those are prose. Which brings me to the fourth, and the reason
-      it is the one worth reading about.
+      All three of those are prose. The fourth is a hook.
     </p>
 
     <div class="decision" data-outcome="reversal">
@@ -260,17 +255,13 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <p>
-      I want to be precise about what that upgrade did and did not buy, because
-      the honest version is less tidy. The staging rule is now enforced by
-      something that cannot be persuaded. The three conventions that shipped
-      alongside it are not. <strong>Nothing fails if a date stamp is wrong, or
-      absent, or invented.</strong> I have made the context legible; I have not
-      made it checkable. That gap is the same one I have written about elsewhere
-      on this site, and naming it while it is still open is the only version of
-      this page worth publishing.
+      The staging rule is now enforced by something that cannot be persuaded.
+      The three conventions that shipped alongside it are not.
+      <strong>Nothing fails if a date stamp is wrong, or absent, or
+      invented.</strong> The context is legible. It is not yet checkable.
     </p>
 
-    <h2>What this is called outside my repositories</h2>
+    <h2>The same gaps in production surveys</h2>
 
     <p>
       LangChain&rsquo;s <a href="https://www.langchain.com/state-of-agent-engineering">State
@@ -284,31 +275,19 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p>
-      Those map onto this architecture more directly than I expected.
-      <strong>Quality</strong> is what provenance and economy are for. An agent
-      acting on a fact that expired in July produces a confident, well-formed,
-      wrong answer, and no amount of model capability fixes an input that is no
-      longer true. <strong>Security</strong> is what isolation is for, and the
-      part that generalises is not the prompt format. It is that the redlines in
-      my setup are enforced per vendor, mechanically, at tool-call time. A
+      Those map onto this architecture. <strong>Quality</strong> is what
+      provenance and economy are for. An agent acting on a fact that expired in
+      July produces a confident, well-formed, wrong answer, and no amount of
+      model capability fixes an input that is no longer true.
+      <strong>Security</strong> is what isolation is for. The redlines in my
+      setup are enforced per vendor, mechanically, at tool-call time. A
       constraint written in a document is a request, and five vendors with
       different harnesses will honour a request differently.
     </p>
 
     <p>
-      And the observability-versus-evaluation gap is the exact shape of the
-      weakness I just named in my own work. I can read my context. I cannot yet
-      fail a build over it.
-    </p>
-
-    <p class="flow-line">
-      A context payload with no dates <span class="flow-arrow">&rarr;</span> is a
-      codebase with no history.
-    </p>
-
-    <p>
-      You can still read it. You just cannot tell which parts you are allowed to
-      believe.
+      The observability-versus-evaluation gap is the same weakness in my own
+      work. I can read my context. I cannot yet fail a build over it.
     </p>
 
   </main>
