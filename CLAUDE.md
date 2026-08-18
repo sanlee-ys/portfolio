@@ -57,9 +57,14 @@ rebuilding, and the build-independent six still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
-in the script line. Set `SITE_ROOT` yourself to override it; run a gate
-directly (`node scripts/link-check.cjs`) and it walks the repo root, which is
-what makes each one usable by hand.
+in the script line. Set `SITE_ROOT` yourself to override it; run most gates
+directly (`node scripts/link-check.cjs`) and they walk the repo root, which is
+what makes them usable by hand.
+
+`check-published-metrics.cjs` is the exception. It excludes `dist/` from its
+walk, so a bare `node scripts/check-published-metrics.cjs` finds no HTML and
+exits 1. Run it as `npm run build && SITE_ROOT=dist node
+scripts/check-published-metrics.cjs`.
 
 **The ADR linter needs a Python 3, and a missing one fails the run rather than
 skipping it.** The runner probes `python3`, `python`, then `py -3` and requires

@@ -60,7 +60,10 @@
  *     Markdown line      -> exit 1. It silently breaks the rendered page while
  *                           leaving this gate green.
  *
- * Run:  node scripts/check-published-metrics.cjs
+ * Run:  npm run build && SITE_ROOT=dist node scripts/check-published-metrics.cjs
+ *
+ * This gate needs SITE_ROOT, unlike the other site gates. BUILD_DIRS below
+ * excludes `dist/`, so a bare run finds no HTML under the repo root and exits 1.
  */
 const fs = require('fs');
 const path = require('path');
@@ -185,7 +188,7 @@ function allClaimFiles() {
   const md = claimFiles(ROOT, ['.md']).map((rel) => ({ root: ROOT, rel }));
   if (html.length === 0) {
     console.error(`✗ check-published-metrics: no HTML found under ${HTML_ROOT}.`);
-    console.error('  Nothing was checked. Run `npm run build` first, or unset SITE_ROOT.');
+    console.error('  Nothing was checked. Run `npm run build`, then set SITE_ROOT=dist.');
     process.exit(1);
   }
   return [...html, ...md];
