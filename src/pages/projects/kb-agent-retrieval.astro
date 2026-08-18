@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Retrieval, Measured · San Lee"
-  description="kb-agent had never measured its own retrieval. A 27-query gold set, three changes each run through a paired A/B, and the most useful result is the one I did not ship."
+  description="kb-agent had never measured its own retrieval. I ran a 27-query gold set through three paired A/B changes and left hybrid off the default."
   canonical="https://sanlee.me/projects/kb-agent-retrieval.html"
   ogType="article"
   ogImage="/assets/og-kb-agent-retrieval.png"
@@ -164,19 +164,18 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Retrieval, Measured</h1>
-    <p class="subtitle">kb-agent had never measured its own retrieval. Three changes later, the most useful result is the one I did not ship.</p>
+    <p class="subtitle">kb-agent had never measured its own retrieval. Three paired A/B changes later, hybrid stayed off the default.</p>
 
     <p class="lead">
       kb-agent is the RAG agent in <a href="the-system.html">the system</a>: it
       answers questions about my own projects out of a small knowledge base. Its
       second milestone was supposed to be a shared retrieval backbone, with the
       classifier calling it over HTTP instead of standing up its own vector
-      store. That consumer went its own way and shipped its own lexical
-      retriever, so the backbone had nobody left to serve. Retiring it exposed
-      the assumption sitting underneath: the plan had taken for granted that
+      store. That consumer shipped its own lexical retriever, so the backbone had
+      nobody left to serve. Retiring it left an untested assumption: that
       kb-agent&rsquo;s retrieval was good enough to be another project&rsquo;s
-      substrate, and nothing had ever measured it. My own kickoff note is blunt
-      about it. Every quality claim about the search tool was a vibe.
+      substrate. Nothing had measured it. My own kickoff note is blunt about it.
+      Every quality claim about the search tool was a vibe.
     </p>
 
     <p>
@@ -265,19 +264,17 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p>
-      There is deliberately <strong>no LLM judge at this layer</strong>. The
-      label is an objective path match, so a judge would be adjudicating a
-      question a person has already answered exactly, at the cost of variance and
-      a validation burden. The second reason matters more: retrieval quality is
-      kept separate from answer quality on purpose, because conflating the two is
-      how a RAG system hides bad retrieval behind a capable model. If answer
-      quality gets measured here later, that layer may well want a judge. It must
-      not merge into this one.
+      There is <strong>no LLM judge at this layer</strong>. The label is an
+      objective path match. A judge would re-score a question a person has
+      already answered, and add variance plus a validation burden. Retrieval
+      quality stays separate from answer quality. Conflating the two is how a RAG
+      system hides bad retrieval behind a capable model. If answer quality gets
+      measured later, that layer can have a judge. It stays off this one.
     </p>
 
     <p>
-      The tool takes an optional <code>kind</code> filter, and the gap between
-      running with it and running without it turned out to be the whole story.
+      The tool takes an optional <code>kind</code> filter. The gap between
+      running with it and running without it is the largest split on this page.
     </p>
 
     <table class="metrics">
@@ -298,10 +295,9 @@ import SiteNav from '../../components/SiteNav.astro';
     <p>
       The first run also turned two vague suspicions into named misses. I had
       left repo boilerplate and generated report files indexed as notes on
-      purpose, on the argument that whether it hurt retrieval was a question for
-      a number rather than an opinion. It was sitting in the top five of the
-      misses. And I had assumed the model usually passed the kind filter. It did
-      not.
+      purpose, to measure whether they hurt retrieval. They were sitting in the
+      top five of the misses. And I had assumed the model usually passed the
+      kind filter. It did not.
     </p>
 
     <h2 id="three-changes">Three changes, each one A/B&rsquo;d</h2>
@@ -311,8 +307,7 @@ import SiteNav from '../../components/SiteNav.astro';
       classifier&rsquo;s eval rather than re-derived: same queries both arms,
       per-query win, loss and tie counts, McNemar&rsquo;s exact test on the
       discordant pairs, and a harness-health section that reports dropped or
-      unpairable rows. That last part is the one I would keep if I could only
-      keep one, because a comparison that quietly shrinks its own denominator
+      unpairable rows. A comparison that quietly shrinks its own denominator
       still prints a confident number.
     </p>
 
@@ -330,8 +325,8 @@ import SiteNav from '../../components/SiteNav.astro';
         <strong>The result:</strong> hit@5 rose from 88.9% to 92.6%, recall@1
         from 0.630 to 0.741, MRR from 0.744 to 0.807, and the kind-filtered arm
         went from 0.852 to 0.963 at recall@1. Per query that is one win, zero
-        losses, 26 ties. The honest sentence is &ldquo;recovered one miss and
-        regressed nothing,&rdquo; not the percentage.
+        losses, 26 ties. The claim is one recovered miss and no regressions, not
+        the percentage.
       </p>
     </div>
 
@@ -339,8 +334,8 @@ import SiteNav from '../../components/SiteNav.astro';
       <p class="tag">Change 2<span class="code-ref">PR #74</span></p>
       <h3>Steer the model to pass the kind filter</h3>
       <p>
-        Not a retrieval change at all. It is prompt and tool-description text,
-        aimed at the gap in the table above, and it needed a different
+        This is prompt and tool-description text, not a retrieval change. It
+        aims at the gap in the table above, and it needed a different
         instrument: a harness that makes one real model call per gold query with
         the real system prompt and the real tool list, then grades the first tool
         call. Did it reach for the search tool with a kind, and was the kind
@@ -353,13 +348,13 @@ import SiteNav from '../../components/SiteNav.astro';
         from 0.370 to 0.852. 15 wins, zero losses, 12 ties. This model rejects
         the temperature parameter as deprecated, so sampling cannot be pinned;
         each arm was run three times and the figures are medians. The baseline
-        spread was 0.333 to 0.407 and the candidate 0.889 to 0.926, which do not
-        overlap. That non-overlap is what makes a median of three worth quoting.
+        spread was 0.333 to 0.407 and the candidate 0.889 to 0.926. Those ranges
+        do not overlap, so the median of three is worth quoting.
       </p>
       <p>
-        What it does not show is that answers got better. It shows the agent now
-        lands more often on the setting the retrieval eval had already measured
-        as the stronger one.
+        This does not show that answers got better. It shows the agent now lands
+        more often on the setting the retrieval eval had already measured as the
+        stronger one.
       </p>
     </div>
 
@@ -391,16 +386,15 @@ import SiteNav from '../../components/SiteNav.astro';
       <p class="tag"><span class="sr-only">Reversed. </span>Change 3<span class="code-ref">PR #73 &middot; ADR-010</span></p>
       <h3>Hybrid lexical and dense retrieval</h3>
       <p>
-        This was the change the whole milestone was pointed at, and the
-        hypothesis was concrete enough to be wrong. Four of the 27 queries exist
-        for this decision: two pairs, each an exact-jargon phrasing against a
-        paraphrase of the same need, placed where lexical and dense retrieval
-        ought to disagree. One of them was still a miss after change 1, and it
-        was the paraphrase half. That is the textbook dense failure a lexical leg
-        is supposed to rescue.
+        This was the change the whole milestone was pointed at. The hypothesis
+        was specific. Four of the 27 queries exist for this decision: two pairs,
+        each an exact-jargon phrasing against a paraphrase of the same need,
+        placed where lexical and dense retrieval ought to disagree. One of them
+        was still a miss after change 1, and it was the paraphrase half. That is
+        the textbook dense failure a lexical leg is supposed to rescue.
       </p>
       <p>
-        So I built it properly. BM25 over the same chunk corpus already in the
+        I built the lexical leg against the same chunk corpus already in the
         vector store, fused with the dense ranking by Reciprocal Rank Fusion at
         k=60, left at the canonical value rather than tuned, because tuning k on
         the same 27 queries that judge the outcome is fitting on the test set.
@@ -434,8 +428,7 @@ import SiteNav from '../../components/SiteNav.astro';
         lexical-versus-dense failure. It is corpus crowding, a topically adjacent
         notes file out-competing a project stub, and no fusion of two retrievers
         that agree can repair it. The other surviving miss reads the same way.
-        That falsifies the premise the experiment was built on, which is worth
-        more to me than the 3.7 points would have been.
+        That falsifies the premise the experiment was built on.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> the default stayed dense only. MRR is
@@ -447,43 +440,36 @@ import SiteNav from '../../components/SiteNav.astro';
         should not change on a wash.
       </p>
       <p>
-        Both paths stay in the tree behind one constant, and one flag re-runs the
-        losing arm from the same checkout. A negative result nobody can re-run is
-        an assertion.
+        Both paths stay in the tree behind one constant. One flag re-runs the
+        losing arm from the same checkout.
       </p>
     </div>
 
     <h2 id="what-the-numbers-support">What the numbers actually support</h2>
 
     <p>
-      n = 27. At that size a single query is worth 3.7 percentage points, which
-      is exactly why the significance line matters more than the recall deltas.
-      Two of the three changes rest on <strong>one discordant pair</strong>, at
-      McNemar p = 1.0000. That cuts both ways, and it is the same sentence in
-      both directions: p = 1.0000 does not mean hybrid is worse, it means the
-      experiment did not clear the bar to change a default. It also does not mean
-      change 1 is proven, which is why its claim is written as
-      &ldquo;regressed nothing&rdquo; rather than as a percentage.
+      n = 27. At that size a single query is 3.7 percentage points, so the
+      significance line carries more weight than the recall deltas. Two of the
+      three changes rest on <strong>one discordant pair</strong>, at McNemar p =
+      1.0000. That p-value does not mean hybrid is worse. It means the experiment
+      did not clear the bar to change a default. It also does not prove change 1.
+      That is why the claim is written as &ldquo;regressed nothing&rdquo; rather
+      than as a percentage.
     </p>
 
     <p class="flow-line">
       One query moved <span class="flow-arrow">&rarr;</span> at n=27 that is 3.7
-      points <span class="flow-arrow">&rarr;</span> and it is still one query.
+      points.
     </p>
 
     <p>
       The kind-steering result is the largest effect on the page and the least
       comparable to the other two. It is a model-behaviour measurement over three
       unpinned runs against a corpus-independent instrument, not a retrieval
-      measurement, and I have kept the two reported separately rather than
-      folding them into one headline about the agent getting better.
+      measurement. I have kept the two reported separately.
     </p>
 
     <h2 id="what-this-does-not-establish">What this does not establish</h2>
-    <p>
-      Stated here rather than at the bottom, because a measurement is only useful
-      if you say where it gives out.
-    </p>
     <ul>
       <li><strong>This is a per-KB measurement.</strong> 260 chunks across 44
         files, one embedding model, one corpus. Nothing here is a claim that
@@ -491,8 +477,8 @@ import SiteNav from '../../components/SiteNav.astro';
         at this size it did not earn a default.</li>
       <li><strong>Retrieval, not answers.</strong> recall@k and MRR say the right
         chunk was retrievable. They say nothing about whether the agent&rsquo;s
-        final answer was good. There is no answer-quality eval in this repo, and
-        the separation is deliberate rather than an omission.</li>
+        final answer was good. There is no answer-quality eval in this repo.
+        That split is the design, not a gap.</li>
       <li><strong>One labeler, and the labels were drafted before they were
         reviewed.</strong> Queries and proposed labels were drafted against the
         actual stub contents and I reviewed every entry before merge, which is
@@ -536,12 +522,10 @@ import SiteNav from '../../components/SiteNav.astro';
     <p>
       The same discipline as the <a href="defense-news-classifier.html">classifier</a>,
       applied to a different problem: build the measurement before the change,
-      then let it decide. What I want read here is the third change. It was
-      designed around a specific hypothesis, built to completion rather than
-      sketched, and reported as falsifying its own premise. The most valuable
-      thing it produced was not the 3.7 points it could have claimed. It was
-      finding out that the failure I had spent the milestone aiming at was a
-      different failure entirely.
+      then let it decide. The third change was designed around a specific
+      hypothesis, built to completion, and reported as falsifying its own
+      premise. The miss I had aimed the milestone at was corpus crowding, not a
+      lexical-versus-dense gap.
     </p>
   </main>
   <script is:inline src="../assets/theme.js"></script>

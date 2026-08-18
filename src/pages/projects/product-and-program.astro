@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Product & Program · San Lee"
-  description="The same system read as product and program work: the user and job, success metrics in two registers, a Now/Next/Later roadmap, and an honest risk register."
+  description="The same system, framed as a product and run as a program. Solo build. The program layer is simulated; the workstreams and the risk register are not."
   canonical="https://sanlee.me/projects/product-and-program.html"
   ogType="article"
   ogImage="/assets/og-product-and-program.png"
@@ -108,15 +108,12 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Product &amp; Program</h1>
-    <p class="subtitle">The same system, seen from above. How I frame it as a product and run it as a program, with the limits named.</p>
+    <p class="subtitle">The same system, framed as a product and run as a program. Solo build. The program layer is simulated.</p>
 
     <p class="lead">
-      The engineering writeups are about building the system. This one is about
-      framing and running it: who it is for, how success is measured, how the work
-      is sequenced, and what could go wrong. This is a solo build, so there is no
-      team to coordinate, and the program layer here is simulated. What sits
-      underneath it (the workstreams, the dependency map, the risk register) is
-      real work, done as if a team existed.
+      This is a solo build. There is no team to coordinate, so the program
+      layer is simulated. The workstreams, the dependency map, and the risk
+      register are real work, done as if a team existed.
     </p>
 
     <h2>The problem (product framing)</h2>
@@ -196,7 +193,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <h2>Success metrics</h2>
-    <p>Split deliberately into two kinds, because they answer different questions.</p>
+    <p>Two kinds. They answer different questions.</p>
 
     <h3>User-outcome metrics (does it help the analyst?)</h3>
     <ul>
@@ -215,7 +212,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </ul>
 
     <h2>Roadmap (program framing)</h2>
-    <p>Sequenced Now / Next / Later, harvested from real delivery rather than wishful planning.</p>
+    <p>Sequenced Now / Next / Later, harvested from delivery.</p>
     <svg class="nnl-plate" viewBox="0 0 260 72" role="img"
          aria-label="Program sequence: Now is shipped work, Next is queued work, Later is deferred work including explicit non-goals.">
       <title>Now shipped, Next queued, Later deferred.</title>
@@ -279,11 +276,8 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <h2>What it demonstrates</h2>
     <p>
-      The ability to put the product and program hats on over real engineering work:
-      to name the user and the job, to measure outcomes in two registers, to sequence
-      dependent workstreams, and to track risk honestly, including the risk of the
-      exercise itself. The scale is personal by design, and named as such rather than
-      dressed up. The source documents live in the architecture repo:
+      The scale is personal. The program is simulated. The source documents
+      live in the architecture repo:
       <a href="https://github.com/sanlee-ys/architecture/blob/main/product/one-pager.md">the product one-pager</a>
       and <a href="https://github.com/sanlee-ys/architecture/blob/main/program/README.md">the program view</a>.
     </p>

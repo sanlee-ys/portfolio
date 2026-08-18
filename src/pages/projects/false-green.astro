@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="False Green · San Lee"
-  description="Six checks I built, wired into CI, and later caught reporting success for work that had not happened. What they have in common is not that they broke — it is that they passed."
+  description="Six checks I built, wired into CI, and later caught reporting success for work that had not happened. Each one exited green."
   canonical="https://sanlee.me/projects/false-green.html"
   ogType="article"
   ogImage="/assets/og-false-green.png"
@@ -143,7 +143,7 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>False Green</h1>
-    <p class="subtitle">Six checks I built, wired into CI, and later caught reporting success for work that had not happened. What they have in common is not that they broke. It is that they passed.</p>
+    <p class="subtitle">Six checks I built, wired into CI, and later caught reporting success for work that had not happened. Each one exited green.</p>
 
     <svg class="six-pass" viewBox="0 0 260 100" role="img"
          aria-label="Six checks. Each one reported PASS for work that had not happened.">
@@ -163,8 +163,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="sx-ok-text" x="216" y="76" text-anchor="middle">PASS</text>
     </svg>
     <p class="six-pass-caption">
-      Six greens. The shared fact is not that they broke. It is that they
-      passed.
+      Six greens. Each check reported PASS for work that had not happened.
     </p>
 
     <h2>Two ways to fail</h2>
@@ -175,8 +174,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p>
-      The first break was a missing OIDC permission. It went red in minutes,
-      which is what a broken thing is supposed to do.
+      The first break was a missing OIDC permission. It went red in minutes.
     </p>
 
     <p>
@@ -243,20 +241,15 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="tf-pass-text" x="223" y="136" text-anchor="middle">PASS</text>
     </svg>
     <p class="two-fail-caption">
-      Same empty middle, opposite report. A deterministic tool fails loudly
-      when it does nothing; an agentic or hand-written gate can still go PASS
-      &mdash; green whether the work happened, was denied, crashed, or was
-      never attempted.
+      Same empty middle, opposite report. A deterministic tool fails when it
+      does nothing. An agentic or hand-written gate can still go PASS, whether
+      the work happened, was denied, crashed, or was never attempted.
     </p>
 
     <p>
-      That was the lesson I wrote down, and I thought it was a lesson about
-      agents.
-    </p>
-
-    <p>
-      It was not. The same shape was already sitting in gates I had written by
-      hand, and it took me another four months to find them.
+      I wrote that down as a lesson about agents. The same shape was already
+      sitting in gates I had written by hand. It took another four months to
+      find them.
     </p>
 
     <h2>The check that measured the wrong thing</h2>
@@ -285,8 +278,8 @@ import SiteNav from '../../components/SiteNav.astro';
       <p>
         The r&eacute;sum&eacute; PDF script printed that line and I believed it
         for months. It read the value from <code>document.fonts</code>, which
-        proves a woff2 loaded into the <em>browser</em> and says nothing about
-        the bytes written to the PDF.
+        proves a woff2 loaded into the <strong>browser</strong> and says nothing
+        about the bytes written to the PDF.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> it read as evidence. It cost me a round of
@@ -296,9 +289,8 @@ import SiteNav from '../../components/SiteNav.astro';
     </div>
 
     <p>
-      Both of these are worse than a check that crashes, because both produced
-      output. There is no moment where you look at a passing gate and wonder
-      what it measured.
+      Both produced output. A crash is obvious. These numbers looked like
+      evidence.
     </p>
 
     <h2>The check that could not see what it was looking for</h2>
@@ -316,8 +308,8 @@ import SiteNav from '../../components/SiteNav.astro';
         <strong>The result:</strong> it had done this since the checker was
         written, so every deep link on the site had been reported valid without
         the anchor ever being confirmed to exist. It mattered the moment I
-        started moving sections between pages, which is to say for the three pull
-        requests immediately before I found it.
+        started moving sections between pages: the three pull requests
+        immediately before I found it.
       </p>
     </div>
 
@@ -333,8 +325,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> either way the face falls out of the scan
-        through a silent <code>continue</code>, and the count of declared faces
-        the gate expects is standing by to turn that gap into a quiet pass.
+        through a silent <code>continue</code>, and the expected face count then
+        treats that gap as a pass.
         Against the fixture I wrote afterward, the old pattern sees one face out
         of three.
       </p>
@@ -416,20 +408,18 @@ import SiteNav from '../../components/SiteNav.astro';
         two defects concealed each other.
       </p>
       <p>
-        The lane&rsquo;s earlier configuration was worse in a way that is almost
-        funny in hindsight: for ten days it had no publish channel at all, and
-        posted zero comments on zero pull requests, which looked exactly like a
-        quiet stretch with nothing to say.
+        The lane&rsquo;s earlier configuration was worse: for ten days it had no
+        publish channel at all, and posted zero comments on zero pull requests.
+        That looked like a quiet stretch with nothing to say.
       </p>
     </div>
 
     <h2>The question</h2>
 
     <p>
-      None of these were subtle. Each is one line, and each survived because a
-      passing check and a check that cannot fail look identical from the outside.
-      The only thing that ever found one was asking a specific question of a
-      specific gate.
+      Each defect is one line. A passing check and a check that cannot fail look
+      the same from the outside. I found each one by asking a specific question
+      of a specific gate.
     </p>
 
     <p class="flow-line">
@@ -438,29 +428,27 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p>
-      The cheapest form of that question is to reconcile the guard&rsquo;s own
-      reported count against a raw grep, once. Every gate on this site now
-      asserts a non-zero count of the thing it walked, because a gate pointed at
-      an empty directory finds nothing and reports that as success.
+      The cheap version is to reconcile the guard&rsquo;s own reported count
+      against a raw grep, once. Every gate on this site now asserts a non-zero
+      count of the thing it walked. A gate pointed at an empty directory finds
+      nothing and reports that as success.
     </p>
 
     <p class="tradeoff">
       <strong>One of them did not, and this page said so first.</strong> The
       metrics guard skipped its parity check on Markdown, so a Markdown marker
-      that parsed to nothing was indistinguishable from a file making no claims
-      &mdash; and marking a number wrong was therefore quieter than not marking
-      it at all. It was named here while it was still live, deliberately, because
-      a list of solved problems is a weaker claim than an open one.
+      that parsed to nothing was indistinguishable from a file making no claims.
+      Marking a number wrong was quieter than not marking it at all. This page
+      named that gap while it was still live.
     </p>
 
     <p>
-      It is closed now. The Markdown branch counts its own markers, and a suite
+      It is closed now. The Markdown branch counts its own markers. A suite
       asserts the counter reports a gap for each shape the value pattern cannot
-      read. That second half is the part that matters: a parity counter that
-      returns zero and a parity counter that is correct produce identical output
-      on a clean tree, so the fix was unfalsifiable until something made it fail
-      on purpose. Reverting the one-line exemption turns exactly three of those
-      tests red.
+      read. A parity counter that returns zero and a parity counter that is
+      correct produce identical output on a clean tree, so the fix was
+      unfalsifiable until something made it fail on purpose. Reverting the
+      one-line exemption turns exactly three of those tests red.
     </p>
 
   </main>

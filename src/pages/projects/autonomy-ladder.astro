@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="The Autonomy Ladder · San Lee"
-  description="Four levels of the same system handed more self-direction, each written down before it was built. Two of the four shipped a no, and the measurements are why."
+  description="The same classifier, four levels of self-direction, each written down before it was built. L2 retired. L4 declined. The measurements are why."
   canonical="https://sanlee.me/projects/autonomy-ladder.html"
   ogType="article"
 >
@@ -73,13 +73,11 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="defense-news-classifier.html">&larr; Back to the classifier</a>
     <h1>The Autonomy Ladder</h1>
-    <p class="subtitle">The same system handed more self-direction, one level at a time. Every level was written down before it was built, and two of them shipped a &ldquo;no.&rdquo;</p>
+    <p class="subtitle">The same classifier, more self-direction one level at a time.</p>
 
     <p>
-      This classifier is also the protagonist of the portfolio&rsquo;s roadmap:
-      an autonomy ladder. Each level is the <em>same system</em> handed more
-      self-direction, not a separate demo. The axis is who drives &mdash;
-      reaching for a tool doesn&rsquo;t move you up a level; deciding for
+      Each level is the same classifier with more self-direction. The axis is
+      who drives. Reaching for a tool does not move a level; deciding for
       yourself does.
     </p>
 
@@ -87,7 +85,7 @@ import SiteNav from '../../components/SiteNav.astro';
          rungs that were retired or declined. ADR-010 N/A. -->
     <svg class="rung-plate" viewBox="0 0 260 132" role="img"
          aria-label="Autonomy ladder scoreboard. L1 single call: shipped. L2 augmented: retired. L3 autonomous loop: shipped. L4 multi-agent: declined.">
-      <title>L1 shipped, L2 retired, L3 shipped, L4 declined. Two of four rungs shipped a no.</title>
+      <title>L1 shipped, L2 retired, L3 shipped, L4 declined.</title>
       <text class="rp-lane" x="4" y="12">THE CLIMB</text>
 
       <text class="rp-id" x="4" y="28">L1</text>
@@ -111,8 +109,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="rp-cut-text" x="195" y="118" text-anchor="middle">DECLINED</text>
     </svg>
     <p class="rung-plate-caption">
-      Every rung was written down before it was built. Two of the four
-      shipped a no, and the measurement is why.
+      The measurements sit in the rungs below.
     </p>
     <!-- The ladder as a climb rather than a table. Same payload the four-row
          table carried (what it gains / who drives / state), but two things a
@@ -211,42 +208,34 @@ import SiteNav from '../../components/SiteNav.astro';
       </li>
     </ol>
     <p>
-      Every level is now climbed, and every level&rsquo;s story ends the same
-      way: the measurement got the last word. The L2 question &mdash; does
-      giving the model something to lean on help? &mdash; was eventually asked
-      three separate ways: retrieved neighbor documents as context (harmful:
-      0 domain calls fixed, 4 broken &mdash;
+      The L2 question &mdash; does giving the model something to lean on
+      help? &mdash; was asked three ways: retrieved neighbor documents as
+      context (harmful: 0 domain calls fixed, 4 broken &mdash;
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>),
       machine-mined keyword features (helpful on the set they were mined
       from, harmful off it &mdash; see L3 below), and retrieved <em>labeled</em>
       examples as few-shot exemplars (inert: 91.0% vs 90.0% baseline on an
       n=300 paired test, p=0.70 &mdash;
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/019-knn-exemplar-fewshot.md">ADR-019</a>).
-      Three shapes, three different ways to not beat a well-prompted single
-      call. A rung that was climbed and then climbed back down is still part
-      of the record, which is why L2 isn&rsquo;t quietly relabeled.
+      L2 stays on the record as climbed, then retired.
     </p>
     <p>
-      L3&rsquo;s two rungs each earned an autonomy scar, and the
-      <a href="loop-replay.html">run replay</a> now steps through both
-      recorded runs. Rung 1&rsquo;s shows the prompt-optimization loop gaining
-      on the set it tuned against while slipping on held-out gold. Rung 2 &mdash; an agent doing error-driven feature engineering on
-      a trained baseline
+      L3&rsquo;s two rungs each have a recorded run on the
+      <a href="loop-replay.html">run replay</a>. Rung 1: the
+      prompt-optimization loop gained on the set it tuned against and slipped
+      on held-out gold. Rung 2 &mdash; an agent doing error-driven feature
+      engineering on a trained baseline
       (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/018-agent-driven-ml-loop.md">ADR-018</a>)
-      &mdash; did it live and bigger: +6.0 points on the validation split it
-      was allowed to see, <strong>&minus;8.6 on the human-labeled set it
-      wasn&rsquo;t</strong>. The loop&rsquo;s design assumed its own gains
-      might be fake, so the held-out set had veto power, and it used it.
-      That&rsquo;s not the harness failing &mdash; that&rsquo;s the harness
-      being the product.
+      &mdash; scored +6.0 on the validation split it could see, and
+      <strong>&minus;8.6 on the human-labeled set it could not</strong>. The
+      loop&rsquo;s design gave the held-out set veto power, and it used it.
     </p>
     <p>
-      L4 put the metric-gaming story where the ladder always said it would
-      live: the backward edge. The critic was aimed at the one named,
-      rule-checkable error cluster &mdash; seven rows where the model inferred
-      a region from the US actor when the text stated no place &mdash; and it
-      fixed <strong>six of the seven</strong>. The honesty test passed. The
-      pipeline still lost
+      L4&rsquo;s honesty test is the backward edge. The critic was aimed at
+      the one named, rule-checkable error cluster &mdash; seven rows where
+      the model inferred a region from the US actor when the text stated no
+      place &mdash; and it fixed <strong>six of the seven</strong>. The
+      honesty test passed. The pipeline still lost
       (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/020-l4-multi-agent-pipeline.md">ADR-020</a>):
       the critic&rsquo;s restraint lived only in its prompt, it challenged
       4&times; more often than its charter allowed, and outside its target it
@@ -257,13 +246,11 @@ import SiteNav from '../../components/SiteNav.astro';
       enforced by prose instead of code will spend that power freely.
     </p>
     <p>
-      Each level was written down before it was built.
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/006-autonomy-ladder-portfolio-spine.md">ADR-006</a>
-      records the decision to make the ladder the spine, and the
+      records the decision to make the ladder the spine. The
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/docs/specs/autonomy-ladder.md">living roadmap</a>
-      holds the per-level detail &mdash; so what shipped can be checked
-      against what was promised, including the levels that shipped a
-      &ldquo;no.&rdquo;
+      holds the per-level detail, so what shipped can be checked against
+      what was promised.
     </p>
 
   </main>

@@ -1,27 +1,22 @@
 # portfolio
 
-Public portfolio site for San Lee — a curated front door to the systems and
-product work I build for myself.
+Public site for San Lee. Systems and product work, with a decision log.
 
 **Live site:** https://sanlee.me
 
-This repo is deliberately **public**. It's the polished, showcase end of my
-personal projects: the artifact that points at real work and frames it in
-systems / product language.
-
 The site is **Astro** (static output, zero JS by default). Pages live under
-`src/pages/`; static assets and the standalone résumé live under `public/`.
+`src/pages/`. Static assets and the standalone résumé live under `public/`.
 GitHub Pages serves the built `dist/`.
 
 ## Layout
 
 | Path | Holds |
 |---|---|
-| `src/pages/` | Route sources — `index`, `colophon`, `glossary`, `404`, plus `lab/` and `projects/`. |
+| `src/pages/` | Route sources: `index`, `colophon`, `glossary`, `404`, plus `lab/` and `projects/`. |
 | `src/layouts/` | Shared chrome (`Base.astro`: head, theme bootstrap, analytics, theme toggle). |
 | `src/components/` | Shared pieces (`SiteNav.astro` and anything else reused across pages). |
 | `public/` | Static files copied as-is: `assets/` (CSS, fonts, JS, images), standalone `resume.html` / `resume.pdf`, `CNAME`, `robots.txt`. |
-| `astro.config.mjs` | Build config. `build.format: 'file'` keeps URLs as `glossary.html` rather than `glossary/index.html` — do not change it. |
+| `astro.config.mjs` | Build config. `build.format: 'file'` keeps URLs as `glossary.html` rather than `glossary/index.html`. Do not change it. |
 | `scripts/` | The QA gates CI runs (see **QA** below), font subsetting, résumé PDF build, local pre-commit guard. |
 | `decisions/` | Architecture Decision Records for this site. |
 | `learning/` | The learning log — one Markdown lesson per technique. |
@@ -124,46 +119,28 @@ Grouped the way the site is organized — each link is a full writeup under
 
 **System and program**
 
-- **The System** (`projects/the-system.html`) — how a single classifier grew into
-  a multi-repo system: frozen contracts, idempotency, recorded decisions.
-- **One Note, End to End** (`projects/the-system-run.html`) — the same loop
-  carrying a real note through real schemas, including the field a consumer
-  never mapped.
-- **Product & Program** (`projects/product-and-program.html`) — the same system
-  read as product and program work: scope cuts, risk reasoning, decision framing.
+- **The System** (`projects/the-system.html`): frozen contracts, idempotency, recorded decisions.
+- **One Note, End to End** (`projects/the-system-run.html`): one note through the real schemas.
+- **Product & Program** (`projects/product-and-program.html`): the same system read as program work.
 
 **Classifier and evidence**
 
-- **Defense News Classifier** (`projects/defense-news-classifier.html`) — an LLM
-  classifier that enriches notes via an in-process FastAPI BackgroundTask, scored
-  on a real hand-labeled eval (<!-- metric:category_accuracy -->94.4%
+- **Defense News Classifier** (`projects/defense-news-classifier.html`): LLM classifier on a hand-labeled eval (<!-- metric:category_accuracy -->94.4%
   category, <!-- metric:domain_accuracy -->98.1% operational
   domain, <!-- metric:region_accuracy -->94.4% region).
-- **Why an LLM at All** (`projects/classifier-baseline.html`) — TF-IDF + logistic
-  regression baseline on the same 54 rows; the classical case that lost, run in
-  the browser.
-- **Autonomy Ladder** (`projects/autonomy-ladder.html`) — four levels of the same
-  system handed more self-direction; two of four shipped a measured "no."
-- **Loop replay** (`projects/loop-replay.html`) — recorded-replay viewer for the
-  prompt-optimization loop's run log; interactive evidence for the L3 rung and
-  the Goodhart argument.
+- **Why an LLM at All** (`projects/classifier-baseline.html`): TF-IDF + logistic regression on the same 54 rows, in the browser.
+- **Autonomy Ladder** (`projects/autonomy-ladder.html`): four levels of self-direction. Two of four shipped a measured no.
+- **Loop replay** (`projects/loop-replay.html`): recorded replay of the prompt-optimization loop.
 
 **Measurement and method**
 
-- **Faithfulness Judge** (`projects/faithfulness-judge.html`) — measuring the
-  measurer: can an LLM judge catch made-up claims? Plus the truncation bug that
-  nearly shipped a false result.
-- **False Green** (`projects/false-green.html`) — six checks that reported success
-  for work that never ran; what they share is that they passed.
-- **Retrieval, Measured** (`projects/kb-agent-retrieval.html`) — a gold set and
-  paired A/Bs on kb-agent retrieval; the most useful result is the one that
-  did not ship.
+- **Faithfulness Judge** (`projects/faithfulness-judge.html`): can an LLM judge catch a made-up claim?
+- **False Green** (`projects/false-green.html`): six checks that reported success for work that never ran.
+- **Retrieval, Measured** (`projects/kb-agent-retrieval.html`): gold set and paired A/Bs on kb-agent retrieval.
 
 **Lab**
 
-- **Zero-Touch Provisioning** (`projects/netops-lab.html`) — a factory-blank
-  router configures itself on one power cycle; every real obstacle sat on the
-  machine driving the cycle, not the device.
+- **Zero-Touch Provisioning** (`projects/netops-lab.html`): a factory-blank router configures itself on one power cycle.
 
 ## Analytics
 

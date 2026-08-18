@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Zero-Touch Provisioning · San Lee"
-  description="A factory-blank router configures itself on one power cycle. Every real obstacle to running it unattended turned out to be on the machine driving the cycle, not on the device."
+  description="A factory-blank MikroTik comes up fully configured after one power cycle. Host SSH prompts, leftover management paths, and a device-mode flag were the work."
   canonical="https://sanlee.me/projects/netops-lab.html"
   ogType="article"
   ogImage="/assets/og-netops-lab.png"
@@ -100,16 +100,15 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Zero-Touch Provisioning</h1>
-    <p class="subtitle">A factory-blank router configures itself on one power cycle. The hard part wasn&rsquo;t the router.</p>
+    <p class="subtitle">A factory-blank router configures itself on one power cycle. One command, about ninety seconds.</p>
 
     <p class="lead">
       This is a physical lab: one MikroTik router, one Raspberry Pi, on a desk.
       The goal was a reliable wipe-to-provisioned cycle &mdash; power on a blank
-      device, touch nothing, and have it come up fully configured. Not because
-      provisioning is interesting on its own, but because it is the apparatus
-      for a later experiment about an agent severing its own management access.
-      Without a cheap way back, every failed run is a manual rebuild, and
-      experiments that are expensive to repeat stop getting repeated.
+      device, touch nothing, and have it come up fully configured. That cycle
+      is the apparatus for a later experiment: an agent severing its own
+      management access. Without a cheap way back, every failed run is a
+      manual rebuild.
     </p>
 
     <nav class="toc" aria-labelledby="toc-heading">
@@ -124,11 +123,6 @@ import SiteNav from '../../components/SiteNav.astro';
       <li><a href="#what-it-demonstrates">What it demonstrates</a></li>
       </ol>
     </nav>
-    <p>
-      It works. It also produced a finding I did not expect, and would not have
-      found by reading about it.
-    </p>
-
     <h2 id="the-result">The result</h2>
     <p>
       One command, one power cycle, about ninety seconds. No console cable, no
@@ -221,31 +215,25 @@ import SiteNav from '../../components/SiteNav.astro';
       </li>
     </ol>
     <p class="cycle-close">
-      Exactly one of the five needs a person, and it is not the one you would
-      expect.
+      Exactly one of the five needs a person: pulling the power and plugging it
+      back in.
     </p>
     <p>
-      The provisioning host is the Pi rather than my desktop, which matters more
-      than it sounds: the whole cycle is scriptable from the box that is already
-      always-on. MikroTik&rsquo;s Netinstall tool ships as a 32-bit x86 binary,
-      and the Pi is ARM, so it runs under user-mode QEMU. That sounds worse than
-      it is &mdash; the binary is statically linked, so there is no 32-bit
-      sysroot to assemble, which is normally the expensive part of that trick.
+      The provisioning host is the Pi rather than my desktop, so the whole cycle
+      is scriptable from the box that is already always-on. MikroTik&rsquo;s
+      Netinstall tool ships as a 32-bit x86 binary, and the Pi is ARM, so it
+      runs under user-mode QEMU. The binary is statically linked, so there is
+      no 32-bit sysroot to assemble.
     </p>
 
     <h2 id="the-finding-the-barriers-were-on-the-host-not">The finding: the barriers were on the host, not the device</h2>
     <p>
-      I expected the router to be the obstacle. Embedded network gear is where
-      you expect the hostile surprises: locked-down defaults, firmware quirks,
-      a management plane that fights automation.
-    </p>
-    <p>
-      The router did have one. After a fresh install, RouterOS leaves the admin
-      account with a blank password and demands you change it interactively
-      before doing anything. That looks like it kills unattended provisioning
-      outright, and I had already started designing around it &mdash; which
-      would have meant putting a credential into a public repository or building
-      machinery to inject one at provision time.
+      After a fresh install, RouterOS leaves the admin account with a blank
+      password and demands you change it interactively before doing anything.
+      That looks like it kills unattended provisioning outright, and I had
+      already started designing around it &mdash; which would have meant putting
+      a credential into a public repository or building machinery to inject one
+      at provision time.
     </p>
 
     <div class="decision">
@@ -275,11 +263,10 @@ import SiteNav from '../../components/SiteNav.astro';
       that would genuinely mean something is wrong.
     </p>
     <p>
-      So &ldquo;zero-touch&rdquo; did not get achieved so much as <em>relocated</em>.
-      The device end is genuinely unattended. What remains is host-side
-      automation hygiene on the machine driving it, which is a more honest place
-      for the problem to live, and the class of thing that would otherwise have
-      ambushed every later piece of automation in this lab.
+      The device end is unattended. What remains is host-side automation hygiene
+      on the machine driving it: a lab-only known-hosts file, and a key the
+      script can use without a prompt. Those two would have blocked every later
+      piece of automation in this lab.
     </p>
 
     <h2 id="three-back-doors-one-shape">Three back doors, one shape</h2>
@@ -314,12 +301,10 @@ import SiteNav from '../../components/SiteNav.astro';
         shipping mode doing me a favour I hadn&rsquo;t asked for.</li>
     </ul>
     <p>
-      The transferable part isn&rsquo;t the list. It&rsquo;s that I only found
-      the second one by applying the question from the first, and the third by
-      accident. <strong>&ldquo;Locked out&rdquo; only means something once you
-      have enumerated every independent path in</strong>, and there is no
-      obvious point at which that enumeration is finished. It is now a question I
-      ask of every new surface this configuration grows.
+      I found the second path by applying the question from the first, and the
+      third by accident. <strong>&ldquo;Locked out&rdquo; only means something
+      once every independent path in has been enumerated</strong>, and there is
+      no obvious point at which that enumeration is finished.
     </p>
 
     <h2 id="a-deferred-item-that-turned-out-not-to-be">A deferred item that turned out not to be deferrable</h2>
@@ -339,25 +324,19 @@ import SiteNav from '../../components/SiteNav.astro';
       a plug.
     </p>
     <p>
-      The filing error is the interesting part rather than the fix.
       &ldquo;This only affects a later phase&rdquo; was an assumption I recorded
-      as though it were a finding, and I made it about the one subsystem whose
-      entire purpose is to block things. The decision record now carries the
-      correction in place rather than a tidy rewrite, because the mistake is more
-      useful than the conclusion.
+      as though it were a finding, about the one subsystem whose entire purpose
+      is to block things. The decision record now carries the correction in
+      place rather than a tidy rewrite.
     </p>
     <p>
-      It resolved well: the flag survives a reinstall, so enabling it is a
-      one-time cost per device rather than a tax on every cycle. That answer also
-      kept a RouterOS version upgrade off the critical path, which is where it
-      would have gone if the flag had reset.
+      The flag survives a reinstall, so enabling it is a one-time cost per
+      device rather than a tax on every cycle. That answer also kept a RouterOS
+      version upgrade off the critical path, which is where it would have gone
+      if the flag had reset.
     </p>
 
     <h2 id="what-this-does-not-establish">What this does not establish</h2>
-    <p>
-      Stating this up front rather than at the bottom, because a working demo is
-      only useful if you say where it stops.
-    </p>
     <ul>
       <li><strong>This is not standards-based ZTP.</strong> Real zero-touch
         provisioning has a trust story &mdash; RFC 8572, BRSKI, a certificate
@@ -374,7 +353,7 @@ import SiteNav from '../../components/SiteNav.astro';
         a passphrase-free key, and it lands squarely on the experiment this lab
         exists for, since an unattended lab is exactly the scenario where a
         reboot is most likely.</li>
-      <li><strong>One thing is genuinely unresolved.</strong> The setting that
+      <li><strong>One thing is unresolved.</strong> The setting that
         re-arms the router lives in the bootloader, not the OS, so it may have
         survived the reinstall on its own rather than being re-applied by my
         script. Both produce identical output. This board is armed either way; a
@@ -382,7 +361,7 @@ import SiteNav from '../../components/SiteNav.astro';
         distinguishes them.</li>
       <li><strong>The actual experiment is not built.</strong> The self-lockout
         question is the reason this lab exists, and everything above is the
-        apparatus for it. Apparatus that works is not a result.</li>
+        apparatus for it.</li>
     </ul>
 
     <h2 id="stack">Stack</h2>
@@ -397,29 +376,27 @@ import SiteNav from '../../components/SiteNav.astro';
       what broke and what the symptoms actually meant are all checkable.
     </p>
     <p>
-      The field log is deliberately as detailed as the design docs. The two
-      things that cost the most time in this build were an Ethernet link that
-      would not come up until I disabled a power-saving feature on the host
-      network card, and an interface that reported a perfectly correct IP address
-      while no cable was attached to it. Neither is clever. Both are the kind of
-      thing that is only cheap the second time.
+      The field log is as detailed as the design docs. The two things that cost
+      the most time in this build were an Ethernet link that would not come up
+      until I disabled a power-saving feature on the host network card, and an
+      interface that reported a perfectly correct IP address while no cable was
+      attached to it.
     </p>
 
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
-      Building the recovery mechanism before the experiment that needs it, and
-      being willing to test an assumption rather than design around it. The
+      The recovery mechanism was built before the experiment that needs it. The
       forced-password-change problem would have taken a day to solve properly and
       did not exist; one command established that. The IPv6 hole would have taken
       no time at all to leave in place, and would have invalidated the results
-      quietly rather than loudly.
+      without a visible failure.
     </p>
     <p>
       Most of what I do professionally is measured on software I can re-run
       until it is right. Hardware is less forgiving about that, and a management
       plane you are reaching through is less forgiving still &mdash; every change
-      is potentially the change that ends the session. That constraint is the
-      reason for the lab.
+      is potentially the change that ends the session. That is why the lab
+      exists.
     </p>
   </main>
   <script is:inline src="../assets/theme.js"></script>

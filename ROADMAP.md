@@ -127,10 +127,9 @@ These have no tradeoffs worth debating. None were previously planned.
       tell. Do not grow it. Longer stories stay private.*
 - [ ] **No résumé link and no contact path** beyond social icons. For a
       job-relevant site, an easy "email me / résumé" is a cheap, obvious add.
-- [ ] **The voice is relentless.** Nearly every paragraph lands an aphorism.
-      Each is good; in aggregate the rhetorical pressure never lets up. Letting a
-      few paragraphs state a fact plainly would make the punchlines that remain
-      hit harder. Stylistic — do only if it feels right.
+- [x] **The voice is relentless.** *Done 2026-08-18: site-copy pass cut the
+      stacked aphorisms. Tables and decision facts stay. Locked About tell
+      unchanged (ADR-011).*
 
 ### Breadth — the strategic gap
 
