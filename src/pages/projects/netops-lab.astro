@@ -128,6 +128,14 @@ import SiteNav from '../../components/SiteNav.astro';
       One command, one power cycle, about ninety seconds. No console cable, no
       serial adapter, no reset-button timing.
     </p>
+    <p>
+      Since then the cycle has shed its last hand
+      (<a href="https://github.com/sanlee-ys/netops-lab/blob/main/decisions/008-unattended-wipe-cycle.md">decision 008</a>,
+      2026-08-03): a repeat cycle issues that same reboot over SSH, so a routine
+      wipe is one command with no physical step at all. The power pull survives
+      in exactly two places &mdash; a factory-blank board&rsquo;s first boot, and a router
+      that is already unreachable over its management path.
+    </p>
 
     <!-- Topology of the wipe-to-provision lab. The ordered list below still
          carries the five steps; this figure's job is the closed loop a
@@ -135,8 +143,8 @@ import SiteNav from '../../components/SiteNav.astro';
          power is the only hand in the apparatus. No 1–5 numbering here —
          sequence stays on ol.cycle (ADR-004 Decision 5 floor). -->
     <svg class="lab-topo" viewBox="0 0 260 150" role="img"
-         aria-label="Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.">
-      <title>Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.</title>
+         aria-label="Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step, needed on a factory-blank first boot, is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.">
+      <title>Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step, needed on a factory-blank first boot, is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.</title>
       <defs>
         <marker id="lt-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto">
@@ -188,9 +196,11 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="lt-note" x="130" y="144" text-anchor="middle">re-arm closes the next wipe</text>
     </svg>
     <p class="lab-topo-caption">
-      Power is the only hand in the loop. Netinstall, the blank-router offer,
-      OS and default config, and re-arm are automated; re-arm is the return
-      edge that makes the next wipe start without rebuilding the host.
+      Power is the only hand in the loop, and only on a factory-blank first
+      boot. Netinstall, the blank-router offer, OS and default config, and
+      re-arm are automated; re-arm is the return edge that makes the next wipe
+      start without rebuilding the host. On repeat cycles even the hand goes
+      away: the reboot is issued over SSH.
     </p>
 
     <ol class="cycle" aria-label="One wipe-to-provisioned cycle">
@@ -200,6 +210,7 @@ import SiteNav from '../../components/SiteNav.astro';
       </li>
       <li data-actor="hand">
         <p class="cycle-step"><span class="cycle-num">2</span>Pull the power, plug it back in<span class="cycle-actor">by hand</span></p>
+        <p class="cycle-note">By hand only on a factory-blank first boot. A repeat cycle issues the same reboot over SSH, and Etherboot cannot tell the difference (decision 008).</p>
       </li>
       <li>
         <p class="cycle-step"><span class="cycle-num">3</span>The router offers itself, Netinstall answers</p>
@@ -215,8 +226,10 @@ import SiteNav from '../../components/SiteNav.astro';
       </li>
     </ol>
     <p class="cycle-close">
-      Exactly one of the five needs a person: pulling the power and plugging it
-      back in.
+      On a factory-blank first boot, exactly one of the five needs a person:
+      pulling the power and plugging it back in. On every cycle after that,
+      none of them do &mdash; the reboot goes over SSH and the whole loop is one
+      command.
     </p>
     <p>
       The provisioning host is the Pi rather than my desktop, so the whole cycle
