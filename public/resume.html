@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Résumé &middot; San Lee</title>
-  <meta name="description" content="San Lee — technical product and program. Roles, scope, and responsibilities across JPMorganChase, an MBA, and U.S. Army leadership." />
+  <title>Technical Program Manager Résumé &middot; San Lee</title>
+  <meta name="description" content="San Lee's technical program management résumé: enterprise product delivery, seven years of platform engineering, cross-functional leadership, and AI systems work." />
   <link rel="canonical" href="https://sanlee.me/resume.html" />
   <meta property="og:site_name" content="San Lee" />
   <meta property="og:type" content="profile" />
   <meta property="og:url" content="https://sanlee.me/resume.html" />
-  <meta property="og:title" content="Résumé &middot; San Lee" />
-  <meta property="og:description" content="Technical product and program. Roles, scope, and responsibilities across JPMorganChase, an MBA, and U.S. Army leadership." />
+  <meta property="og:title" content="Technical Program Manager Résumé &middot; San Lee" />
+  <meta property="og:description" content="Enterprise product delivery, seven years of platform engineering, cross-functional leadership, and AI systems work." />
   <meta property="og:image" content="https://sanlee.me/assets/og-cover.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Résumé &middot; San Lee" />
-  <meta name="twitter:description" content="Technical product and program. Roles, scope, and responsibilities across JPMorganChase, an MBA, and U.S. Army leadership." />
+  <meta name="twitter:title" content="Technical Program Manager Résumé &middot; San Lee" />
+  <meta name="twitter:description" content="Enterprise product delivery, seven years of platform engineering, cross-functional leadership, and AI systems work." />
   <meta name="twitter:image" content="https://sanlee.me/assets/og-cover.png" />
   <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
@@ -182,13 +182,13 @@
       <a class="back" href="index.html">&larr; Back to portfolio</a>
       <div class="actions-right">
         <a class="pdf-link" href="resume.pdf" download="San-Lee-resume.pdf">Download PDF</a>
-        <button id="theme-toggle" class="theme-toggle" type="button">Toggle theme</button>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme">Switch to dark theme</button>
       </div>
     </div>
 
     <header class="masthead">
       <h1>San Lee</h1>
-      <p class="role-line">Senior Product Associate</p>
+      <p class="role-line">Technical Program Management &middot; Product &amp; Platform Delivery</p>
       <p class="contact">
         <a href="mailto:hi@sanlee.me">hi@sanlee.me</a><span class="sep" aria-hidden="true">&middot;</span>
         <a href="https://www.linkedin.com/in/leesan/">linkedin.com/in/leesan</a><span class="sep" aria-hidden="true">&middot;</span>
@@ -199,16 +199,15 @@
     <section>
       <h2 class="sec">Summary</h2>
       <p class="summary">
-        Product professional at JPMorganChase, working on enterprise
-        collaboration products (SharePoint Online and OneDrive). Behind that seat
-        are seven years in infrastructure and platform engineering at the same
-        firm, an MBA, and service as a U.S. Army veteran. I work across the
-        technical and product seam, turning stakeholder needs into sequenced,
-        testable delivery and trusting evidence over intuition when the two
-        disagree. Outside the firm I build LLM applications (evals, RAG, agentic
-        tool-use) in the open, run the way a technical program manager runs a
-        program: AI agents are the build capacity; direction, contracts, and
-        evidence gates are mine.
+        Technical program management professional working on enterprise
+        collaboration products at JPMorganChase, with seven years of infrastructure and platform
+        engineering experience at the same firm. I turn stakeholder needs into
+        sequenced, testable delivery; manage roadmaps, risks, dependencies, and
+        capacity across product and engineering; and communicate tradeoffs to
+        senior leaders. An MBA and U.S. Army leadership experience reinforce that
+        delivery foundation. Outside the firm, I design and build LLM systems in
+        the open, using evals, explicit contracts, and evidence gates to direct
+        reliable execution.
       </p>
     </section>
 
@@ -325,10 +324,20 @@
   </div>
 
   <script>
-    document.getElementById("theme-toggle").addEventListener("click", function () {
+    var themeButton = document.getElementById("theme-toggle");
+    function syncThemeButton() {
+      var dark = document.documentElement.getAttribute("data-theme") === "dark";
+      var action = dark ? "Switch to light theme" : "Switch to dark theme";
+      themeButton.setAttribute("aria-pressed", dark ? "true" : "false");
+      themeButton.setAttribute("aria-label", action);
+      themeButton.textContent = action;
+    }
+    syncThemeButton();
+    themeButton.addEventListener("click", function () {
       var cur = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
       document.documentElement.setAttribute("data-theme", cur);
       try { localStorage.setItem("theme", cur); } catch (e) {}
+      syncThemeButton();
     });
   </script>
 </body>

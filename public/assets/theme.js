@@ -9,13 +9,23 @@
     return root.getAttribute("data-theme") === "light" ? "light" : "dark";
   }
 
+  function syncButton(btn) {
+    var dark = current() === "dark";
+    var action = dark ? "Switch to light theme" : "Switch to dark theme";
+    btn.setAttribute("aria-pressed", dark ? "true" : "false");
+    btn.setAttribute("aria-label", action);
+    btn.setAttribute("title", action);
+  }
+
   function wire() {
     var btn = document.getElementById("theme-toggle");
     if (!btn) return;
+    syncButton(btn);
     btn.addEventListener("click", function () {
       var next = current() === "light" ? "dark" : "light";
       root.setAttribute("data-theme", next);
       try { localStorage.setItem(KEY, next); } catch (e) {}
+      syncButton(btn);
     });
   }
 

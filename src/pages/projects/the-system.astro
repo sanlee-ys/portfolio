@@ -3,8 +3,8 @@ import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
-  title="The System · San Lee"
-  description="Four public repos talk over frozen HTTP contracts. An audit found each side's tests asserting against its own copy of the shape."
+  title="AI System Architecture and Contract Testing · San Lee"
+  description="A four-service AI system built around explicit HTTP contracts, asynchronous enrichment, and an audit that exposed a false-green integration seam."
   canonical="https://sanlee.me/projects/the-system.html"
   ogType="article"
   ogImage="/assets/og-the-system.png"
@@ -98,6 +98,17 @@ import SiteNav from '../../components/SiteNav.astro';
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>The System</h1>
     <p class="subtitle">Four public repos talk over frozen HTTP contracts. An audit found each side's tests asserting against its own copy of the shape.</p>
+
+    <div class="decision" aria-label="Case study summary">
+      <p class="tag">Case study summary</p>
+      <ul>
+        <li><strong>Problem:</strong> Make four independently deployable repositories operate as one system without hiding coupling in shared code.</li>
+        <li><strong>Ownership:</strong> I directed the solo build, defined the cross-repo decisions and contracts, and audited whether their controls worked.</li>
+        <li><strong>Constraints:</strong> Note creation had to stay responsive when the classifier was unavailable; reprocessing had to be safe; and each repository kept its own release boundary.</li>
+        <li><strong>Actions:</strong> I designed an asynchronous, idempotent enrichment loop, recorded system-level ADRs, added contract checks, and built a portal linking decisions to the source.</li>
+        <li><strong>Result and evidence:</strong> Notes are classified and tagged automatically and the system is browsable end to end. The audit also exposed a false-green contract seam; it remains open and is documented rather than presented as solved.</li>
+      </ul>
+    </div>
 
     <!-- Argument: each side's test is green against its own copy of the
          shape; the wire between them is broken. Word + geometry first

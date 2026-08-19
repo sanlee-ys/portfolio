@@ -3,11 +3,11 @@ import Base from '../layouts/Base.astro';
 import SiteNav from '../components/SiteNav.astro';
 ---
 <Base
-  title="San Lee · AI Systems, Run Like a Program"
-  description="I run engineering the way a technical program manager runs a program, with AI agents as the build capacity. Direction, contracts, evidence gates. A decision log, reversals included."
+  title="San Lee · Technical Program Manager, AI Systems"
+  description="Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery."
   canonical="https://sanlee.me/"
   ogType="website"
-  ogDescription="I run engineering the way a technical program manager runs a program, with AI agents as the build capacity. Direction, contracts, evidence gates. A decision log, reversals included."
+  ogDescription="Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery."
   skipTo="#work"
 >
   <Fragment slot="head">
@@ -19,7 +19,7 @@ import SiteNav from '../components/SiteNav.astro';
     "url": "https://sanlee.me/",
     "jobTitle": "Senior Product Associate",
     "worksFor": { "@type": "Organization", "name": "JPMorganChase" },
-    "description": "I run engineering the way a technical program manager runs a program, with AI agents as the build capacity. Direction, contracts, evidence gates. A decision log, reversals included.",
+    "description": "Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery.",
     "sameAs": [
       "https://github.com/sanlee-ys",
       "https://www.linkedin.com/in/leesan/"
@@ -64,22 +64,41 @@ import SiteNav from '../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0;
     }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin: 22px 0 0;
+    }
+    .hero-actions a {
+      border-bottom: 1px solid var(--rule-strong);
+      color: var(--text);
+      font-weight: 600;
+      padding: 4px 0;
+      text-decoration: none;
+    }
+    .hero-actions a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
   </style>
   </Fragment>
 
   <header class="hero">
     <div class="wrap">
       <h1>San Lee</h1>
-      <p class="tagline">I run engineering the way a technical program manager runs a program, with AI agents as the build capacity.</p>
-      <p class="now">Product at JPMorganChase, on collaboration platforms serving 300,000 employees; the first seven years there were the wires.</p>
+      <p class="tagline">Technical program manager building reliable AI systems.</p>
+      <p class="now">Product at JPMorganChase, on collaboration platforms serving 300,000 employees, after seven years in infrastructure and operations.</p>
       <p class="lede">
-        I set the direction, freeze the contracts between the parts, and gate
-        every change on evidence.
+        I set direction, define the interfaces between teams and systems, and
+        gate delivery on evidence. I use AI agents to accelerate execution while
+        retaining ownership of the architecture, decisions, and quality bar.
       </p>
+      <p class="hero-actions"><a href="mailto:hi@sanlee.me">Contact me</a><a href="resume.html">View résumé</a></p>
     </div>
   </header>
 
-  <SiteNav />
+  <SiteNav current="work" />
 
 
   <div class="wrap proof-band">
@@ -101,13 +120,12 @@ import SiteNav from '../components/SiteNav.astro';
 
   <main class="wrap" id="work" tabindex="-1">
     <section class="orientation" aria-label="What this record demonstrates">
-      <p class="kicker">Start here</p>
-      <p class="orientation-lede">A small AI system, directed by me and typed mostly by Claude. An eval gates the merge. Pick a door.</p>
-      <ul class="doors-index" aria-label="Four ways in">
-        <li><a href="projects/faithfulness-judge.html"><span class="door-name">Judge</span><span class="door-why">Can an LLM judge catch a made-up claim?</span></a></li>
-        <li><a href="projects/product-and-program.html"><span class="door-name">Product &amp; Program</span><span class="door-why">The same system, read as a program</span></a></li>
-        <li><a href="projects/defense-news-classifier.html"><span class="door-name">Classifier</span><span class="door-why">The numbers, and how they were graded</span></a></li>
-        <li><a href="projects/false-green.html"><span class="door-name">False Green</span><span class="door-why">Six checks that passed on work that never ran</span></a></li>
+      <p class="kicker">Selected work</p>
+      <p class="orientation-lede">Three views of one end-to-end program: how I structured it, measured it, and managed the decisions. Deeper investigations remain linked throughout the record.</p>
+      <ul class="doors-index" aria-label="Three flagship case studies">
+        <li><a href="projects/the-system.html"><span class="door-name">The System</span><span class="door-why">Architecture, interfaces, and the integration loop</span></a></li>
+        <li><a href="projects/defense-news-classifier.html"><span class="door-name">Classifier</span><span class="door-why">Evaluation, reversals, and evidence-based tradeoffs</span></a></li>
+        <li><a href="projects/product-and-program.html"><span class="door-name">Product &amp; Program</span><span class="door-why">The work read through a TPM lens</span></a></li>
       </ul>
 
       <!-- How the work is run. Open pipeline, no oxide: this is the method,
@@ -209,7 +227,7 @@ import SiteNav from '../components/SiteNav.astro';
         <li><span class="stat-value" data-metric="domain_accuracy">98.1%</span><span class="stat-label">Domain</span></li>
         <li><span class="stat-value" data-metric="region_accuracy">94.4%</span><span class="stat-label">Region</span></li>
       </ul>
-      <p class="stat-note">Category and domain are scored separately. They happen to land on the same figure here.</p>
+      <p class="stat-note">Category and region are scored separately. They happen to land on the same figure here.</p>
       <p>Those numbers are from the harder gold set. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
       <p>The classical baseline that lost the case for an LLM is vendored here and runs in the browser, on the same rows. <a href="projects/classifier-baseline.html#try-it">Run it yourself &rarr;</a></p>
     </section>
@@ -234,7 +252,7 @@ import SiteNav from '../components/SiteNav.astro';
       <p class="muted-line">A selection; the full, growing set is on the notes site.</p>
     </section>
 
-    <section class="measure about">
+    <section class="measure about" id="about">
       <h2 class="section-title">About</h2>
       <p>
         Seven years in infra and operations at the same firm, then a product seat

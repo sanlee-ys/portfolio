@@ -13,17 +13,13 @@
 const { current } = Astro.props;
 
 const items = [
-  { id: 'the-system', href: '/projects/the-system.html', label: 'System' },
-  { id: 'defense-news-classifier', href: '/projects/defense-news-classifier.html', label: 'Classifier' },
-  { id: 'faithfulness-judge', href: '/projects/faithfulness-judge.html', label: 'Judge' },
-  { id: 'false-green', href: '/projects/false-green.html', label: 'False Green' },
-  { id: 'kb-agent-retrieval', href: '/projects/kb-agent-retrieval.html', label: 'KB Agent' },
-  { id: 'product-and-program', href: '/projects/product-and-program.html', label: 'Product & Program' },
-  { id: 'glossary', href: '/glossary.html', label: 'Glossary' },
+  { id: 'work', href: '/#work', label: 'Work' },
+  { id: 'about', href: '/#about', label: 'About' },
   { id: 'resume', href: '/resume.html', label: 'Résumé' },
+  { id: 'contact', href: 'mailto:hi@sanlee.me', label: 'Contact' },
 ];
 ---
-<nav class="doors" aria-label="The work">
+<nav class="doors" aria-label="Primary">
   <div class="wrap">
     {items.map((item) => (
       <a href={item.href} aria-current={item.id === current ? 'page' : undefined}>{item.label}</a>

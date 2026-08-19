@@ -3,8 +3,8 @@ import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
-  title="Defense News Classifier · San Lee"
-  description="An LLM classifier for public defense news, graded on 54 hand-labeled rows. Domain accuracy fell from 97.3% to 88.9% when the gold got real; the upgrades that failed that gold were cut."
+  title="Evaluating an LLM Defense News Classifier · San Lee"
+  description="An LLM classifier evaluated on hand-labeled defense news, with evidence gates that rejected retrieval, premium routing, and multi-agent complexity."
   canonical="https://sanlee.me/projects/defense-news-classifier.html"
   ogType="article"
   ogImage="/assets/og-defense-news-classifier.png"
@@ -168,6 +168,17 @@ import SiteNav from '../../components/SiteNav.astro';
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Defense News Classifier</h1>
     <p class="subtitle">An LLM classifier for defense news, and the eval that graded every change.</p>
+
+    <div class="decision" aria-label="Case study summary">
+      <p class="tag">Case study summary</p>
+      <ul>
+        <li><strong>Problem:</strong> Classify public defense news across category, operational domain, and region without treating a convincing demo as proof of quality.</li>
+        <li><strong>Ownership:</strong> I built the classifier and evaluation harness, labeled the gold set, defined the merge gate, and made the ship-or-cut decisions.</li>
+        <li><strong>Constraints:</strong> The initial 300-row synthetic set graded model-written examples; the replacement human-labeled set had only 54 rows, so small apparent gains could be noise.</li>
+        <li><strong>Actions:</strong> I replaced synthetic evaluation with real text, tested a classical baseline, scaled a corroborating run to 300 examples, and measured retrieval, premium routing, and multi-agent review against held-out evidence.</li>
+        <li><strong>Result and evidence:</strong> The shipped single-call classifier scores 94.4% category, 98.1% domain, and 94.4% region accuracy on the current gold. The gate rejected three more complex approaches, preserving the simpler path.</li>
+      </ul>
+    </div>
 
     <p class="lead">
       This labels public defense-news text on three axes: category (procurement,

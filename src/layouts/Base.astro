@@ -109,7 +109,7 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
 </head>
 <body>
   <a class="skip-link" href={skipTo}>Skip to content</a>
-  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false" title="Switch to dark theme">
     <span class="theme-icon-dark">&#9789;</span>
     <span class="theme-icon-light">&#9728;</span>
   </button>

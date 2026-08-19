@@ -3,8 +3,8 @@ import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
-  title="Product & Program · San Lee"
-  description="The same system, framed as a product and run as a program. Solo build. The program layer is simulated; the workstreams and the risk register are not."
+  title="Technical Program Management for an AI System · San Lee"
+  description="An AI system framed as a technical program through its roadmap, dependencies, success measures, delivery risks, and evidence-based scope decisions."
   canonical="https://sanlee.me/projects/product-and-program.html"
   ogType="article"
   ogImage="/assets/og-product-and-program.png"
@@ -109,6 +109,17 @@ import SiteNav from '../../components/SiteNav.astro';
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Product &amp; Program</h1>
     <p class="subtitle">The same system, framed as a product and run as a program. Solo build. The program layer is simulated.</p>
+
+    <div class="decision" aria-label="Case study summary">
+      <p class="tag">Case study summary</p>
+      <ul>
+        <li><strong>Problem:</strong> Reduce the time a defense-news analyst spends finding and sorting developments before analysis can begin.</li>
+        <li><strong>Ownership:</strong> I acted as product owner and TPM for a solo build, turning delivery into a roadmap, dependency map, success measures, and risk register.</li>
+        <li><strong>Constraints:</strong> There was no team or external design partner, so cross-team coordination and user-outcome claims could not be represented as real.</li>
+        <li><strong>Actions:</strong> I defined the job to be done, sequenced Now / Next / Later work, tied program artifacts to shipped work, and used eval results to manage quality, cost, and scope risk.</li>
+        <li><strong>Result and evidence:</strong> The asynchronous enrichment loop, tool-layer contract, and classifier CI gate shipped. Classification is measured; analyst outcome metrics are explicitly defined but not yet validated in real use.</li>
+      </ul>
+    </div>
 
     <p class="lead">
       This is a solo build. There is no team to coordinate, so the program
