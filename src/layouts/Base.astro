@@ -114,5 +114,69 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
     <span class="theme-icon-light">&#9728;</span>
   </button>
   <slot />
+  <!-- Glossary tooltip layer (Term.astro). One element per page, shared by
+       every a.term; the script below is a no-op on pages that have none.
+       The anchor's own navigation is the tap behavior -- this never calls
+       preventDefault or scrollIntoView (see "A figure offers the jump"). -->
+  <div id="term-tip" role="tooltip" hidden></div>
+  <script is:inline>
+    (function () {
+      var tip = document.getElementById("term-tip");
+      var anchors = document.querySelectorAll("a.term");
+      if (!tip || anchors.length === 0) { if (tip) tip.remove(); return; }
+      var active = null;
+      var GAP = 8;
+
+      function place(anchor) {
+        var a = anchor.getBoundingClientRect();
+        var t = tip.getBoundingClientRect();
+        // Below the anchor by default; flip above only when there is no room
+        // below and there is room above. Never covers the term either way.
+        var top = a.bottom + GAP;
+        if (top + t.height > window.innerHeight - GAP && a.top - t.height - GAP >= GAP) {
+          top = a.top - t.height - GAP;
+        }
+        // Clamp horizontally so the tooltip can never overflow the viewport;
+        // its max-width leaves 2rem spare, so the clamp always has room.
+        var left = a.left + a.width / 2 - t.width / 2;
+        left = Math.max(GAP, Math.min(left, window.innerWidth - t.width - GAP));
+        tip.style.top = top + "px";
+        tip.style.left = left + "px";
+      }
+
+      function show(anchor) {
+        var text = anchor.getAttribute("data-tip");
+        if (!text) return;
+        tip.textContent = text;
+        tip.hidden = false;
+        place(anchor);
+        // Focusing an off-screen anchor makes the browser scroll it into
+        // view AFTER focusin has run, which would strand a fixed-position
+        // tooltip where the anchor used to be. Re-place on the next frame.
+        requestAnimationFrame(function () { if (active === anchor) place(anchor); });
+        anchor.setAttribute("aria-describedby", "term-tip");
+        active = anchor;
+      }
+
+      function hide() {
+        tip.hidden = true;
+        if (active) { active.removeAttribute("aria-describedby"); active = null; }
+      }
+
+      for (var i = 0; i < anchors.length; i++) {
+        anchors[i].addEventListener("mouseenter", function (e) { show(e.currentTarget); });
+        anchors[i].addEventListener("focusin", function (e) { show(e.currentTarget); });
+        anchors[i].addEventListener("mouseleave", hide);
+        anchors[i].addEventListener("focusout", hide);
+      }
+      // Escape dismisses the tooltip and nothing else: focus stays put.
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !tip.hidden) hide();
+      });
+      // Scrolling with the tooltip open: keep it on its anchor. This reads
+      // geometry only; it never scrolls anything itself.
+      window.addEventListener("scroll", function () { if (active) place(active); }, { passive: true });
+    })();
+  </script>
 </body>
 </html>
