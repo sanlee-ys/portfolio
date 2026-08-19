@@ -1,0 +1,75 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteNav from '../components/SiteNav.astro';
+---
+<Base
+  title="About San Lee · Technical Program Manager"
+  description="San Lee is a technical program management professional with experience across enterprise product delivery, platform engineering, and reliable AI systems."
+  canonical="https://sanlee.me/about.html"
+  ogType="profile"
+>
+  <SiteNav current="about" />
+
+  <main class="wrap article-body" id="main" tabindex="-1">
+    <p class="kicker">About</p>
+    <h1>Technical depth, program discipline</h1>
+    <p class="subtitle">I work at the seam between product, engineering, and delivery.</p>
+
+    <p class="lead">
+      I am a product professional at JPMorganChase, working on collaboration
+      platforms serving more than 300,000 employees. Before moving into product,
+      I spent seven years in infrastructure and platform engineering at the same
+      firm.
+    </p>
+
+    <h2>How I work</h2>
+    <p>
+      I turn ambiguous goals into sequenced, testable delivery: set the direction,
+      make the interfaces between teams and systems explicit, track risks and
+      dependencies, and use evidence to decide what ships. When a measurement
+      contradicts the plan, I change the plan.
+    </p>
+    <p>
+      Outside the firm, I build public AI systems to exercise the full loop. I
+      use AI agents to accelerate execution while retaining ownership of the
+      architecture, decisions, contracts, and quality bar. The portfolio records
+      both the calls that shipped and the ones the evidence reversed.
+    </p>
+
+    <h2>Background</h2>
+    <p>
+      My experience spans product delivery, distributed systems, network
+      automation, APIs, CI/CD, observability, and operational support. I also
+      hold an MBA from Seoul National University and served in the U.S. Army.
+    </p>
+    <p>
+      Most of what I know came from people who were patient when I was the one
+      who did not know yet and generous with hard-won expertise. I try to pass
+      that forward where I can.
+    </p>
+
+    <div class="decision">
+      <p class="tag">Start with the evidence</p>
+      <h2>Selected work</h2>
+      <p><a href="projects/the-system.html">AI system architecture and contract testing &rarr;</a></p>
+      <p><a href="projects/defense-news-classifier.html">Classifier evaluation and evidence gates &rarr;</a></p>
+      <p><a href="projects/product-and-program.html">The system through a TPM lens &rarr;</a></p>
+    </div>
+
+    <h2>Outside the work</h2>
+    <p>
+      Traveling, hiking, photography, and a Scottish Fold named Sango who
+      supervises. The good frames live in <a href="lab/gallery.html">the gallery</a>.
+    </p>
+
+    <p><a href="mailto:hi@sanlee.me">Contact me</a> &middot; <a href="resume.html">View résumé</a></p>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p class="disclaimer">Personal site &mdash; views and projects are my own, not my employer's.</p>
+    </div>
+  </footer>
+
+  <script is:inline src="/assets/theme.js"></script>
+</Base>
