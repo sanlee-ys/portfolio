@@ -117,7 +117,8 @@ const main = async () => {
   await browser.close();
 
   const fonts = assertFontsEmbedded(pdfPath);
-  console.log(`✓ Wrote resume.pdf from resume.html (Letter, print media). `
+  const pages = assertPageCount(pdfPath);
+  console.log(`✓ Wrote resume.pdf from resume.html (Letter, print media, ${pages} pages). `
     + `Webfonts loaded: ${fontReport.loaded.sort().join(', ')}. `
     + `PDF carries ${fonts.total} embedded font(s): `
     + `${fonts.type3} Type 3 (${fonts.glyphProcs} glyph procedures), ${fonts.fontFiles} font program(s).`);
@@ -199,4 +200,30 @@ function assertFontsEmbedded(file) {
   return { total, type3, fontFiles, glyphProcs };
 }
 
-module.exports = { assertFontsEmbedded };
+/*
+ * Assert the written PDF stays at two pages or fewer.
+ *
+ * The résumé crossed to three pages on 2026-07-05 and shipped that way for six
+ * weeks, because every check here watched fonts, not length. The overflow was
+ * ~6% of a page — invisible in a green run, obvious to a recruiter.
+ *
+ * Same parsing posture as assertFontsEmbedded: PDF-1.4, uncompressed
+ * dictionaries, so a regex over raw bytes is enough. `/Page\b` cannot match
+ * `/Pages` — 's' is a word character, so there is no boundary before it.
+ */
+const MAX_PAGES = 2;
+function assertPageCount(file) {
+  const raw = fs.readFileSync(file).toString('latin1');
+  const pages = (raw.match(/\/Type\s*\/Page\b/g) || []).length;
+  if (pages === 0) {
+    throw new Error('no /Type /Page objects found in the written PDF. If Chromium '
+      + 'moved past PDF-1.4 the dictionaries are now compressed and this check needs a parser.');
+  }
+  if (pages > MAX_PAGES) {
+    throw new Error(`resume.pdf is ${pages} pages; the maximum is ${MAX_PAGES}.\n`
+      + '  Cut copy or tighten the @media print rules in resume.html, then rerun.');
+  }
+  return pages;
+}
+
+module.exports = { assertFontsEmbedded, assertPageCount };
