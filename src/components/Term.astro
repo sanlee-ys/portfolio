@@ -1,0 +1,32 @@
+---
+// A glossary term in running prose. Renders an ordinary anchor into the
+// glossary page's `#term-<id>` entry, plus a `data-tip` short form that the
+// tooltip script in Base.astro shows on hover and focus. The link IS the
+// mobile/tap behavior (CLAUDE.md: "a figure offers the jump" -- the tooltip
+// is a visual layer over a navigation the reader can always take).
+//
+// The id is validated at build time against src/data/terms.mjs, so a typo
+// throws here instead of shipping a dead tooltip.
+//
+// The href is computed relative to the consuming page, because this site
+// writes cross-page links relatively ("glossary.html" from the root,
+// "../index.html" from projects/). With build.format 'file' the page URL is
+// one path segment per directory plus the page itself, so the directory
+// depth is the segment count minus one.
+import { terms } from '../data/terms.mjs';
+
+const { id } = Astro.props;
+const term = terms[id];
+if (!term) {
+  throw new Error(
+    `Term.astro: unknown glossary term id "${id}". ` +
+      'Add it to src/data/terms.mjs (and make sure glossary.astro has a matching #term-' +
+      id +
+      ' anchor), or fix the typo.',
+  );
+}
+const segments = Astro.url.pathname.split('/').filter(Boolean);
+const depth = Math.max(0, segments.length - 1);
+const href = `${'../'.repeat(depth)}glossary.html#term-${id}`;
+---
+<a class="term" href={href} data-tip={term.short}><slot /></a>

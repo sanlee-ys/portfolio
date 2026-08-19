@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
+import Term from '../../components/Term.astro';
 ---
 <Base
   title="Measuring RAG Retrieval Quality with A/B Tests · San Lee"
@@ -167,10 +168,10 @@ import SiteNav from '../../components/SiteNav.astro';
     <p class="subtitle">kb-agent had never measured its own retrieval. Three paired A/B changes later, hybrid stayed off the default.</p>
 
     <p class="lead">
-      kb-agent is the RAG agent in <a href="the-system.html">the system</a>: it
+      kb-agent is the <Term id="rag">RAG</Term> agent in <a href="the-system.html">the system</a>: it
       answers questions about my own projects out of a small knowledge base. Its
       second milestone was supposed to be a shared retrieval backbone, with the
-      classifier calling it over HTTP instead of standing up its own vector
+      <Term id="classification">classifier</Term> calling it over HTTP instead of standing up its own vector
       store. That consumer shipped its own lexical retriever, so the backbone had
       nobody left to serve. Retiring it left an untested assumption: that
       kb-agent&rsquo;s retrieval was good enough to be another project&rsquo;s
@@ -259,12 +260,12 @@ import SiteNav from '../../components/SiteNav.astro';
       4 adversarial. The corpus is lopsided, so an even split would have
       misrepresented what retrieval actually searches. Each label is a query
       paired with the source file or files that should come back, and the metrics
-      are recall at 1, 3 and 5 plus MRR, with k=5 chosen to match the search
+      are recall at 1, 3 and 5 plus <Term id="recall-mrr">MRR</Term>, with k=5 chosen to match the search
       tool&rsquo;s own default.
     </p>
 
     <p>
-      There is <strong>no LLM judge at this layer</strong>. The label is an
+      There is <strong>no LLM <Term id="judge-model">judge</Term> at this layer</strong>. The label is an
       objective path match. A judge would re-score a question a person has
       already answered, and add variance plus a validation burden. Retrieval
       quality stays separate from answer quality. Conflating the two is how a RAG
@@ -304,7 +305,7 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <p>
       Every change ran through a paired comparison layer vendored from the
-      classifier&rsquo;s eval rather than re-derived: same queries both arms,
+      classifier&rsquo;s <Term id="eval">eval</Term> rather than re-derived: same queries both arms,
       per-query win, loss and tie counts, McNemar&rsquo;s exact test on the
       discordant pairs, and a harness-health section that reports dropped or
       unpairable rows. A comparison that quietly shrinks its own denominator
@@ -347,12 +348,12 @@ import SiteNav from '../../components/SiteNav.astro';
         went from 0.370 to 0.889, and the rate at which that kind is also correct
         from 0.370 to 0.852. 15 wins, zero losses, 12 ties. This model rejects
         the temperature parameter as deprecated, so sampling cannot be pinned;
-        each arm was run three times and the figures are medians. The baseline
+        each arm was run three times and the figures are medians. The <Term id="baseline">baseline</Term>
         spread was 0.333 to 0.407 and the candidate 0.889 to 0.926. Those ranges
         do not overlap, so the median of three is worth quoting.
       </p>
       <p>
-        This does not show that answers got better. It shows the agent now lands
+        This does not show that answers got better. It shows the <Term id="agent">agent</Term> now lands
         more often on the setting the retrieval eval had already measured as the
         stronger one.
       </p>
@@ -398,7 +399,7 @@ import SiteNav from '../../components/SiteNav.astro';
         vector store, fused with the dense ranking by Reciprocal Rank Fusion at
         k=60, left at the canonical value rather than tuned, because tuning k on
         the same 27 queries that judge the outcome is fitting on the test set.
-        Ranks fuse; scores do not, since a cosine distance and a BM25 score share
+        Ranks fuse; scores do not, since a cosine distance and a <Term id="bm25">BM25</Term> score share
         no scale and any weighted blend needs a constant fitted on that same
         data.
       </p>
@@ -506,7 +507,7 @@ import SiteNav from '../../components/SiteNav.astro';
       paired-comparison layer vendored from the classifier&rsquo;s eval rather
       than rewritten. The repo is public:
       <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a>.
-      The gold set, both eval harnesses, the decision record for the negative
+      The <Term id="gold-set">gold set</Term>, both eval harnesses, the decision record for the negative
       result and the per-query rank tables behind every figure above are all
       checkable:
       <a href="https://github.com/sanlee-ys/kb-agent/blob/main/eval/gold_set.yaml">the gold set</a>,

@@ -2680,6 +2680,38 @@ main.wrap > .measure { grid-column: full; }
 .article-body p a:hover,
 .article-body li a:hover { text-decoration-color: var(--accent); }
 
+/* ---- Glossary terms in prose (Term.astro + the #term-tip layer) ---------
+   A term is an ordinary prose link into the glossary -- same accent, same
+   underline machinery as the rule above -- with a DOTTED underline as the
+   one distinguishing affordance: "this explains itself where it stands".
+   No new colors, no opacity on text (ADR-009), no italics. */
+.article-body a.term {
+  text-decoration-style: dotted;
+}
+
+/* The shared tooltip. Panel surface + body ink, the same pairing every
+   card on the site already passes the rendered-contrast gate with, in both
+   themes. Position is set by the Base.astro script (fixed; below the
+   anchor, flipped above only when out of room, clamped to the viewport).
+   max-width leaves 2rem of viewport spare so the horizontal clamp can
+   always succeed -- it can never be the thing that overflows at 320px.
+   No transition, so there is nothing for prefers-reduced-motion to undo. */
+#term-tip {
+  position: fixed;
+  z-index: 40;
+  max-width: min(20rem, calc(100vw - 2rem));
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px var(--shadow);
+  padding: 8px 11px;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  pointer-events: none;
+}
+
 /* Responsive */
 /* No viewport/breakpoint media queries left: the grid auto-fits and the
    spacing/type clamp, so the layout is intrinsically responsive. (The only

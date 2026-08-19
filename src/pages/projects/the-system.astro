@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
+import Term from '../../components/Term.astro';
 ---
 <Base
   title="AI System Architecture and Contract Testing · San Lee"
@@ -104,9 +105,9 @@ import SiteNav from '../../components/SiteNav.astro';
       <ul>
         <li><strong>Problem:</strong> Make four independently deployable repositories operate as one system without hiding coupling in shared code.</li>
         <li><strong>Ownership:</strong> I directed the solo build, defined the cross-repo decisions and contracts, and audited whether their controls worked.</li>
-        <li><strong>Constraints:</strong> Note creation had to stay responsive when the classifier was unavailable; reprocessing had to be safe; and each repository kept its own release boundary.</li>
-        <li><strong>Actions:</strong> I designed an asynchronous, idempotent enrichment loop, recorded system-level ADRs, added contract checks, and built a portal linking decisions to the source.</li>
-        <li><strong>Result and evidence:</strong> Notes are classified and tagged automatically and the system is browsable end to end. The audit also exposed a false-green contract seam; it remains open and is documented rather than presented as solved.</li>
+        <li><strong>Constraints:</strong> Note creation had to stay responsive when the <Term id="classification">classifier</Term> was unavailable; reprocessing had to be safe; and each repository kept its own release boundary.</li>
+        <li><strong>Actions:</strong> I designed an asynchronous, <Term id="idempotency">idempotent</Term> enrichment loop, recorded system-level <Term id="adr">ADRs</Term>, added contract checks, and built a portal linking decisions to the source.</li>
+        <li><strong>Result and evidence:</strong> Notes are classified and tagged automatically and the system is browsable end to end. The audit also exposed a false-green <Term id="contract">contract seam</Term>; it remains open and is documented rather than presented as solved.</li>
       </ul>
     </div>
 
@@ -176,8 +177,8 @@ import SiteNav from '../../components/SiteNav.astro';
     <h2 id="what-it-grew-into">The four repos</h2>
     <ul class="repo-grid">
       <li><strong><a href="https://github.com/sanlee-ys/notes-api">notes-api</a></strong><span>FastAPI REST service. The knowledge base and data layer.</span></li>
-      <li><strong><a href="https://github.com/sanlee-ys/defense-news-classifier">defense-news-classifier</a></strong><span>LLM classifier with a real eval harness. Labels the content.</span></li>
-      <li><strong><a href="https://github.com/sanlee-ys/kb-agent">kb-agent</a></strong><span>RAG and tool-use agent. The hub that reasons over the system.</span></li>
+      <li><strong><a href="https://github.com/sanlee-ys/defense-news-classifier">defense-news-classifier</a></strong><span>LLM classifier with a real <Term id="eval">eval harness</Term>. Labels the content.</span></li>
+      <li><strong><a href="https://github.com/sanlee-ys/kb-agent">kb-agent</a></strong><span><Term id="rag">RAG</Term> and tool-use agent. The hub that reasons over the system.</span></li>
       <li><strong><a href="https://github.com/sanlee-ys/learning-notes">learning-notes</a></strong><span>Plain-language notes on the techniques behind it all.</span></li>
     </ul>
     <p class="ex-caption">All four repos are public. The ADRs and contract tests below live in those repos.</p>
@@ -251,7 +252,7 @@ import SiteNav from '../../components/SiteNav.astro';
     <div class="decision" id="decision-rightsized" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>Decision &middot; SYS-005</p>
       <h3>Make the enrichment loop async and idempotent by design</h3>
-      <p>Creating a note triggers a FastAPI BackgroundTask in notes-api. The task
+      <p>Creating a note triggers a FastAPI <Term id="backgroundtask">BackgroundTask</Term> in notes-api. The task
         calls the classifier, then writes the returned labels back as namespaced
         tags (<code>category:</code> / <code>domain:</code>) with replace
         semantics — notes-api owns the writeback, the classifier stays a pure
@@ -268,7 +269,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <h3>Gate model choice on evidence</h3>
       <p>Default to Sonnet across the system. Escalate to Opus only where an eval
         shows the quality gain pays for itself. The same gate ran the July 2026
-        migration to Sonnet 5: eval before and after on the same gold set.</p>
+        migration to Sonnet 5: eval before and after on the same <Term id="gold-set">gold set</Term>.</p>
       <p class="tradeoff"><strong>Why:</strong> the escalation has now been built
         and measured three separate times, and declined all three &mdash; the
         verdicts are on the
@@ -295,7 +296,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <li><strong>Create a note and it is automatically classified and tagged</strong>, asynchronously, with no coupling between note creation and classifier availability.</li>
       <li><strong>The four repos stay independently deployable</strong> &mdash; though cross-repo drift is <em>not</em> yet caught by a red build. I thought it was; an audit proved otherwise, and closing that gap needs one shared contract artifact both sides assert against.</li>
       <li><strong>The whole system is browsable in one portal</strong>, with links straight to the real code.</li>
-      <li><strong>A skill map (SYS-007) spells out what the system exercises</strong>: evals, context engineering, agents, and observability. It also names where I'm weak, which is security on the agent's tool seam.</li>
+      <li><strong>A skill map (SYS-007) spells out what the system exercises</strong>: evals, context engineering, <Term id="agent">agents</Term>, and observability. It also names where I'm weak, which is security on the agent's tool seam.</li>
     </ul>
 
     <h2 id="where-it-goes-next">Where it goes next</h2>
