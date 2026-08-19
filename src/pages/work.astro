@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteNav from '../components/SiteNav.astro';
+---
+<Base
+  title="Work · San Lee, Technical Program Manager"
+  description="A complete index of San Lee's AI systems, evaluation, technical program management, reliability, and infrastructure projects."
+  canonical="https://sanlee.me/work.html"
+  ogType="website"
+>
+  <SiteNav current="work" />
+
+  <main class="wrap article-body" id="main" tabindex="-1">
+    <p class="kicker">Complete index</p>
+    <h1>Work</h1>
+    <p class="subtitle">The homepage is curated. Nothing is hidden here.</p>
+
+    <h2>Flagship case studies</h2>
+    <ul class="doors-index" aria-label="Flagship case studies">
+      <li><a href="projects/the-system.html"><span class="door-name">The System</span><span class="door-why">Architecture, interfaces, asynchronous delivery, and a broken contract seam</span></a></li>
+      <li><a href="projects/defense-news-classifier.html"><span class="door-name">Defense News Classifier</span><span class="door-why">Human-labeled evaluation, reversals, and evidence-gated model decisions</span></a></li>
+      <li><a href="projects/faithfulness-judge.html"><span class="door-name">Faithfulness Judge</span><span class="door-why">Whether an LLM judge can reliably identify unsupported claims</span></a></li>
+      <li><a href="projects/product-and-program.html"><span class="door-name">Product &amp; Program</span><span class="door-why">Roadmap, dependencies, risks, metrics, and the limits of a solo simulation</span></a></li>
+    </ul>
+
+    <h2>Evaluation and reliability</h2>
+    <ul class="ledger">
+      <li><a href="projects/classifier-baseline.html#try-it">Classifier baseline and live demo</a> &mdash; run the TF-IDF logistic-regression baseline in the browser.</li>
+      <li><a href="projects/false-green.html">False Green</a> &mdash; six checks that passed when the required work never ran.</li>
+      <li><a href="projects/kb-agent-retrieval.html">Retrieval, Measured</a> &mdash; a 27-query gold set and three paired retrieval experiments.</li>
+      <li><a href="projects/autonomy-ladder.html">The Autonomy Ladder</a> &mdash; four levels of agent autonomy, with two shipped and two rejected.</li>
+      <li><a href="projects/loop-replay.html">Loop Replay</a> &mdash; interactive playback of two autonomous improvement runs.</li>
+      <li><a href="projects/context-architecture.html">Context Architecture</a> &mdash; an audit of relevance, sufficiency, isolation, economy, and provenance.</li>
+    </ul>
+
+    <h2>Systems and infrastructure</h2>
+    <ul class="ledger">
+      <li><a href="projects/the-system-run.html">One Note, End to End</a> &mdash; one payload traced across the real service contracts.</li>
+      <li><a href="projects/netops-lab.html">Zero-Touch Provisioning</a> &mdash; a factory-blank router configured after one power cycle.</li>
+    </ul>
+
+    <h2>Web lab</h2>
+    <ul class="ledger">
+      <li><a href="lab/scroll-storytelling.html">Scroll-driven storytelling</a> &mdash; a sticky, scroll-scrubbed presentation built without JavaScript.</li>
+    </ul>
+
+    <p>Looking for terminology used across the projects? <a href="glossary.html">Open the glossary &rarr;</a></p>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <nav>
+        <a href="mailto:hi@sanlee.me">Email</a>
+        <a href="resume.html">Résumé</a>
+        <a href="https://github.com/sanlee-ys">GitHub</a>
+        <a href="colophon.html">Colophon</a>
+      </nav>
+      <p class="disclaimer">Personal site &mdash; views and projects are my own, not my employer's.</p>
+    </div>
+  </footer>
+
+  <script is:inline src="/assets/theme.js"></script>
+</Base>
