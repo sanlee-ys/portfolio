@@ -46,10 +46,11 @@ as an instruction to run, or it stops being run. The ADR carries the reasoning, 
 alternatives, and the status lifecycle; `CLAUDE.md` keeps the imperative and cross-links.
 Nothing is deleted from `CLAUDE.md` by adding a record here.
 
-## Still to record
+## Current implementation notes
 
-**One open item, and it is implementation rather than a question:**
-[`ADR-007`](ADR-007-split-dont-trim.md) is accepted and its splits have not shipped yet.
+[`ADR-007`](ADR-007-split-dont-trim.md)'s splits shipped. Its 2026-08-20
+amendment records the current routing layer: a curated homepage plus a complete
+Work index.
 
 ADR-007 answers the complaint that opened ADR-006 and that ADR-006 pointedly refused to take
 credit for: *too much information density.* It resolves the tension the owner raised — that
@@ -143,8 +144,9 @@ posture and the private-repo boundary — were recorded on 2026-07-18 as
 the split above, both remain in `CLAUDE.md` as operative instruction; the ADRs carry the why.
 
 [`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md)'s migration was carried out on
-2026-07-23: the lab section is gone, `loop-replay.html` now lives in `projects/`, and the
-learning log moved to the colophon. The ADR was written before the migration on purpose — it
+2026-07-23: the lab section is gone and `loop-replay.html` now lives in `projects/`.
+PR #223 later removed the redundant learning-log exhibit from the colophon; the
+source notes and stable archived lab URLs remain without becoming a Work category. The ADR was written before the migration on purpose — it
 reverses two previously written rules, so the reversal wanted a reviewable record rather than
 a diff — and its *Downstream surfaces* section served as the checklist.
 

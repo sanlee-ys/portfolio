@@ -12,7 +12,7 @@ GitHub Pages serves the built `dist/`.
 
 | Path | Holds |
 |---|---|
-| `src/pages/` | Route sources: `index`, `colophon`, `glossary`, `404`, plus `lab/` and `projects/`. |
+| `src/pages/` | Route sources: `index`, `work`, `about`, `colophon`, `glossary`, `404`, plus archived `lab/` artifacts and `projects/`. |
 | `src/layouts/` | Shared chrome (`Base.astro`: head, theme bootstrap, analytics, theme toggle). |
 | `src/components/` | Shared pieces (`SiteNav.astro` and anything else reused across pages). |
 | `public/` | Static files copied as-is: `assets/` (CSS, fonts, JS, images), standalone `resume.html` / `resume.pdf`, `CNAME`, `robots.txt`. |
@@ -55,8 +55,8 @@ phantom broken links if `dist/` and `public/` are both present.
 ## QA
 
 CI (GitHub Actions, `.github/workflows/qa.yml`) and the local runner
-(`scripts/gates.cjs` / `npm run gates`) run the **same fourteen checks**. The
-six that need no build, browser, or network run first; the eight that walk the
+(`scripts/gates.cjs` / `npm run gates`) run the **same sixteen checks**. The
+seven that need no build, browser, or network run first; the nine that walk the
 built site or launch Chromium run after. `scripts/gates.cjs` must stay a
 faithful mirror of the workflow — add a step there, add it here.
 
@@ -77,12 +77,18 @@ faithful mirror of the workflow — add a step there, add it here.
   its glyphs, plus its own adversarial suite.
 - **`node --test scripts/check-published-metrics.test.cjs`** — marker-parity
   suite behind the published-metrics gate.
+- **`node --test scripts/navigation-check.test.cjs`** — adversarial fixtures
+  for the navigation contract: complete Work discovery and contextual return
+  links, with explicit exemptions for archived standalone pages.
 - **`scripts/lint_decisions.py`** — every ADR in `decisions/` carries a
   `## Downstream surfaces` section. Stdlib Python 3, no venv.
 
 **Against the built site (`SITE_ROOT=dist`):**
 
 - **`scripts/link-check.cjs`** — no broken internal links.
+- **`scripts/navigation-check.cjs`** — every current professional-work page is
+  linked from `work.html`, and every non-primary content page offers a
+  contextual back link; archived standalone pages are explicitly exempted.
 - **`scripts/font-coverage.cjs`** — every character in the copy has a
   self-hosted glyph (re-hashes the woff2 files against
   `scripts/font-coverage.json`).

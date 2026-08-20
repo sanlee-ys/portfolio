@@ -31,7 +31,7 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all fourteen checks:
+runs all sixteen checks:
 
 ```
 npm run qa
@@ -45,15 +45,15 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Six of the fourteen need no build, no browser and no network — five
+Seven of the sixteen need no build, no browser and no network — six
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The eight that walk the built site or launch a browser run after,
+seconds. The nine that walk the built site or launch a browser run after,
 slowest last. (`hit-target.test.cjs` is a `node --test` suite but is **not**
-one of the cheap six: it spawns the gate, which launches Chromium, so it sits
+one of the cheap seven: it spawns the gate, which launches Chromium, so it sits
 at the bottom with the browser work.)
 
-`npm run gates` runs the same fourteen against an existing `dist/` without
-rebuilding, and the build-independent six still run on a clone that has never
+`npm run gates` runs the same sixteen against an existing `dist/` without
+rebuilding, and the build-independent seven still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
@@ -81,6 +81,24 @@ recognize before you go looking for a regression that isn't there.
 
 Each walking gate **fails if it finds no pages**, so a gate pointed at an
 unbuilt or empty directory reddens instead of passing on an empty walk.
+
+## Navigation has two layers, and both are checked
+
+*Reasoning: [`decisions/ADR-007`](decisions/ADR-007-split-dont-trim.md), as
+amended 2026-08-20.*
+
+`index.html` is the curated front door; `work.html` is the complete index of
+current professional work. Home, Work, About, and the résumé may live in the
+shared primary nav. Project depth stays out of that nav and is reached through
+the Work index or a parent project.
+
+Every non-primary content page needs the existing `.back` link to a meaningful
+parent or index. Stable archived pages under `lab/` may be exempted, but an
+exemption must be explicit in `scripts/navigation-check.cjs`; an unlinked page
+is not silently treated as an archive. Run `npm run qa` after adding, moving, or
+retiring a route. The navigation suite and built-site gate check Work-index
+coverage and return links; the ordinary link gate separately checks that the
+links resolve.
 
 ## Mobile is a contract, not an afterthought
 
@@ -377,8 +395,9 @@ Hard stops:
 - Employer: title, platform, firm-wide scale, and the résumé's
   merchant-command line. No team names, no feature list, no "I uniquely
   did X."
-- Do not add a career page, a photo essay, or extra About paragraphs that
-  thicken the biography.
+- `about.html` is the one permitted career page. Keep it short; do not add a
+  timeline, photo essay, or extra paragraphs that thicken the biography. The
+  homepage may carry only a short version of the same tell.
 - Longer stories stay in the private narrative bank. They are spoken, not
   indexed.
 

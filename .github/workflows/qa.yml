@@ -26,11 +26,6 @@ jobs:
           npm ci
           npm run build
 
-      - name: Check internal links
-        run: node scripts/link-check.cjs
-        env:
-          SITE_ROOT: dist
-
       - name: Private-repo guard (adversarial suites, A+B and C)
         run: node --test scripts/private-repo-check.test.cjs scripts/private-name-precommit.test.cjs
 
@@ -73,6 +68,36 @@ jobs:
       - name: published-metrics marker parity (adversarial suite)
         run: node --test scripts/check-published-metrics.test.cjs
 
+      # An internal href can be valid while a real page remains stranded, and
+      # a clean site cannot prove the checker would catch that. Exercise the
+      # graph walk, back-link contract, narrow exemptions, and fail-closed walk
+      # against synthetic sites before checking the build.
+      - name: Navigation contract (adversarial suite)
+        run: node --test scripts/navigation-check.test.cjs
+
+      # Ports the architecture repo's 'Downstream surfaces' rule down to this repo's
+      # ADR tier. Stdlib Python, no venv — this is a static site with no Python
+      # toolchain, and a doc linter is not a reason to grow one. Every ADR complies,
+      # so it is enforced with zero exceptions (LEGACY_NO_DOWNSTREAM is empty). No
+      # count here on purpose — the linter prints the live one, and prose goes stale.
+      # `python3`, not `python`: this job sets up Node, not Python, and only python3
+      # is guaranteed on the ubuntu runner image.
+      - name: ADRs list their downstream surfaces
+        run: python3 scripts/lint_decisions.py
+
+      - name: Check internal links
+        run: node scripts/link-check.cjs
+        env:
+          SITE_ROOT: dist
+
+      # Link-check proves that href targets exist. This proves the other half:
+      # every published page is discoverable from the front page and every
+      # detail page gives the reader a working, visible way back.
+      - name: Page reachability and back navigation
+        run: node scripts/navigation-check.cjs
+        env:
+          SITE_ROOT: dist
+
       # Every character in the built copy must have a glyph in a font this site
       # ships. A codepoint the fonts lack still RENDERS — borrowed from a
       # platform face — so it survives every other gate, looks right on the
@@ -83,14 +108,6 @@ jobs:
       - name: Every character in the copy has a self-hosted glyph
         run: node scripts/font-coverage.cjs
         env:
-          SITE_ROOT: dist
-
-      - name: Private-repo guard (never name/link/describe a private repo)
-        run: node scripts/private-repo-check.cjs
-        env:
-          # Authenticated read raises the API rate limit; the token can't see
-          # other repos' private visibility, and the script filters !private.
-          GITHUB_TOKEN: ${{ github.token }}
           SITE_ROOT: dist
 
       # Published figures are quoted from the classifier's eval runs. They used to
@@ -107,15 +124,13 @@ jobs:
         env:
           SITE_ROOT: dist
 
-      # Ports the architecture repo's 'Downstream surfaces' rule down to this repo's
-      # ADR tier. Stdlib Python, no venv — this is a static site with no Python
-      # toolchain, and a doc linter is not a reason to grow one. Every ADR complies,
-      # so it is enforced with zero exceptions (LEGACY_NO_DOWNSTREAM is empty). No
-      # count here on purpose — the linter prints the live one, and prose goes stale.
-      # `python3`, not `python`: this job sets up Node, not Python, and only python3
-      # is guaranteed on the ubuntu runner image.
-      - name: ADRs list their downstream surfaces
-        run: python3 scripts/lint_decisions.py
+      - name: Private-repo guard (never name/link/describe a private repo)
+        run: node scripts/private-repo-check.cjs
+        env:
+          # Authenticated read raises the API rate limit; the token can't see
+          # other repos' private visibility, and the script filters !private.
+          GITHUB_TOKEN: ${{ github.token }}
+          SITE_ROOT: dist
 
       - name: Install Playwright Chromium
         working-directory: scripts

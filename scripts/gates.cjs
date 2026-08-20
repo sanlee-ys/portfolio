@@ -140,9 +140,9 @@ function runSiteGate(label, script) {
 }
 
 /*
- * Ordered cheapest-first, which is also build-independent-first. The six checks
+ * Ordered cheapest-first, which is also build-independent-first. The seven checks
  * above the line need no `dist/`, no browser and no network, and finish in
- * seconds; the eight below either walk the built site or launch a browser —
+ * seconds; the nine below either walk the built site or launch a browser —
  * contrast-check renders every page in both themes, mobile-qa renders 64
  * page-widths, hit-target hit-tests every control at two widths. A missing ADR
  * section should redden in two seconds, not after a full render pass.
@@ -183,11 +183,21 @@ const CHECKS = [
       runNodeTest('published-metrics suite', ['scripts/check-published-metrics.test.cjs']),
   },
   {
+    label: 'navigation contract (adversarial suite)',
+    needsSite: false,
+    run: () => runNodeTest('navigation-check suite', ['scripts/navigation-check.test.cjs']),
+  },
+  {
     label: 'ADRs list their downstream surfaces',
     needsSite: false,
     run: runAdrLint,
   },
   { label: 'internal links', needsSite: true, run: () => runSiteGate('link-check', 'scripts/link-check.cjs') },
+  {
+    label: 'page reachability and back navigation',
+    needsSite: true,
+    run: () => runSiteGate('navigation-check', 'scripts/navigation-check.cjs'),
+  },
   {
     label: 'every character in the copy has a self-hosted glyph',
     needsSite: true,

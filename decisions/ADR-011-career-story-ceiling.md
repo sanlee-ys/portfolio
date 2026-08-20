@@ -1,6 +1,6 @@
 # ADR-011: The public career tell stays short
 
-**Status:** Accepted
+**Status:** Accepted; amended 2026-08-20
 **Date:** 2026-08-17
 **Deciders:** San Lee
 
@@ -76,3 +76,17 @@ longer story to the private narrative bank, or leave it unsaid.
 | A full public career page (Army to product) | Indexed detail without a hiring need. Doxxing risk. Hero voice the owner rejected. |
 | Leave About as side-project only | The résumé then has to carry the whole arc. Two short sentences close the hole without a page. |
 | Expand the résumé Leadership or Experience bullets | Same color problem on a page people download and file. |
+
+## Amendment (2026-08-20): one short About page
+
+A dedicated `about.html` is permitted as the single home of the locked tell.
+This supersedes only the original prohibition on a new career page; it does not
+raise the career-story ceiling. About stays short, uses only the public facts
+allowed above, and does not become a timeline, memoir, or photo essay.
+
+Downstream ownership moves from `src/pages/index.astro` to
+`src/pages/about.astro`. The homepage may retain a short version of the tell and
+link to About, but must not duplicate or expand the biography. Any claim about
+who built the site remains subject to [`ADR-002`](ADR-002-ai-use-posture.md):
+name Claude plainly and describe directed work rather than using a vague AI
+credit.

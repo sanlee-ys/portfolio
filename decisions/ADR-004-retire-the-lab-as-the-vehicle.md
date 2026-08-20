@@ -315,3 +315,14 @@ build join the list. Recorded here rather than in ADR-006 alone, so the next rea
 of this record does not have to infer that the premise was rechecked.
 
 Nothing else in this record changes, and no candidate reopens.
+
+## Amendment (2026-08-20): stable artifacts are not a portfolio category
+
+PR #223 later removed the learning-log exhibit from the colophon. The seven
+source notes remain in `learning/`, and the two surviving `lab/` pages keep their
+stable public URLs, but neither fact revives a Lab section.
+
+In particular, `lab/scroll-storytelling.html` is an archived learning artifact,
+not a category of professional work. It does not belong in the Work index or the
+primary navigation. Interactive work still earns portfolio placement only where
+it strengthens a current project's argument, as Decision 3 says.
