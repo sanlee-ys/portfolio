@@ -166,19 +166,42 @@ function localTarget(page, href, pages) {
   return candidates.find((candidate) => pages.has(candidate)) ?? null;
 }
 
+function hasTextContent(source) {
+  let inTag = false;
+  let quote = '';
+  for (let index = 0; index < source.length; index++) {
+    if (!inTag && source.startsWith('<!--', index)) {
+      const end = source.indexOf('-->', index + 4);
+      if (end === -1) return false;
+      index = end + 2;
+      continue;
+    }
+    const char = source[index];
+    if (inTag) {
+      if (quote) {
+        if (char === quote) quote = '';
+      } else if (char === '"' || char === "'") {
+        quote = char;
+      } else if (char === '>') {
+        inTag = false;
+      }
+    } else if (char === '<') {
+      inTag = true;
+    } else if (!/\s/.test(char)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function hasVisibleBack(pageAnchors, page, pages, graph) {
   for (const anchor of pageAnchors) {
     const classNames = (anchor.attrs.get('class') || '').split(/\s+/);
     if (!classNames.includes('back')) continue;
-    const text = anchor.content
-      .replace(/<!--[^]*?-->/g, '')
-      .replace(/<[^>]*>/g, '')
-      .replace(/&(?:#\d+|#x[\da-f]+|[a-z]+);/gi, 'x')
-      .trim();
     const labelled = (anchor.attrs.get('aria-label') || '').trim();
     const target = localTarget(page, anchor.attrs.get('href'), pages);
     const contextual = target === ENTRY_PAGE || graph.get(target)?.has(page);
-    if (!anchor.hidden && (text || labelled) && target && contextual) {
+    if (!anchor.hidden && (hasTextContent(anchor.content) || labelled) && target && contextual) {
       return true;
     }
   }
