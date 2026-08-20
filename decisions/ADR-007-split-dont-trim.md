@@ -1,8 +1,6 @@
 # ADR-007: Split, don't trim — the two-speed reader
 
-**Status:** Accepted 2026-07-26. Implementation follows this record, per the
-decision-before-diff practice [`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md)
-and [`ADR-006`](ADR-006-hand-written-html-or-a-generator.md) both used.
+**Status:** Accepted 2026-07-26; implemented; amended 2026-08-20
 **Date:** 2026-07-26
 **Deciders:** San Lee
 
@@ -218,3 +216,22 @@ who chose it.
 | **Collapse all 8 homepage decision cards to one-liners** | The maximal density win (~640 words) and the plan's original recommendation. Declined: those cards are summaries written for the homepage, not duplicates of it, and they sit where a 90-second reader actually looks. See §4 |
 | **Compress the classifier's "The decisions" cards to linked ADR one-liners** | Declined at §4. The only proposed cut that removes reasoning rather than duplication, for ~150 words. Where a cut meets the floor, the floor wins |
 | **Do nothing structural; treat it as an editorial problem** | Half right — the corpus really is long — but the measurable defect is that the *default path* forces a reader through 4,630 words before they can judge anything. Routing fixes that without deleting an argument |
+
+## Amendment (2026-08-20): a curated front door plus a complete index
+
+The split shipped. Its three deep pages, shorter homepage path, preserved
+argument units, and parent-page back links are the implemented baseline.
+
+The later `work.html` route supersedes the narrower rejection of a projects hub
+and the claim that the shared nav alone must be the 90-second router. The
+architecture is now two complementary layers:
+
+- `index.html` is the curated front door: it makes the fast editorial cut and
+  points to representative evidence.
+- `work.html` is the complete professional-work index: it makes every current
+  work page discoverable without forcing all of it onto the homepage.
+
+The shared nav may link Home, Work, About, and the résumé. Depth pages still do
+not enter that nav; they keep contextual back links to a parent or index. This
+amendment changes routing, not the original content rule: claim, evidence, and
+caveat still travel together, and a summary does not hide a negative result.
