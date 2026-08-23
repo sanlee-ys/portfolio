@@ -156,6 +156,8 @@
     .proof a { color: var(--muted); }
     .proof a:hover { color: var(--accent); }
 
+    .site-note { margin-top: 44px; font-size: 0.78rem; color: var(--muted); }
+
     @media print {
       :root { --bg: #ffffff; --panel: #ffffff; --text: #14181f; --muted: #444c5a; --accent: #1a4fc4; --border: #cbd2dc; }
       html[data-theme="dark"] { --bg:#ffffff; --text:#14181f; --muted:#444c5a; --accent:#1a4fc4; --border:#cbd2dc; }
@@ -172,6 +174,7 @@
       .edu-item, .lead-item { margin-bottom: 4px; }
       .skills p { margin-bottom: 3px; }
       .entry, .edu-item { break-inside: avoid; }
+      .site-note { margin-top: 12px; }
       a { color: inherit; text-decoration: none; }
     }
   </style>
@@ -222,8 +225,9 @@
         <p class="role">Senior Product Associate, Content Creation &amp; Collaboration &middot; Jersey City, NJ</p>
         <ul>
           <li>Own planning, build, and delivery of collaboration features across SharePoint Online and OneDrive for the entire firm &mdash; available to 300,000+ employees &mdash; moving them through a structured release lifecycle.</li>
-          <li>Gather and document requirements across lines of business; report roadmap, delivery status, risks, and dependencies to stakeholders and senior leadership.</li>
-          <li>Apply capacity management and prioritization to a high-demand, many-to-one user base &mdash; tracking execution in Jira and partnering closely with product engineering.</li>
+          <li>Drive an on-premises SharePoint to SharePoint Online migration for the firm's data retention and governance groups: run the weekly stakeholder cadence, gather requirements, and coordinate a vendor, internal engineering, and Microsoft.</li>
+          <li>Launched a SharePoint Framework (SPFx) pilot with recruited users; field feature requests across lines of business, including a proof of concept for a managing director.</li>
+          <li>Run incident response for the migration queue, troubleshooting blocking issues directly with Microsoft engineers; built Power Automate flows that cut its manual triage.</li>
         </ul>
       </div>
 
@@ -280,7 +284,7 @@
         <p class="role" style="margin-top:0">Built and documented in the open &mdash; every claim below links to its writeup and the public code behind it. <a href="https://sanlee.me">sanlee.me</a></p>
         <ul>
           <li><strong>LLM eval harness (defense-news classifier)</strong> &mdash; built the eval before trusting the model: an LLM-as-judge scored against a hand-labeled gold set caught two changes I'd have shipped on instinct (a &ldquo;cleaner&rdquo; prompt, an unproven retrieval add) that actually regressed accuracy. The product call: gate every change on evidence, not on how confident it feels. <span class="proof">&rarr; <a href="https://sanlee.me/projects/defense-news-classifier.html">sanlee.me/projects/defense-news-classifier</a></span></li>
-          <li><strong>kb-agent</strong> &mdash; RAG + tool-use agent orchestration, answering from a live knowledge base over versioned contracts instead of a static index, so answers can't silently drift out of sync with the source of truth; also ships as an MCP server any MCP host can mount. <span class="proof">&rarr; <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a></span></li>
+          <li><strong>telltale</strong> &mdash; a Go terminal app whose council mode puts one brief to five coding-agent CLIs side by side (Claude Code, Codex, Antigravity, Cursor, Grok), over a cross-vendor statusline and HUD. Every number comes from measured tool output; an unmeasured reading renders absent, never zero. <span class="proof">&rarr; <a href="https://github.com/sanlee-ys/telltale">github.com/sanlee-ys/telltale</a></span></li>
           <li><strong>Cross-repo LLM system</strong> &mdash; evidence-gated model routing (cheaper model by default, escalate only where an eval proves the lift), wired across four services with frozen wire contracts and an idempotent async pipeline. Built the premium-tier upgrade, measured it, and shipped the negative result: it moved zero rows at ~1.97&times; the cost, so the shipped path stays single-model. <span class="proof">&rarr; <a href="https://sanlee.me/projects/the-system.html">sanlee.me/projects/the-system</a></span></li>
         </ul>
       </div>
@@ -318,7 +322,7 @@
       <p><span class="k">Certifications:</span> AWS Cloud Practitioner (2023) &nbsp;&middot;&nbsp; <span class="k">Languages:</span> Native English, Intermediate Korean</p>
     </section>
 
-    <p style="margin-top: 44px; font-size: 0.78rem; color: var(--muted);">
+    <p class="site-note">
       Personal site &mdash; views and projects are my own, not my employer's.
     </p>
   </div>
