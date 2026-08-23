@@ -175,6 +175,10 @@
       .skills p { margin-bottom: 3px; }
       .entry, .edu-item { break-inside: avoid; }
       .site-note { margin-top: 12px; }
+      /* Wide tracking makes pdftotext split headers into single letters
+         ("E X PE R I E N C E"), and ATS parsers segment a resume by these
+         headers. Screen keeps the tracking; the PDF must stay parseable. */
+      h2.sec { letter-spacing: 0.02em; }
       a { color: inherit; text-decoration: none; }
     }
   </style>
