@@ -40,7 +40,8 @@ down carries the full reasoning for each item.
 - [x] **Career-story depth.** *Closed 2026-08-17 as a ceiling, not a memoir
       (`ADR-011`). About holds a three-sentence tell. The résumé keeps the
       facts. No further public biography.*
-- [ ] **Voice pass** (soften the relentlessness). Stylistic, optional.
+- [x] **Voice pass** (soften the relentlessness). *Done 2026-08-18 — see "The
+      voice is relentless" under Positioning for what the pass changed.*
 
 ### Later — strategic or deliberately deferred
 
