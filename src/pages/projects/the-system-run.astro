@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="End-to-End Contract Test for a Multi-Service AI System · San Lee"
-  description="One labeled note traced through an API, classifier, writeback, and knowledge agent to verify real schemas and expose a consumer contract that drops a field."
+  description="I traced one labeled note through an API, a classifier, a writeback, and a knowledge agent. The run checks the real schemas and finds a consumer contract that drops a field."
   canonical="https://sanlee.me/projects/the-system-run.html"
   ogType="article"
 >
@@ -69,6 +69,114 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 6px;
     }
+
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
+
+       COPY. ORIGIN: src/pages/projects/context-architecture.astro, at commit
+       9d81caa (pull request #247). The declarations below are that page's
+       block, verbatim. It is copied and not extracted because a concurrent
+       session owns public/assets/style.css for the tap-target work, and two
+       writers on one shared stylesheet cannot merge. OC-F of the redesign
+       brief carries the consolidation, for after that session merges.
+
+       .fig-what states what the figure argues. .fig-limit states what the
+       figure does not show. The gate fails the build on an empty .fig-limit,
+       because a figure that ends on a win while its caveat sits somewhere else
+       is the split ADR-007 refuses.
+
+       The quiet voice is a token, never opacity (ADR-009). Both slots are
+       block-level, so the limit reads as its own line and not as a tail. */
+    .fig {
+      margin: 0 0 22px;
+    }
+    .fig figcaption {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+    }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* tsr1-hygiene (ADR-013). The prefix carries a digit, because a marker id
+       is global to the document and a duplicate id repaints the wrong arrow
+       head where no gate sees it. The rn- prefix above is the only other
+       prefix on this page.
+
+       Two hues only. --accent marks the guard that nobody built, which is the
+       surprise this page reports. --accent-warm means a reversal on this site,
+       and an absent guard is not a reversal, so it does not appear here.
+
+       Every state is dual-encoded by a word and a shape. The path that runs is
+       a solid box and it reads "nothing breaks". The guard is a dashed box and
+       it reads NOT BUILT. contrast-check.cjs exempts SVG text and no gate
+       reads a plate, so the word half is the half that always survives.
+
+       At max-width 260 the viewBox units are CSS px 1:1 down to 320px. The
+       plate sits inside .example-run, which sets padding 0 and list-style
+       none, so a list item is the full content track: 272px on a 320px phone.
+       The plate renders at 260 and adds no indent of its own. */
+    .tsr1-hygiene {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 14px 0 0;
+    }
+    .tsr1-hygiene .tsr1-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .tsr1-hygiene .tsr1-title,
+    .tsr1-hygiene .tsr1-gap-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .tsr1-hygiene .tsr1-micro {
+      fill: var(--text-secondary);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .tsr1-hygiene .tsr1-kicker {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .tsr1-hygiene .tsr1-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* The guard that is not built: a dashed accent outline with no fill, and
+       the word NOT BUILT beside it. The dash is the shape half and the word is
+       the word half, the same encoding .nl1-doors uses for a path that stops. */
+    .tsr1-hygiene .tsr1-gap {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      stroke-dasharray: 3 2.5;
+    }
+    .tsr1-hygiene .tsr1-gap-mark {
+      fill: var(--accent);
+      font-family: var(--font);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .tsr1-hygiene marker path { fill: var(--muted); }
   </style>
   </Fragment>
 
@@ -77,21 +185,21 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="the-system.html">&larr; Back to The System</a>
     <h1>One Note, End to End</h1>
-    <p class="subtitle">One gold note through the real schemas. Writeback maps two labels and drops region.</p>
+    <p class="subtitle">One gold note through the real schemas. The writeback maps two labels and drops region.</p>
     <p class="ex-caption">
-      The article text and all three predicted labels are real: gold row
-      <code>g002</code> from the classifier's eval set, a prediction that matches
-      both the hand label and the LLM judge on every axis. The note's title,
+      The article text and all three predicted labels are real. They come from
+      gold row <code>g002</code> in the classifier's eval set. That prediction
+      matches the hand label and the LLM judge on every axis. The note's title,
       <code>id</code>, and timestamps are illustrative placeholders.
     </p>
 
     <!-- Run companion to the-system diagram: one note through the four seams.
          region is the load-bearing asymmetry (dashed oxide drop off classifier).
-         Ordered list below still carries the five steps and real payloads.
-         ADR-010 N/A — no interactive nodes. -->
+         The ordered list below still carries the five steps and the real
+         payloads. ADR-010 is not applicable. There are no interactive nodes. -->
     <svg class="run-plate" viewBox="0 0 260 118" role="img"
-         aria-label="One note end to end: notes-api creates the note, the classifier returns three labels, writeback keeps two as tags and drops region unmapped, then kb-agent can search by tag.">
-      <title>One note end to end: notes-api creates the note, the classifier returns three labels, writeback keeps two as tags and drops region unmapped, then kb-agent can search by tag.</title>
+         aria-label="One note end to end. notes-api creates the note. The classifier returns three labels. writeback keeps two as tags and drops region unmapped. kb-agent can then search by tag.">
+      <title>One note end to end. notes-api creates the note. The classifier returns three labels. writeback keeps two as tags and drops region unmapped. kb-agent can then search by tag.</title>
       <defs>
         <marker id="rn-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
@@ -136,12 +244,12 @@ import SiteNav from '../../components/SiteNav.astro';
     </svg>
     <p class="run-plate-caption">
       Create, classify, write two tags, search. The dashed branch is the field
-      the consumer never mapped &mdash; step&nbsp;3 below names it.
+      the consumer never mapped. Step&nbsp;3 below names it.
     </p>
 
     <ol class="example-run">
       <li>
-        <p class="ex-step">A note is created</p>
+        <p class="ex-step">A client creates a note</p>
         <p class="ex-note"><code>POST /notes</code> takes a title and content. It
           returns <code>201</code> immediately and schedules the enrichment as a
           background task, so <code>tags</code> is still empty at this point.</p>
@@ -152,14 +260,14 @@ import SiteNav from '../../components/SiteNav.astro';
 &#125;</code></pre>
       </li>
       <li>
-        <p class="ex-step">The classifier is forced to answer in schema</p>
+        <p class="ex-step">A forced tool call keeps the classifier in schema</p>
         <p class="ex-note">The background task POSTs the text to the classifier's
           <code>/classify</code> endpoint. One <code>claude-sonnet-5</code> call
-          with <code>tool_choice</code> pinned to the <code>classify_article</code>
-          tool forces the model to answer only as an enum-validated tool call,
-          which the endpoint returns as
-          <code>&#123;category, operational_domain, region&#125;</code>. No confidence
-          score, by design.</p>
+          pins <code>tool_choice</code> to the <code>classify_article</code>
+          tool. That forces the model to answer only as an enum-validated tool
+          call. The endpoint returns the call as
+          <code>&#123;category, operational_domain, region&#125;</code>. There is
+          no confidence score, by design.</p>
         <pre><code>// forced tool_use emitted by the model
 &#123;
   "name": "classify_article",
@@ -173,29 +281,87 @@ import SiteNav from '../../components/SiteNav.astro';
       <li>
         <p class="ex-step">Labels become namespaced tags</p>
         <p class="ex-note">notes-api owns the writeback. It maps the fields it
-          knows to prefixed tags (note the <code>operational_domain</code>
-          &rarr; <code>domain:</code> rename) and applies them with replace
-          semantics, so reprocessing converges instead of piling up duplicates.
-          The user's own tags are preserved. The background task writes through
-          the ORM in-process rather than calling the service's own HTTP
-          endpoint; the equivalent <code>PUT /notes/&#123;id&#125;/tags</code> exists for
-          external callers and carries the same replace semantics.</p>
+          knows to prefixed tags. Note the <code>operational_domain</code>
+          &rarr; <code>domain:</code> rename. It applies the tags with replace
+          semantics, so a second run converges and writes no duplicate. It keeps
+          the user's own tags.</p>
+        <p class="ex-note">The background task writes through the ORM
+          in-process, and it does not call the service's own HTTP endpoint. The
+          equivalent <code>PUT /notes/&#123;id&#125;/tags</code> exists for
+          external callers, and it carries the same replace semantics.</p>
         <p class="ex-note"><strong>Note what happens to <code>region</code>
-          here: nothing.</strong> The classifier grew a third field in v3;
-          this consumer still reads two and drops the rest on the floor. It
-          doesn't break, because the writeback pulls fields out by name instead
-          of assuming the response shape. Wiring <code>region:</code> through is
-          pending work, and until it lands this page shows two tags because two
-          tags is what actually gets written.</p>
-        <p class="ex-note">Tolerating an unknown field is consumer hygiene, not
-          a guard. The frozen contract for this seam requires a provider change
-          to land with a coordinated consumer update. When the classifier
-          shipped <code>region</code>, that update did not happen and no build
-          went red &mdash; each repo's &ldquo;contract test&rdquo; asserts
+          here: nothing.</strong> The classifier grew a third field in v3. This
+          consumer still reads two, and it drops the rest. It does not break,
+          because the writeback pulls the fields out by name and does not assume
+          the response shape. The <code>region:</code> wiring is pending work,
+          and until I merge it this page shows two tags, because two tags is
+          what the writeback actually writes.</p>
+        <p class="ex-note">The frozen contract for this seam requires a provider
+          change and a coordinated consumer update together. The classifier
+          shipped <code>region</code>, and that update did not happen. No build
+          went red, because each repo's &ldquo;contract test&rdquo; asserts
           against its own copy of the shape rather than a shared one. Nothing
           broke here, and nothing would have noticed if it had. The
           <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-004-classify-http-contract.md">SYS-004 amendment</a>
           records it.</p>
+
+        <!-- tsr1-hygiene (ADR-013). The page's own point, and nothing showed it
+             until now: this consumer tolerates an unknown field, and tolerance
+             is not a guard. .run-plate above already shows the drop, so this
+             plate does not repeat it. The seam that let the drift through is
+             shown on the-system.html, and .fig-limit links there rather than
+             showing it a second time in a second grammar. Zero digits here.
+             Every count stays in the notes above. -->
+        <figure class="fig" data-fig="plate">
+          <svg class="tsr1-hygiene" viewBox="0 0 260 96" role="img"
+               aria-label="Two paths. The consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. A check that fails the build is not built here.">
+            <title>Two paths. The consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. A check that fails the build is not built here.</title>
+            <defs>
+              <marker id="tsr1-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                      markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+                <path d="M 0 0 L 10 5 L 0 10 z" />
+              </marker>
+            </defs>
+
+            <!-- The path that runs. Solid boxes, muted edges. rx matches
+                 --radius-sm (2px), the same as .run-plate above. -->
+            <text class="tsr1-kicker" x="2" y="9">Hygiene</text>
+
+            <rect class="tsr1-box" x="2" y="14" width="66" height="30" rx="2" />
+            <text class="tsr1-title" x="35" y="28" text-anchor="middle">a new field</text>
+            <text class="tsr1-micro" x="35" y="39" text-anchor="middle">provider</text>
+
+            <rect class="tsr1-box" x="85" y="14" width="72" height="30" rx="2" />
+            <text class="tsr1-title" x="121" y="28" text-anchor="middle">read by name</text>
+            <text class="tsr1-micro" x="121" y="39" text-anchor="middle">consumer</text>
+
+            <rect class="tsr1-box" x="174" y="14" width="84" height="30" rx="2" />
+            <text class="tsr1-title" x="216" y="28" text-anchor="middle">nothing breaks</text>
+            <text class="tsr1-micro" x="216" y="39" text-anchor="middle">result</text>
+
+            <path class="tsr1-edge" d="M 70 29 L 84 29" marker-end="url(#tsr1-arrow)" aria-hidden="true" />
+            <path class="tsr1-edge" d="M 159 29 L 173 29" marker-end="url(#tsr1-arrow)" aria-hidden="true" />
+
+            <!-- The guard that nobody built. The dash and the words NOT BUILT
+                 carry the state together, so colour never carries it alone. -->
+            <text class="tsr1-kicker" x="2" y="59">A guard</text>
+
+            <rect class="tsr1-gap" x="2" y="64" width="256" height="30" rx="2" />
+            <text class="tsr1-gap-title" x="12" y="83">a check that fails the build</text>
+            <text class="tsr1-gap-mark" x="248" y="83" text-anchor="end">Not built</text>
+          </svg>
+          <figcaption>
+            <span class="fig-what">Tolerance of an unknown field is consumer
+              hygiene, not a guard. The writeback reads the fields it knows by
+              name, so a new field costs it nothing. No shared check fails the
+              build when the two shapes drift apart.</span>
+            <span class="fig-limit">It does not show why no build went red. Each
+              repository asserts against its own copy of the shape, and
+              <a href="the-system.html">The System</a> shows that seam. The
+              notes above keep the reasoning and the record link.</span>
+          </figcaption>
+        </figure>
+
         <pre><code>classifier_tags(&#123;
     "category": "operations",
     "operational_domain": "air",
@@ -208,10 +374,10 @@ import SiteNav from '../../components/SiteNav.astro';
       </li>
       <li>
         <p class="ex-step">The note is now enriched</p>
-        <p class="ex-note">Reading it back shows the labels in its flat
-          <code>tags</code> list. There is no <code>status</code> field anywhere:
-          "enriched" is simply the presence of <code>category:</code> /
-          <code>domain:</code> tags, which keeps the schema small and the state
+        <p class="ex-note">A <code>GET</code> returns the labels in its flat
+          <code>tags</code> list. There is no <code>status</code> field anywhere.
+          The word "enriched" simply means the presence of <code>category:</code>
+          / <code>domain:</code> tags. That keeps the schema small and the state
           honest.</p>
         <pre><code>GET /notes/1
 &#123;
