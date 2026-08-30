@@ -2,10 +2,26 @@
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 import Term from '../../components/Term.astro';
+import figures from '../../data/figures.json';
+
+/* The plot geometry. scripts/build-plots.cjs computed every number below from
+   a named artifact at a pinned commit, and this page interpolates them. It
+   never types a coordinate, so the figure cannot drift from the measurement.
+   `dncPower.artifact` and `dncPower.sha` also fill the caption, so the
+   provenance line cannot disagree with the geometry above it. */
+const dncPower = figures.plots['dnc1-power'];
+if (!dncPower) {
+  throw new Error(
+    'defense-news-classifier: src/data/figures.json holds no "dnc1-power" plot. '
+    + 'Run: node scripts/build-plots.cjs --repo=<path to defense-news-classifier>'
+  );
+}
+const pw = dncPower.geometry;
+const pwCommit = dncPower.sha.slice(0, 7);
 ---
 <Base
   title="Evaluating an LLM Defense News Classifier · San Lee"
-  description="An LLM classifier evaluated on hand-labeled defense news, with evidence gates that rejected retrieval, premium routing, and multi-agent complexity."
+  description="I measured an LLM classifier against hand-labeled defense news. Evidence gates declined retrieval, premium routing, and multi-agent complexity."
   canonical="https://sanlee.me/projects/defense-news-classifier.html"
   ogType="article"
   ogImage="/assets/og-defense-news-classifier.png"
@@ -159,6 +175,205 @@ import Term from '../../components/Term.astro';
       font-size: 0.92rem;
       margin: 0 0 18px;
     }
+
+    /* ==================================================================
+       THE TWO-SLOT CAPTION GRAMMAR (ADR-013). ORIGIN PAGE: this file.
+       A later lane COPIES this block verbatim into its own page-scoped
+       <style is:inline>, with a comment naming this page and the commit
+       it copied from. It is copied and never extracted, because a
+       concurrent session owns public/assets/style.css and two lanes
+       cannot both write one stylesheet. OC-F carries the consolidation
+       for after that session merges.
+
+       The margin reset is load-bearing. A <figure> carries a 40px
+       browser side margin, and a 260px plate inside one then renders
+       below 1:1 at every gate width.
+       ================================================================== */
+    .fig {
+      margin: 18px 0 20px;
+      padding: 0;
+    }
+    .fig figcaption {
+      font-size: 0.92rem;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .fig .fig-limit {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+    }
+    /* An artifact path is one long token and the content track at 320px is
+       narrower than it. Without this the caption widens the page and the
+       mobile gate reddens. */
+    .fig figcaption code { overflow-wrap: anywhere; }
+
+    /* dnc1-power. A PLOT: every x below is interpolated from
+       src/data/figures.json, which scripts/build-plots.cjs computed from a
+       named artifact at a pinned commit. No coordinate here is typed, which
+       is what the <svg>'s data-fig-generated="true" declares.
+
+       The SVG holds no digit. Both p-values sit in .fig-what beside the
+       artifact that produced them, so the reader gets the number and its
+       source in one place rather than a bare figure on a plate.
+
+       The first run lands about one pixel left of the bar. That is the honest
+       geometry -- it missed by 0.0022 -- so the VERDICT WORD carries the
+       outcome and the position only supports it. */
+    .dnc1-plot {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 0;
+    }
+    .dnc1-plot .dnc1-bar { stroke: var(--text); stroke-width: 1.5; }
+    .dnc1-plot .dnc1-track { stroke: var(--border); stroke-width: 1; }
+    .dnc1-plot .dnc1-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .dnc1-plot .dnc1-note {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    /* Oxide is the site's mark for a decision that was taken back, the same
+       encoding as .ep-drop above and .rung[data-state="retired"] on the
+       ladder page. The soft fill is translucent, so the bar stays visible
+       through the dot that straddles it. */
+    .dnc1-plot .dnc1-dot-back {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .dnc1-plot .dnc1-verdict-back {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .dnc1-plot .dnc1-dot-kept {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .dnc1-plot .dnc1-verdict-kept {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* dnc2-inversion. Hand-drawn, so it carries no digit (ADR-013): the
+       counts sit in .fig-what and in the prose below. What it draws is the
+       DIRECTION of a miss, which is the one thing the prose can only state.
+       Monochrome on purpose. Oxide on this site means a decision that was
+       taken back, and a mislabeled row is not one. The two directions are
+       dual-encoded by their own words and by the mirrored word order. */
+    .dnc2-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 0;
+    }
+    .dnc2-plate .dnc2-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .dnc2-plate .dnc2-row {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1;
+    }
+    .dnc2-plate .dnc2-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .dnc2-plate .dnc2-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .dnc2-plate .dnc2-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .dnc2-plate .dnc2-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .dnc2-plate marker path { fill: var(--muted); }
+
+    /* dnc-s1, the rung strip. HTML and CSS, not an SVG, so the four labels
+       are the same text nodes p.flow-line carried and the contrast gate
+       still reads them. The state vocabulary is the ladder page's own
+       data-state, and "declined" is the word its .rung-plate already renders
+       for L4. The state WORD carries the verdict; the rail colour only
+       supports it, so no state is colour-only. .rung and .rung-state are
+       global classes in style.css and these names do not collide with
+       them. */
+    .dncs1-rows {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .dncs1-row {
+      display: grid;
+      grid-template-columns: 2.2rem 1fr auto;
+      gap: 0 10px;
+      align-items: baseline;
+      min-width: 0;
+      padding: 8px 0 8px 10px;
+      border-left: 3px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .dncs1-row:last-child { border-bottom: 0; }
+    .dncs1-row > span { min-width: 0; }
+    .dncs1-id {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .dncs1-name { font-size: 0.95rem; }
+    .dncs1-state {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid;
+      border-radius: var(--radius-sm);
+      padding: 1px 6px;
+      white-space: nowrap;
+    }
+    .dncs1-row[data-state="shipped"] { border-left-color: var(--accent); }
+    .dncs1-row[data-state="shipped"] .dncs1-id,
+    .dncs1-row[data-state="shipped"] .dncs1-state { color: var(--accent); }
+    .dncs1-row[data-state="shipped"] .dncs1-state { border-color: var(--accent); }
+    .dncs1-row[data-state="retired"],
+    .dncs1-row[data-state="declined"] { border-left-color: var(--accent-warm); }
+    .dncs1-row[data-state="retired"] .dncs1-id,
+    .dncs1-row[data-state="retired"] .dncs1-state,
+    .dncs1-row[data-state="declined"] .dncs1-id,
+    .dncs1-row[data-state="declined"] .dncs1-state { color: var(--accent-warm); }
+    .dncs1-row[data-state="retired"] .dncs1-state,
+    .dncs1-row[data-state="declined"] .dncs1-state { border-color: var(--accent-warm); }
   </style>
   </Fragment>
 
@@ -173,26 +388,29 @@ import Term from '../../components/Term.astro';
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
       <ul>
-        <li><strong>Problem:</strong> Classify public defense news across category, operational domain, and region without treating a convincing demo as proof of quality.</li>
-        <li><strong>Ownership:</strong> I built the <Term id="classification">classifier</Term> and evaluation harness, labeled the <Term id="gold-set">gold set</Term>, defined the merge gate, and made the ship-or-cut decisions.</li>
-        <li><strong>Constraints:</strong> The initial 300-row synthetic set graded model-written examples; the replacement human-labeled set had only 54 rows, so small apparent gains could be noise.</li>
-        <li><strong>Actions:</strong> I replaced synthetic evaluation with real text, tested a classical <Term id="baseline">baseline</Term>, scaled a corroborating run to 300 examples, and measured retrieval, premium routing, and multi-agent review against held-out evidence.</li>
-        <li><strong>Result and evidence:</strong> The shipped single-call classifier scores 94.4% category, 98.1% domain, and 94.4% region accuracy on the current gold. The gate rejected three more complex approaches, preserving the simpler path.</li>
+        <li><strong>Problem:</strong> Classify public defense news across category, operational domain, and region. A convincing demo is not proof of quality.</li>
+        <li><strong>Ownership:</strong> I built the <Term id="classification">classifier</Term> and the eval harness. I labeled the <Term id="gold-set">gold set</Term>, defined the merge gate, and made the ship-or-cut decisions.</li>
+        <li><strong>Constraints:</strong> The initial 300-row synthetic set graded model-written examples. The replacement human-labeled set had only 54 rows. Small apparent gains could therefore be noise.</li>
+        <li><strong>Actions:</strong> I replaced the synthetic eval with real text and I tested a classical <Term id="baseline">baseline</Term>. I scaled a corroborating run to 300 examples. I measured retrieval, premium routing, and multi-agent review against held-out evidence.</li>
+        <li><strong>Result and evidence:</strong> The shipped single-call classifier scores 94.4% category, 98.1% domain, and 94.4% region accuracy on the current gold. The gate declined three more complex approaches, and the simpler path stayed.</li>
       </ul>
     </div>
 
     <p class="lead">
-      This labels public defense-news text on three axes: category (procurement,
-      operations, policy, technology, industry), operational domain (air, land,
-      sea, cyber, space, multi), and region (indo-pacific, europe, middle-east,
-      africa, americas, global). One model call does the labeling. This page is
-      the <Term id="eval">eval</Term>: what the gold set did to the numbers, and which upgrades failed it.
+      The classifier labels public defense-news text on three axes. The axes are
+      category (procurement, operations, policy, technology, industry),
+      operational domain (air, land, sea, cyber, space, multi), and region
+      (indo-pacific, europe, middle-east, africa, americas, global). One model
+      call applies
+      all three labels. This page is the <Term id="eval">eval</Term>. It reports
+      what the gold set did to the numbers, and which upgrades failed it.
     </p>
 
     <!-- Argument: the number fell when the gold got real, and that drop is
-         the trustworthy reading. State is word + geometry first (FLATTERING
-         vs TRUSTWORTHY, ink vs oxide), numbers second — not a colour-only
-         chart, and not a second metrics table. ADR-010 N/A. -->
+         the trustworthy reading. The state is a word plus a geometry first
+         (FLATTERING against TRUSTWORTHY, ink against oxide). The numbers come
+         second. This is not a colour-only chart, and it is not a second
+         metrics table. ADR-010 does not apply. -->
     <svg class="eval-plate" viewBox="0 0 260 132" role="img"
          aria-label="The eval rebuild: v1 graded the model on 300 self-generated snippets and reported 97.3 percent domain accuracy. v2 replaced that with 54 hand-labeled real snippets and domain fell to 88.9 percent. The lower number is the trustworthy one.">
       <title>The eval rebuild: v1 self-graded 97.3 percent domain; v2 hand-labeled 88.9 percent. The drop is the trustworthy reading.</title>
@@ -229,7 +447,7 @@ import Term from '../../components/Term.astro';
       <p class="toc-heading" id="toc-heading">On this page</p>
       <ol>
       <li><a href="#why-the-numbers-can-be-trusted">Gold and versions</a></li>
-      <li><a href="#what-the-eval-caught">What the eval caught</a></li>
+      <li><a href="#what-the-eval-caught">What the eval found</a></li>
       <li><a href="#why-an-llm-at-all">Why an LLM at all</a></li>
       <li><a href="#two-ways-of-not-fooling-myself">Scale and routing</a></li>
       <li><a href="#the-third-axis">The third axis</a></li>
@@ -244,8 +462,9 @@ import Term from '../../components/Term.astro';
     <p>
       v1 graded the model on 300 snippets it generated itself.
       <code>industry</code> recall was 0.217. v2 replaced that set with 54
-      hand-labeled real snippets (DoD news wire plus SEC filings), cross-checked
-      by an Opus <Term id="judge-model">judge</Term>. On that gold, <code>industry</code> <Term id="f1">F1</Term> went to 1.000.
+      hand-labeled real snippets from the DoD news wire and SEC filings. An Opus
+      <Term id="judge-model">judge</Term> cross-checked them. On that gold,
+      <code>industry</code> <Term id="f1">F1</Term> went to 1.000.
     </p>
 
     <table class="metrics">
@@ -263,34 +482,35 @@ import Term from '../../components/Term.astro';
     </table>
     <p>
       Every column after the first is the same 54 hand-labeled snippets. In July
-      2026 the workhorse moved from Sonnet 4.6 to Sonnet 5 on that set: domain
-      rose to 94.4%; category did not move.
+      2026 the workhorse moved from Sonnet 4.6 to Sonnet 5 on that set. Domain
+      rose to 94.4%. Category did not move.
     </p>
 
     <div class="decision">
       <p class="tag">The ceiling that wasn&rsquo;t</p>
-      <p>A per-cell confusion breakdown showed the remaining misses were not
-        scattered. They clustered on one boundary: <code>technology</code> read
-        as <code>operations</code> whenever a new system was tested or demoed in
-        an operational setting, plus a habit of over-assigning <code>land</code>.
-        Two targeted rubric clauses moved category from 90.7% to
-        <strong>94.4%</strong> and domain from 90.7% to 92.6%, with
-        <code>technology</code> recall reaching 1.000 and nothing regressing.</p>
+      <p>A per-cell confusion breakdown showed that the remaining misses were
+        not scattered. They clustered on one boundary. The model read
+        <code>technology</code> as <code>operations</code> whenever a new system
+        was tested or demoed in an operational setting. It also over-assigned
+        <code>land</code>. Two targeted rubric clauses moved category from 90.7%
+        to <strong>94.4%</strong> and domain from 90.7% to 92.6%.
+        <code>technology</code> recall reached 1.000, and nothing regressed.</p>
       <p class="tradeoff"><strong>The lesson:</strong> the misses were a prompt
         problem. A stronger model did not move that boundary.</p>
     </div>
 
 
-    <h2 id="what-the-eval-caught">What the eval caught</h2>
+    <h2 id="what-the-eval-caught">What the eval found</h2>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>The prompt that read better and performed worse</p>
-      <p>I sharpened the system prompt to draw a cleaner line between
-        <code>procurement</code> (a purchase, the buyer's view) and
-        <code>industry</code> (a company's own business news). Category accuracy
-        fell from 79.0% to 76.7%, and <code>industry</code> recall dropped from
-        0.217 to 0.100. The sharper rule gave the model a cleaner excuse to dump
-        borderline company stories into <code>procurement</code>. I reverted it.</p>
+      <p>I sharpened the system prompt to separate <code>procurement</code> from
+        <code>industry</code>. <code>procurement</code> is a purchase from the
+        buyer's view, and <code>industry</code> is a company's own business news.
+        Category accuracy fell from 79.0% to 76.7%, and <code>industry</code>
+        recall dropped from 0.217 to 0.100. The sharper rule gave the model a
+        cleaner excuse to move borderline company stories into
+        <code>procurement</code>. I reverted it.</p>
       <p class="tradeoff"><strong>The lesson:</strong> the prompt read cleaner.
         The numbers did not. Reverted.</p>
     </div>
@@ -298,21 +518,21 @@ import Term from '../../components/Term.astro';
     <div class="decision" id="decision-grounding" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>The grounding that did not pay</p>
       <p>I added <Term id="bm25">BM25</Term> lexical retrieval to ground each classification in similar
-        documents, expecting a clear win. Measured lift: +1.9% category accuracy
-        (a net of one correct call in 54) and +0.0% on domain, where grounding
-        fixed three calls and broke three. Lexical retrieval does not earn the
-        cost of moving to embeddings here.</p>
-      <p>The comparison itself had a bug: I was scoring the
-        <em>new-prompt</em> grounded arm against an <em>old-prompt</em> frozen
-        baseline, which inflated the lift. Rebuilding the baseline so both arms
-        ran the same prompt killed the advantage. A three-pass confirm settled
-        it: across 162 grounded classifications, grounding fixed a domain call
+        documents. I expected a clear win. The measured lift was +1.9% category
+        accuracy, a net of one correct call in 54. On domain the lift was +0.0%:
+        grounding fixed three calls and broke three. Lexical retrieval does not
+        earn the cost of a move to embeddings here.</p>
+      <p>The comparison itself had a bug. I scored the <em>new-prompt</em>
+        grounded arm against an <em>old-prompt</em> frozen baseline, and that
+        inflated the lift. I rebuilt the baseline so both arms ran the same
+        prompt, and the advantage disappeared. A three-pass confirm settled it.
+        Across 162 grounded classifications, grounding fixed a domain call
         <strong>zero</strong> times and broke four.</p>
       <p>So I retired it
-        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>):
-        out of the shipped path, out of the CI gate. The retrieval code, the
-        corpus, and the measurement scripts stay in the repo, dormant and
-        reproducible. The verdict: BM25 does not justify itself.</p>
+        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>).
+        It came out of the shipped path and out of the CI gate. The retrieval
+        code, the corpus, and the measurement scripts stay in the repo, dormant
+        and reproducible. The verdict is that BM25 does not justify itself.</p>
       <p class="tradeoff"><strong>The lesson:</strong> the first measurement said
         skip embeddings. A fair baseline said cut BM25. The comparison only
         holds if exactly one thing changes.</p>
@@ -322,23 +542,26 @@ import Term from '../../components/Term.astro';
     <h2 id="why-an-llm-at-all">Why an LLM at all</h2>
     <p>
       Does this task need an LLM? I built the boring baseline: TF-IDF into
-      logistic regression, standard and untuned, scored against the same 54
+      logistic regression, standard and untuned. I scored it against the same 54
       hand-labeled rows as everything else on this page.
     </p>
     <p>
       <strong>The LLM won by 20 points on category and 26 on domain</strong>
       (paired exact McNemar, p=0.013 and p=0.0005). The baseline collapses toward
-      whichever class is lexically loud, so the spend is for the boundaries that
-      need reading comprehension. Two handicaps cut against the baseline: its
-      training labels came from a judge that disagrees with humans 5&ndash;6% of
-      the time, and <code>industry</code> had exactly one training row. A margin
-      this size survives them.
+      whichever class is lexically loud. The spend is therefore for the
+      boundaries that need reading comprehension.
+    </p>
+    <p>
+      Two handicaps cut against the baseline. Its training labels came from a
+      judge that disagrees with humans 5&ndash;6% of the time.
+      <code>industry</code> also had exactly one training row. A margin this size
+      survives them.
       <a class="card-link" href="classifier-baseline.html">The full bake-off, handicaps included <span class="arrow">&rarr;</span></a>
     </p>
     <p>
       The baseline runs with no key and no server. It is vendored into this site
-      and classifies live in your tab. Pick a row it gets wrong and watch which
-      class lights up instead.
+      and classifies live in your tab. Pick a row it gets wrong, and watch which
+      class it picks instead.
       <a class="card-link" href="classifier-baseline.html#try-it">Run the losing baseline <span class="arrow">&rarr;</span></a>
     </p>
 
@@ -349,24 +572,24 @@ import Term from '../../components/Term.astro';
     </p>
 
     <div class="decision">
-      <p class="tag">Scaling the eval</p>
+      <p class="tag">The scaled eval</p>
       <p>A couple of lucky rows can look like progress on n=54. So I scaled to
-        <strong>300</strong> real snippets graded by the Opus judge, which
-        roughly halves each interval &mdash; category to
-        <strong>93.3%</strong>, domain to <strong>90.3%</strong>. Those
-        corroborate the hand-graded numbers.</p>
+        <strong>300</strong> real snippets, and the Opus judge graded them. That
+        roughly halves each interval: category to <strong>93.3%</strong>, domain
+        to <strong>90.3%</strong>. Those corroborate the hand-graded
+        numbers.</p>
 
-      <!-- The scaled-eval Wilson CIs, drawn (portfolio ADR-004 candidate 2).
-           A plot shows a confidence interval as what it is -- a width -- better
-           than "[89.9, 95.6]" in prose does. The bracket numbers move to the
-           caption so no precision is lost. The n=54 baseline here is the two-
-           axis gold the scaled run was measured against (category 94.4%), which
-           at the time read higher than the v3 headline of 92.6%; the caption
-           names it so the difference reads as two measurements, not a
-           contradiction. (v3.2.1 later moved that headline to 94.4% as well --
-           this plot is a frozen v2.1.0-era measurement and is deliberately not
-           re-baselined against it.) SVG geometry generated from
-           evals/scale_eval.txt, not hand-placed. -->
+      <!-- The scaled-eval Wilson CIs, as a figure (portfolio ADR-004 candidate
+           2). A plot shows a confidence interval as what it is, a width. Prose
+           that writes "[89.9, 95.6]" does not. The bracket numbers move to the
+           caption, so no precision is lost. The n=54 baseline here is the
+           two-axis gold the scaled run was measured against (category 94.4%).
+           At the time it read higher than the v3 headline of 92.6%. The caption
+           names it, so the difference reads as two measurements and not as a
+           contradiction. (v3.2.1 later moved that headline to 94.4% as well.
+           This plot is a frozen v2.1.0-era measurement, and no lane
+           re-baselines it against that headline.) The SVG geometry is generated
+           from evals/scale_eval.txt. Nobody hand-placed it. -->
       <svg class="ci-plot" viewBox="0 0 232 196" role="img"
            aria-label="Confidence-interval comparison. For category accuracy, the n=54 human-graded interval spans 84.9 to 98.1 percent; the n=300 judge-graded interval spans 89.9 to 95.6, about half as wide. For domain accuracy, n=54 spans 82.5 to 97.1 and n=300 spans 86.5 to 93.2. Scaling the eval roughly halves each interval.">
         <line class="ci-grid" x1="16.0" y1="24" x2="16.0" y2="150" />
@@ -404,15 +627,15 @@ import Term from '../../components/Term.astro';
       </svg>
       <p class="ci-caption">95% Wilson intervals on an 80&ndash;100% axis. Wide
         bar: the <strong>n=54</strong> human-graded gold the scaled run was
-        checked against &mdash; category [84.9, 98.1], domain [82.5, 97.1].
-        Narrow bar: the <strong>n=300</strong> judge-graded run &mdash; category
-        [89.9, 95.6], domain [86.5, 93.2]. The point estimates barely move; the
-        interval is what halves.</p>
+        checked against. Category [84.9, 98.1], domain [82.5, 97.1]. Narrow bar:
+        the <strong>n=300</strong> judge-graded run. Category [89.9, 95.6],
+        domain [86.5, 93.2]. The point estimates barely move, and the interval
+        is what halves.</p>
       <p class="tradeoff"><strong>The caveat:</strong> the judge is the answer
-        key here, so this measures agreement with a model and inherits its
-        roughly 5&ndash;6% disagreement with humans. The source wire is also
-        operations-heavy, which makes the category macro-F1 uninformative. The
-        report says so.</p>
+        key here. This measures agreement with a model, and it inherits the
+        judge's roughly 5&ndash;6% disagreement with humans. The source wire is
+        also operations-heavy, which makes the category macro-F1 uninformative.
+        The report states this.</p>
     </div>
 
     <div class="decision" data-outcome="reversal">
@@ -421,19 +644,19 @@ import Term from '../../components/Term.astro';
         the more expensive model. I built the trigger, measured it, and shipped
         the negative result. Routing moved <strong>+0 rows</strong> on both axes
         at about <strong>1.97&times;</strong> the cost per article. Of nine
-        escalations on the gold set it fixed zero and broke one, and even
-        sending <em>everything</em> to the premium model scored the same 94.4%
-        category, so there was no headroom for any router to capture.</p>
+        escalations on the gold set it fixed zero and broke one. I sent
+        <em>everything</em> to the premium model, and it scored the same 94.4%
+        category. So no router had any headroom.</p>
       <p class="tradeoff"><strong>Why it shipped as a no:</strong> the earlier
-        prompt fix had already taken the ground routing was aimed at. One more
-        finding stayed in the record: adding a field to the schema flipped one
-        benign snippet into a model refusal, so the measurement apparatus itself
-        changed the behavior being measured. Full verdict in
+        prompt fix already took the ground routing was aimed at. One more finding
+        stayed in the record: a new field in the schema flipped one benign
+        snippet into a model refusal. The measurement apparatus changed the
+        behavior it measured. The full verdict is in
         <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/013-decline-tiered-routing.md">ADR-013</a>.
-        A separate project, measuring
-        <a href="faithfulness-judge.html">how reliable an LLM judge is</a>,
-        later landed on the same verdict. Three independent measurements now
-        say escalation barely pays.</p>
+        A separate project measured
+        <a href="faithfulness-judge.html">how reliable an LLM judge is</a>, and
+        it landed on the same verdict. Three independent measurements now state
+        that escalation barely pays.</p>
     </div>
 
 
@@ -466,46 +689,129 @@ import Term from '../../components/Term.astro';
     </p>
 
     <p>
-      v3 added <code>region</code>, which breaks the output contract on purpose:
-      callers that expected two fields now get three. Six labels, with
-      <code>global</code> as the single catch-all for stories with no
-      geographic anchor and stories spanning several. Splitting &ldquo;no
+      v3 added <code>region</code>, and it breaks the output contract on purpose.
+      Callers that expected two fields now get three. There are six labels, and
+      <code>global</code> is the single catch-all. It takes stories with no
+      geographic anchor, and stories that span several. A split of &ldquo;no
       geography&rdquo; from &ldquo;worldwide&rdquo; would have put the fuzziest
-      boundary on the most common kind of story in the corpus. The label set,
-      the boundary rules, and the scope limits were written down before the
-      build in
+      boundary on the most common kind of story in the corpus. I wrote down the
+      label set, the boundary rules, and the scope limits before the build in
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/014-region-field-design.md">ADR-014</a>.
     </p>
     <p>
       Region landed at 87.0% against fresh hand labels when the axis shipped.
       <strong>All seven</strong> first-pass misses were stories whose true label
-      is <code>global</code> that the model pulled to a specific region, usually
-      <code>americas</code>. The rule says label the theater the activity
-      happens in, and only when the text says so. The model kept seeing a US
-      actor and inferring a US theater.
+      is <code>global</code>. The model pulled each one to a specific region,
+      usually <code>americas</code>. The rule is to label the theater the
+      activity happens in, and only when the text names it. The model repeatedly
+      saw a US actor and inferred a US theater.
     </p>
     <p>
       Region now reads
       <strong><span data-metric="region_accuracy">94.4%</span></strong>. The fix
-      is one bullet of prompt telling the model that naming a US command or
-      contractor identifies the actor, not a place. It shipped in two rounds:
-      measured once and <em>reverted</em> at p=0.0522 against a pre-registered
-      p&lt;0.05, then re-run against a ruler twice the size, where the identical
-      clause landed at <strong>p=0.0002</strong> and shipped. The bar never
-      moved. The first experiment did not have the power to decide.
+      is one bullet of prompt. It tells the model that a named US command or
+      contractor identifies the actor, not a place. The identical clause shipped
+      in two rounds, and the second round used a ruler twice the size. The first
+      experiment did not have the power to decide.
     </p>
+
+    <!-- dnc1-power. A PLOT, and the first entry in the plot registry. Every x
+         is interpolated from src/data/figures.json, which
+         scripts/build-plots.cjs read out of a pinned commit; the page types no
+         coordinate. The claim is one the prose can only state: one bar, two
+         runs, and the bar never moved. On a log axis the first run lands about
+         a pixel short of it, which is the honest picture of a miss by 0.0022,
+         so the VERDICT WORD carries the outcome. Both p-values sit in
+         .fig-what beside the artifact that produced them. Zero digits in the
+         SVG. ADR-010 does not apply: nothing here is a control. -->
+    <figure class="dnc1-power fig" data-fig="plot">
+      <svg class="dnc1-plot" viewBox="0 0 260 132" role="img"
+           data-fig-generated="true"
+           aria-label="A p-value axis, with less evidence on the left and more on the right. One pre-registered bar stands at p equals 0.05. The first run sits just short of that bar at p equals 0.0522, and I reverted it. The re-run sits far past the same bar at p equals 0.0002, and it shipped.">
+        <title>One pre-registered bar. The first run missed it and reverted. The re-run cleared it and shipped.</title>
+
+        <line class="dnc1-track" x1={pw.axisX0} y1="50" x2={pw.axisX1} y2="50" />
+        <line class="dnc1-track" x1={pw.axisX0} y1="92" x2={pw.axisX1} y2="92" />
+        <line class="dnc1-bar" x1={pw.barX} y1="20" x2={pw.barX} y2="104" />
+        <text class="dnc1-lane" x={pw.barX} y="14" text-anchor="middle">PRE-REGISTERED BAR</text>
+
+        <text class="dnc1-lane" x="4" y="34">FIRST RUN</text>
+        <text class="dnc1-verdict-back" x="256" y="34" text-anchor="end">REVERTED</text>
+        <circle class="dnc1-dot-back" cx={pw.firstX} cy="50" r="4.5" />
+
+        <text class="dnc1-lane" x="4" y="76">RE-RUN</text>
+        <text class="dnc1-verdict-kept" x="256" y="76" text-anchor="end">SHIPPED</text>
+        <circle class="dnc1-dot-kept" cx={pw.rerunX} cy="92" r="4.5" />
+
+        <line class="dnc1-track" x1={pw.axisX0} y1="118" x2={pw.axisX1} y2="118" />
+        <text class="dnc1-note" x={pw.axisX0} y="128">less evidence</text>
+        <text class="dnc1-note" x={pw.axisX1} y="128" text-anchor="end">more evidence</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">The same clause, measured twice against one
+          pre-registered bar at p&lt;0.05. The bar never moved. Round one
+          reverted at p=0.0522. Round two landed at <strong>p=0.0002</strong>
+          and shipped.
+          Geometry from <code>{dncPower.artifact}</code> at v3.2.1
+          ({pwCommit}).</span>
+        <span class="fig-limit">The axis carries the p-value only. It does not
+          show the effect size, the two axes the clause was not aimed at, or the
+          human-graded arm.</span>
+      </figcaption>
+    </figure>
+
+    <!-- dnc2-inversion. Hand-drawn, so no digit: the counts sit in .fig-what
+         and in the prose. It draws the DIRECTION of a miss, which is the one
+         thing the prose can only state. The mirrored word order is the
+         inversion. Monochrome, because oxide on this site marks a decision
+         that was taken back and a mislabeled row is not one. -->
+    <figure class="dnc2-inversion fig" data-fig="plate">
+      <svg class="dnc2-plate" viewBox="0 0 260 118" role="img"
+           aria-label="Before the fix, every region miss ran one way: the gold label was global and the model called a named region. Now the misses run in two directions. One is still gold global called americas. Two are the converse, gold americas called global.">
+        <title>The miss direction inverted. One old-cluster miss is left, and two run the other way.</title>
+        <defs>
+          <marker id="dnc2-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+
+        <text class="dnc2-lane" x="4" y="10">FIRST PASS</text>
+        <rect class="dnc2-box" x="4" y="16" width="252" height="26" rx="2" />
+        <text class="dnc2-title" x="12" y="33">gold global &rarr; a region</text>
+        <text class="dnc2-micro" x="248" y="33" text-anchor="end">one direction</text>
+
+        <path class="dnc2-edge" d="M 130 44 L 130 58" marker-end="url(#dnc2-arrow)" aria-hidden="true" />
+
+        <text class="dnc2-lane" x="4" y="64">NOW</text>
+        <rect class="dnc2-row" x="4" y="70" width="252" height="22" rx="2" />
+        <text class="dnc2-title" x="12" y="85">gold global &rarr; americas</text>
+        <text class="dnc2-micro" x="248" y="85" text-anchor="end">the old cluster</text>
+
+        <rect class="dnc2-row" x="4" y="94" width="252" height="22" rx="2" />
+        <text class="dnc2-title" x="12" y="109">gold americas &rarr; global</text>
+        <text class="dnc2-micro" x="248" y="109" text-anchor="end">the converse</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">Seven region misses became three, and the mode
+          inverted. One is still the old cluster. Two are the converse, where
+          the clause over-called <code>americas</code> rows to
+          <code>global</code>. The three come from
+          <code>evals/gold_confusion_v3.md</code> at v3.2.1 ({pwCommit}).</span>
+        <span class="fig-limit">The plate draws the direction of a miss and not
+          the count. It does not show the rows the clause left correct.</span>
+      </figcaption>
+    </figure>
+
     <p>
-      Three region misses remain instead of seven, and the error mode inverted:
-      only one is still the old cluster, and the other two are the converse
-      &mdash; <code>americas</code> rows the clause over-called to
-      <code>global</code>. That collateral was priced before the run. Five
+      The over-calls are the collateral, and I priced them before the run. Five
       under-calls traded for two over-calls is the shape of the win.
     </p>
     <p>
-      Judge-versus-human agreement on region, the measured condition that gated
-      the scaled eval, fell from a perfect <strong>100.0%</strong> to
-      <strong>96.3%</strong>. That is 2 disagreements in 54 against a CI floor
-      budgeting 3. Three disagreements would have stopped the release.
+      Judge-versus-human agreement on region is the measured condition that
+      gated the scaled eval. It fell from a perfect <strong>100.0%</strong> to
+      <strong>96.3%</strong>. That is 2 disagreements in 54, against a CI floor
+      that budgets 3. Three disagreements would have stopped the release.
     </p>
 
 
@@ -566,37 +872,78 @@ import Term from '../../components/Term.astro';
     <p>
       This classifier is also the portfolio&rsquo;s autonomy ladder. Each level
       is the <em>same system</em> handed more self-direction. The axis is who
-      drives. Reaching for a tool does not move a level; deciding does.
+      drives. A reach for a tool does not move a level. A decision does.
     </p>
-    <p class="flow-line">
-      L1 a human runs it <span class="flow-arrow">&rarr;</span> L2 + a tool
-      <span class="flow-arrow">&rarr;</span> L3 it decides it&rsquo;s done
-      <span class="flow-arrow">&rarr;</span> L4 agents coordinate
+
+    <!-- dnc-s1, the rung strip. It re-lays the four labels p.flow-line carried,
+         byte for byte, and adds one state word per row. The state vocabulary is
+         the ladder page's own data-state, and "declined" is the word that
+         page's .rung-plate already renders for L4. Not an SVG on purpose: a
+         strip keeps its text inside contrast-check.cjs, which exempts SVG text.
+         The .rung-plate itself is NOT redrawn here; that figure belongs to the
+         ladder page and this strip carries verdicts, not the climb. -->
+    <figure class="dncs1-rungs fig" data-fig="strip">
+      <ol class="dncs1-rows" aria-label="The four rungs and their verdicts">
+        <li class="dncs1-row" data-state="shipped">
+          <span class="dncs1-id">L1</span>
+          <span class="dncs1-name">a human runs it</span>
+          <span class="dncs1-state">Shipped</span>
+        </li>
+        <li class="dncs1-row" data-state="retired">
+          <span class="dncs1-id">L2</span>
+          <span class="dncs1-name">+ a tool</span>
+          <span class="dncs1-state">Retired</span>
+        </li>
+        <li class="dncs1-row" data-state="shipped">
+          <span class="dncs1-id">L3</span>
+          <span class="dncs1-name">it decides it&rsquo;s done</span>
+          <span class="dncs1-state">Shipped</span>
+        </li>
+        <li class="dncs1-row" data-state="declined">
+          <span class="dncs1-id">L4</span>
+          <span class="dncs1-name">agents coordinate</span>
+          <span class="dncs1-state">Declined</span>
+        </li>
+      </ol>
+      <figcaption>
+        <span class="fig-what">Four rungs, and two of them shipped a no. L2
+          retired the retrieval grounding. L4 was declined: outside its target
+          it broke more than it fixed, at p=0.016 and four times the
+          cost.</span>
+        <span class="fig-limit">The strip carries the verdicts only. Each
+          rung&rsquo;s reasoning and its caveats sit in the prose below, and on
+          the ladder page.</span>
+      </figcaption>
+    </figure>
+
+    <p>
+      I climbed L2 and then climbed back down. The retrieval grounding above is
+      that rung, retired. L3&rsquo;s optimisation loop improved against the
+      split it could see, and it gave ground on held-out gold. The set it never
+      saw vetoed it.
     </p>
     <p>
-      L2 was climbed and then climbed back down: the retrieval grounding above
-      is that rung, retired. L3&rsquo;s optimisation loop improved against the
-      split it could see while giving ground on held-out gold, so it was vetoed
-      by the set it never saw. L4 fixed six of the seven rows it was aimed at
-      and <em>was still declined</em>: outside its target it broke more than it
-      fixed, the repo&rsquo;s first statistically significant harm (p=0.016) at
-      four times the cost. Two of the four levels shipped a &ldquo;no,&rdquo;
-      and each was written down before it was built.
+      L4 fixed six of the seven rows it was aimed at, and <em>I still declined
+      it</em>. Outside its target it broke more than it fixed. That was the
+      repo&rsquo;s first statistically significant harm. Two of the four levels
+      shipped a &ldquo;no,&rdquo; and I wrote each one down before I built it.
       <a class="card-link" href="autonomy-ladder.html">The full ladder, level by level <span class="arrow">&rarr;</span></a>
       <a class="card-link" href="loop-replay.html">Replay the two autonomous runs <span class="arrow">&rarr;</span></a>
     </p>
 
     <h2 id="stack">Stack</h2>
     <p>
-      Python, the Anthropic SDK (Sonnet 5 for classification, Opus as the grading
-      judge), pandas for the eval tables, FastAPI for the HTTP endpoint, and
-      rank-bm25 for the retired grounding experiment. scikit-learn appears in the
-      eval dependencies only, for the classical baseline the model was measured
-      against; nothing in the shipped path uses it. Tested with pytest on mocked
-      calls. The repo is
+      The stack is Python and the Anthropic SDK, with Sonnet 5 for
+      classification and Opus as the judge that grades. pandas builds the eval
+      tables, FastAPI serves the HTTP endpoint, and rank-bm25 ran the retired
+      grounding experiment. scikit-learn appears in the eval dependencies only,
+      for the classical baseline the model was measured against. Nothing in the
+      shipped path uses it. pytest tests the code on mocked calls. The repo is
       public: <a href="https://github.com/sanlee-ys/defense-news-classifier">github.com/sanlee-ys/defense-news-classifier</a>.
-      The eval harness, gold set, and ADRs are checkable, including the
-      experiments that were measured and cut.
+    </p>
+    <p>
+      The eval harness, the gold set, and the ADRs are checkable. That includes
+      the experiments I measured and cut.
     </p>
 
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
