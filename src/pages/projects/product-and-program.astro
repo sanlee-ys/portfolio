@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Technical Program Management for an AI System · San Lee"
-  description="An AI system framed as a technical program through its roadmap, dependencies, success measures, delivery risks, and evidence-based scope decisions."
+  description="I frame an AI system as a technical program. The frame is its roadmap, its dependencies, its success measures, its delivery risks, and its evidence-based scope decisions."
   canonical="https://sanlee.me/projects/product-and-program.html"
   ogType="article"
   ogImage="/assets/og-product-and-program.png"
@@ -141,6 +141,185 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 12px;
     }
+
+    /* ---- The two-slot figure caption (ADR-013) --------------------------
+       ORIGIN BLOCK for this rule set. Another page copies these declarations
+       verbatim and names this page and its commit in the copy. They are page-
+       scoped, and not in public/assets/style.css, because a concurrent session
+       owns that file. Consolidation is an open owner call for later.
+
+       scripts/figure-contract.cjs fails the build when a figure that carries
+       data-fig holds no .fig-what or no .fig-limit, or holds an empty one. The
+       empty .fig-limit is the failure the slot exists to stop: a figure that
+       ends on a win while its caveat sits somewhere else.
+
+       No padding on .fig. A figure is a grid item of the content track, and
+       padding here would shrink the track a plate measures itself against. */
+    .fig {
+      margin: 22px 0 6px;
+      min-width: 0;
+    }
+    .fig figcaption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 10px 0 0;
+    }
+    .fig .fig-what,
+    .fig .fig-limit { display: block; }
+    .fig .fig-limit {
+      margin-top: 6px;
+      padding-left: 12px;
+      border-left: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    /* pp1: the axis board. A STRIP, so it re-lays text and draws nothing.
+       Two lists sit under this section today, and the reader has to join a
+       result to its ruling by hand. The board puts them in one grammar: the
+       claim, then the evidence. That grammar is the homepage ledger's.
+
+       Two columns above 620px and one column below it, so every row reads at
+       320px. min-width: 0 on every cell, because a grid item defaults to its
+       content's minimum width and a long word then widens the page. */
+    .pp1-board { margin: 22px 0 6px; }
+    .pp1-rows {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .pp1-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px 20px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      min-width: 0;
+    }
+    .pp1-claim {
+      margin: 0;
+      min-width: 0;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.96rem;
+      line-height: 1.5;
+    }
+    .pp1-detail {
+      margin: 0;
+      min-width: 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.58;
+    }
+    .pp1-group {
+      margin: 26px 0 0;
+      font-family: var(--font);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+    @media (min-width: 620px) {
+      .pp1-row { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+    }
+
+    /* pp2: three independent measurements, one verdict. The claim recurs on
+       four pages and is drawn on none, so it is drawn once here. Hand-drawn,
+       so it holds no digit: the figures stay in the bullets above it. Max-
+       width 260 keeps one viewBox unit at one CSS pixel down to 320px, and
+       the figure carries no padding, so the container is the content track.
+       Its own marker id and its own marker, because a marker does not inherit
+       the stroke of the path that references it. */
+    .pp2-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 0;
+    }
+    .pp2-plate .pp2-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .pp2-plate .pp2-verdict {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .pp2-plate .pp2-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .pp2-plate .pp2-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .pp2-plate .pp2-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .pp2-plate marker path { fill: var(--muted); }
+
+    /* The register's pointer row holds the only link inside a table cell on
+       this site, so no shared rule ever gave it a colour and it painted the
+       browser default. That default measured 1.97:1 in the dark theme and the
+       contrast gate failed the build. It points at the accent token now, which
+       is the colour every other link on this page already uses. The underline
+       stays, so the link is not marked by colour alone. */
+    .article-body table a { color: var(--accent); }
+
+    /* pp3: the one risk in the register that happened. A STRIP again: the row
+       moves, and no word of it changes its meaning. Inside a three-column
+       table that row read at the same weight as five risks that never fired,
+       and its 50-word cell is unreadable at 320px. No oxide here. A risk that
+       fired is not a decision that I took back, and --accent-warm means only
+       the second thing. */
+    .pp3-rows {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-top: 2px solid var(--rule-strong);
+      border-bottom: 1px solid var(--border);
+    }
+    .pp3-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px 20px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      min-width: 0;
+    }
+    .pp3-rows > .pp3-row:first-child { border-top: 0; }
+    .pp3-label {
+      margin: 0;
+      min-width: 0;
+      font-family: var(--font);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+    .pp3-value {
+      margin: 0;
+      min-width: 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.58;
+    }
+    .pp3-value strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+    @media (min-width: 620px) {
+      .pp3-row { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+    }
   </style>
   </Fragment>
 
@@ -150,7 +329,7 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Product &amp; Program</h1>
-    <p class="subtitle">The same system, framed as a product and run as a program. Solo build. The program layer is simulated.</p>
+    <p class="subtitle">I frame the same system as a product, and I run it as a program. Solo build. The program layer is simulated.</p>
 
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
@@ -166,23 +345,24 @@ import SiteNav from '../../components/SiteNav.astro';
     <p class="lead">
       This is a solo build. There is no team to coordinate, so the program
       layer is simulated. The workstreams, the dependency map, and the risk
-      register are real work, done as if a team existed.
+      register are real work. I did that work as if a team existed.
     </p>
 
     <h2>The problem (product framing)</h2>
     <p>
-      Defense developments are scattered across many sources and arrive faster than
-      one person can triage. An analyst spends a disproportionate share of time
-      finding and sorting before any real analysis begins.
+      Defense developments come from many sources. They arrive faster than one
+      person can triage. An analyst spends a disproportionate share of the time
+      to find them and to sort them. Real analysis begins after that.
     </p>
 
-    <!-- Open pipeline, not a second copy of the JTBD when/so card: Firehose →
-         Triage → Queryable KB → Brief. Three L→R muted edges only; no return,
-         no oxide (not a failure/reversal claim). ADR-010 N/A — no interactive
-         nodes. -->
+    <!-- Open pipeline, and not a second copy of the JTBD when/so card:
+         Firehose → Triage → Queryable KB → Brief. Three L→R muted edges only.
+         No return edge, and no oxide, because this is not a failure claim and
+         not a reversal claim. ADR-010 does not apply. There is no interactive
+         node here. -->
     <svg class="jtbd-strip" viewBox="0 0 260 72" role="img"
-         aria-label="Defense-news firehose is triaged by relevance and category into a queryable knowledge base so the analyst can brief from a prepared store instead of a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.">
-      <title>Defense-news firehose is triaged by relevance and category into a queryable knowledge base so the analyst can brief from a prepared store instead of a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.</title>
+         aria-label="Triage sorts the defense-news firehose by relevance and category into a queryable knowledge base. The analyst briefs from a prepared store, and not from a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.">
+      <title>Triage sorts the defense-news firehose by relevance and category into a queryable knowledge base. The analyst briefs from a prepared store, and not from a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.</title>
       <defs>
         <marker id="jtbd-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
@@ -190,11 +370,12 @@ import SiteNav from '../../components/SiteNav.astro';
         </marker>
       </defs>
 
-      <!-- Four stage boxes. rx matches --radius-sm (2px); at max-width 260
-           viewBox units are CSS px 1:1. Queryable KB is two lines so the short
-           labels fit without horizontal overflow at 320. -->
+      <!-- Four stage boxes. rx matches --radius-sm (2px). At max-width 260 one
+           viewBox unit is one CSS pixel. Queryable KB runs on two lines, so the
+           short labels fit with no horizontal overflow at 320. -->
       <rect class="jtbd-box" x="2" y="6" width="56" height="40" rx="2" />
-      <!-- Stacked feed marks: raw multi-source stream into Firehose. -->
+      <!-- Stacked feed marks. They draw the raw multi-source stream into
+           Firehose. -->
       <g class="jtbd-glyph" aria-hidden="true">
         <path d="M 12 14 H 28" />
         <path d="M 12 18 H 32" />
@@ -212,13 +393,15 @@ import SiteNav from '../../components/SiteNav.astro';
       <rect class="jtbd-box" x="200" y="6" width="56" height="40" rx="2" />
       <text class="jtbd-title" x="228" y="30" text-anchor="middle">Brief</text>
 
-      <!-- Three L→R muted arrows only — open pipeline, no return edge. -->
+      <!-- Three L→R muted arrows only. The pipeline is open, and it has no
+           return edge. -->
       <path class="jtbd-edge" d="M 58 26 L 66 26" marker-end="url(#jtbd-arrow)" aria-hidden="true" />
       <path class="jtbd-edge" d="M 124 26 L 132 26" marker-end="url(#jtbd-arrow)" aria-hidden="true" />
       <path class="jtbd-edge" d="M 190 26 L 198 26" marker-end="url(#jtbd-arrow)" aria-hidden="true" />
 
-      <!-- Geist Mono microcopy under each stage. Kept short so adjacent
-           labels do not collide at 260 viewBox width (centers ~66 apart). -->
+      <!-- Geist Mono microcopy under each stage. Each label stays short, so
+           two adjacent labels do not collide at 260 viewBox width. The centres
+           sit about 66 units apart. -->
       <text class="jtbd-micro" x="30" y="60" text-anchor="middle">raw feed</text>
       <text class="jtbd-micro" x="96" y="60" text-anchor="middle">rel+category</text>
       <text class="jtbd-micro" x="162" y="60" text-anchor="middle">ask store</text>
@@ -226,16 +409,17 @@ import SiteNav from '../../components/SiteNav.astro';
     </svg>
     <p class="jtbd-strip-caption">
       Firehose in; brief out. Triage and a queryable knowledge base sit in the
-      middle so analysis time is not spent sorting.
+      middle, so the analyst does not spend analysis time on the sort.
     </p>
 
     <h2>Who it is for</h2>
     <p>
-      <strong>Primary user:</strong> a defense-news analyst who must stay current
-      across programs, contracts, geopolitics, and technology, and brief others on
-      what matters. Defense is a deliberately chosen vertical, not a claim of domain
-      expertise. <strong>Design partner:</strong> me, dogfooding, as the first user
-      and the early validation loop.
+      <strong>Primary user:</strong> a defense-news analyst. The analyst must
+      stay current across programs, contracts, geopolitics, and technology, and
+      must brief others on what matters. Defense is a deliberately chosen
+      vertical, and not a claim of domain expertise.
+      <strong>Design partner:</strong> me. I use the system myself, as the first
+      user and the early validation loop.
     </p>
 
     <div class="decision">
@@ -251,23 +435,76 @@ import SiteNav from '../../components/SiteNav.astro';
     <h3>User-outcome metrics (does it help the analyst?)</h3>
     <ul>
       <li><strong>Auto-triage rate:</strong> share of incoming items correctly categorized automatically, so the analyst never hand-sorts them.</li>
-      <li><strong>Coverage (recall):</strong> share of genuinely relevant developments surfaced rather than missed.</li>
+      <li><strong>Coverage (recall):</strong> the share of genuinely relevant developments the system finds rather than misses.</li>
       <li><strong>Answer usefulness:</strong> for a query, the agent returns a correct, cited answer, fast.</li>
     </ul>
-    <p class="ex-caption">These outcome metrics are defined, not yet measured. Measuring them honestly needs the analyst in the loop over real use, and this is a solo build. What is measured today is classification quality, below.</p>
+    <p class="ex-caption">I defined these outcome metrics. I did not measure them yet. An honest measurement needs the analyst in the loop over real use, and this is a solo build. What I measure today is classification quality, below.</p>
 
-    <h3>AI-quality metrics (can it be measured, not just demoed?)</h3>
+    <h3>AI-quality metrics (is there a measurement, or only a demo?)</h3>
     <ul>
-      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On real, human-labeled text the current v3 classifier scores category <span data-metric="category_accuracy">94.4%</span> (macro-F1 <span data-metric="category_macro_f1">0.930</span>), operational domain <span data-metric="domain_accuracy">98.1%</span> (<span data-metric="domain_macro_f1">0.982</span>), and region <span data-metric="region_accuracy">94.4%</span> (<span data-metric="region_macro_f1">0.975</span>). Corroborated at n=300 with confidence intervals half as wide as the 54-snippet set allows.</li>
-      <li><strong>Cost per unit of quality:</strong> escalating to the premium model was built and measured, not assumed. It moved zero rows at about 1.97&times; the cost, so the shipped path stays single-model. That is the second of three independent measurements landing on the same verdict, alongside the retired retrieval layer and the <a href="faithfulness-judge.html">judge-reliability study</a>.</li>
+      <li><strong>Classification quality:</strong> per-field precision, recall, F1. On real, human-labeled text the current v3 classifier scores category <span data-metric="category_accuracy">94.4%</span> (macro-F1 <span data-metric="category_macro_f1">0.930</span>). It scores operational domain <span data-metric="domain_accuracy">98.1%</span> (<span data-metric="domain_macro_f1">0.982</span>), and region <span data-metric="region_accuracy">94.4%</span> (<span data-metric="region_macro_f1">0.975</span>). I corroborated the figures at n=300. The confidence intervals are half as wide as the 54-snippet set allows.</li>
+      <li><strong>Cost per unit of quality:</strong> I built the premium-model escalation and I measured it. I did not assume it. It moved zero rows at about 1.97&times; the cost, so the shipped path stays single-model. It is the second of three independent measurements with the same verdict. The other two are the retired retrieval layer and the <a href="faithfulness-judge.html">judge-reliability study</a>.</li>
       <li><strong>Retrieval quality (RAG):</strong> recall@k, answer groundedness, citation correctness.</li>
       <li><strong>Regression gate:</strong> an eval pass-rate threshold wired into CI, so a change that drops below it does not merge.</li>
     </ul>
 
+    <!-- pp2-converge (ADR-013). Three independent measurements, one verdict.
+         The claim sits in the "Cost per unit of quality" bullet above, it
+         recurs on four pages, and no page draws it. It is drawn once here, and
+         the other pages link to this page rather than redraw it. The plate is
+         hand-drawn, so it holds no digit: every figure stays in the bullets.
+         Three muted edges converge on one verdict box. No oxide, because a
+         measurement that returns a "no" is not a decision taken back.
+         ADR-010 does not apply. There is no interactive node here. -->
+    <figure class="fig" data-fig="plate">
+      <svg class="pp2-plate" viewBox="0 0 260 96" role="img"
+           aria-label="Three boxes point down into one verdict box. The three are the retired retrieval layer, the premium-model escalation, and the judge-reliability study. Each one is marked measured. The verdict box reads: the same verdict.">
+        <title>Three independent measurements, and one verdict.</title>
+        <defs>
+          <marker id="pp2-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+
+        <!-- Three measurement boxes, each named by the words the bullets use.
+             The microcopy is the same word under all three, because the shared
+             property is the argument: each one was measured. -->
+        <rect class="pp2-box" x="2" y="4" width="78" height="34" rx="2" />
+        <text class="pp2-title" x="41" y="20" text-anchor="middle">RETRIEVAL</text>
+        <text class="pp2-micro" x="41" y="31" text-anchor="middle">measured</text>
+
+        <rect class="pp2-box" x="91" y="4" width="78" height="34" rx="2" />
+        <text class="pp2-title" x="130" y="20" text-anchor="middle">ESCALATION</text>
+        <text class="pp2-micro" x="130" y="31" text-anchor="middle">measured</text>
+
+        <rect class="pp2-box" x="180" y="4" width="78" height="34" rx="2" />
+        <text class="pp2-title" x="219" y="20" text-anchor="middle">JUDGE STUDY</text>
+        <text class="pp2-micro" x="219" y="31" text-anchor="middle">measured</text>
+
+        <!-- Three edges land on three separate points of the verdict box, so
+             three arrow heads never stack on one point. -->
+        <path class="pp2-edge" d="M 41 38 L 41 50 L 70 50 L 70 58"
+              marker-end="url(#pp2-arrow)" aria-hidden="true" />
+        <path class="pp2-edge" d="M 130 38 L 130 58"
+              marker-end="url(#pp2-arrow)" aria-hidden="true" />
+        <path class="pp2-edge" d="M 219 38 L 219 50 L 190 50 L 190 58"
+              marker-end="url(#pp2-arrow)" aria-hidden="true" />
+
+        <rect class="pp2-verdict" x="42" y="60" width="176" height="32" rx="2" />
+        <text class="pp2-title" x="130" y="76" text-anchor="middle">THE SAME VERDICT</text>
+        <text class="pp2-micro" x="130" y="87" text-anchor="middle">three independent measurements</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">Three separate measurements returned the same verdict: the retired retrieval layer, the premium-model escalation, and the judge-reliability study. I built each one and I measured it. I did not assume any of them.</span>
+        <span class="fig-limit">The plate does not show what each measurement measured, or by how much it moved. The bullets above keep those figures, and the judge-reliability study keeps its own page.</span>
+      </figcaption>
+    </figure>
+
     <h2>Roadmap (program framing)</h2>
-    <p>Sequenced Now / Next / Later, harvested from delivery.</p>
+    <p>I sequenced the work Now / Next / Later. I harvested the sequence from delivery.</p>
     <svg class="nnl-plate" viewBox="0 0 260 72" role="img"
-         aria-label="Program sequence: Now is shipped work, Next is queued work, Later is deferred work including explicit non-goals.">
+         aria-label="Program sequence. Now is shipped, Next is queued, Later is deferred. Later includes explicit non-goals.">
       <title>Now shipped, Next queued, Later deferred.</title>
       <rect class="nn-now" x="2" y="6" width="80" height="40" rx="2" />
       <text class="nn-title" x="42" y="24" text-anchor="middle">Now</text>
@@ -281,7 +518,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="nn-micro" x="130" y="64" text-anchor="middle">harvested from delivery</text>
     </svg>
     <p class="nnl-plate-caption">
-      Solid is shipped. Hairline is queued. Dashed is deferred, including
+      Solid is shipped. Hairline is queued. Dashed is deferred, and it includes
       the things I will not build.
     </p>
     <div class="roadmap">
@@ -290,7 +527,7 @@ import SiteNav from '../../components/SiteNav.astro';
         <ul>
           <li>Async enrichment loop: create, classify, idempotent writeback</li>
           <li>Integration tests across both seams (pytest, fully offline)</li>
-          <li>Agent tool-layer contract (SYS-003), accepted and implemented</li>
+          <li>Agent tool-layer contract (SYS-003), accepted and built</li>
           <li>Evals-as-CI: the classifier&rsquo;s gold evals gate every PR</li>
           <li>Product one-pager and this program view</li>
         </ul>
@@ -318,25 +555,62 @@ import SiteNav from '../../components/SiteNav.astro';
         <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
       </thead>
       <tbody>
-        <tr><td>Enrichment lost if the background task fails or the process restarts (no broker redelivery)</td><td>Low</td><td>Tags are derived and reclassification is idempotent (namespaced-tag replace), so enrichment re-runs safely; note creation never fails on classifier errors</td></tr>
-        <tr><td>Classifier accuracy ceiling (residual label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model &mdash; measured at +0 rows for ~1.97&times; cost. Refine the rubric instead: a confusion breakdown found the misses clustered on one boundary and two clauses lifted category 90.7% &rarr; 94.4%</td></tr>
+        <tr><td>Enrichment lost if the background task fails or the process restarts (no broker redelivery)</td><td>Low</td><td>Tags are derived and reclassification is idempotent (namespaced-tag replace), so enrichment re-runs safely. Note creation never fails on classifier errors</td></tr>
+        <tr><td>Classifier accuracy ceiling (residual label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model. I measured it at +0 rows for ~1.97&times; cost. Refine the rubric instead. A confusion breakdown found the misses clustered on one boundary, and two clauses lifted category 90.7% &rarr; 94.4%</td></tr>
         <tr><td>Breadth creep (verticals without depth)</td><td>Medium</td><td>Deep on one vehicle; other verticals are an explicit non-goal</td></tr>
-        <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep artifacts thin and living, tied to real delivery only</td></tr>
-        <tr><td>Silent contract drift (separate repos)</td><td><strong>High &mdash; this one happened</strong></td><td>Frozen wire contracts, but the enforcement was never real: each repo's tests assert against its own copy of the shape, so when the classifier added a field the coordinated consumer update was skipped and both builds stayed green. Open. The fix is one shared artifact both sides check against</td></tr>
-        <tr><td>Simulated program (no real cross-team coordination)</td><td>Low (honesty)</td><td>Stated plainly; the reasoning and artifacts are real, the org is not</td></tr>
+        <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep the artifacts thin and current, and tie them to real delivery only</td></tr>
+        <tr><td>Silent contract drift (separate repos)</td><td colspan="2">This is the one risk that happened. The <a href="#risk-drift">callout below</a> carries the severity, what happened, the open status, and the fix</td></tr>
+        <tr><td>Simulated program (no real cross-team coordination)</td><td>Low (honesty)</td><td>I state it plainly. The reasoning and the artifacts are real. The org is not</td></tr>
       </tbody>
     </table>
 
+    <!-- pp-s2 (ADR-013). Row 5 of the register leaves the severity cell. It is
+         the one risk that fired, and inside a three-column table it read at the
+         same weight as five risks that never did. Its 50-word cell is also
+         unreadable at 320px. This is a move and not a cut: the register keeps
+         the row, and the row keeps a pointer here, so the register still lists
+         six risks. No oxide. --accent-warm marks a decision that I took back,
+         and a risk that fired is not that. -->
+    <figure class="fig" id="risk-drift" data-fig="strip"
+            aria-label="The one risk in the register that happened: silent contract drift between separate repos.">
+      <ul class="pp3-rows">
+        <li class="pp3-row">
+          <p class="pp3-label">Risk</p>
+          <p class="pp3-value">Silent contract drift (separate repos)</p>
+        </li>
+        <li class="pp3-row">
+          <p class="pp3-label">Severity</p>
+          <p class="pp3-value"><strong>High. This one happened</strong></p>
+        </li>
+        <li class="pp3-row">
+          <p class="pp3-label">What happened</p>
+          <p class="pp3-value">The wire contracts are frozen, but the enforcement was never real. Each repo&rsquo;s tests assert against its own copy of the shape. The classifier added a field, and the coordinated consumer update never happened. Both builds stayed green.</p>
+        </li>
+        <li class="pp3-row">
+          <p class="pp3-label">Status</p>
+          <p class="pp3-value">Open.</p>
+        </li>
+        <li class="pp3-row">
+          <p class="pp3-label">The fix</p>
+          <p class="pp3-value">One shared artifact both sides check against.</p>
+        </li>
+      </ul>
+      <figcaption>
+        <span class="fig-what">Six risks sit in the register, and one of them happened. This callout carries that one at full weight: frozen contracts that no shared artifact enforced.</span>
+        <span class="fig-limit">The callout does not show the other five risks, and it does not close this one. The fix is stated. It is not built.</span>
+      </figcaption>
+    </figure>
+
     <h2 id="capacity-gate">I pre-registered six axes for a capacity review, then measured that nothing wrote to them.</h2>
     <p>
-      The same evidence gate this record applies to a model choice, applied to
-      the build capacity behind the work. On a fixed date I wrote the review
-      down: six evidence axes, a close date, and a rule that nothing changes
-      until the close. Then I let the axes decide.
+      This record applies an evidence gate to a model choice. I applied the same
+      gate to the build capacity behind the work. On a fixed date I wrote the
+      review down. It named six evidence axes, a close date, and a rule that
+      nothing changes until the close. Then I let the axes decide.
     </p>
 
     <svg class="gp-plate" viewBox="0 0 260 72" role="img"
-         aria-label="How the capacity review was run: pre-register the evidence axes before any evidence exists, freeze every change until the close date, then rule on the record that accumulated. The gate returned a step down.">
+         aria-label="How I ran the capacity review. I pre-registered the evidence axes before any evidence existed. I froze every change until the close. Then I ruled on the record. The gate returned a step down.">
       <title>Pre-register the axes, freeze until the close, rule on the record.</title>
       <defs>
         <marker id="gp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
@@ -358,47 +632,89 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="gp-micro" x="130" y="64" text-anchor="middle">the gate said step down</text>
     </svg>
     <p class="gp-plate-caption">
-      Two design choices did all the work: the axes were written before the
-      evidence existed, and nothing changed until the close.
+      Two design choices did all the work. I wrote the axes before the evidence
+      existed, and nothing changed until the close.
     </p>
 
     <p>
-      Those two choices are the whole method. Because the axes were written
-      first, nothing could pick its own success criterion after the fact.
-      Because every change was frozen until the close, nothing could be cut on
-      a bad week or kept on a good anecdote. The close came early, on a full
-      month of evidence, for the only reason that justifies closing early: the
-      last stretch added no new evidence on any axis.
+      Those two choices are the whole method. I wrote the axes first, so nothing
+      could pick its own success criterion after the fact. I froze every change
+      until the close, so nothing could be cut on a bad week or kept on a good
+      anecdote. The close came early, on a full month of evidence. One reason
+      justifies an early close: the last stretch added no new evidence on any
+      axis.
     </p>
 
     <h3>The results, by axis</h3>
     <p>
-      <strong>This section reports by evidence axis, never by lane and never by
-      name.</strong> An axis is a question. A lane is a seat, and a seat maps to
-      somebody&rsquo;s product &mdash; so reporting by lane would turn a
-      one-operator measurement into a public claim about a third party. That is
-      the difference between a measurement and an opinion with a table around
-      it.
+      <strong>This section reports by evidence axis. It never reports by lane
+      and never by name.</strong> An axis is a question. A lane is a seat, and a
+      seat maps to somebody&rsquo;s product. A report by lane turns a
+      one-operator measurement into a public claim about a third party. A
+      measurement is not an opinion. A table around an opinion does not make it
+      a measurement.
     </p>
-    <ul class="ledger">
-      <li><strong>One axis produced repeated, measured value.</strong> Independent review loops raised real findings; most were confirmed and fixed before merge, and the noise rate was nil. This is the axis that earned its keep.</li>
-      <li><strong>The capacity axis produced the opposite of what I expected.</strong> No friction events at all &mdash; and, going the other way, dated directives in my own operating rules telling sessions to spend the headroom rather than conserve it. Capacity was never the binding constraint.</li>
-      <li><strong>The remaining axes produced no dated unique result</strong> in a month that gave them the chance to.</li>
-    </ul>
 
-    <h3>The rulings, as principles</h3>
-    <ul class="ledger">
-      <li><strong>Capacity that was never consumed is unproven, not proven.</strong> So the top tier steps down, and the first month on the lower tier is itself the next measurement.</li>
-      <li><strong>A parked upgrade was declined</strong>, because no recorded event showed that capacity ever blocking anything.</li>
-      <li><strong>A seat is retained for demonstrated unique value.</strong> Attachment to a tier is not evidence.</li>
-    </ul>
-    {/* Owner call, still open: whether this section names figures rather than
-        only the mechanism. It ships with the mechanism and no figures. If that
-        is ever released it is three sentences and nothing else — one above
-        this block, one clause in the first ruling, one in the closing
+    <!-- pp-s1 (ADR-013). A STRIP: it re-lays the two ledger lists of this
+         section as one board, and it draws nothing. Two lists made the reader
+         join a result to its ruling by hand. The board holds six rows because
+         the prose holds six items, and every row keeps its own words.
+
+         It deliberately does NOT enumerate the six axes as six rows. Four of
+         them carry no named identity anywhere in the record, so a row for each
+         axis would need an invented name, or a blank cell that begs to be
+         filled. The axis with no result keeps the words the prose uses.
+
+         BOUNDARY, and the writer is the only control here. No gate reads any
+         of it. Nothing in this board, its caption, or its aria-label names a
+         vendor, a lane, a seat identity, a dollar figure, an account or
+         billing detail, a machine identity, a repository of any kind, or
+         anything internal to the employer. -->
+    <figure class="fig pp1-board" data-fig="strip"
+            aria-label="The capacity review as one board. Three rows report what the axes produced. Three rows state the rulings that followed.">
+      <ul class="pp1-rows">
+        <li class="pp1-row">
+          <p class="pp1-claim">One axis produced repeated, measured value.</p>
+          <p class="pp1-detail">Independent review loops raised real findings. I confirmed and fixed most of them before merge, and the noise rate was nil. This is the one axis with demonstrated unique value.</p>
+        </li>
+        <li class="pp1-row">
+          <p class="pp1-claim">The capacity axis produced the opposite of what I expected.</p>
+          <p class="pp1-detail">There were no friction events at all. The record goes the other way: dated directives in my own operating rules tell sessions to spend the headroom rather than to conserve it. Capacity was never the binding constraint.</p>
+        </li>
+        <li class="pp1-row">
+          <p class="pp1-claim">The remaining axes produced no dated unique result.</p>
+          <p class="pp1-detail">The month gave them the chance to produce one.</p>
+        </li>
+      </ul>
+
+      <h3 class="pp1-group">The rulings, as principles</h3>
+      <ul class="pp1-rows">
+        <li class="pp1-row">
+          <p class="pp1-claim">Capacity that was never consumed is unproven, not proven.</p>
+          <p class="pp1-detail">So the top tier steps down. The first month on the lower tier is itself the next measurement.</p>
+        </li>
+        <li class="pp1-row">
+          <p class="pp1-claim">I declined a parked upgrade.</p>
+          <p class="pp1-detail">No recorded event showed that capacity ever blocked anything.</p>
+        </li>
+        <li class="pp1-row">
+          <p class="pp1-claim">A seat is retained for demonstrated unique value.</p>
+          <p class="pp1-detail">Attachment to a tier is not evidence.</p>
+        </li>
+      </ul>
+
+      <figcaption>
+        <span class="fig-what">The board argues that the record was lopsided. What the axes produced sits beside the rulings that followed, so the reader does not have to join them by hand.</span>
+        <span class="fig-limit">The board names no seat, no product, and no lane. It reports the axes only, and it does not close the review. The limit on the whole reading sits below it.</span>
+      </figcaption>
+    </figure>
+    {/* Owner call, still open: does this section name figures, or only the
+        mechanism? It ships with the mechanism and no figures. A release is
+        three sentences and nothing else. One sentence goes above this block.
+        One clause goes in the first ruling. One sentence goes in the closing
         paragraph. These markers are Astro comments, not HTML comments, so they
-        do not reach the published page: a note about what a page deliberately
-        withholds should not itself be published. */}
+        do not reach the published page. A note about what a page deliberately
+        withholds must not itself be published. */}
     <p class="ex-caption">
       The limit on this reading, at the point of the claim: one month, one
       operator, one body of work, and no controlled comparison. It is a routing
@@ -406,17 +722,17 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p class="tradeoff">
-      <strong>The result:</strong> the six axes were pre-registered and nothing
+      <strong>The result:</strong> I pre-registered the six axes and nothing
       ever wrote to them. There was no friction log, no tally file, and no
-      dead-rows list, so the evidence had to be reconstructed at the end out of
+      dead-rows list. So I had to reconstruct the evidence at the end out of
       dated records. The gate still returned a clear answer, because the answer
       was lopsided. <strong>A closer result would have been unrecoverable.</strong>
     </p>
     <p>
       The lesson: pre-registration without an instrument is half a measurement.
       I built a gauge for this same capacity, and it does not write this log
-      today. That is the open item, and naming it is the only honest place to
-      end.
+      today. That is the open item. I name it here, because that is the only
+      honest place to end.
     </p>
     <p class="diagram-more standalone"><a class="card-link" href="telltale.html">telltale, the instrument for the same capacity <span class="arrow">&rarr;</span></a></p>
 
