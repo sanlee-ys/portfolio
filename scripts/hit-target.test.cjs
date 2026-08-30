@@ -201,6 +201,47 @@ test('a fully hittable control below the 44px tap minimum FAILS at phone width',
   assert.match(out, /tap target/);
 });
 
+// ---- The width the gate used to be blind to ------------------------------
+
+/*
+ * The system map's shape, reduced to one rect. The SVG takes a fraction of the
+ * viewport over a viewBox, so every box inside it is a USER-SPACE unit and it
+ * shrinks with the screen. `unitH` is the node's declared height in those
+ * units. It is the single number the real defect turned on.
+ *
+ * The viewBox is the real plate's. At 440 units wide, one declaration renders
+ * two different controls: `unitH: 59` measures 52px at 390px and 43px at 320px.
+ * A gate that reads 390 alone reports the passing end of a failing range. That
+ * is what shipped.
+ */
+const SCALED_NODE_PAGE = (unitH) => `<!doctype html><html><head><title>t</title><style>
+  body { margin: 0; }
+  svg { display: block; width: 100%; height: auto; }
+  .hit { fill: transparent; }
+</style></head><body>
+<svg id="d" viewBox="0 0 440 470" xmlns="http://www.w3.org/2000/svg">
+  <rect class="hit" x="60" y="60" width="140" height="${unitH}"
+        role="button" tabindex="0" aria-label="scaled"></rect>
+</svg>${PROSE_LINK}</body></html>`;
+
+test('a viewport-scaled control that clears 44px at 390 but not at 320 FAILS', () => {
+  const dir = makeFixture({ 'index.html': SCALED_NODE_PAGE(59) });
+  const { status, out } = runGate(dir);
+  assert.notStrictEqual(status, 0, 'a control that is under 44px at 320px must fail');
+  assert.match(out, /@320px/);
+  assert.match(out, /tap target/);
+  // This line is the point of the test. 390px is where the control PASSES. A
+  // failure here means the fixture no longer reproduces the defect, and nothing
+  // exercises the width list any more.
+  assert.doesNotMatch(out, /@390px/);
+});
+
+test('the same control one size up PASSES at every width', () => {
+  const dir = makeFixture({ 'index.html': SCALED_NODE_PAGE(72) });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, `expected a pass, got:\n${out}`);
+});
+
 // ---- Standalone anchors (the card-link class of miss) ---------------------
 
 /*
@@ -291,6 +332,23 @@ test('an anchor wrapping a below-the-fold lazy image is measured LOADED', () => 
   });
   const { status, out } = runGate(dir);
   assert.strictEqual(status, 0, `a loaded 200px image tile must pass:\n${out}`);
+});
+
+// ---- The width list itself ------------------------------------------------
+
+test('the success line names every width the gate measured', () => {
+  /*
+   * A gate that stops measuring a width is this suite's own subject, one level
+   * up. Both probes pass over a width nobody renders, and the run stays green.
+   * The reported set is the only evidence a reader has, so this test pins it.
+   * A change that drops 320 from either list fails here. It does not arrive as
+   * a faster gate.
+   */
+  const dir = makeFixture({ 'index.html': STANDALONE_LINK_PAGE('padding: 15px 0;') });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, `expected a pass, got:\n${out}`);
+  assert.match(out, /pages × 1280\/430\/390\/360\/320px/);
+  assert.match(out, /standalone anchor check\(s\) × 430\/390\/360\/320px\./);
 });
 
 test('a build with no anchors at all FAILS rather than passing vacuously', () => {
