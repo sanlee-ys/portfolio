@@ -150,8 +150,10 @@ Before committing any layout / style / markup change:
      within the viewport. A table scrolls inside its **own** box (`display:
      block; overflow-x: auto`), it never widens the page.
    - Nav and footer link rows **wrap**, never clip.
-   - Tap targets ≥ 44px. (`hit-target.cjs` now enforces this for SVG controls
-     at 390px; for everything else it is still on you.)
+   - Tap targets ≥ 44px. (`hit-target.cjs` enforces this at 390px for SVG
+     controls and for standalone anchors — a link that is the only text of its
+     block. A link inside a sentence keeps the WCAG 2.5.8 inline exception;
+     for everything else it is still on you.)
    - If you change colors, check **both** light and dark themes.
 
 3. **Actually look at it.** For anything visual, screenshot the affected page at
@@ -205,6 +207,11 @@ npm run build && SITE_ROOT=dist node scripts/hit-target.cjs
   because an SVG clips at its viewport and un-claimable area is not a defect.
 - **Finding zero interactive SVG elements is a failure, not a clean run** — the
   figures are script-drawn, so "none found" most likely means a renderer broke.
+- It also measures every **standalone anchor** at 390px against the same 44px
+  floor. Standalone = the link is the only text of its block container (the
+  homepage card links shipped at 15px tall this way). A link inside a sentence
+  is exempt — WCAG 2.5.8's inline exception, adopted deliberately in the ToC
+  block in `style.css`. Finding zero anchors site-wide is a failure too.
 
 ## A figure offers the jump, it does not take it
 
