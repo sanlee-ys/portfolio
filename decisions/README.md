@@ -17,6 +17,7 @@ Repo-local decision records for the portfolio site, per the two-tier practice in
 | [ADR-010](ADR-010-the-figure-offers-the-jump.md) | A figure offers the jump, it does not take it | Accepted |
 | [ADR-011](ADR-011-career-story-ceiling.md) | The public career tell stays short | Accepted |
 | [ADR-012](ADR-012-telltale-promoted-above-the-router.md) | Promote the instrument above the router, and gate its figures | Accepted |
+| [ADR-013](ADR-013-diagram-led-narrative.md) | A diagram-led narrative, and a gate under every figure | Accepted |
 
 ## Why this tier was missing
 

@@ -84,6 +84,16 @@ jobs:
       - name: Telltale evidence gate (adversarial suite)
         run: node --test scripts/check-telltale-evidence.test.cjs
 
+      # The figure contract's own adversarial suite. The gate has three ways to
+      # be worthless and every one looks like a clean run: it can fail nothing,
+      # it can fail the wrong thing, or it can hold an exemption for a figure
+      # that is gone. The second one is the reason the suite exists — one plate
+      # on this site reads `wipe &#8594; cfg`, which is digits in the source and
+      # an arrow on the screen, so a gate that skipped the entity decode would
+      # fail a correct figure and push a lane toward deleting it.
+      - name: Figure contract (adversarial suite)
+        run: node --test scripts/figure-contract.test.cjs
+
       # Ports the architecture repo's 'Downstream surfaces' rule down to this repo's
       # ADR tier. Stdlib Python, no venv — this is a static site with no Python
       # toolchain, and a doc linter is not a reason to grow one. Every ADR complies,
@@ -143,6 +153,19 @@ jobs:
       # to a page-wide search, and this site has a page about exactly that.
       - name: Telltale figures and frames match the generated record
         run: node scripts/check-telltale-evidence.cjs
+        env:
+          SITE_ROOT: dist
+
+      # A hand-drawn plate is markup somebody typed, so a count inside one is a
+      # published figure with no producer and no gate. This fails the build on a
+      # digit inside an <svg> <text> node, unless the figure sits in the
+      # measured baseline or the <svg> declares data-fig-generated="true". It
+      # also requires the two caption slots on every new figure, which is what
+      # stops a figure sequence from ending on a win with the caveat elsewhere.
+      # It reads dist/ and decodes entities, because the rule is about what a
+      # reader sees. See decisions/ADR-013.
+      - name: Figure contract (no digit in a hand-drawn plate; every figure captioned)
+        run: node scripts/figure-contract.cjs
         env:
           SITE_ROOT: dist
 

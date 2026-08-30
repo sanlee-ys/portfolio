@@ -140,9 +140,9 @@ function runSiteGate(label, script) {
 }
 
 /*
- * Ordered cheapest-first, which is also build-independent-first. The eight checks
+ * Ordered cheapest-first, which is also build-independent-first. The nine checks
  * above the line need no `dist/`, no browser and no network, and finish in
- * seconds; the ten below either walk the built site or launch a browser —
+ * seconds; the eleven below either walk the built site or launch a browser —
  * contrast-check renders every page in both themes, mobile-qa renders 64
  * page-widths, hit-target hit-tests every control at two widths. A missing ADR
  * section should redden in two seconds, not after a full render pass.
@@ -194,6 +194,11 @@ const CHECKS = [
       runNodeTest('telltale-evidence suite', ['scripts/check-telltale-evidence.test.cjs']),
   },
   {
+    label: 'figure contract (adversarial suite)',
+    needsSite: false,
+    run: () => runNodeTest('figure-contract suite', ['scripts/figure-contract.test.cjs']),
+  },
+  {
     label: 'ADRs list their downstream surfaces',
     needsSite: false,
     run: runAdrLint,
@@ -222,6 +227,15 @@ const CHECKS = [
     label: 'telltale figures and frames match the generated record',
     needsSite: true,
     run: () => runSiteGate('check-telltale-evidence', 'scripts/check-telltale-evidence.cjs'),
+  },
+  {
+    // Reads the BUILT page on purpose. The rule is about what a reader sees,
+    // and one plate in `src/` reads `wipe &#8594; cfg` — digits in the source,
+    // an arrow on the screen. A source-reading gate would fail a correct
+    // figure, and the cheapest way to green a false failure is a deletion.
+    label: 'figure contract (no digit in a hand-drawn plate; every figure captioned)',
+    needsSite: true,
+    run: () => runSiteGate('figure-contract', 'scripts/figure-contract.cjs'),
   },
   {
     label: 'private-repo guard (never name/link/describe a private repo)',
@@ -266,11 +280,36 @@ function siteRootMissing() {
   return true;
 }
 
+/*
+ * The count is printed, not written in prose.
+ *
+ * Every gate in this repo has a rule about it in `CLAUDE.md`, and the number of
+ * gates was one of them. A prose count goes stale the moment a check is added,
+ * and it goes stale silently, because nothing reads prose. It also made a
+ * required review step unperformable: a reviewer asked to confirm that all the
+ * checks ran had to count them by hand, against a file they were reviewing.
+ *
+ * So the runner says what it is about to do and what it did. Reaching the final
+ * line means every check ran, because the loop exits at the first non-zero.
+ */
+/*
+ * No cheap/expensive split in this line. `needsSite` means "reads dist/", which
+ * is not the same set as "no build, no browser, no network": the hit-target
+ * SUITE reads no `dist/` and still launches Chromium. `CLAUDE.md` carries that
+ * distinction with its reason. A second, looser copy of it here would be a
+ * second thing to keep in step, and it would disagree.
+ */
+console.log(`gates: running ${CHECKS.length} checks.\n`);
+
+let ran = 0;
 for (const check of CHECKS) {
   if (check.needsSite && siteRootMissing()) process.exit(1);
   const status = check.run();
   if (status !== 0) {
-    console.error(`✗ gates: failed at "${check.label}".`);
+    console.error(`✗ gates: failed at "${check.label}" (check ${ran + 1} of ${CHECKS.length}).`);
     process.exit(status);
   }
+  ran += 1;
 }
+
+console.log(`\nOK - all ${ran} of ${CHECKS.length} QA checks ran and passed.`);

@@ -31,11 +31,16 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all eighteen checks:
+runs all twenty checks:
 
 ```
 npm run qa
 ```
+
+**The runner prints the count, so do not take the number above on trust.** It
+opens with `gates: running 20 checks.` and closes with `OK - all 20 of 20 QA
+checks ran and passed.` The loop exits at the first non-zero, so the closing
+line is the proof that every check ran. **An unrun gate is not a pass.**
 
 **`scripts/gates.cjs` must stay a faithful mirror of
 [`.github/workflows/qa.yml`](.github/workflows/qa.yml) — add a step there, add
@@ -45,15 +50,15 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Eight of the eighteen need no build, no browser and no network — seven
+Nine of the twenty need no build, no browser and no network — eight
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The ten that walk the built site or launch a browser run after,
+seconds. The eleven that walk the built site or launch a browser run after,
 slowest last. (`hit-target.test.cjs` is a `node --test` suite but is **not**
-one of the cheap eight: it spawns the gate, which launches Chromium, so it sits
+one of the cheap nine: it spawns the gate, which launches Chromium, so it sits
 at the bottom with the browser work.)
 
-`npm run gates` runs the same eighteen against an existing `dist/` without
-rebuilding, and the build-independent eight still run on a clone that has never
+`npm run gates` runs the same twenty against an existing `dist/` without
+rebuilding, and the build-independent nine still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
@@ -212,6 +217,56 @@ npm run build && SITE_ROOT=dist node scripts/hit-target.cjs
   homepage card links shipped at 15px tall this way). A link inside a sentence
   is exempt — WCAG 2.5.8's inline exception, adopted deliberately in the ToC
   block in `style.css`. Finding zero anchors site-wide is a failure too.
+
+## The figure contract: a hand-drawn figure carries no digit
+
+*Reasoning and alternatives: [`decisions/ADR-013`](decisions/ADR-013-diagram-led-narrative.md).
+This section is canonical for what to **do**.*
+
+A plate is markup that a person types. A count inside one is a published figure
+with no producer, and no gate reads it: `contrast-check.cjs` exempts SVG text,
+and `check-published-metrics.cjs` reads a `data-metric` span. So the number
+lives in the caption or in the prose, where a gate already reads it.
+
+```
+npm run build && SITE_ROOT=dist node scripts/figure-contract.cjs
+```
+
+Three rules, and the gate fails the build on each one.
+
+- **A digit inside an `<svg>` `<text>` node fails.** Two exits. A generated
+  figure declares `data-fig-generated="true"` on its `<svg>`, and its
+  `.fig-what` names the artifact and the commit. `scripts/build-plots.cjs`
+  writes that geometry into `src/data/figures.json`, and the page interpolates
+  it. The other exit is the baseline below.
+- **A `<figure>` that carries `data-fig` needs both caption slots.** A
+  `<figcaption>` holds a non-empty `.fig-what` and a non-empty `.fig-limit`.
+  `.fig-what` states what the figure argues. `.fig-limit` states what it does
+  not show. An empty `.fig-limit` fails.
+- **A `<figure>` that carries no `data-fig` fails**, unless the baseline lists
+  it. Without this rule a new figure escapes the caption rule. It omits the
+  attribute and nothing runs.
+
+**The gate reads `dist/` and decodes entities, and that is not a detail.** The
+plate on `netops-lab` reads `wipe &#8594; cfg`. The digits belong to the entity
+and the reader sees an arrow. A gate that read `src/` would fail a correct
+figure, and the cheapest way to green a false failure is a deletion.
+
+**`scripts/figure-contract-baseline.json` records what already ships.** Nine
+figures on eight pages carried a digit when the gate landed, so the gate binds
+new work and asks no lane to delete an existing figure. Each entry lists its
+exact text values and its reason. **Two entries are permanent:** `.eval-plate`
+and `.ci-plot` are frozen historical measurements, and the value list is what
+freezes them. A changed value reddens the build.
+
+**Add a baseline entry only with an ADR line.** An exemption is a rule somebody
+decided to break. The gate rejects an entry that carries no reason, and it also
+rejects an entry the site no longer matches, so a stale exemption cannot sit
+there unread.
+
+Re-seed the measured inventory with `node scripts/figure-contract.cjs --seed`.
+It prints JSON and writes nothing. A gate that can rewrite its own baseline can
+green itself.
 
 ## A figure offers the jump, it does not take it
 
