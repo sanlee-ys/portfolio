@@ -21,6 +21,7 @@ const assert = require('node:assert');
 const {
   decodeEntities,
   contentRegion,
+  stripNonMarkup,
   svgsIn,
   textNodesIn,
   figuresIn,
@@ -77,6 +78,203 @@ test('a main that is neither .wrap nor .article-body is not a content region', (
 
 test('a page with no main contributes no region', () => {
   assert.strictEqual(contentRegion('<body><p>nothing</p></body>'), null);
+});
+
+// --- switched-off markup is not markup --------------------------------------
+/*
+ * Every plate on this site is preceded by a comment recording its design
+ * rationale: 16 shipped pages carry 100 comments inside <main>. A gate that
+ * reads a comment as page markup therefore complains about markup no reader
+ * will ever see, and the cheapest way to green a false failure is to delete the
+ * comment that explains the figure.
+ *
+ * `closeOfTag` learned about `-->` in #244, which repaired `textOf`, `slotText`
+ * and `closingIndexOf`. It did not reach `svgsIn`, `figuresIn`, `textNodesIn`
+ * or `unparsedFigureMarkers`, which each run a regex over raw markup. Measured
+ * against the gate at `fe51fa1`: the first case below passed already, and the
+ * next three failed. They are pinned together so the boundary between what was
+ * fixed and what was not stays legible.
+ *
+ * Each test states its own direction. A test that only removed complaints
+ * would be satisfied by a gate that complains about nothing, so the true
+ * positives are re-asserted here beside their switched-off twins.
+ */
+
+test('a > inside a comment does not end the comment: the case #244 already fixed', () => {
+  const { problems } = verify({
+    pages: site('<!-- ADR-004 decision 5 -> keep 7 --><svg class="p"><text>rungs</text></svg>'),
+    baseline: emptyBaseline(),
+  });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a digit in an ordinary comment beside a plate does not fail', () => {
+  // The rationale comments hold measurements. A digit that no <text> node
+  // paints is not a published figure.
+  const { problems } = verify({
+    pages: site('<!-- this plate used to read 4 rungs --><svg class="p"><text>rungs</text></svg>'),
+    baseline: emptyBaseline(),
+  });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a commented-out figure is not a figure: R-N must not fire on it', () => {
+  const off = '<!-- <figure class="old-fig"><svg><text>a</text></svg></figure> -->';
+  assert.deepStrictEqual(figuresIn(stripNonMarkup(off)), []);
+  const { problems } = verify({ pages: site(off), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a commented-out DECLARED figure is not checked for caption slots', () => {
+  /*
+   * The worse half of the same defect. R-N is one complaint; R-C is two, and
+   * both name caption slots that a commented-out figure will never have.
+   */
+  const off = '<!-- <figure class="old" data-fig="plate"><svg><text>a</text></svg></figure> -->';
+  assert.strictEqual(unparsedFigureMarkers(stripNonMarkup(off)), 0);
+  const { problems } = verify({ pages: site(off), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a commented-out <text> node is not painted copy: R-D must not fire on it', () => {
+  const off = '<svg class="p"><!-- old: <text>4 rungs</text> --><text>rungs</text></svg>';
+  assert.deepStrictEqual(textNodesIn(stripNonMarkup(off)), ['rungs']);
+  const { problems } = verify({ pages: site(off), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a commented-out close tag does not truncate the REAL figure around it', () => {
+  /*
+   * The worst shape of the defect, because the figure it fails is correct.
+   * `figuresIn` matches non-greedily to the first `</figure>`, so a
+   * commented-out close tag ends the body early and the caption slots that
+   * follow it are never seen. Measured against the gate at `fe51fa1`: two R-C
+   * complaints about a figure that holds both slots. The lane reading that
+   * message is pointed at a caption that is already right, and the cheapest way
+   * to green it is to delete the comment.
+   */
+  const fig = '<figure class="f" data-fig="plate">'
+    + '<!-- an earlier draft ended here: </figure> -->'
+    + '<figcaption><span class="fig-what">A claim.</span>'
+    + '<span class="fig-limit">A limit.</span></figcaption></figure>';
+  const { problems } = verify({ pages: site(fig), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a real digit that FOLLOWS a comment still fails: the strip removes the comment only', () => {
+  // The failure direction of the fix above. A strip that ran on to the next
+  // `>` would swallow the plate and report a clean page.
+  const { problems } = verify({
+    pages: site('<svg class="p"><!-- why this plate --><text>4 rungs</text></svg>'),
+    baseline: emptyBaseline(),
+  });
+  assert.strictEqual(problems.length, 1);
+  assert.match(problems[0], /"4 rungs"/);
+});
+
+test('a comment is deleted, not blanked, so the text runs either side join', () => {
+  /*
+   * `n=<!-- note -->54` renders `n=54`: removing a comment node joins the text
+   * runs beside it. Blanking would write `n= 54`, invent a word break, and stop
+   * matching the baseline value the page still renders. Same call `textNodesIn`
+   * makes about a <tspan>.
+   */
+  assert.deepStrictEqual(
+    textNodesIn(stripNonMarkup('<svg><text>n=<!-- note -->54</text></svg>')),
+    ['n=54']
+  );
+});
+
+test('a style island is not page markup, even when it names a figure', () => {
+  /*
+   * The same defect in different clothes, and the shape the identity lanes hit.
+   * A `<figure>` inside a CSS comment is documentation; `[data-fig="plate"]` is
+   * a selector, not an attribute. Every island on this site sits ABOVE <main>
+   * today, which is the only reason the gate is green — a position nobody
+   * promised to hold, not a property of the parser.
+   */
+  const island = '<style is:inline>/* .fig--plate wraps a bare '
+    + '<figure data-fig="plate"> ... </figure>, never a real one */\n'
+    + '[data-fig="plate"] { margin-block-start: 2rem }</style>';
+  const { problems } = verify({ pages: site(island), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a CSS comment naming an svg text node does not fail R-D', () => {
+  const island = '<style is:inline>/* the plate <svg><text>4 rungs</text></svg> is hand '
+    + 'drawn */\n.p { fill: none }</style>';
+  const { problems } = verify({ pages: site(island), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a script island holding figure markup in a string is not a figure', () => {
+  const island = '<script is:inline>const t = "<figure data-fig=\'plate\'>'
+    + '<text>4</text></figure>";</script>';
+  const { problems } = verify({ pages: site(island), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a REAL figure after a style island is still read', () => {
+  // The failure direction. A strip that ran past `</style>` would take the page
+  // with it, and an empty walk reads exactly like a clean run.
+  const { problems } = verify({
+    pages: site('<style is:inline>.f { margin: 0 }</style>'
+      + '<figure class="real-fig"><svg class="s"><text>a</text></svg></figure>'),
+    baseline: emptyBaseline(),
+  });
+  assert.strictEqual(problems.length, 1);
+  assert.match(problems[0], /"\.real-fig" carries no `data-fig`/);
+});
+
+test('position decides precedence between a comment and an island', () => {
+  // A <style> inside a comment is comment; a comment inside a <style> is style.
+  // Either reading alone leaves the other span half-read.
+  assert.strictEqual(stripNonMarkup('a<!-- <style>x</style> -->b'), 'ab');
+  assert.strictEqual(stripNonMarkup('a<style>/* --> */ x</style>b'), 'a<style></style>b');
+});
+
+test('an unterminated comment or island does not leak markup back into the region', () => {
+  /*
+   * A browser runs an unterminated comment to the end of the document. Keeping
+   * the tail would be reading markup nobody can see, which is the whole defect.
+   */
+  assert.strictEqual(stripNonMarkup('a<!-- <figure data-fig="x"> b'), 'a');
+  assert.strictEqual(stripNonMarkup('a<style> <figure data-fig="x"> b'), 'a<style>');
+});
+
+test('an unterminated comment reports the inert gate rather than passing quietly', () => {
+  /*
+   * The half of the case above that matters most. An unterminated comment eats
+   * the rest of the page, so the strip is RIGHT to take the plate with it — and
+   * a strip that quietly returned an empty region would read exactly like a
+   * clean run. The inert-gate check is what makes that loud, and this pins the
+   * two working together: the false `data-fig` complaint is gone, and what
+   * replaces it is a stop, not a pass.
+   */
+  const { problems } = verify({
+    pages: site('<!-- <figure class="never-closed" data-fig="plate">'),
+    baseline: emptyBaseline(),
+  });
+  assert.strictEqual(problems.length, 1);
+  assert.match(problems[0], /not one carried an <svg>/);
+  assert.ok(!messages(problems).includes('data-fig'), 'no complaint about the switched-off figure');
+});
+
+test('the region keeps the island TAGS, so the markup around them still parses', () => {
+  // Only the body goes. Dropping the tags too would join the elements on
+  // either side of the island.
+  assert.strictEqual(
+    stripNonMarkup('<p>a</p><script>var x = 1;</script><p>b</p>'),
+    '<p>a</p><script></script><p>b</p>'
+  );
+});
+
+test('the content region arrives at every reader already stripped', () => {
+  // The reduction happens at one chokepoint. A reader that had to remember is a
+  // reader that will forget, which is how the layer above closeOfTag was missed.
+  const region = contentRegion(site('<!-- <figure data-fig="x"></figure> -->')[0].html);
+  assert.ok(!region.includes('<figure'));
+  assert.ok(region.includes('ok-plate'), 'real markup survives the strip');
 });
 
 // --- the decode, in both directions -----------------------------------------
