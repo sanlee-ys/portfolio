@@ -209,16 +209,19 @@ jobs:
             - `gh pr comment` and
               `mcp__github_inline_comment__create_inline_comment` to publish.
               These two are your only way to say anything to anyone.
-            - `Write`, for paths under `/tmp` only. Use it to compose your
-              summary body, then post with
-              `gh pr comment <N> --body-file /tmp/<name>.md`.
+            - `Write`, for exactly one path: `review-summary.md` at the root
+              of the working tree. Use it to compose your summary body, then
+              post with `gh pr comment <N> --body-file review-summary.md`.
+              Do not write to `/tmp` — it is outside the working tree, and
+              every write there is denied.
 
             Keep every command free of `$(...)` and backticks. Command
             substitution makes a command unanalyzable, so it is denied even
             when it starts with a granted prefix — `gh pr comment N --body
-            "$(cat <<'EOF' ...)"` is a denied call, not a granted one. For a
-            multi-line body, `Write` the file to `/tmp` and pass
-            `--body-file`.
+            "$(cat <<'EOF' ...)"` is a denied call, not a granted one. A
+            backtick inside a double-quoted `--body` string is command
+            substitution too. So do not pass your summary with `--body`:
+            `Write` it to `review-summary.md` and pass `--body-file`.
 
             Do not run this repo's QA gates (`scripts/*.cjs`, `scripts/*.py`)
             or any other program. The `qa` workflow already ran all of them
@@ -326,6 +329,22 @@ jobs:
           #              unscoped Write, and nothing that merges or pushes --
           #              this widening covers posting only.
           #
+          #              MEASURED 2026-08-30, same day, on run 33327226664
+          #              (PR #240): `Write(//tmp/**)` does not work here. The
+          #              action delivered the rule intact in its resolved
+          #              config (CLI 2.1.251), and all three Write calls to
+          #              /tmp/pr240-summary.md were denied anyway. The likely
+          #              boundary is the working tree; this file records only
+          #              the measurement. The verdict still posted, through a
+          #              plain `--body` string, because the `$(...)` ban held
+          #              -- and it held only because that body carried no
+          #              backticks: inside a double-quoted `--body`, a
+          #              backtick is command substitution and the same denial.
+          #              So the grant is now `Write(review-summary.md)` -- one
+          #              relative path inside the checkout, the documented
+          #              rule shape -- and the prompt names that exact file
+          #              and bans `--body` for the summary.
+          #
           # max-turns was 25, on the theory that denied tool calls -- not the
           # ceiling -- were the binding constraint: of the 26 turns PR #101
           # spent, 11 were denials returning nothing. That line invited its own
@@ -346,7 +365,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-5
             --max-turns 40
-            --allowedTools "Read,Grep,Glob,Write(//tmp/**),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
+            --allowedTools "Read,Grep,Glob,Write(review-summary.md),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
 
       # Turn "the action exited non-zero" into a signal that distinguishes
       # I-found-problems from I-ran-out-of-road. See ADR-005 for the reasoning.
