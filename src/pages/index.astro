@@ -87,6 +87,57 @@ import SiteNav from '../components/SiteNav.astro';
       margin: 14px 0 0;
     }
     .flagship-figure span { color: var(--text); font-weight: 600; }
+
+    /* ix-s1. The decision ledger, re-laid as a strip. Eight rows carry one
+       grammar: the claim, then the page that records it in full. The strip
+       re-lays the row. It does not rewrite it. The STE conversion of the same
+       rows is a separate edit in the same commit, and the pull request keeps
+       the two ledger blocks apart.
+
+       The strip adds no status word. Three rows carry data-outcome="reversal"
+       and five do not, and the five are not five shipped decisions: one is an
+       audit finding and one is a bug found before publication. A status stamp
+       on the unmarked five would add a claim the page never made. The only
+       mark here is the reversal mark the row already carried.
+
+       The link stays inline in the claim below 48rem, and becomes its own
+       cell only above it. scripts/hit-target.cjs measures a standalone anchor
+       at 390px, and a link that is the only text of its block owes a 44px box
+       there. Eight of those boxes cost the phone reader about 0.2 screens and
+       return no reading gain, so the phone keeps the WCAG 2.5.8 inline
+       exception that this row already relies on. */
+    @media (min-width: 48rem) {
+      .ledger li {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 10.5rem;
+        gap: 4px 24px;
+        align-items: start;
+      }
+      .ledger li .led-to {
+        justify-self: end;
+        text-align: right;
+      }
+    }
+
+    /* ix-s2. Twelve field notes under five cluster headings. Every one of the
+       twelve titles is byte-exact. The five headings are the only new words,
+       and each one is drawn from the vocabulary the titles already use. A
+       heading is a structural label. It states no result.
+
+       The label reuses .kicker, which is the site's own label grammar, so this
+       block adds no second idiom, no new colour, and no new size. */
+    .notes-clusters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0 32px;
+      margin: 16px 0 10px;
+    }
+    .notes-clusters .notes-cluster { min-width: 0; }
+    .notes-clusters .kicker { margin: 16px 0 0; }
+    .notes-clusters .notes-list {
+      grid-template-columns: minmax(0, 1fr);
+      margin: 6px 0 0;
+    }
   </style>
   </Fragment>
 
@@ -184,7 +235,7 @@ import SiteNav from '../components/SiteNav.astro';
     </section>
 
     <h2 class="section-title">The system</h2>
-    <p class="section-sub">Three services wired into one loop: an API, an LLM classifier, and a RAG agent.</p>
+    <p class="section-sub">I wired three services into one loop: an API, an LLM classifier, and a RAG agent.</p>
     <figure class="diagram-wrap">
       <p class="flow-line" aria-label="System data flow, in order">
         Notes API <span class="flow-arrow" aria-hidden="true">&rarr;</span>
@@ -195,7 +246,7 @@ import SiteNav from '../components/SiteNav.astro';
         KB Agent <span class="flow-arrow" aria-hidden="true">&rarr;</span>
         Grounded answer
       </p>
-      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="group" aria-label="Interactive map of the system: notes-api, classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop. Select a component to see what it does and the decision behind it.">
+      <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="group" aria-label="Interactive map of the system: notes-api, classifier, and kb-agent. An async BackgroundTasks enrichment loop connects them. Select a component to see what it does and the decision behind it.">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z"></path>
@@ -235,16 +286,23 @@ import SiteNav from '../components/SiteNav.astro';
         <p>Category accuracy actually rose, because real vocabulary separates more cleanly; domain fell because the synthetic set was trivially easy to grade. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
       </div>
 
-      <p class="ledger-intro">Eight more, in one line each. The full telling of every one is on the page it links to.</p>
+      <p class="ledger-intro">Eight more, one row each. Each row links to the page that records it in full.</p>
+      <!-- ix-s1, the verdict strip. Each row holds the claim and then the page
+           that records it. The reversal mark and the sr-only prefix stay on the
+           three rows that already carried them, and no row gains a status word.
+           Five rows are not five shipped decisions: decision-falsegreen is an
+           audit finding and decision-truncation is a bug found before
+           publication. The CSS note in the head records why the link only
+           leaves the sentence above 48rem. -->
       <ul class="ledger">
-        <li id="decision-contracts">Decoupled the repos with frozen HTTP contracts &mdash; then audited the seam and found it <strong>broken with both repos' CI green</strong>, because each side asserted against its own copy of the shape. Two unit tests that happen to agree are not a contract test. <a href="projects/the-system.html">The System &rarr;</a></li>
-        <li id="decision-falsegreen">Audited my own gates and found six of them reporting success for work that had not happened &mdash; a review lane that went green in <strong>36 seconds having posted nothing</strong>, and the counter built to catch that reading a key that does not exist. <a href="projects/false-green.html">False Green &rarr;</a></li>
-        <li id="decision-hybrid" data-outcome="reversal"><span class="sr-only">Reversed. </span>Built hybrid lexical retrieval to rescue one specific miss, measured it, and kept the dense-only default &mdash; <strong>MRR identical to four decimals</strong>, and the miss it was built for turned out not to be a lexical failure at all. <a href="projects/kb-agent-retrieval.html">Retrieval &rarr;</a></li>
-        <li id="decision-truncation">Nearly published a dramatic premium-vs-cheap model gap that was <strong>my own bug</strong> &mdash; a <code>max_tokens</code> cap truncated the cheap tier before its verdict on 20% of claims, and my scoring counted each as a disagreement. <a href="projects/faithfulness-judge.html">Judge &rarr;</a></li>
-        <li id="decision-ceiling">Called it a ceiling, then went looking anyway &mdash; the misses clustered on one boundary, and two rubric clauses moved category <strong>90.7% &rarr; 94.4%</strong> with nothing regressing. A prompt problem wearing a ceiling's clothes. <a href="projects/defense-news-classifier.html">Classifier &rarr;</a></li>
-        <li id="decision-prompt" data-outcome="reversal"><span class="sr-only">Reversed. </span>A prompt that read better to a human and measured worse &mdash; category <strong>79.0% &rarr; 76.7%</strong>, industry recall 0.217 &rarr; 0.100. Reverted. <a href="projects/defense-news-classifier.html">Classifier &rarr;</a></li>
-        <li id="decision-rightsized" data-outcome="reversal"><span class="sr-only">Reversed. </span>Built the enrichment loop on Kafka to learn it properly, then cut it &mdash; a single-user idempotent workload <strong>never needed a distributed log</strong>. Now an in-process background task. <a href="projects/the-system.html">The System &rarr;</a></li>
-        <li id="decision-tooluse">Forced output to a tool schema instead of parsing prose, so an invalid label is rejected at the API layer &mdash; <strong>one out-of-enum response in 300</strong>, handled by a re-sample. <a href="projects/defense-news-classifier.html">Classifier &rarr;</a></li>
+        <li id="decision-contracts"><span class="led-claim">I decoupled the repos with frozen HTTP contracts. Then I audited the seam and found it <strong>broken with both repos' CI green</strong>. Each side asserted against its own copy of the shape. Two unit tests that happen to agree are not a contract test.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
+        <li id="decision-falsegreen"><span class="led-claim">I audited my own gates. Six of them reported success for work that never ran. One review lane went green in <strong>36 seconds</strong> and posted nothing. The counter I built to find that failure read a key that does not exist.</span> <span class="led-to"><a href="projects/false-green.html">False Green &rarr;</a></span></li>
+        <li id="decision-hybrid" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built hybrid lexical retrieval to rescue one specific miss. I measured it and kept the dense-only default. The measurement returned <strong>MRR identical to four decimals</strong>. The miss it was built for was not a lexical failure at all.</span> <span class="led-to"><a href="projects/kb-agent-retrieval.html">Retrieval &rarr;</a></span></li>
+        <li id="decision-truncation"><span class="led-claim">I nearly published a dramatic premium-vs-cheap model gap. The gap was <strong>my own bug</strong>. A <code>max_tokens</code> cap truncated the cheap tier before its verdict on 20% of claims. I counted each one as a disagreement.</span> <span class="led-to"><a href="projects/faithfulness-judge.html">Judge &rarr;</a></span></li>
+        <li id="decision-ceiling"><span class="led-claim">I called it a ceiling. Then I looked anyway. The misses clustered on one boundary. Two rubric clauses moved category <strong>90.7% &rarr; 94.4%</strong>, and nothing regressed. It was a prompt problem, not a ceiling.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
+        <li id="decision-prompt" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>A prompt read better to a human and measured worse. Category moved <strong>79.0% &rarr; 76.7%</strong>, and industry recall moved 0.217 &rarr; 0.100. I reversed it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
+        <li id="decision-rightsized" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built the enrichment loop on Kafka to learn it properly. Then I cut it. A single-user idempotent workload <strong>never needed a distributed log</strong>. It is now an in-process background task.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
+        <li id="decision-tooluse"><span class="led-claim">I forced output to a tool schema instead of a prose parse. The API layer rejects an invalid label. It rejected <strong>one out-of-enum response in 300</strong>, and a re-sample handled it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
       </ul>
     </section>
 
@@ -256,29 +314,59 @@ import SiteNav from '../components/SiteNav.astro';
         <li><span class="stat-value" data-metric="domain_accuracy">98.1%</span><span class="stat-label">Domain</span></li>
         <li><span class="stat-value" data-metric="region_accuracy">94.4%</span><span class="stat-label">Region</span></li>
       </ul>
-      <p class="stat-note">Category and region are scored separately. They happen to land on the same figure here.</p>
+      <p class="stat-note">I score category and region separately. The two figures are equal here by coincidence.</p>
       <p>Those numbers are from the harder gold set. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
-      <p>The classical baseline that lost the case for an LLM is vendored here and runs in the browser, on the same rows. <a href="projects/classifier-baseline.html#try-it">Run it yourself &rarr;</a></p>
+      <p>The classical baseline lost the case for an LLM. I vendored it here, and it runs in the browser on the same rows. <a href="projects/classifier-baseline.html#try-it">Run it yourself &rarr;</a></p>
     </section>
 
     <section class="measure">
       <h2 class="section-title">Field notes</h2>
-      <p>Notes I keep while learning, in plain language, on the techniques behind all of this. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
-      <ul class="notes-list">
-        <li>Structured output via tool-use</li>
-        <li>Eval-driven development</li>
-        <li>Reading the numbers</li>
-        <li>Tool use, the general idea</li>
-        <li>The agentic tool-use loop</li>
-        <li>RAG: answering from your own docs</li>
-        <li>Embeddings and vector stores</li>
-        <li>Synthetic data and circular eval</li>
-        <li>Tiered model routing</li>
-        <li>Secrets and env</li>
-        <li>Reproducible environments with uv</li>
-        <li>Checkpoint, resume, and retries</li>
-      </ul>
-      <p class="muted-line">A selection; the full, growing set is on the notes site.</p>
+      <p>I keep these notes as I learn. They are in plain language, on the techniques behind all of this. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
+      <!-- ix-s2, the note clusters. The twelve titles are byte-exact and the
+           order is the only thing that moved. The five headings are structural
+           labels and each one is drawn from the words the titles already use.
+           A heading names a subject. It states no result and it adds no
+           assertion the notes site does not already carry. -->
+      <div class="notes-clusters">
+        <div class="notes-cluster">
+          <p class="kicker">Tool use</p>
+          <ul class="notes-list">
+            <li>Structured output via tool-use</li>
+            <li>Tool use, the general idea</li>
+            <li>The agentic tool-use loop</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">Eval</p>
+          <ul class="notes-list">
+            <li>Eval-driven development</li>
+            <li>Reading the numbers</li>
+            <li>Synthetic data and circular eval</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">RAG</p>
+          <ul class="notes-list">
+            <li>RAG: answering from your own docs</li>
+            <li>Embeddings and vector stores</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">Model routing</p>
+          <ul class="notes-list">
+            <li>Tiered model routing</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">Environments and checkpoints</p>
+          <ul class="notes-list">
+            <li>Secrets and env</li>
+            <li>Reproducible environments with uv</li>
+            <li>Checkpoint, resume, and retries</li>
+          </ul>
+        </div>
+      </div>
+      <p class="muted-line">This is a selection. The notes site carries the full set, and the set still grows.</p>
     </section>
 
     <section class="measure about" id="about">
@@ -288,9 +376,9 @@ import SiteNav from '../components/SiteNav.astro';
         read <a href="about.html">About &rarr;</a>
       </p>
       <p>
-        It is a solo build, so the program layer is simulated &mdash; I lay out what
-        that means on the <a href="projects/product-and-program.html">Product
-        &amp; Program</a> page.
+        It is a solo build, so I simulate the program layer. The
+        <a href="projects/product-and-program.html">Product &amp; Program</a>
+        page states what that means.
       </p>
       <p>
         A second record sits off this system: a physical lab that makes a
