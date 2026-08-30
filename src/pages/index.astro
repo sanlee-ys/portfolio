@@ -64,6 +64,29 @@ import SiteNav from '../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0;
     }
+
+    /* Flagship block (promoted above the router). Same rule-and-air rhythm as
+       .orientation so the two read as siblings: a promoted entry, then the
+       index. No accent fill and no card: the site's austerity is the
+       credibility signal, and a banner here would argue against the page's own
+       thesis. No opacity on text (ADR-009). */
+    .flagship {
+      margin: 52px 0 0;
+      padding: 18px 0 4px;
+      border-top: 2px solid var(--rule-strong);
+    }
+    .flagship .kicker { margin: 0 0 10px; }
+    .flagship .section-title { margin-top: 0; }
+    /* Counted figures, set as a record: mono, tabular, not a headline number. */
+    .flagship-figure {
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin: 14px 0 0;
+    }
+    .flagship-figure span { color: var(--text); font-weight: 600; }
   </style>
   </Fragment>
 
@@ -101,6 +124,28 @@ import SiteNav from '../components/SiteNav.astro';
   </div>
 
   <main class="wrap" id="work" tabindex="-1">
+    <!-- Flagship, promoted above the router. Not a fifth door: the router
+         holds four views of one system, and this is the instrument that
+         measures the capacity that built them. Same rule-and-air grammar as
+         .orientation below, so it reads as a promoted entry rather than a
+         banner. Every figure here is marked data-tt and is gated by
+         scripts/check-telltale-evidence.cjs. No number is typed by hand. -->
+    <section class="flagship" aria-label="Flagship project">
+      <p class="kicker">The instrument</p>
+      <h2 class="section-title">telltale</h2>
+      <p class="section-sub">Five coding-agent CLIs, one brief, five columns &mdash; and gauges that render nothing when nothing was measured.</p>
+      <p>
+        The agents that build this record are the thing I most needed to
+        measure. telltale reads what five agent CLIs leave on disk and draws
+        one row per seat. A reading no vendor exposes renders as an em dash,
+        never as a zero, and <span data-tt="goldens.zeroVsAbsent">3</span>
+        golden files in three packages fail the build if those two ever draw
+        the same.
+      </p>
+      <p class="flagship-figure">v0.2.0 &middot; <span data-tt="goldens.total">132</span> golden files &middot; <span data-tt="tests.total">1780</span> test functions</p>
+      <p class="diagram-more"><a class="card-link" href="projects/telltale.html">Read the telltale writeup <span class="arrow">&rarr;</span></a></p>
+    </section>
+
     <section class="orientation" aria-label="What this record demonstrates">
       <p class="kicker">Selected work</p>
       <p class="orientation-lede">Four views of the work: how I structured the system, measured its decisions, tested a judge, and managed the program. Deeper investigations remain linked throughout the record.</p>
