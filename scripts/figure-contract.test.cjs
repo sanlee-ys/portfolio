@@ -366,6 +366,31 @@ test('a caption slot is found when the class sits beside others', () => {
   );
 });
 
+test('a near-miss class name does NOT satisfy a slot', () => {
+  /*
+   * `\b` treats a hyphen as a word boundary, so a `\b fig-what \b` pattern also
+   * accepts `fig-what-extra`. A required slot that a near-miss name satisfies is
+   * a required slot with a hole in it, and the hole is invisible: the build
+   * stays green and the caption has no limit.
+   */
+  const cap = '<figure data-fig="plate"><figcaption>'
+    + '<span class="fig-whatever">Not the slot.</span>'
+    + '<span class="fig-limit-ish">Not the slot either.</span></figcaption></figure>';
+  assert.strictEqual(slotText(cap, 'fig-what'), null);
+  assert.strictEqual(slotText(cap, 'fig-limit'), null);
+
+  const { problems } = verify({ pages: site(cap), baseline: emptyBaseline() });
+  assert.strictEqual(problems.length, 2);
+  assert.match(messages(problems), /holds no `\.fig-what`/);
+  assert.match(messages(problems), /holds no `\.fig-limit`/);
+});
+
+test('the slot search passes over an earlier element that is not the slot', () => {
+  const cap = '<figcaption><span class="lead">Intro.</span>'
+    + '<span class="fig-what">The claim.</span></figcaption>';
+  assert.strictEqual(slotText(cap, 'fig-what'), 'The claim.');
+});
+
 // --- R-N, the declaration rule ----------------------------------------------
 
 test('a new figure with no data-fig fails: the escape hatch is closed', () => {

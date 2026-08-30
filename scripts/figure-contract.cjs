@@ -280,33 +280,62 @@ function unparsedFigureMarkers(region) {
 }
 
 /*
- * The text of one caption slot, or null when the slot is absent.
+ * The index of the close tag that balances an already-open `<tag>`, starting the
+ * search at `from`. Returns the end of the string when nothing closes it.
  *
- * The close tag is found by counting depth, not by a non-greedy match to the
- * first one. The caption contract puts the exact numbers inside a `data-metric`
- * or `data-tt` span INSIDE `.fig-what`, so same-tag nesting is the normal case
- * rather than an edge case. A non-greedy read stops at the inner `</span>` and
- * returns the first fragment, which is a silently truncated answer.
+ * Depth is counted, and a non-greedy match to the first close tag is not
+ * enough. The caption contract puts the exact numbers inside a `data-metric` or
+ * `data-tt` span INSIDE `.fig-what`, so same-name nesting is the normal case.
+ * A first-close read returns the fragment before the nested span, which is a
+ * silent truncation rather than a visible failure.
  */
-function slotText(figureBody, slot) {
-  const openRe = new RegExp(`<(\\w+)\\b[^>]*\\bclass="[^"]*\\b${slot}\\b[^"]*"[^>]*>`);
-  const m = openRe.exec(figureBody);
-  if (!m) return null;
-  const tag = m[1];
-  const rest = figureBody.slice(m.index + m[0].length);
-  const tagRe = new RegExp(`<${tag}\\b[^>]*>|</${tag}>`, 'g');
+function closingIndexOf(markup, tag, from) {
+  const openRe = new RegExp(`^<${tag}\\b`, 'i');
+  const closeRe = new RegExp(`^</${tag}\\s*>$`, 'i');
   let depth = 0;
-  let end = rest.length; // an unclosed slot reads to the end of the figure
-  let t;
-  while ((t = tagRe.exec(rest)) !== null) {
-    if (t[0].startsWith('</')) {
-      if (depth === 0) { end = t.index; break; }
+  let i = from;
+  while (i < markup.length) {
+    const lt = markup.indexOf('<', i);
+    if (lt === -1) break;
+    const gt = closeOfTag(markup, lt);
+    if (gt === -1) break;
+    const piece = markup.slice(lt, gt + 1);
+    if (closeRe.test(piece)) {
+      if (depth === 0) return lt;
       depth -= 1;
-    } else {
+    } else if (openRe.test(piece) && !piece.endsWith('/>')) {
       depth += 1;
     }
+    i = gt + 1;
   }
-  return normalize(decodeEntities(textOf(rest.slice(0, end), ' ')).text);
+  return markup.length;
+}
+
+/*
+ * The text of one caption slot, or null when the slot is absent.
+ *
+ * The class is matched as a WHOLE TOKEN, split on whitespace. A `\b`-anchored
+ * pattern also accepts `fig-what-extra`, because a hyphen is a word boundary,
+ * and a required slot that a near-miss class name satisfies is a required slot
+ * with a hole in it.
+ */
+function slotText(figureBody, slot) {
+  let i = 0;
+  while (i < figureBody.length) {
+    const lt = figureBody.indexOf('<', i);
+    if (lt === -1) return null;
+    const gt = closeOfTag(figureBody, lt);
+    if (gt === -1) return null;
+    const openTag = figureBody.slice(lt, gt + 1);
+    const tag = (openTag.match(/^<([a-zA-Z][\w-]*)/) || [])[1];
+    const cls = (openTag.match(/\bclass="([^"]*)"/) || [, ''])[1];
+    if (tag && cls.trim().split(/\s+/).includes(slot)) {
+      const body = figureBody.slice(gt + 1, closingIndexOf(figureBody, tag, gt + 1));
+      return normalize(decodeEntities(textOf(body, ' ')).text);
+    }
+    i = gt + 1;
+  }
+  return null;
 }
 
 /*
