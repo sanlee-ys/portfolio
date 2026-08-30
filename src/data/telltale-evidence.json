@@ -81,6 +81,7 @@
       "path": "internal/hud/testdata/golden/usage-ascii.txt",
       "lineStart": 3,
       "lineEnd": 14,
+      "columns": 119,
       "lines": [
         " fleet usage  quota is a reading against a limit; spend is a count with none  =========================================",
         "",
@@ -96,14 +97,77 @@
         "        models         gemini-3-pro"
       ]
     },
+    "stale": {
+      "path": "internal/hud/testdata/golden/usage-stale-ascii.txt",
+      "lineStart": 3,
+      "lineEnd": 10,
+      "columns": 119,
+      "lines": [
+        " fleet usage  quota is a reading against a limit; spend is a count with none  =========================================",
+        "",
+        " claude  quota relayed by the statusline - ! 19h ago - older than the fleet's shortest quota window",
+        "        7d             ###-----------------    15%  ~ 4d07h",
+        "",
+        " codex  quota read from its own store, this scan",
+        "        models         gpt-5.1-codex",
+        "        7d             ###############-----    79%  ~ 22h48m"
+      ]
+    },
+    "absent": {
+      "path": "internal/hud/testdata/golden/usage-stale-ascii.txt",
+      "lineStart": 20,
+      "lineEnd": 24,
+      "columns": 75,
+      "lines": [
+        " cursor  no quota anywhere - its store holds experiment values, not usage",
+        "        models         composer-2.5",
+        "",
+        " grok  no quota anywhere - no window, no ordinal, no reset time on its disk",
+        "        models         grok-4.5"
+      ]
+    },
     "record": {
       "path": "internal/council/testdata/golden/arena-record-ascii.txt",
       "lineStart": 8,
       "lineEnd": 10,
+      "columns": 120,
       "lines": [
         "  arena record  ===================================================================================  telltale  5 races  ",
         "  read from the arena/ and adopt/ branches this repository still holds, t2 through t9: 3 decided by you, 2 nobody was   ",
         "  adopted from. A race whose branches were dropped is no longer in the record.                                          "
+      ]
+    },
+    "gate": {
+      "path": "internal/council/testdata/golden/gated-vs-streaming-ascii.txt",
+      "lineStart": 21,
+      "lineEnd": 24,
+      "columns": 120,
+      "lines": [
+        "  +------------------------------------------------------------------------------------------------------------------+  ",
+        "  |  :                                                                                                               |  ",
+        "  +---------------------------------------------------------------------------------------------------------  GATE  -+  ",
+        "                Write: internal/council/clock.go  |  y approve  |  n deny  |  a stop asking  |  ctrl+c cancel the turn  "
+      ]
+    },
+    "floor": {
+      "path": "internal/hud/testdata/golden/floor-width.txt",
+      "lineStart": 1,
+      "lineEnd": 1,
+      "columns": 36,
+      "lines": [
+        " telltale needs 60 columns (have 52)"
+      ]
+    },
+    "composer": {
+      "path": "internal/council/testdata/golden/composer-clipped-to-one-row-ascii.txt",
+      "lineStart": 7,
+      "lineEnd": 10,
+      "columns": 60,
+      "lines": [
+        "  +------------------------------------------------------+  ",
+        "  |  ^ 2 more above   third line_                        |  ",
+        "  +---------------------------------------------  GATE  -+  ",
+        "   Write: internal/council/gate.go  |  y approve  |  n de>  "
       ]
     }
   }

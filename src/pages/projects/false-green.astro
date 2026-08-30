@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="False-Green CI Checks in AI Agent Workflows · San Lee"
-  description="Six CI checks that reported success even though required AI-agent work had not happened, plus the contract-level fixes that made the gates trustworthy."
+  description="Six CI checks reported success, and the required AI-agent work never ran. This page carries the contract-level fixes that made the gates trustworthy."
   canonical="https://sanlee.me/projects/false-green.html"
   ogType="article"
   ogImage="/assets/og-false-green.png"
@@ -135,6 +135,159 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 22px;
     }
+
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
+
+       COPIED VERBATIM from src/pages/projects/context-architecture.astro at
+       commit 9d81caa, which is the origin page for this block. Do not edit one
+       copy alone. It is page-scoped on purpose: a concurrent session owns
+       public/assets/style.css for the tap-target work, and two writers on one
+       shared stylesheet cannot merge. OC-F of the redesign brief carries the
+       consolidation, for after that session merges. */
+    .fig {
+      margin: 0 0 22px;
+    }
+    .fig figcaption {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+    }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* fg-s1. The three attempts, re-laid as a strip. Each row keeps the words
+       the paragraph already used: the break, then what CI reported. The strip
+       re-lays the text. It does not rewrite it.
+
+       The cost, the refused posts, and the recorded denial count stay in the
+       prose below the strip. A dollar figure never enters a figure on this
+       site (redesign brief 1.12, OC-D), and the one on this page keeps the
+       placement its owner already chose.
+
+       The row stacks below 34rem and becomes two columns above it, so a 320px
+       reader never reads a squeezed cell. min-width: 0 on both cells, because
+       a grid item defaults to min-content and a long token then widens the
+       page. The cells carry no link, so hit-target.cjs measures nothing new. */
+    .fg-s1-rows {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0;
+      border-top: 1px solid var(--border);
+    }
+    .fg-s1-rows li {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px 24px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .fg-s1-rows .fgs-break {
+      min-width: 0;
+      color: var(--text);
+    }
+    .fg-s1-rows .fgs-out {
+      min-width: 0;
+      color: var(--muted);
+    }
+    @media (min-width: 34rem) {
+      .fg-s1-rows li {
+        grid-template-columns: minmax(0, 1fr) 13rem;
+        align-items: start;
+      }
+      .fg-s1-rows .fgs-out {
+        justify-self: end;
+        text-align: right;
+      }
+    }
+
+    /* fg1-keys. One result message, two key reads (ADR-013). Page-scoped.
+
+       max-width 260 keeps one viewBox unit at one CSS pixel down to 320px. The
+       plate sits inside a .decision card, and that card adds no horizontal
+       padding, so a 320px phone leaves it the same 272px the .wrap gutter
+       leaves. That is the measurement the 1:1 rule needs.
+
+       Oxide marks the miss, and this page already reads oxide that way: the
+       six-pass marks and the two-fail FAIL badge both carry it. The miss also
+       runs dashed behind a broken edge, so the state is a word plus a shape
+       and never a colour alone. No glyph replaces those words, because Geist
+       ships none for the symbols that would.
+
+       The marker ids carry the page code and a digit (fg1-arrow), because a
+       marker id is global to the document. A duplicate id repaints the wrong
+       arrow head, and no gate finds that. */
+    .fg1-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 14px 0 10px;
+    }
+    .fg1-plate .fg1-title {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .fg1-plate .fg1-obj {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .fg1-plate .fg1-obj-label {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11.5px;
+    }
+    .fg1-plate .fg1-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* Broken stub into the miss: the gap reads before the colour does. */
+    .fg1-plate .fg1-edge-miss {
+      fill: none;
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .fg1-plate .fg1-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .fg1-plate .fg1-box-miss {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .fg1-plate .fg1-key {
+      fill: var(--text);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+    .fg1-plate .fg1-hit {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .fg1-plate .fg1-miss {
+      fill: var(--accent-warm);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .fg1-plate marker path { fill: var(--muted); }
+    .fg1-plate marker path.fg1-head-miss { fill: var(--accent-warm); }
   </style>
   </Fragment>
 
@@ -143,10 +296,10 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>False Green</h1>
-    <p class="subtitle">Six checks I built, wired into CI, and later caught reporting success for work that had not happened. Each one exited green.</p>
+    <p class="subtitle">I built six checks and wired them into CI. Later I found that each one reported success for work that never ran. Each one exited green.</p>
 
     <svg class="six-pass" viewBox="0 0 260 100" role="img"
-         aria-label="Six checks. Each one reported PASS for work that had not happened.">
+         aria-label="Six checks. Each one reported PASS for work that never ran.">
       <title>Six PASS marks. The shared fact is that they passed.</title>
       <text class="sx-lane" x="4" y="12">SIX CHECKS</text>
       <rect class="sx-ok" x="4" y="22" width="80" height="28" rx="2" />
@@ -163,7 +316,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="sx-ok-text" x="216" y="76" text-anchor="middle">PASS</text>
     </svg>
     <p class="six-pass-caption">
-      Six greens. Each check reported PASS for work that had not happened.
+      Six greens. Each check reported PASS for work that never ran.
     </p>
 
     <h2>Two ways to fail</h2>
@@ -173,29 +326,54 @@ import SiteNav from '../../components/SiteNav.astro';
       worked.
     </p>
 
-    <p>
-      The first break was a missing OIDC permission. It went red in minutes.
-    </p>
+    <!-- fg-s1, the attempts strip. Three breaks of one lane, each beside what
+         CI reported. The rows re-lay the three paragraphs that stood here. The
+         STE conversion of the same words is a separate pass in the same commit,
+         and the pull request keeps the two ledger blocks apart.
+
+         Everything the row grammar cannot hold stays in the paragraph below:
+         the cost, the refused posts, the recorded denial count, and the ruling
+         that a tool denial is not a job failure. The dollar figure never enters
+         the figure (redesign brief 1.12, OC-D). -->
+    <figure class="fg-s1 fig" data-fig="strip">
+      <ul class="fg-s1-rows">
+        <li>
+          <span class="fgs-break">A missing OIDC permission</span>
+          <span class="fgs-out">Red in minutes.</span>
+        </li>
+        <li>
+          <span class="fgs-break">A missing tool grant</span>
+          <span class="fgs-out">Green in thirty-six seconds.</span>
+        </li>
+        <li>
+          <span class="fgs-break">A pull request that edited the lane&rsquo;s own workflow file</span>
+          <span class="fgs-out">Green. The job never ran at all.</span>
+        </li>
+      </ul>
+      <figcaption>
+        <span class="fig-what">One agentic review lane broke three times
+        before it worked. The first break failed in minutes. The second break
+        and the third break both reported green.</span>
+        <span class="fig-limit">The strip holds the outcome and nothing else.
+        The second break&rsquo;s cost, its refused posts, and the recorded
+        denial count stay in the prose below.</span>
+      </figcaption>
+    </figure>
 
     <p>
-      The second break was a missing tool grant. It went green in thirty-six
-      seconds, having spent $0.14 across seven turns. The agent had read the
-      diff, formed a review, attempted to post it six times, been refused each
-      time, and exited zero. The run recorded
+      That second run spent $0.14 across seven turns. The agent read the diff,
+      formed a review, and attempted to post it six times. Every attempt was
+      refused. The agent exited zero. The run recorded
       <code>permission_denials_count: 6</code>. A tool denial is not a job
       failure, so the job did not fail.
     </p>
 
-    <p>
-      The third break was a pull request that edited the lane&rsquo;s own
-      workflow file. Green. The job never executed at all.
-    </p>
-
-    <!-- Argument: same empty middle, opposite report. State is word + geometry
-         first (FAIL/PASS, broken vs intact edge), oxide/ink second — not a
-         colour-only reading, and no invented CI green. -->
+    <!-- Argument: same empty middle, opposite report. The state is a word plus
+         a geometry first (FAIL/PASS, a broken or an intact edge). Oxide and ink
+         come second. This is not a colour-only reading, and the figure invents
+         no CI green. -->
     <svg class="two-fail" viewBox="0 0 260 188" role="img"
-         aria-label="Two parallel CI outcomes when no work ran. Top: a deterministic tool exits non-zero and reports FAIL. Bottom: an agentic or hand-written gate exits zero and reports PASS — the same success mark whether the work was denied, crashed, or never attempted.">
+         aria-label="Two parallel CI outcomes when no work ran. Top: a deterministic tool exits non-zero and reports FAIL. Bottom: an agentic or hand-written gate exits zero and reports PASS. The mark is the same whether the work was denied, crashed, or never attempted.">
       <defs>
         <marker id="tf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto">
@@ -211,14 +389,14 @@ import SiteNav from '../../components/SiteNav.astro';
         </marker>
       </defs>
 
-      <!-- Top lane: deterministic tool — loud FAIL when nothing ran. -->
+      <!-- Top lane: deterministic tool. A loud FAIL when nothing ran. -->
       <text class="tf-lane" x="6" y="14">DETERMINISTIC TOOL</text>
       <rect class="tf-box" x="6" y="24" width="64" height="36" rx="2" />
       <text class="tf-step" x="38" y="46" text-anchor="middle">run tool</text>
       <path class="tf-edge" d="M 70 42 L 84 42" marker-end="url(#tf-arrow)" />
       <rect class="tf-hollow" x="88" y="24" width="74" height="36" rx="2" />
       <text class="tf-hollow-label" x="125" y="46" text-anchor="middle">nothing ran</text>
-      <!-- Broken final edge: gap is the loud break into FAIL. -->
+      <!-- Broken final edge: the gap is the loud break into FAIL. -->
       <path class="tf-edge-break" d="M 162 42 L 170 42" />
       <path class="tf-edge-break" d="M 180 42 L 188 42" marker-end="url(#tf-arrow-fail)" />
       <!-- ASCII exit code + word badge only: ≠ / ✕ / ✓ are not in Geist, and
@@ -227,7 +405,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <rect class="tf-fail" x="192" y="24" width="62" height="36" rx="2" />
       <text class="tf-fail-text" x="223" y="46" text-anchor="middle">FAIL</text>
 
-      <!-- Bottom lane: agentic / hand gate — quiet PASS on the same empty middle. -->
+      <!-- Bottom lane: agentic or hand gate. A quiet PASS on the same empty middle. -->
       <text class="tf-lane" x="6" y="104">AGENTIC / HAND GATE</text>
       <rect class="tf-box" x="6" y="114" width="64" height="36" rx="2" />
       <text class="tf-step" x="38" y="136" text-anchor="middle">run check</text>
@@ -242,14 +420,13 @@ import SiteNav from '../../components/SiteNav.astro';
     </svg>
     <p class="two-fail-caption">
       Same empty middle, opposite report. A deterministic tool fails when it
-      does nothing. An agentic or hand-written gate can still go PASS, whether
-      the work happened, was denied, crashed, or was never attempted.
+      does nothing. An agentic or hand-written gate can still report PASS,
+      whether the work happened, was denied, crashed, or was never attempted.
     </p>
 
     <p>
-      I wrote that down as a lesson about agents. The same shape was already
-      sitting in gates I had written by hand. It took another four months to
-      find them.
+      I wrote that down as a lesson about agents. The same shape already sat in
+      gates that I wrote by hand. It took another four months to find them.
     </p>
 
     <h2>The check that measured the wrong thing</h2>
@@ -261,12 +438,12 @@ import SiteNav from '../../components/SiteNav.astro';
         The mobile QA gate renders every page at four widths and fails on
         horizontal overflow. It opened the built files directly, over
         <code>file:</code> URLs. The layout emits root-absolute asset paths, and
-        those do not resolve over <code>file:</code>, so every page it measured
-        rendered unstyled.
+        those paths do not resolve over <code>file:</code>. So every page it
+        measured rendered unstyled.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> an unstyled page does not overflow. The gate
-        ran, produced numbers for sixteen pages at four widths, and the numbers
+        ran and produced numbers for sixteen pages at four widths. The numbers
         described a page no visitor would ever see. It now serves the build over
         HTTP.
       </p>
@@ -277,14 +454,14 @@ import SiteNav from '../../components/SiteNav.astro';
       <h3>&ldquo;Fonts embedded: Geist&rdquo;</h3>
       <p>
         The r&eacute;sum&eacute; PDF script printed that line and I believed it
-        for months. It read the value from <code>document.fonts</code>, which
-        proves a woff2 loaded into the <strong>browser</strong> and says nothing
-        about the bytes written to the PDF.
+        for months. It read the value from <code>document.fonts</code>. That
+        value proves a woff2 loaded into the <strong>browser</strong>. It says
+        nothing about the bytes written to the PDF.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> it read as evidence. It cost me a round of
-        investigating a font defect that did not exist. It now asserts against
-        the raw bytes of the file it just wrote.
+        investigation into a font defect that did not exist. It now asserts
+        against the raw bytes of the file it just wrote.
       </p>
     </div>
 
@@ -296,20 +473,19 @@ import SiteNav from '../../components/SiteNav.astro';
     <h2>The check that could not see what it was looking for</h2>
 
     <div class="decision" data-outcome="reversal">
-      <p class="tag"><span class="sr-only">Reversed. </span>Every deep link, unverified</p>
+      <p class="tag"><span class="sr-only">Reversed. </span>Every deep link, unchecked</p>
       <h3>The link checker split the fragment off first</h3>
       <p>
         One line: split the URL on <code>#</code>, split on <code>?</code>, then
         ask whether the file exists. So a link to a real page with a dead anchor
-        was a good link, and the reader lands at the top of the page with no sign
-        anything went wrong.
+        was a good link. The reader lands at the top of the page with no sign
+        that anything went wrong.
       </p>
       <p class="tradeoff">
-        <strong>The result:</strong> it had done this since the checker was
-        written, so every deep link on the site had been reported valid without
-        the anchor ever being confirmed to exist. It mattered the moment I
-        started moving sections between pages: the three pull requests
-        immediately before I found it.
+        <strong>The result:</strong> the checker did this from the day I wrote
+        it. So it reported every deep link on the site as valid, and it never
+        checked one anchor. It mattered the moment I moved sections between
+        pages. That was the three pull requests immediately before I found it.
       </p>
     </div>
 
@@ -318,14 +494,14 @@ import SiteNav from '../../components/SiteNav.astro';
       <h3>The font gate&rsquo;s regular expression</h3>
       <p>
         The coverage gate matches font declarations with
-        <code>@font-face\s*&#123;([^&#125;]*)&#125;</code>. A comment sitting
-        between <code>@font-face</code> and its opening brace hides the block
-        from <code>\s*</code>. A closing brace inside a comment truncates the
-        body early.
+        <code>@font-face\s*&#123;([^&#125;]*)&#125;</code>. A comment between
+        <code>@font-face</code> and its opening brace hides the block from
+        <code>\s*</code>. A closing brace inside a comment truncates the body
+        early.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> either way the face falls out of the scan
-        through a silent <code>continue</code>, and the expected face count then
+        through a silent <code>continue</code>. The expected face count then
         treats that gap as a pass.
         Against the fixture I wrote afterward, the old pattern sees one face out
         of three.
@@ -379,37 +555,88 @@ import SiteNav from '../../components/SiteNav.astro';
     <h2>The check watching the check</h2>
 
     <div class="decision" data-outcome="reversal">
-      <p class="tag"><span class="sr-only">Reversed. </span>The instrument that read a missing field</p>
+      <p class="tag"><span class="sr-only">Reversed. </span>The instrument that read an absent field</p>
       <h3>A counter that was structurally always zero</h3>
       <p>
-        The review workflow was supposed to warn me about exactly the failure
-        that started this page. If a run hit tool denials, the classify step
-        would flag it, so a green check with no comment could never again be
-        mistaken for a clean review.
+        I built the review workflow to warn me about exactly the failure that
+        started this page. If a run hit tool denials, the classify step would
+        report it. Then nobody could ever again read a green check with no
+        comment as a clean review.
+      </p>
+
+      <!-- fg1-keys. One result message, two key reads. The hit returns an
+           array and the miss returns nothing, so the code defaulted it to
+           zero. Zero digits in the plate: the run figures stay in the prose
+           below, where a reader can check them against the run summary. Both
+           key names are exact, because a near-miss identifier is a wrong
+           identifier and the whole defect is one character run of them. -->
+      <figure class="fg1-fig fig" data-fig="plate">
+        <svg class="fg1-plate" viewBox="0 0 260 118" role="img"
+             aria-label="One result message and two key reads. The key permission_denials holds an array. The key permission_denials_count is not in the message, so the read returned zero.">
+          <title>Two key reads against one result message. One returns an array, one returns zero.</title>
+          <defs>
+            <marker id="fg1-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+            <marker id="fg1-arrow-miss" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto">
+              <path class="fg1-head-miss" d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+          </defs>
+
+          <!-- The object both reads run against. -->
+          <text class="fg1-title" x="6" y="11">ONE RESULT MESSAGE</text>
+          <rect class="fg1-obj" x="6" y="16" width="248" height="22" rx="2" />
+          <text class="fg1-obj-label" x="130" y="31" text-anchor="middle">the saved execution log</text>
+          <path class="fg1-edge" d="M 16 38 L 16 96" />
+
+          <!-- The read that hit: intact edge, solid box, a word for the value. -->
+          <path class="fg1-edge" d="M 16 60 L 30 60" marker-end="url(#fg1-arrow)" />
+          <rect class="fg1-box" x="34" y="48" width="222" height="24" rx="2" />
+          <text class="fg1-key" x="42" y="64">permission_denials</text>
+          <text class="fg1-hit" x="248" y="64" text-anchor="end">an array</text>
+
+          <!-- The read that missed: broken edge, dashed box, and the word the
+               code substituted. -->
+          <path class="fg1-edge-miss" d="M 16 96 L 21 96" />
+          <path class="fg1-edge-miss" d="M 25 96 L 30 96" marker-end="url(#fg1-arrow-miss)" />
+          <rect class="fg1-box-miss" x="34" y="84" width="222" height="24" rx="2" />
+          <text class="fg1-key" x="42" y="100">permission_denials_count</text>
+          <text class="fg1-miss" x="248" y="100" text-anchor="end">zero</text>
+        </svg>
+        <figcaption>
+          <span class="fig-what">The counter read one key and the message
+          carried another. The array permission_denials was there. The key
+          permission_denials_count was not, so the read returned undefined and
+          the code defaulted it to zero.</span>
+          <span class="fig-limit">The plate shows one defect, not the way two
+          defects concealed each other. The run&rsquo;s logged denial count, its
+          turn count, and its cost stay in the prose below.</span>
+        </figcaption>
+      </figure>
+
+      <p>
+        The log is the raw message stream. Its result message carries the array
+        <code>permission_denials</code>. A read of an absent key returns
+        undefined, and the code defaulted that to zero.
       </p>
       <p>
-        It read <code>permission_denials_count</code> from the saved execution
-        log. That key does not exist. The log is the raw message stream, and its
-        result message carries the array <code>permission_denials</code>.
-        Reading an absent key returns undefined, and the code defaulted it to
-        zero.
-      </p>
-      <p>
-        On one pull request the step logged <code>denials=0</code> while
-        reporting <code>turns</code> as 8 and <code>cost</code> as 0.1447, both
-        matching the run summary to the digit. The same result object, one field
-        silently misread.
+        On one pull request the step logged <code>denials=0</code>. It reported
+        <code>turns</code> as 8 and <code>cost</code> as 0.1447. Both figures
+        matched the run summary to the digit. The same result object, and one
+        field silently misread.
       </p>
       <p class="tradeoff">
-        <strong>The result:</strong> that review agent held four tools, none of
-        which could open a file. On a diff whose meaning lived in the markup it
-        burned five denied reads and posted nothing. The instrument that existed
-        to surface those denials was reading a field that was never there. The
+        <strong>The result:</strong> that review agent held four tools, and none
+        of them could open a file. The diff&rsquo;s meaning lived in the markup.
+        The agent burned five denied reads and posted nothing. The instrument I
+        built to report those denials read a field that was never there. The
         two defects concealed each other.
       </p>
       <p>
-        The lane&rsquo;s earlier configuration was worse: for ten days it had no
-        publish channel at all, and posted zero comments on zero pull requests.
+        The lane&rsquo;s earlier configuration was worse. For ten days it had no
+        publish channel at all. It posted zero comments on zero pull requests.
         That looked like a quiet stretch with nothing to say.
       </p>
     </div>
@@ -418,7 +645,7 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <p>
       Each defect is one line. A passing check and a check that cannot fail look
-      the same from the outside. I found each one by asking a specific question
+      the same from the outside. I found each one. I asked a specific question
       of a specific gate.
     </p>
 
@@ -428,27 +655,27 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     <p>
-      The cheap version is to reconcile the guard&rsquo;s own reported count
-      against a raw grep, once. Every gate on this site now asserts a non-zero
-      count of the thing it walked. A gate pointed at an empty directory finds
-      nothing and reports that as success.
+      The cheap version reconciles the gate&rsquo;s own reported count against a
+      raw grep, once. Every gate on this site now asserts a non-zero count of
+      the thing it walked. A gate pointed at an empty directory finds nothing
+      and reports that as success.
     </p>
 
     <p class="tradeoff">
       <strong>One of them did not, and this page said so first.</strong> The
-      metrics guard skipped its parity check on Markdown, so a Markdown marker
-      that parsed to nothing was indistinguishable from a file making no claims.
-      Marking a number wrong was quieter than not marking it at all. This page
-      named that gap while it was still live.
+      metrics gate skipped its parity check on Markdown. So a Markdown marker
+      that parsed to nothing looked exactly like a file that makes no claims. A
+      wrong mark on a number was quieter than no mark at all. This page named
+      that gap while it was still live.
     </p>
 
     <p>
       It is closed now. The Markdown branch counts its own markers. A suite
-      asserts the counter reports a gap for each shape the value pattern cannot
-      read. A parity counter that returns zero and a parity counter that is
-      correct produce identical output on a clean tree, so the fix was
-      unfalsifiable until something made it fail on purpose. Reverting the
-      one-line exemption turns exactly three of those tests red.
+      asserts that the counter reports a gap for each shape the value pattern
+      cannot read. A parity counter that returns zero and a correct parity
+      counter produce identical output on a clean tree. So the fix was
+      unfalsifiable until something made it fail on purpose. If I revert the
+      one-line exemption, exactly three of those tests turn red.
     </p>
 
   </main>

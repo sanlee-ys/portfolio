@@ -3,23 +3,41 @@ import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 import evidence from '../../data/telltale-evidence.json';
 /*
- * The record is read at render time in two places, and the two are protected
- * differently on purpose.
+ * The page reads the record at render time in two places. Each place has a
+ * different protection, on purpose.
  *
  * FIGURES are typed into the markup as literals. `check-telltale-evidence.cjs`
  * then compares the rendered text to this file, so the gate does real work: a
- * mistyped count fails the build. Interpolating a figure here would make the
- * gate compare the record to itself, which is not a check.
+ * mistyped count fails the build. An interpolated figure would make the gate
+ * compare the record to itself, and that is not a check.
  *
- * FRAMES are interpolated from `evidence.frames`, so page-versus-record drift
- * is impossible by construction rather than merely detected. That is the
- * stronger guarantee, and it is the right one here: a frame is 120 columns of
- * terminal output where a single retyped space is invisible to a reader and
- * fatal to the alignment. The gate's frame half therefore checks what is left
- * to check — that every `data-tt-frame` key on the page resolves to a stored
- * frame, and that every stored line is pure ASCII.
+ * FRAMES are interpolated from `evidence.frames`. Page-versus-record drift is
+ * therefore impossible by construction, not merely detected. That is the
+ * stronger guarantee and it is the right one here. A frame is up to 120 columns
+ * of terminal output. One retyped space is invisible to a reader and fatal to
+ * the alignment. The gate's frame half checks what is left to check: every
+ * `data-tt-frame` key on the page resolves to a stored frame, and every stored
+ * line is pure ASCII.
+ *
+ * THE READER'S ORDER IS DECLARED HERE, NOT DERIVED FROM THE RECORD. The record
+ * is a map and its key order is an accident of the puller. The reading order is
+ * an argument: a reading, then a marked stale reading, then an absence, then
+ * the record's reach, then the gate that spends a quota, then the refusal, and
+ * last the phone-native twin. `scripts/pull-telltale-evidence.cjs` owns which
+ * frames exist. This page owns the order they are read in.
  */
 const src = evidence.source;
+const READER_ORDER = ['usage', 'stale', 'absent', 'record', 'gate', 'floor', 'composer'];
+const missingFrames = READER_ORDER.filter((k) => !evidence.frames[k]);
+if (missingFrames.length) {
+  // A frame the record no longer holds must stop the build here. Rendering the
+  // reader without it would drop a caption and an argument in silence.
+  throw new Error(
+    `telltale.astro: the frame reader names ${missingFrames.join(', ')}, which `
+    + 'src/data/telltale-evidence.json does not hold. Re-run '
+    + 'scripts/pull-telltale-evidence.cjs, or correct READER_ORDER.'
+  );
+}
 ---
 <Base
   title="telltale · Gauges That Refuse to Guess · San Lee"
@@ -132,6 +150,278 @@ const src = evidence.source;
       font-size: 0.92rem;
       margin: 0 0 18px;
     }
+
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
+
+       COPIED VERBATIM from src/pages/projects/context-architecture.astro at
+       9d81caa (PR #247), which is the origin copy. Do not edit this block
+       here; edit the origin and re-copy. It is page-scoped on purpose: a
+       concurrent session owns public/assets/style.css for the tap-target work,
+       and two writers on one shared stylesheet cannot merge. OC-F of the
+       redesign brief carries the consolidation, for after that session merges.
+
+       .fig-what states what the figure argues. .fig-limit states what the
+       figure does not show. The gate fails the build on an empty .fig-limit,
+       because a figure that ends on a win while its caveat sits somewhere else
+       is the split ADR-007 refuses.
+
+       The quiet voice is a token, never opacity (ADR-009). Both slots are
+       block-level, so the limit reads as its own line and not as a tail. */
+    .fig {
+      margin: 0 0 22px;
+    }
+    .fig figcaption {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+    }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* One page-local addition to the copied block, kept separate so the copy
+       above stays byte-identical to its origin. `min-width: 0` matters here
+       and not on the origin page: every frame figure is a grid item holding a
+       120-column `<pre>`, and a grid item's default `min-width: auto` refuses
+       to shrink below its content, so the figure would widen its own track and
+       take the page with it.
+
+       Nothing else is added. Every frame figure carries BOTH `tt-figure` and
+       `fig`, so the copied `.fig figcaption` rules already style all thirteen
+       captions on this page. A second rule restating the same values is a
+       thing that drifts. */
+    .fig { min-width: 0; }
+
+    /* ---------------------------------------------------------------------
+       `tt9-` IS THE SHARED GRAMMAR FOR THE FOUR NEW PLATES ON THIS PAGE.
+       The prefix rule wants a digit, because the site's existing plate
+       prefixes carry none and a duplicate marker id repaints the wrong arrow
+       head with no gate to see it. One vocabulary for four plates on one page
+       beats four copies of the same six rules.
+
+       Rules these plates inherit, and a later editor must keep:
+         - No digit in any <text> node. `figure-contract.cjs` fails on one, and
+           every count lives in the caption or in kept prose.
+         - Two hues only. `--accent-warm` means a decision that was taken back,
+           so only the retired badge class uses it. Nothing else here is a
+           reversal.
+         - A state is a WORD plus a geometry. Geist has no glyph for the
+           symbols that would replace them, and `false-green.astro` records
+           that constraint for the whole site.
+         - No `opacity` on text (ADR-009), and no italic: Geist ships no
+           italic cut.
+         - SVG text inherits from <body>, so every text class declares its own
+           `font-family`.
+         - `max-width: 260px` keeps one viewBox unit at one CSS pixel down to
+           320px. Nothing here sits inside an indent, so the container is the
+           full content track.
+       --------------------------------------------------------------------- */
+    .tt9-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 0;
+    }
+    .tt9-set,
+    .tt9-band {
+      fill: none;
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+    }
+    .tt9-box {
+      fill: var(--accent-soft);
+      stroke: var(--accent);
+      stroke-width: 1;
+    }
+    .tt9-box-open {
+      fill: none;
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+      stroke-dasharray: 2 2;
+    }
+    .tt9-box-warm {
+      fill: var(--accent-warm-soft);
+      stroke: var(--accent-warm);
+      stroke-width: 1;
+    }
+    .tt9-panel {
+      fill: none;
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .tt9-edge {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.25;
+    }
+    /* A marker does not inherit the referencing path's stroke, so it declares
+       its own paint. Without this the arrow head renders black in both themes. */
+    .tt9-arrowhead { fill: var(--accent); stroke: none; }
+    .tt9-strike {
+      fill: none;
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .tt9-head {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+    }
+    .tt9-label {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .tt9-note {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 7.5px;
+    }
+    .tt9-warm { fill: var(--accent-warm); }
+
+    /* ---------------------------------------------------------------------
+       STRIPS. A strip re-lays text nodes in a grid. It writes no new
+       assertion, it keeps every word, and because it is HTML rather than SVG
+       it stays inside `contrast-check.cjs`. `min-width: 0` on every grid item,
+       or an unbreakable token widens its own track and takes the page with it.
+       --------------------------------------------------------------------- */
+    .tt-strip { margin: 0; min-width: 0; }
+    .tt-strip ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .tt-strip li {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px 18px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      min-width: 0;
+    }
+    .tt-strip li > * { min-width: 0; }
+    .tt-strip .tt-strip-a { color: var(--text); }
+    .tt-strip .tt-strip-b { color: var(--muted); }
+    /* `min-width: 0` on the header cells too, for the same reason the row cells
+       get it: a grid item's default `min-width: auto` refuses to shrink below
+       its content. Both header strings break on spaces today, so this is the
+       rule the block already states rather than a fix for a live overflow. */
+    .tt-strip-cols > * { min-width: 0; }
+    .tt-strip-cols {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px 18px;
+      padding-bottom: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tt-s2-group {
+      margin: 16px 0 2px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tt-s2-group:first-of-type { margin-top: 4px; }
+    @media (min-width: 34rem) {
+      .tt-strip li,
+      .tt-strip-cols { grid-template-columns: 3fr 4fr; }
+    }
+    /* tt-s2 groups a single-column list. It is a strip because it re-lays
+       existing text under headings, not because it has two columns. The
+       two-class selector out-ranks the media query at every width, so the
+       order of these blocks cannot matter. */
+    .tt-strip.tt-s2 li { grid-template-columns: 1fr; }
+    .tt-strip.tt-s2 ul + p { margin-top: 18px; }
+    /* tt-s3 is a TABLE, so it carries no `data-fig` and no caption slots: a
+       table is not a figure (ADR-013) and it adds no unguarded claim. Its
+       second column holds Go test names, which are single unbreakable tokens
+       wider than the 320px content track. They must be allowed to break, or
+       one identifier widens the page. */
+    .tt-s3 code { overflow-wrap: anywhere; }
+
+    /* ---------------------------------------------------------------------
+       THE FRAME READER (portfolio ADR-013, RULE D2).
+
+       EVERY FRAME SHIPS IN THE SERVED HTML AND JAVASCRIPT ONLY REDUCES THE
+       SET. `scripts/mobile-qa.cjs` loads a page, measures the overflow once,
+       and never clicks, so a frame swapped in after load is measured by
+       nothing. The site's known silent failure is a `.tt-frame` that loses on
+       specificity, wraps, shears every column, and turns the mobile gate GREEN
+       because a wrapped frame cannot overflow. A later change that
+       server-renders one frame reopens that hole in silence. Do not make it.
+
+       The hiding rule is the ONLY thing the enhancement does, and it is
+       written here rather than in the script so nothing flashes on load.
+       --------------------------------------------------------------------- */
+    .tt-reader[data-enhanced] figure[id^="frame-"]:not([data-current]) {
+      display: none;
+    }
+    .tt-reader-rail {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0 4px;
+      padding: 0;
+    }
+    .tt-reader-rail li { min-width: 0; }
+    /* A real control, not a word. 44px at every width, which is what the
+       hit-target gate measures at 390px for a standalone anchor. */
+    .tt-reader-rail a,
+    .tt-reader-step {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      color: var(--accent-quiet);
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      text-decoration: none;
+    }
+    .tt-reader-rail a[aria-current] {
+      border-color: var(--accent);
+      color: var(--text);
+      font-weight: 600;
+    }
+    .tt-reader-step { cursor: pointer; }
+    .tt-reader-step:disabled {
+      color: var(--muted);
+      cursor: default;
+    }
+    .tt-reader-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 4px;
+    }
+    .tt-reader-status {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .tt-reader figure { margin: 18px 0 22px; }
+    .tt-reader figure:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   </style>
   </Fragment>
 
@@ -140,30 +430,30 @@ const src = evidence.source;
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>telltale</h1>
-    <p class="subtitle">A terminal instrument for five coding-agent CLIs. Every reading is measured, and a reading it cannot measure is drawn absent, not zero.</p>
+    <p class="subtitle">A terminal instrument for five coding-agent CLIs. It measures every reading, and a reading it cannot measure renders as absent, never as zero.</p>
 
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
       <ul>
-        <li><strong>Problem:</strong> I direct five coding-agent CLIs across several repositories. None of them tells me how much context is left, what a run cost, whether its sandbox holds, or whether a seat that looks busy has quietly died. Any dashboard I could have built would have had to invent at least one of those numbers.</li>
+        <li><strong>Problem:</strong> I direct five coding-agent CLIs across several repositories. None of them tells me how much context is left or what a run cost. None tells me whether its sandbox holds, or whether a seat that looks busy died quietly. Any dashboard I built would have to invent at least one of those numbers.</li>
         <li><strong>Ownership:</strong> Sole author. I set the honesty contract, the read-only boundary, and the release bar, and I made every ship-or-refuse call recorded on this page. Claude did most of the typing. The golden files and the postmortems are the proof.</li>
-        <li><strong>Constraints:</strong> It reads; it never writes back to a vendor. It binds no port and sends nothing off the machine. Windows is the primary target. Every vendor changes its on-disk format without telling anyone.</li>
-        <li><strong>Actions:</strong> One Go binary. I built one adapter per vendor from its real records, pinned the difference between zero and absent in three golden suites, moved the README&rsquo;s pictures out of my hands and into the test suite, raced one brief across five seats in isolated worktrees, and refused a list of features that would each have required a number nobody measured.</li>
-        <li><strong>Result and evidence:</strong> v0.2.0 ships as four archives and a checksum file. The honesty rules are enforced by named tests rather than by intent, so a reader can grep for them. The platform labels say which builds were run and which were only built.</li>
+        <li><strong>Constraints:</strong> It reads; it never writes back to a vendor. It binds no port and sends nothing off the machine. Windows is the primary target. Every vendor changes its on-disk format, and no vendor announces it.</li>
+        <li><strong>Actions:</strong> One Go binary. I built one adapter per vendor from its real records. I pinned the difference between zero and absent in three golden suites. I moved the README&rsquo;s pictures out of my hands and into the test suite. I raced one brief across five seats in isolated worktrees. I refused a list of features, and each one would have required a number nobody measured.</li>
+        <li><strong>Result and evidence:</strong> v0.2.0 ships as four archives and a checksum file. Named tests enforce the honesty rules, not intent, so a reader can grep for them. The platform labels say which builds I ran and which I only built.</li>
       </ul>
     </div>
 
     <p class="lead">
       telltale is a Go terminal program. It reads what five coding-agent CLIs
-      leave on disk and draws one row per seat: context, spend, quota,
-      liveness, sandbox posture. The interesting part is not the gauge. It is
-      the refusal. A gauge that fills a gap with a plausible number is worse
-      than no gauge, because a plausible number gets trusted. Most of the
-      engineering here is the code that declines to render.
+      leave on disk. It renders one row per seat: context, spend, quota,
+      liveness, and sandbox posture. The interesting part is not the gauge; it
+      is the refusal. A gauge that fills a gap with a plausible number is worse
+      than no gauge, because a reader trusts a plausible number. Most of the
+      engineering here is the code that refuses to render.
     </p>
 
     <svg class="tt-plate" viewBox="0 0 260 96" role="img"
-         aria-label="Three states a gauge can be in. Measured zero: the value reads 0 percent and the track is drawn in full and left empty. Absent: the value is an em dash and no track is drawn at all, because nothing was measured. Invented: the value reads 47 percent over a half-filled track, struck through, because a plausible number nobody measured is the one failure this program exists to prevent.">
+         aria-label="Three states a gauge can be in. Measured zero: the value reads 0 percent over a full, empty track. Absent: the value is an em dash and no track at all, because nothing measured it. Invented: the value reads 47 percent over a half-filled track, struck through. A plausible number nobody measured is the one failure this program prevents.">
       <title>Measured zero draws a full empty track. Absent draws nothing. An invented reading is the failure.</title>
 
       <rect class="tt-track" x="6" y="30" width="68" height="12" rx="2" aria-hidden="true" />
@@ -193,12 +483,12 @@ const src = evidence.source;
     </p>
 
     <p>
-      Two kinds of number appear below. A plain figure was recounted from the
-      repository by a script at build time, at the commit printed under Stack.
-      A figure with a source reference beside it was measured once and recorded
-      in the project&rsquo;s design document, and this page cites that record
-      rather than re-measuring it. A check in this site&rsquo;s own test suite
-      fails the build if either kind drifts from the file it was pulled into.
+      Two kinds of number appear below. A script recounts a plain figure from
+      the repository at build time, at the commit printed under Stack. I
+      measured a figure with a source reference beside it once, and I recorded
+      it in the project&rsquo;s design document. This page cites that record and
+      does not re-measure it. A check in this site&rsquo;s own test suite fails
+      the build when either kind drifts from the record.
     </p>
 
     <nav class="toc" aria-labelledby="toc-heading">
@@ -206,9 +496,10 @@ const src = evidence.source;
       <ol>
       <li><a href="#what-it-is">What it is</a></li>
       <li><a href="#absent">Zero and absent are different states</a></li>
-      <li><a href="#badges">The badges claimed more than I had measured</a></li>
+      <li><a href="#badges">The badges claimed more than I measured</a></li>
       <li><a href="#race">Five seats, one brief, and no winner</a></li>
       <li><a href="#instrument">Twice the instrument was the bug</a></li>
+      <li><a href="#see-it">See it: seven recorded frames</a></li>
       <li><a href="#refusals">What it refuses to render</a></li>
       <li><a href="#capacity">The gate that measured the capacity</a></li>
       <li><a href="#limits">What this does not establish</a></li>
@@ -219,82 +510,163 @@ const src = evidence.source;
 
     <h2 id="what-it-is">What it is</h2>
     <p>
-      One static Go binary, no runtime dependency. It has two faces. A heads-up
-      display draws every live agent session as one row. A dispatch room seats
-      five of those agents side by side, sends them one brief, and shows the
-      five answers as five columns. The room is the product and the gauges are
-      the infrastructure, and that ranking is a recorded ruling in the
-      project&rsquo;s design document rather than a preference of mine.
+      telltale is one static Go binary with no runtime dependency. It has two
+      faces. The heads-up display renders every live agent session as one row.
+      The dispatch room seats five of those agents side by side and sends them
+      one brief. It renders the five answers as five columns.
     </p>
     <p>
-      Underneath, there are <span data-tt="adapters.vendor">7</span> vendor
-      adapters. That is a larger number than the five seats on purpose: two of
-      the vendors are watched by the display but are deliberately not seated in
-      the room, and the design document says which and why. A sixth kind of row
-      comes from a drop-file relay &mdash; a documented format any tool can
-      write, so a program telltale ships no adapter for can still put a row on
-      screen. That row is marked self-reported, because telltale did not
-      measure it.
+      The room is the product and the gauges are the infrastructure. The
+      project&rsquo;s design document records that ranking as a ruling, not as a
+      preference.
+    </p>
+
+    <!-- tt2-roster (portfolio ADR-013). Set membership, drawn once: which
+         adapters the room seats, which the display only watches, and the relay
+         that is not an adapter at all. The counts stay in the caption, inside
+         the `data-tt` span where a gate reads them. Nothing here is a reversal,
+         so nothing here uses the warm hue. -->
+    <figure class="fig" data-fig="plate">
+      <svg class="tt9-plate" viewBox="0 0 260 104" role="img"
+           aria-label="Vendor adapters drawn as one set. The dispatch room seats five of them. The display watches the other two and does not seat them. The drop-file relay sits outside the set, and the display marks its row self-reported.">
+        <title>Five adapters are seated, two are watched, and the relay sits outside the set.</title>
+
+        <text class="tt9-head" x="2" y="10">VENDOR ADAPTERS</text>
+        <rect class="tt9-set" x="1" y="16" width="258" height="52" rx="3" aria-hidden="true" />
+
+        <text class="tt9-label" x="9" y="30">SEATED IN</text>
+        <text class="tt9-label" x="9" y="40">THE ROOM</text>
+        <rect class="tt9-box" x="9" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="29" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="49" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="69" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="89" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+
+        <path class="tt9-band" d="M 132 22 L 132 62" aria-hidden="true" />
+
+        <text class="tt9-label" x="150" y="30">WATCHED,</text>
+        <text class="tt9-label" x="150" y="40">NOT SEATED</text>
+        <rect class="tt9-box-open" x="150" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box-open" x="170" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+
+        <rect class="tt9-box-open" x="9" y="78" width="16" height="14" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="31" y="86">DROP-FILE RELAY</text>
+        <text class="tt9-note" x="31" y="98">MARKED SELF-REPORTED</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">
+          telltale ships <span data-tt="adapters.vendor">7</span> vendor
+          adapters, and the dispatch room seats five of them. The display
+          watches the other two and does not seat them, on purpose. The
+          drop-file relay is a sixth kind of row and it is not an adapter, so
+          it sits outside the set.
+        </span>
+        <span class="fig-limit">
+          The plate names no vendor, and it does not say which two the display
+          only watches. The design document holds that list and the reason for
+          it. The plate also does not show the relay format.
+        </span>
+      </figcaption>
+    </figure>
+
+    <p>
+      The design document says which two vendors the display only watches, and
+      why. The relay format is documented and any tool can write it. So a
+      program telltale ships no adapter for can still put a row on screen.
+      telltale marks that row self-reported, because telltale did not measure
+      it.
     </p>
     <p>
       An agent-facing mode serves the same document over stdio. It binds no
       port and it writes nothing. Install is a direct archive, a scoop manifest
       exercised once, or a source build.
+      <a href="#frame-usage">See the display refuse a reading &rarr;</a>
     </p>
-
-    <figure class="tt-figure">
-      <pre class="tt-frame" data-tt-frame="usage" tabindex="0">{evidence.frames.usage.lines.join('\n')}</pre>
-      <figcaption>
-        This is what a refusal looks like when it is rendered rather than
-        argued. Two vendors have a quota reading and print it against its
-        window; the third has none reaching disk at all, so the row says that
-        in words and draws no gauge &mdash; the header states the distinction
-        the view is built on. Lines 3&ndash;14 of <code>internal/hud/testdata/golden/usage-ascii.txt</code>
-        at <code>{src.sha}</code>, copied byte for byte from the test suite&rsquo;s
-        own output. The fixture is synthesized; the repository holds no real
-        session content. Scrolls sideways on a narrow screen.
-      </figcaption>
-    </figure>
 
     <p>
       <strong>What the release does and does not prove.</strong> Two of the four
       archives are built, not run: no recorded run exists for the macOS ARM
       build or the Linux build. All macOS measurement is one Intel machine. No
-      binary is signed, so checksum verification against the release&rsquo;s own
-      checksum file is the whole verification the release offers. The Windows
-      reputation prompt is unmeasured. One package-manager manifest set is a
-      draft and was never submitted.
+      binary is signed. Checksum verification against the release&rsquo;s own
+      checksum file is therefore the whole verification the release offers. The
+      Windows reputation prompt is unmeasured. One package-manager manifest set
+      is a draft and I never submitted it.
     </p>
 
     <h2 id="absent">Zero and absent are different states</h2>
+
+    <!-- tt3-layers (portfolio ADR-013). The MECHANISM only: two independent
+         places where an absence is enforced. `.tt-plate` above already argues
+         the three render states, so this plate must not restate them. The three
+         arguments in this section stay as prose: that a column of dashes is
+         itself a claim, that a documented search is a different claim from no
+         search, and the refusal to draw a context percentage. A plate cannot
+         carry any of them at full strength. -->
+    <figure class="fig" data-fig="plate">
+      <svg class="tt9-plate" viewBox="0 0 260 132" role="img"
+           aria-label="Two independent layers enforce presence. Per session, every optional field is a pointer, so one field can drop on its own. Per adapter, a capability declaration drops a whole column and does not fill it with dashes.">
+        <title>A pointer drops one field. A declaration drops a whole column.</title>
+
+        <text class="tt9-head" x="2" y="10">TWO INDEPENDENT LAYERS</text>
+
+        <rect class="tt9-band" x="1" y="16" width="258" height="48" rx="3" aria-hidden="true" />
+        <text class="tt9-label" x="9" y="30">PER SESSION: A POINTER</text>
+        <rect class="tt9-box" x="9" y="36" width="26" height="18" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="39" y="36" width="26" height="18" rx="2" aria-hidden="true" />
+        <rect class="tt9-box-open" x="69" y="36" width="26" height="18" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="99" y="36" width="26" height="18" rx="2" aria-hidden="true" />
+        <text class="tt9-note" x="136" y="49">ONE FIELD DROPS</text>
+
+        <rect class="tt9-band" x="1" y="72" width="258" height="56" rx="3" aria-hidden="true" />
+        <text class="tt9-label" x="9" y="86">PER ADAPTER: A DECLARATION</text>
+        <rect class="tt9-box" x="9" y="92" width="26" height="28" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="39" y="92" width="26" height="28" rx="2" aria-hidden="true" />
+        <rect class="tt9-box-open" x="69" y="92" width="26" height="28" rx="2" aria-hidden="true" />
+        <text class="tt9-note" x="106" y="106">ONE COLUMN DROPS</text>
+        <text class="tt9-note" x="106" y="118">DROPPED, NOT DASHED</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">
+          An absence is enforced in two independent places, and neither one can
+          cover for the other. A nil pointer on a session drops one field. A
+          capability declaration on an adapter drops a whole column.
+        </span>
+        <span class="fig-limit">
+          The plate does not show what a reader sees where the column used to
+          be, and it shows no context percentage. Some vendors expose no
+          per-model window, so that denominator does not exist.
+        </span>
+      </figcaption>
+    </figure>
+
     <p>
       Presence lives in two places, on purpose. Every optional field on a
-      session is a pointer, so a missing reading is a nil rather than a
-      sentinel number, and a rendered <code>0</code> therefore always means the
-      vendor said zero. Above that sits a capability declaration per adapter: a
-      vendor that can never supply a field declares it unsupported, and the
-      column is dropped entirely rather than filled with dashes. A column of
-      dashes for a vendor that could never fill it is itself a small claim
-      about what was measured.
+      session is a pointer, so an absent reading is a nil and never a sentinel
+      number. A rendered <code>0</code> therefore always means the vendor said
+      zero. Above that sits a capability declaration per adapter: a vendor that
+      can never supply a field declares it unsupported. A column of dashes for
+      a vendor that could never fill it is itself a small claim about what was
+      measured.
     </p>
     <p>
-      The strongest detail in the repository is how one of those declarations
-      is documented. It is not asserted. The package documentation names the
-      fields the survey looked for in a live corpus and records that the search
-      returned no matches. An absence documented with the search that found
-      nothing is a different claim from an absence nobody looked for.
+      The strongest detail in the repository is the way the code documents one
+      of those declarations. The code does not merely state it. The package
+      documentation names the fields the survey looked for in a live corpus,
+      and it records that the search returned no matches. An absence documented
+      with the search that found nothing is a different claim from an absence
+      nobody looked for.
     </p>
     <p>
       The same rule is why there is no context percentage for some vendors. A
-      percentage needs a per-model window as its denominator, and where the
-      vendor does not expose one, any percentage would be arithmetic performed
-      on a number I made up.
+      percentage needs a per-model window as its denominator. Where the vendor
+      does not expose one, any percentage would be arithmetic on a number I
+      made up.
     </p>
     <p>
       <span data-tt="goldens.zeroVsAbsent">3</span> golden files, in three
-      different packages, fail the build if a measured zero and an absence ever
-      render the same. The rule is enforced by a stored render rather than by
-      intent, because intent does not fail a build.
+      different packages, fail the build when a measured zero and an absence
+      ever render the same. A stored render enforces the rule, not intent,
+      because intent does not fail a build.
     </p>
     <p class="tradeoff">
       <strong>The rule:</strong> a gauge may state a number, or it may state
@@ -303,150 +675,312 @@ const src = evidence.source;
       an absence nobody looked for. That difference is the whole product.
     </p>
 
-    <h2 id="badges">The badges claimed more than I had measured</h2>
+    <h2 id="badges">The badges claimed more than I measured</h2>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>A badge with no evidence class</p>
       <h3>The row read like enforcement, and one seat had a mechanism</h3>
       <p>
-        Each seat in the room carries a badge describing its sandbox posture.
-        The first version of that row read as enforcement across four seats
-        when exactly one of them had a measured mechanism behind it. Nobody
-        wrote a false sentence. The badge simply did not say what kind of thing
-        it was.
+        Each seat in the room carries a badge that describes its sandbox
+        posture. The first version of that row read as enforcement across four
+        seats. Exactly one of the four had a measured mechanism behind it.
+        Nobody wrote a false sentence. The badge simply did not say what kind
+        of thing it was.
       </p>
+
+      <!-- tt5-badges (portfolio ADR-013). The four cells, and the struck cell
+           reuses the INVENTED geometry from `.tt-plate` above so the page has
+           one vocabulary for "this one is the failure". `--accent-warm` is
+           correct here and nowhere else on this page: the retirement is a
+           decision that was taken back.
+           NO VENDOR NAME ENTERS THIS PLATE, ITS TITLE, ITS CAPTION, OR ITS
+           `aria-label`. The measured two-direction example below stays as
+           prose with no identifying shape, and there is no per-vendor verdict
+           table anywhere on this site. -->
+      <figure class="fig" data-fig="plate">
+        <svg class="tt9-plate" viewBox="0 0 260 96" role="img"
+             aria-label="Four badge classes. Enforced: a live run measured the restriction holding. Refuted: a live run measured it failing. Unverified: I looked for a result and got none. Claimed: retired, and struck through, because it read like enforced and was not.">
+          <title>Three evidence classes are live, and the fourth is retired.</title>
+
+          <text class="tt9-head" x="2" y="10">EVERY BADGE NAMES ITS EVIDENCE CLASS</text>
+
+          <rect class="tt9-panel" x="1" y="18" width="62" height="66" rx="2" aria-hidden="true" />
+          <text class="tt9-label" x="32" y="36" text-anchor="middle">ENFORCED</text>
+          <text class="tt9-note" x="32" y="52" text-anchor="middle">A LIVE RUN</text>
+          <text class="tt9-note" x="32" y="63" text-anchor="middle">MEASURED IT</text>
+          <text class="tt9-note" x="32" y="74" text-anchor="middle">HOLDING</text>
+
+          <rect class="tt9-panel" x="66" y="18" width="62" height="66" rx="2" aria-hidden="true" />
+          <text class="tt9-label" x="97" y="36" text-anchor="middle">REFUTED</text>
+          <text class="tt9-note" x="97" y="52" text-anchor="middle">A LIVE RUN</text>
+          <text class="tt9-note" x="97" y="63" text-anchor="middle">MEASURED IT</text>
+          <text class="tt9-note" x="97" y="74" text-anchor="middle">FAILING</text>
+
+          <rect class="tt9-panel" x="131" y="18" width="62" height="66" rx="2" aria-hidden="true" />
+          <text class="tt9-label" x="162" y="36" text-anchor="middle">UNVERIFIED</text>
+          <text class="tt9-note" x="162" y="52" text-anchor="middle">LOOKED FOR,</text>
+          <text class="tt9-note" x="162" y="63" text-anchor="middle">NO RESULT</text>
+
+          <rect class="tt9-panel" x="196" y="18" width="62" height="66" rx="2" aria-hidden="true" />
+          <text class="tt9-label tt9-warm" x="227" y="36" text-anchor="middle">CLAIMED</text>
+          <path class="tt9-strike" d="M 202 32 L 252 32" aria-hidden="true" />
+          <text class="tt9-note tt9-warm" x="227" y="52" text-anchor="middle">RETIRED</text>
+          <text class="tt9-note" x="227" y="63" text-anchor="middle">IT READ LIKE</text>
+          <text class="tt9-note" x="227" y="74" text-anchor="middle">ENFORCEMENT</text>
+        </svg>
+        <figcaption>
+          <span class="fig-what">
+            A badge names its evidence class, so the reader is not left to
+            supply the strongest reading. Three classes are live: enforced,
+            refuted, and unverified. The fourth class, claimed, is retired.
+          </span>
+          <span class="fig-limit">
+            The plate names no vendor and no seat. It shows no per-vendor
+            sandbox posture and no verdict table, because which settings do not
+            contain writes is a bypass instruction.
+          </span>
+        </figcaption>
+      </figure>
+
       <p>
         The fix was not a better badge. Every badge now names its evidence
-        class, and there are three: <strong>enforced</strong>, where a live run
-        measured the restriction holding; <strong>refuted</strong>, where a live
-        run measured it failing; and <strong>unverified</strong>, where it was
-        looked for and no result was obtained. A fourth class was retired,
-        because &ldquo;claimed&rdquo; read like &ldquo;enforced&rdquo; and was
-        not. The original error stays in the design document as the reason the
-        rule exists.
+        class, and there are three: <strong>enforced</strong>,
+        <strong>refuted</strong>, and <strong>unverified</strong>. I retired a
+        fourth class, because &ldquo;claimed&rdquo; read like
+        &ldquo;enforced&rdquo; and was not. The original error stays in the
+        design document as the reason the rule exists.
       </p>
       <p>
-        One seat has moved in both directions, which is the only way to show
-        the classes are real. It carried a weaker badge because at one tool
-        version a read-only flag failed every process spawn, and it earned the
-        stronger badge back only on a later re-probe that measured a live write
-        denied with no file left on disk. I do not name the seat, and I do not
-        publish a per-vendor verdict table. Which settings do not contain
-        writes is a bypass instruction, and a negative finding measured once by
-        one operator is not a fact about somebody&rsquo;s product.
+        One seat moved in both directions, and that is the only way to show the
+        classes are real. It carried a weaker badge, because at one tool version
+        a read-only flag failed every process spawn. It earned the stronger
+        badge back on a later re-probe. That re-probe measured a live write
+        denied, with no file left on disk.
       </p>
       <p>
-        The same vocabulary covers the seats that were considered and not
-        taken, so that &ldquo;we looked and said no&rdquo; never reads like
-        &ldquo;nobody looked&rdquo;. Non-seated candidates are recorded with
-        their evidence class, and one is recorded as installed, waitlisted, and
-        explicitly not a rejection.
+        I do not name the seat, and I do not publish a per-vendor verdict table.
+        Which settings do not contain writes is a bypass instruction. A negative
+        finding measured once by one operator is not a fact about
+        somebody&rsquo;s product.
+      </p>
+      <p>
+        The same vocabulary covers the seats I considered and did not take, so
+        &ldquo;I looked and said no&rdquo; never reads like &ldquo;nobody
+        looked&rdquo;. The record holds every non-seated candidate with its
+        evidence class. It records one as installed, waitlisted, and explicitly
+        not a rejection.
       </p>
       <p class="tradeoff">
         <strong>The lesson:</strong> a badge that does not name its evidence
         class is a rumour with a border. A reader supplies the strongest
-        reading available, so the claim has to carry its own evidence class or
+        reading available. So the claim has to carry its own evidence class, or
         it lies by default.
       </p>
     </div>
 
     <h2 id="race">Five seats, one brief, and no winner</h2>
     <p>
-      One brief is raced across every seat at once, each attempt in its own git
-      worktree, and the attempts are compared by diff instead of by prose. Two
-      mechanics exist only to stop a lying diff. The diff anchors on a recorded
-      base commit and never on <code>HEAD</code>, and untracked files are staged
-      first &mdash; so an attempt whose entire answer is a new file cannot read
-      as &ldquo;no changes&rdquo;.
-    </p>
-    <p>
-      Each finisher carries a rank, a phase word, its own clock, and a commit
-      receipt. A seat cut by hand keeps its receipt too. In the first race that
-      seated all five, the first finish came in at
-      <span data-tt="race.firstFinish">50s</span>, two more finished within
-      about twenty seconds of it, and two seats were given up by hand after
-      roughly <span data-tt="race.givenUp">11 minutes</span> &mdash; both
-      keeping their commits exactly as the finish-line design promised. Those
-      two figures are cited from the design document&rsquo;s section on the
-      race, not re-measured here.
-    </p>
-    <p>
-      <strong>I withhold the seat names, and the reason is the point.</strong>
-      One race is not a benchmark. Publishing a ranking off a single brief on a
-      single machine would be a claim about five products that the measurement
-      cannot support, and the standings inside the program refuse the same
-      thing for the same reason.
-    </p>
-    <p>
-      A check grades an attempt from the real exit code and nothing else. Not
-      from output, not from the diff, not from duration, and not from a
-      model&rsquo;s opinion. A command that could not run reads &ldquo;check
-      unavailable&rdquo;, which is not a FAIL. The standings say
-      <strong>adopted</strong>, never <strong>won</strong>, because the git refs
-      can record that a branch merged and cannot record a rank, a phase, or
-      that a seat was cut. An undecided race is reported beside the rate and
-      never inside it, and the rate never prints without its count.
-      Hand-cut receipts are refused outright, which makes the figure an
-      undercount &mdash; and an undercount is the honest direction to be wrong
-      in.
+      telltale races one brief across every seat at once. Each attempt runs in
+      its own git worktree. A diff compares the attempts, and prose does not.
+      Two of the mechanics below exist only to stop a lying diff.
     </p>
 
-    <figure class="tt-figure">
-      <pre class="tt-frame" data-tt-frame="record" tabindex="0">{evidence.frames.record.lines.join('\n')}</pre>
+    <!-- tt-s1 (portfolio ADR-013). A STRIP re-lays existing text nodes in a
+         grid. It writes no new assertion, every cell keeps the words the prose
+         used, and because it is HTML rather than SVG it stays inside
+         `contrast-check.cjs`.
+         SIX ROWS, NOT SEVEN, AND THE COUNT IS A PARITY DECISION. The prose
+         names the failure it blocks for six mechanics. It does not name one for
+         the undecided-rate rule, so that rule stays as prose below rather than
+         read a blank cell or an invented failure. A blank cell begs to be
+         filled, and filling it inflates the figure past its own prose.
+         The two rulings stay as prose for the same reason: that an undercount
+         is the honest direction to be wrong in, and that one race is not a
+         benchmark. A strip cannot carry a ruling at full strength. -->
+    <figure class="fig" data-fig="strip">
+      <div class="tt-strip">
+        <!-- NOT `aria-hidden`. These two are column LABELS, and CLAUDE.md's
+             contrast rule names exactly this case: marking something
+             aria-hidden asserts it is decoration that nobody reads, and a
+             label is not decoration. A screen reader should hear the pairing
+             the sighted reader sees. -->
+        <div class="tt-strip-cols">
+          <span>The mechanic</span>
+          <span>The failure it blocks</span>
+        </div>
+        <ul>
+          <li>
+            <span class="tt-strip-a">The diff anchors on a recorded base commit and never on <code>HEAD</code>.</span>
+            <span class="tt-strip-b">A lying diff.</span>
+          </li>
+          <li>
+            <span class="tt-strip-a">Untracked files are staged first.</span>
+            <span class="tt-strip-b">An attempt whose entire answer is a new file reads as &ldquo;no changes&rdquo;.</span>
+          </li>
+          <li>
+            <span class="tt-strip-a">A check grades an attempt from the real exit code and nothing else.</span>
+            <span class="tt-strip-b">Not from output, not from the diff, not from duration, and not from a model&rsquo;s opinion.</span>
+          </li>
+          <li>
+            <span class="tt-strip-a">A command that could not run reads &ldquo;check unavailable&rdquo;.</span>
+            <span class="tt-strip-b">It is not a FAIL.</span>
+          </li>
+          <li>
+            <span class="tt-strip-a">The standings say <strong>adopted</strong>, never <strong>won</strong>.</span>
+            <span class="tt-strip-b">The git refs can record that a branch merged. They cannot record a rank, a phase, or that a seat was cut.</span>
+          </li>
+          <li>
+            <span class="tt-strip-a">Hand-cut receipts are refused outright.</span>
+            <span class="tt-strip-b">The figure is an undercount.</span>
+          </li>
+        </ul>
+      </div>
       <figcaption>
-        The record states its own reach before it states a single result: what
-        it read, how many races that was, how many a human decided, and that a
-        race whose branches were dropped is simply gone from the record rather
-        than counted as a loss. Lines 8&ndash;10 of
-        <code>internal/council/testdata/golden/arena-record-ascii.txt</code> at
-        <code>{src.sha}</code>, copied byte for byte. The per-seat rows below
-        this header are deliberately not reproduced here. Scrolls sideways on a
-        narrow screen.
+        <span class="fig-what">
+          Six race mechanics, each beside the failure the page says it blocks.
+          Every cell keeps the words the prose used, and the two column names
+          are the only new words.
+        </span>
+        <span class="fig-limit">
+          The strip names no seat and reports no result. One race is not a
+          benchmark, so there is no ranking to show. It also leaves out the
+          undecided-rate rule, because the prose never says what that rule
+          blocks.
+        </span>
       </figcaption>
     </figure>
 
     <p>
-      <strong>What has no live half yet.</strong> No live race has run under a
-      check, and no real hybrid adopt has been armed. Both are built and both
-      are unexercised.
+      The standings report an undecided race beside the rate and never inside
+      it, and the rate never prints without its count. An undercount is the
+      honest direction to be wrong in.
+    </p>
+    <p>
+      Each finisher carries a rank, a phase word, its own clock, and a commit
+      receipt. A seat that I cut by hand keeps its receipt too. The first race
+      seated all five seats. The first finish came in at
+      <span data-tt="race.firstFinish">50s</span>, and two more finished within
+      about twenty seconds of it. I gave up two seats by hand after roughly
+      <span data-tt="race.givenUp">11 minutes</span>. Both seats kept their
+      commits, exactly as the finish-line design promised.
+    </p>
+    <p>
+      This page cites those two figures from the design document&rsquo;s section
+      on the race. It does not re-measure them.
+      <a href="#frame-record">See the record state its reach &rarr;</a>
+    </p>
+    <p>
+      <strong>I withhold the seat names, and the reason is the point.</strong>
+      One race is not a benchmark. A ranking published off a single brief on a
+      single machine would be a claim about five products. The measurement
+      cannot support that claim. The standings inside the program refuse the
+      same thing for the same reason.
+    </p>
+
+    <p>
+      <strong>What has no live half yet.</strong> No live race ever ran under a
+      check, and I never armed a real hybrid adopt. Both are built and both are
+      unexercised.
     </p>
 
     <h2 id="instrument">Twice the instrument was the bug</h2>
     <p>
-      Four corrections, and two of them are the same shape: the thing that was
-      wrong was my own measuring equipment, and it failed by reporting nothing
-      found.
+      Four corrections, and two of them are the same shape. The thing that was
+      wrong was my own measuring equipment. It failed in one direction: it
+      reported nothing found.
     </p>
+
+    <!-- tt4-sweep (portfolio ADR-013). The verdict word is INSTRUMENT, not
+         DRIFT, and that is the whole point of the plate: an old session with
+         the identical key set is what rules out the vendor. The two figures are
+         `cited`, so they stay in the prose below with their design-document
+         reference. A plate cannot carry a citation, and a figure that drops a
+         citation is worse than no figure. -->
+    <figure class="fig" data-fig="plate">
+      <svg class="tt9-plate" viewBox="0 0 260 118" role="img"
+           aria-label="The record on disk holds the keys. The sweep sits between the record and the answer, and its pattern matched almost nothing, so it reported nothing found. A session recorded weeks earlier holds the identical key set. The verdict is instrument, not drift.">
+        <title>An old session with the identical key set rules out vendor drift.</title>
+        <defs>
+          <!-- The prefix carries a digit, because the site's existing marker
+               prefixes carry none and a duplicate id repaints the wrong arrow
+               head with no gate to see it. A marker does not inherit the
+               referencing path's stroke, so `.tt9-arrowhead` sets its own. -->
+          <marker id="tt9-arrow" viewBox="0 0 8 8" refX="7" refY="4"
+                  markerWidth="5" markerHeight="5" orient="auto">
+            <path class="tt9-arrowhead" d="M 0 0 L 8 4 L 0 8 z" />
+          </marker>
+        </defs>
+
+        <text class="tt9-head" x="2" y="10">WHAT THE SWEEP COULD SEE</text>
+
+        <rect class="tt9-panel" x="1" y="16" width="68" height="38" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="35" y="32" text-anchor="middle">RECORD</text>
+        <text class="tt9-note" x="35" y="45" text-anchor="middle">ON DISK</text>
+
+        <path class="tt9-edge" d="M 70 35 L 84 35" marker-end="url(#tt9-arrow)" aria-hidden="true" />
+
+        <rect class="tt9-band" x="87" y="16" width="68" height="38" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="121" y="32" text-anchor="middle">SWEEP</text>
+        <text class="tt9-note" x="121" y="45" text-anchor="middle">A PATTERN</text>
+
+        <path class="tt9-edge" d="M 156 35 L 170 35" marker-end="url(#tt9-arrow)" aria-hidden="true" />
+
+        <rect class="tt9-box-warm" x="173" y="16" width="86" height="38" rx="2" aria-hidden="true" />
+        <text class="tt9-label tt9-warm" x="216" y="32" text-anchor="middle">REPORTED</text>
+        <text class="tt9-note tt9-warm" x="216" y="45" text-anchor="middle">NOTHING FOUND</text>
+
+        <path class="tt9-band" d="M 35 62 L 35 54" aria-hidden="true" />
+        <rect class="tt9-panel" x="1" y="62" width="68" height="30" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="35" y="76" text-anchor="middle">OLD SESSION</text>
+        <text class="tt9-note" x="35" y="87" text-anchor="middle">WEEKS EARLIER</text>
+        <text class="tt9-note" x="78" y="80">IDENTICAL KEY SET</text>
+
+        <rect class="tt9-panel" x="1" y="98" width="258" height="18" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="130" y="111" text-anchor="middle">INSTRUMENT, NOT DRIFT</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">
+          The sweep sat between the record and the answer, and it reported
+          nothing found. A session recorded weeks earlier carried the identical
+          key set, so the verdict is the instrument and not vendor drift.
+        </span>
+        <span class="fig-limit">
+          The plate carries no count. Both counts are cited figures, so they
+          stay in the prose below with the design-document reference the plate
+          cannot carry.
+        </span>
+      </figcaption>
+    </figure>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>The regex answered the question it was asked</p>
       <h3>A sweep reported one key, and the record carried eleven</h3>
       <p>
         A pattern sweep behind one vendor&rsquo;s cost row concluded that the
-        vendor exposed a cost total and nothing else. The pattern was anchored
-        on the substring <code>cost</code> and it was lowercase, so a key
-        spelled with a capital letter in the middle matched neither half. It was
-        structurally incapable of the question a reader takes that row to
-        answer.
+        vendor exposed a cost total and nothing else. I anchored the pattern on
+        the substring <code>cost</code>, and I wrote it in lowercase. A key
+        spelled with a capital letter in the middle matched neither half. The
+        pattern was structurally incapable of the question a reader takes that
+        row to answer.
       </p>
       <p>
         A live re-measure read <span data-tt="sweep.keysPresent">eleven keys</span>
-        off the same turn record, where the sweep could match
+        off the same turn record. The sweep could match
         <span data-tt="sweep.keysMatched">one key</span> and reported one key.
-        A session captured weeks earlier carried the identical key set, which
+        A session recorded weeks earlier carried the identical key set, and that
         settles it: this was never vendor drift. The counts were on disk before
-        the adapter was written. Both figures are cited from the design
+        I wrote the adapter. This page cites both figures from the design
         document&rsquo;s own correction block.
       </p>
       <p>
-        The same class of mistake landed a second time, when a pattern that
-        swept file contents could never have matched a directory name.
+        The same class of mistake landed a second time. A pattern swept file
+        contents, and it could never match a directory name.
       </p>
       <p class="tradeoff">
-        <strong>The rule this bought:</strong> before a vendor is built here,
+        <strong>The rule this bought:</strong> before I build a vendor here,
         re-read its records, not its struct. A record struct is an allowlist,
         so what it omits is a decision and not an absence. Both instrument bugs
-        failed in the same direction: they reported nothing found, which is the
+        failed in the same direction: they reported nothing found. That is the
         one failure mode this product is least able to see in itself.
       </p>
     </div>
@@ -455,15 +989,15 @@ const src = evidence.source;
       <p class="tag">A green test over the wrong prompt</p>
       <h3>A live test stayed green while one seat was dead for a day</h3>
       <p>
-        One seat&rsquo;s command-line flag had been separated from its value,
-        and that vendor&rsquo;s parser refuses a brief that opens with three
-        dashes. Every briefed turn died with an empty column. The live test
-        stayed green the whole time, because it probed with a prompt that began
-        with a letter.
+        I separated one seat&rsquo;s command-line flag from its value. That
+        vendor&rsquo;s parser refuses a brief that opens with three dashes.
+        Every briefed turn died with an empty column. The live test stayed
+        green the whole time, because it probed with a prompt that began with a
+        letter.
       </p>
       <p class="tradeoff">
         <strong>The lesson:</strong> probe a vendor with a prompt shaped like a
-        brief, not like a greeting. Every later probe is brief-fenced for that
+        brief, not like a greeting. I brief-fence every later probe for that
         reason.
       </p>
     </div>
@@ -472,14 +1006,16 @@ const src = evidence.source;
       <p class="tag">A guard that read a live process as health</p>
       <h3>A finished racer read as streaming for twenty-one minutes</h3>
       <p>
-        A stale-exit guard attributed a live process to the wrong seat, so a
-        racer that had already exited left its column reading
+        A stale-exit guard attributed a live process to the wrong seat. A racer
+        that already exited therefore left its column live for
         <span data-tt="stall.streaming">21 minutes</span> after the fact: no
-        diff, no commit, no rank, no receipt. Two earlier drives had written it
-        off as the vendor quitting. It was not the vendor. The fix was
-        attribution, and it was verified the same day &mdash; the column retired
-        in <span data-tt="stall.retired">18 seconds</span>. Both durations are
-        cited from the design document&rsquo;s measurement block.
+        diff, no commit, no rank, no receipt. Two earlier drives wrote it off as
+        a vendor that quit. It was not the vendor.
+      </p>
+      <p>
+        The fix was attribution, and I checked it the same day. The column
+        retired in <span data-tt="stall.retired">18 seconds</span>. This page
+        cites both durations from the design document&rsquo;s measurement block.
       </p>
       <p class="tradeoff">
         <strong>The lesson:</strong> a debt that will not pay may be a broken
@@ -491,83 +1027,312 @@ const src = evidence.source;
       <p class="tag"><span class="sr-only">Reversed. </span>Pictures a human maintained</p>
       <h3>The README&rsquo;s frames drifted, and one of them showed a number the code refuses to compute</h3>
       <p>
-        The frames in the README were hand-drawn. They had drifted several ways
-        at once, and one of the drifts was a cost line showing a derived figure
-        that the codebase deliberately does not compute. A picture of a program
-        that the program did not draw is a claim with nothing checking it.
+        I drew the frames in the README by hand. They drifted several ways at
+        once. One drift was a cost line that showed a derived figure the
+        codebase deliberately does not compute. A picture of a program that the
+        program did not render is a claim with no check on it.
       </p>
       <p>
-        They are now emitted by the test suite from the real render, and a test
-        fails the build when they stop matching.
+        The test suite now emits them from the real render, and a test fails the
+        build when they stop matching.
       </p>
       <p class="tradeoff">
         <strong>Why it governs this page too:</strong> a picture a human
-        maintains is a claim with no gate on it. Every count on this page was
-        re-read from the repository at build time, and the commit it was read
-        at is printed under Stack.
+        maintains is a claim with no gate on it. A script re-read every count on
+        this page from the repository at build time. The page prints the commit
+        it read them at under Stack.
       </p>
     </div>
 
+    <!-- THE FRAME READER (portfolio ADR-013, RULE D2).
+
+         WHY A STEPPER OVER GOLDEN FILES, AND NOT A RECORDING. A golden file is
+         what the upstream test suite asserts against, so a drifted frame turns
+         that build red. A `.cast` file is gated by nothing. The admission unit
+         here is a LINE RANGE, which a reviewer checks against the file in one
+         second; a boundary scrub on a recording is unverifiable by
+         construction, because a recording is an append-only stream of partial
+         redraws. And no recording exists: a committed capture is a publication
+         and would need a per-frame review for workspace paths and seat identity
+         first, which this page's own limits section already says.
+
+         EVERY FRAME SHIPS IN THE SERVED HTML. `public/projects/tt-reader.js`
+         only reduces the set to one. `scripts/mobile-qa.cjs` never clicks, so a
+         script-swapped frame would be measured by nothing, and a `.tt-frame`
+         that wraps shears every column while the mobile gate goes GREEN. Do not
+         "optimize" this into a server-rendered single frame.
+
+         THE ORDER IS AN ARGUMENT, AND IT LIVES IN `READER_ORDER` ABOVE. -->
+    <h2 id="see-it">See it: seven recorded frames</h2>
+    <section class="tt-reader">
+      <p>
+        Seven recorded states of the instrument. Each one is a byte-exact,
+        contiguous line range of one committed golden file, and each caption
+        names the file, the range, and the commit. A golden file is what the
+        upstream test suite asserts against, so a drifted frame turns that build
+        red. This is a state stepper and not a time stepper.
+      </p>
+
+      <ol class="tt-reader-rail" aria-label="The seven recorded frames">
+        <li><a href="#frame-usage">a reading</a></li>
+        <li><a href="#frame-stale">a stale reading</a></li>
+        <li><a href="#frame-absent">an absence</a></li>
+        <li><a href="#frame-record">the record</a></li>
+        <li><a href="#frame-gate">the gate</a></li>
+        <li><a href="#frame-floor">the refusal</a></li>
+        <li><a href="#frame-composer">on a phone</a></li>
+      </ol>
+
+      <noscript>
+        <p>The stepper needs JavaScript. All seven frames are below, in order, each with its full caption.</p>
+      </noscript>
+
+      <figure class="tt-figure fig" data-fig="frame" id="frame-usage" tabindex="-1">
+        <pre class="tt-frame" data-tt-frame="usage" tabindex="0">{evidence.frames.usage.lines.join('\n')}</pre>
+        <figcaption>
+          <span class="fig-what">
+            Two vendors expose a quota, so the display renders it against its
+            limit. The third exposes none that reaches disk, so its row states
+            the reason in words and renders no gauge. The header states the
+            distinction the whole view is built on. Lines 3 to 14 of
+            <code>internal/hud/testdata/golden/usage-ascii.txt</code> at
+            <code>{src.sha}</code>, in the ASCII render profile, copied byte for
+            byte from the test suite&rsquo;s own output.
+          </span>
+          <span class="fig-limit">
+            The fixture is synthesized, and the repository holds no real session
+            content. The rows below line 14 are not reproduced. The frame is 119
+            columns and scrolls sideways on a narrow screen.
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="tt-figure fig" data-fig="frame" id="frame-stale" tabindex="-1">
+        <pre class="tt-frame" data-tt-frame="stale" tabindex="0">{evidence.frames.stale.lines.join('\n')}</pre>
+        <figcaption>
+          <span class="fig-what">
+            The display marks a relayed reading that went stale, and the mark
+            carries the reason: the reading is older than the fleet&rsquo;s
+            shortest quota window. The display does not drop it and does not
+            refresh it by guesswork. Lines 3 to 10 of
+            <code>internal/hud/testdata/golden/usage-stale-ascii.txt</code> at
+            <code>{src.sha}</code>, in the ASCII render profile.
+          </span>
+          <span class="fig-limit">
+            The fixture is synthesized. The frame does not show how the display
+            decides that a reading is stale, only that it says so. The frame is
+            119 columns and scrolls sideways on a narrow screen.
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="tt-figure fig" data-fig="frame" id="frame-absent" tabindex="-1">
+        <pre class="tt-frame" data-tt-frame="absent" tabindex="0">{evidence.frames.absent.lines.join('\n')}</pre>
+        <figcaption>
+          <span class="fig-what">
+            An absence names its own search. Two vendors have no quota that
+            reaches disk, and each row states a different reason in words. One
+            store holds experiment values and not usage. The other has no
+            window, no ordinal, and no reset time at all. Lines 20 to 24 of
+            <code>internal/hud/testdata/golden/usage-stale-ascii.txt</code> at
+            <code>{src.sha}</code>, in the ASCII render profile.
+          </span>
+          <span class="fig-limit">
+            A third vendor states a third reason, and this window does not reach
+            it. The first frame above carries that row. The window stops below
+            the relayed block, because one line there names a vendor family
+            beside a rate, and this site never publishes that pairing. The frame
+            is 75 columns and scrolls sideways on a narrow screen.
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="tt-figure fig" data-fig="frame" id="frame-record" tabindex="-1">
+        <pre class="tt-frame" data-tt-frame="record" tabindex="0">{evidence.frames.record.lines.join('\n')}</pre>
+        <figcaption>
+          <span class="fig-what">
+            The record states its own reach before it states a single result. It
+            names what it read, how many races that was, and how many a human
+            decided. A race whose branches were dropped is gone from the record,
+            and it is not counted as a loss. Lines 8 to 10 of
+            <code>internal/council/testdata/golden/arena-record-ascii.txt</code>
+            at <code>{src.sha}</code>, in the ASCII render profile.
+          </span>
+          <span class="fig-limit">
+            The per-seat rows below this header are not reproduced, at any line
+            range and under any caption. They pair a named seat with an adoption
+            rate and a verdict, and one race is not a benchmark. The frame is
+            120 columns and scrolls sideways on a narrow screen.
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="tt-figure fig" data-fig="frame" id="frame-gate" tabindex="-1">
+        <pre class="tt-frame" data-tt-frame="gate" tabindex="0">{evidence.frames.gate.lines.join('\n')}</pre>
+        <figcaption>
+          <span class="fig-what">
+            A person who presses a key is the only thing that spends a quota.
+            The composer box sits above the gate bar, and the bar offers
+            approve, deny, stop asking, and cancel. Lines 21 to 24 of
+            <code>internal/council/testdata/golden/gated-vs-streaming-ascii.txt</code>
+            at <code>{src.sha}</code>, in the ASCII render profile.
+          </span>
+          <span class="fig-limit">
+            The seat rows above this window are not reproduced. The row directly
+            under them pairs each named seat with its sandbox setting, and
+            naming which settings do not contain writes is a bypass instruction.
+            The frame is 120 columns and scrolls sideways on a narrow screen.
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="tt-figure fig" data-fig="frame" id="frame-floor" tabindex="-1">
+        <pre class="tt-frame" data-tt-frame="floor" tabindex="0">{evidence.frames.floor.lines.join('\n')}</pre>
+        <figcaption>
+          <span class="fig-what">
+            Below 60 columns the display renders nothing but the reason. This is
+            the product&rsquo;s own refusal, in one line, and it is the same rule
+            the gauges follow: state the reason, never a plausible substitute.
+            Line 1 of
+            <code>internal/hud/testdata/golden/floor-width.txt</code> at
+            <code>{src.sha}</code>, in the ASCII render profile.
+          </span>
+          <span class="fig-limit">
+            The frame does not show what the display would have rendered at 60
+            columns, because it renders nothing. It is 36 columns, and it is the
+            only frame here that a 390px phone reads whole with no sideways
+            scroll.
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="tt-figure fig" data-fig="frame" id="frame-composer" tabindex="-1">
+        <pre class="tt-frame" data-tt-frame="composer" tabindex="0">{evidence.frames.composer.lines.join('\n')}</pre>
+        <figcaption>
+          <span class="fig-what">
+            The 60-column twin of the gate frame, and the narrowest council
+            window in the corpus, at half the width of every frame above it. The
+            composer clips to one row and says how many rows it hid. Lines 7 to
+            10 of
+            <code>internal/council/testdata/golden/composer-clipped-to-one-row-ascii.txt</code>
+            at <code>{src.sha}</code>, in the ASCII render profile.
+          </span>
+          <span class="fig-limit">
+            Lines 1 to 6 are cut. Line 5 is a council seat row, and lines 3, 4,
+            and 6 each name a vendor beside a state. This site publishes neither.
+            The frame is 60 columns, and it still scrolls sideways on a phone,
+            though far less than the frames above it.
+          </span>
+        </figcaption>
+      </figure>
+
+      <p>
+        <strong>The frame that matters most is the one that cannot be shown.</strong>
+        The flagship golden is the one that renders a measured zero and an
+        absence side by side. It carries four distinct non-ASCII characters with
+        no twin in the shipped subset, and one of its lines carries a dollar
+        figure. So the page argues that claim with a plate and states here that
+        it cannot render it. That sentence is not a fallback. It is this
+        page&rsquo;s own rule applied to itself.
+      </p>
+    </section>
+
     <h2 id="refusals">What it refuses to render</h2>
     <p>
-      Each of these was considered, argued, and declined, and each refusal is a
-      file in the repository with the argument still attached.
+      I considered each of these, I argued it, and I declined it. Each refusal
+      is a file in the repository with the argument still attached.
     </p>
     <ul class="ledger">
-      <li><strong>No model judging a check.</strong> An estimate marker means a figure the program computed, and an opinion is not a computation.</li>
+      <li><strong>No model judges a check.</strong> An estimate marker means a figure the program computed, and an opinion is not a computation.</li>
       <li><strong>No rating or ranking on the standings.</strong> A rating is a number with no measurement under it.</li>
-      <li><strong>No fleet total, anywhere.</strong> Each run reports one vendor, so the arithmetic is not available to make. A test fails the build if a total appears.</li>
+      <li><strong>No fleet total, anywhere.</strong> Each run reports one vendor, so the arithmetic is not available to make. A test fails the build when a total appears.</li>
       <li><strong>No &ldquo;percent of plan&rdquo; spend meter.</strong> The plan budget is a guess.</li>
       <li><strong>No cost estimated from a price table.</strong> That invents money out of token counts.</li>
       <li><strong>No cross-device sync.</strong> Network egress breaks the no-write contract.</li>
       <li><strong>No plugin runtime for third-party adapters.</strong> It would run a stranger&rsquo;s code inside the process whose entire contract is &ldquo;reads, never writes&rdquo;. A drop-file relay is the middle path I took instead.</li>
-      <li><strong>No pre-seeded rows in a table.</strong> A rectangular table is a table of claims, and every zero cell would assert a request nobody sent.</li>
+      <li><strong>No pre-seeded rows in a table.</strong> A rectangular table is a table of claims, and every zero cell would state a request nobody sent.</li>
       <li><strong>No star count, download count, install count, or &ldquo;used by&rdquo; badge.</strong> The program measures none of them, and a third-party render of an unmeasured number is the badge form of a rendered guess.</li>
     </ul>
     <p>
-      The review keys are the same rule in a smaller place. Pressing one lands
-      a quoted hunk in the live composer draft, and nothing else happens. The
-      surveyed alternatives route a comment straight back to the agent; this
-      room cannot do that honestly, because a race attempt is one-shot and
-      finished by the time you are reading it. A person pressing a key stays
-      the only thing that spends a quota, and a test asserts it by counting
-      processes spawned and turns started rather than by checking the wording.
+      The review keys are the same rule in a smaller place. A press lands a
+      quoted hunk in the live composer draft, and nothing else happens. The
+      surveyed alternatives route a comment straight back to the agent. This
+      room cannot do that honestly, because a race attempt is one-shot and it is
+      finished before you read it. A person who presses a key stays the only
+      thing that spends a quota. A test asserts that: it counts the processes
+      spawned and the turns started, and it does not check the wording.
+      <a href="#frame-gate">See the gate bar &rarr;</a>
     </p>
 
     <h2 id="capacity">The gate that measured the capacity</h2>
     <p>
-      The same habit that gates a model choice on this site was pointed at the
+      I pointed the same habit that gates a model choice on this site at the
       build capacity itself. On a fixed date I wrote down six evidence axes and
-      a close date, froze every change until the close, and let the axes
-      decide. The month returned a step <strong>down</strong>, and it also
-      returned a process finding I did not want: nothing ever wrote to the
-      axes. I tell that one on the program page, because it is a program
-      artifact and not a product feature.
+      a close date. I froze every change until the close, and I let the axes
+      decide. The month returned a step <strong>down</strong>. It also returned
+      a process finding I did not want: nothing ever wrote to the axes. I tell
+      that one on the program page, because it is a program artifact and not a
+      product feature.
       <a href="product-and-program.html#capacity-gate">The capacity gate &rarr;</a>
     </p>
 
     <h2 id="limits">What this does not establish</h2>
-    <ul>
-      <li>Two of the four release archives are <strong>built, not run</strong>. Nothing here proves they start.</li>
-      <li>All macOS measurement is one Intel machine. The ARM build was not walked at all.</li>
-      <li>No binary is signed, and the Windows reputation prompt is unmeasured.</li>
-      <li>One package manager is a draft manifest that was never submitted; the other route was exercised once.</li>
-      <li>The check mode and the hybrid adopt have no live half yet.</li>
-      <li>The spend-history mode reads <strong>one vendor</strong>. The others are surveyed and named on every run with the reason each is not read &mdash; and that survey is a source read, not a fresh live measurement, which has already been caught out once.</li>
-      <li>The soak is 35 minutes on an idle machine, on one operating system, and <strong>it is not a CI gate</strong>. Two of its cost readings belong to the machine, not to the vendor.</li>
-      <li>One soak arm found slow fires and <strong>refuses to name a cause</strong>, because two pollers shared the machine.</li>
-      <li>One adapter is researched from source and not live-verified, and its heading says so.</li>
-      <li>Two token-total displays are wired end to end and render nowhere today, by ruling.</li>
-      <li>The health command never probes authentication or network. Those rows read &ldquo;not checked&rdquo;, which is neither a failure nor a soft pass, and it exits 0 even when every seat is missing.</li>
-      <li>One seat&rsquo;s guard wiring is an open obligation, not a finished control.</li>
-      <li>There is no recorded demo, capture, or video in the repository. A committed capture is a publication and would need a per-frame review for workspace paths and seat identity first.</li>
-      <li>I do not publish a count of live vendor drives. The project carried one twice and it was wrong both times.</li>
-    </ul>
+
+    <!-- tt-s2 (portfolio ADR-013). GROUPING IS THE ONLY LEGAL TREATMENT OF A
+         NEGATIVE-RESULT LIST. Every one of the fourteen lines below keeps its
+         exact text, byte for byte, and the four group names are the only new
+         words on this list. Nothing is merged, nothing is shortened, and
+         nothing is ranked. This section grows, and that is the correct
+         outcome: ADR-004 and ADR-007 forbid a shorter concession list. -->
+    <figure class="fig" data-fig="strip">
+      <div class="tt-strip tt-s2">
+        <p class="tt-s2-group">Release and platform</p>
+        <ul>
+          <li>Two of the four release archives are <strong>built, not run</strong>. Nothing here proves they start.</li>
+          <li>All macOS measurement is one Intel machine. The ARM build was not walked at all.</li>
+          <li>No binary is signed, and the Windows reputation prompt is unmeasured.</li>
+          <li>One package manager is a draft manifest that was never submitted; the other route was exercised once.</li>
+        </ul>
+
+        <p class="tt-s2-group">Built, with no live half</p>
+        <ul>
+          <li>The check mode and the hybrid adopt have no live half yet.</li>
+          <li>Two token-total displays are wired end to end and render nowhere today, by ruling.</li>
+          <li>One seat&rsquo;s guard wiring is an open obligation, not a finished control.</li>
+        </ul>
+
+        <p class="tt-s2-group">How far the measurement reaches</p>
+        <ul>
+          <li>The spend-history mode reads <strong>one vendor</strong>. The others are surveyed and named on every run with the reason each is not read &mdash; and that survey is a source read, not a fresh live measurement, which has already been caught out once.</li>
+          <li>The soak is 35 minutes on an idle machine, on one operating system, and <strong>it is not a CI gate</strong>. Two of its cost readings belong to the machine, not to the vendor.</li>
+          <li>One adapter is researched from source and not live-verified, and its heading says so.</li>
+          <li>The health command never probes authentication or network. Those rows read &ldquo;not checked&rdquo;, which is neither a failure nor a soft pass, and it exits 0 even when every seat is missing.</li>
+        </ul>
+
+        <p class="tt-s2-group">What this page refuses to publish</p>
+        <ul>
+          <li>One soak arm found slow fires and <strong>refuses to name a cause</strong>, because two pollers shared the machine.</li>
+          <li>There is no recorded demo, capture, or video in the repository. A committed capture is a publication and would need a per-frame review for workspace paths and seat identity first.</li>
+          <li>I do not publish a count of live vendor drives. The project carried one twice and it was wrong both times.</li>
+        </ul>
+      </div>
+      <figcaption>
+        <span class="fig-what">
+          Fourteen recorded limits, in four kinds. Every line keeps its exact
+          text, and the four group names are the only new words.
+        </span>
+        <span class="fig-limit">
+          The grouping ranks nothing and drops nothing. A short group is not a
+          small problem, and a limit that is not on this list is a limit I have
+          not found yet.
+        </span>
+      </figcaption>
+    </figure>
 
     <h2 id="stack">Stack</h2>
     <p>
-      Go, one static binary, no runtime dependency. No network listener is
-      bound by default; the agent-facing mode serves the same document over
+      Go, one static binary, no runtime dependency. The program binds no network
+      listener by default. The agent-facing mode serves the same document over
       stdio and binds no port. No telemetry, no price table, and no model call
       anywhere in the gauge path. Public repository:
       <a href="https://github.com/sanlee-ys/telltale">github.com/sanlee-ys/telltale</a>.
@@ -576,17 +1341,57 @@ const src = evidence.source;
       The honesty rules are named tests, so a skeptic can grep rather than
       trust:
     </p>
-    <ul class="ledger">
-      <li>the three <code>zero-vs-absent</code> goldens, in three packages, consumed by <code>TestGoldenZeroVsAbsent</code>, <code>TestGoldenRenders</code>, and <code>TestGoldenDocuments</code>;</li>
-      <li><code>TestNoTotalIsRenderedAnywhere</code>, which fails the build if a total is rendered &mdash; and asserts it on the rendered string rather than on the code;</li>
-      <li><code>TestNoGaugeReadsTheEventStore</code>, which walks the transitive import graph and fails if any gauge package can reach the verbatim event store;</li>
-      <li><code>TestDQuotesIntoTheDraftAndSpawnsNothing</code>, which asserts a review key seeds the draft and spends no quota, by counting processes and turns;</li>
-      <li>the council package&rsquo;s <code>TestMain</code>, which <strong>panics</strong> if a test would reach a real vendor binary. The default used to be the opposite, and it was measured spending real money: a plain suite run on a machine with a vendor installed opened a live, write-enabled turn on my own account. CI could never have caught that, because CI has no vendors installed;</li>
-      <li>a CI step that pipes a fixture through the <strong>built binary</strong> and greps its own standard output, failing if a quota window renders without its rate-limit source.</li>
-    </ul>
+
+    <!-- tt-s3. A TABLE, not a figure: it carries existing text, adds no
+         unguarded claim, and therefore takes no `data-fig` and no caption
+         slots (ADR-013). The `TestMain` row carries only what the test fails
+         the build on. The real-money incident is an argument about a
+         measurement, so it stays as prose below the table and never inside a
+         cell. -->
+    <table class="tt-s3">
+      <thead>
+        <tr>
+          <th scope="col">The honesty rule</th>
+          <th scope="col">The test that fails the build</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A measured zero and an absence never render the same.</td>
+          <td>the three <code>zero-vs-absent</code> goldens, in three packages, read by <code>TestGoldenZeroVsAbsent</code>, <code>TestGoldenRenders</code>, and <code>TestGoldenDocuments</code></td>
+        </tr>
+        <tr>
+          <td>No total is rendered anywhere. The assertion reads the rendered string, not the code.</td>
+          <td><code>TestNoTotalIsRenderedAnywhere</code></td>
+        </tr>
+        <tr>
+          <td>No gauge package can reach the verbatim event store.</td>
+          <td><code>TestNoGaugeReadsTheEventStore</code>, which walks the transitive import graph</td>
+        </tr>
+        <tr>
+          <td>A review key seeds the draft and spends no quota.</td>
+          <td><code>TestDQuotesIntoTheDraftAndSpawnsNothing</code>, which counts processes and turns</td>
+        </tr>
+        <tr>
+          <td>No test reaches a real vendor binary.</td>
+          <td>the council package&rsquo;s <code>TestMain</code>, which <strong>panics</strong></td>
+        </tr>
+        <tr>
+          <td>A quota window never renders without its rate-limit source.</td>
+          <td>a CI step that pipes a fixture through the <strong>built binary</strong> and greps its own standard output</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <code>TestMain</code>&rsquo;s default used to be the opposite. I measured
+      that default, and it spent real money. A plain suite run on a machine with
+      a vendor installed opened a live, write-enabled turn on my own account. CI
+      could never find that, because CI has no vendors installed.
+    </p>
     <p>
       I do not print the permission-bypass flag name, the per-vendor sandbox
-      settings, or a containment table. Naming them publishes a bypass
+      settings, or a containment table. Any of those names publishes a bypass
       instruction.
     </p>
     <p class="tradeoff">
@@ -596,32 +1401,37 @@ const src = evidence.source;
       spend money.
     </p>
     <p class="ex-caption">
-      Counts and frames on this page were re-read from
+      A script re-read the counts and frames on this page from
       <code>sanlee-ys/telltale</code> at <code>{src.sha}</code> on
       <code>{src.pulledAt}</code>. The suite holds
       <span data-tt="goldens.total">132</span> golden text renders and
       <span data-tt="tests.total">1780</span> test functions at that commit.
-      Each figure names the command that produced it, and a check in this
-      site&rsquo;s test suite fails the build if a rendered figure drifts from
+      Each figure names the command that produced it. A check in this
+      site&rsquo;s test suite fails the build when a rendered figure drifts from
       that record.
     </p>
 
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       The rest of this record is a system I built with agents. This is the
-      instrument I built to watch them. The honesty rule is one sentence
-      &mdash; a gauge may not render a number nobody measured &mdash; and it is
-      enforced by golden files rather than by intent, because intent does not
-      fail a build. A list of features was refused outright, each because it
-      would have required an invented number, and every refusal is a file you
-      can read with the argument still attached. When my own instrument was the
-      thing that was wrong, the correction went into the record next to the
-      claim it broke, and both times the wrong answer arrived as an absence
-      rather than as an error, which is the failure mode this product is least
-      able to see in itself. Every sentence above resolves to a file you can
-      open.
+      instrument I built to watch them. The honesty rule is one sentence: a
+      gauge may not render a number nobody measured. Golden files enforce that
+      rule, not intent, because intent does not fail a build.
+    </p>
+    <p>
+      I refused a list of features outright, and each one would have required an
+      invented number. Every refusal is a file you can read, with the argument
+      still attached.
+    </p>
+    <p>
+      When my own instrument was the thing that was wrong, the correction went
+      into the record next to the claim it broke. Both times the wrong answer
+      arrived as an absence and not as an error. That is the failure mode this
+      product is least able to see in itself. Every sentence above resolves to a
+      file you can open.
     </p>
   </main>
   <script is:inline src="../assets/theme.js"></script>
   <script is:inline src="../assets/last-updated.js"></script>
+  <script is:inline src="tt-reader.js"></script>
 </Base>
