@@ -1524,9 +1524,13 @@ main.wrap > .measure { grid-column: full; }
    and the standalone card link on product-and-program must wrap at 320px.
    The inline .card-link case (a link inside a sentence on the project pages)
    keeps the ToC block's ruling: prose links stay under the WCAG 2.5.8
-   inline exception, untouched. */
+   inline exception, untouched. That includes the one .diagram-more link
+   that sits mid-sentence (the-system's "watch one note go through it"), so
+   the padding keys on the .standalone modifier rather than on .diagram-more
+   alone. A new standalone card link that forgets the modifier fails the
+   hit-target gate, so the class cannot silently rot. */
 @media (max-width: 900px) {
-  .diagram-more .card-link { padding: 15px 0; }
+  .diagram-more.standalone .card-link { padding: 15px 0; }
   .repo-grid strong a { padding: 14px 0; }
   .selected-work p a {
     display: inline-block;
