@@ -134,16 +134,22 @@ if (missingFrames.length) {
     .tt-plate .tt-state {
       fill: var(--text);
       font-family: var(--font);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.08em;
     }
     .tt-plate .tt-state-absent { fill: var(--muted); }
     .tt-plate .tt-state-bad { fill: var(--accent-warm); }
+    /* The microtext floor (CLAUDE.md, "Why 320px matters"). This plate holds
+       max-width 260px against a 260-unit viewBox. One unit is therefore one
+       CSS pixel at every width from 320px up, and a declared 9px IS a rendered
+       9px. The class shipped at 8px and rendered at 8.00px at 320px, which is
+       under the floor. The state rank above it moves 9px to 10px, so the two
+       ranks stay apart. */
     .tt-plate .tt-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .tt-plate-caption {
       color: var(--muted);
@@ -220,7 +226,10 @@ if (missingFrames.length) {
            `font-family`.
          - `max-width: 260px` keeps one viewBox unit at one CSS pixel down to
            320px. Nothing here sits inside an indent, so the container is the
-           full content track.
+           full content track. Measured 2026-08-30 at 320px: the container
+           offers 272px, the plate renders 260px, and the scale is 1.000.
+         - No text class declares under 9px. At 1:1 the declared size is the
+           rendered size, so 9px is the CLAUDE.md microtext floor.
        --------------------------------------------------------------------- */
     .tt9-plate {
       display: block;
@@ -270,24 +279,34 @@ if (missingFrames.length) {
       stroke: var(--accent-warm);
       stroke-width: 1.5;
     }
+    /* THE MICROTEXT FLOOR, and the three ranks that sit on it.
+       CLAUDE.md rules the floor: no SVG text renders under 9px at a 320px
+       viewport. These plates hold max-width 260px against a 260-unit viewBox,
+       so one unit is one CSS pixel and a declared size IS the rendered size.
+       Measured at 320px before the fix: head 9.00px, label 8.00px, note
+       7.50px. The label and the note were both under the floor.
+       The note takes the floor, the label takes the floor, and the head moves
+       to 10px so the head still outranks the label. Sans 700 against mono 400,
+       and --text against --muted, carry the label-to-note rank instead of a
+       size step. */
     .tt9-head {
       fill: var(--text);
       font-family: var(--font);
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.07em;
     }
     .tt9-label {
       fill: var(--text);
       font-family: var(--font);
-      font-size: 8px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.05em;
     }
     .tt9-note {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 7.5px;
+      font-size: 9px;
     }
     .tt9-warm { fill: var(--accent-warm); }
 
@@ -460,13 +479,13 @@ if (missingFrames.length) {
       <text class="tt-value" x="40" y="22" text-anchor="middle">0%</text>
       <text class="tt-state" x="40" y="58" text-anchor="middle">MEASURED</text>
       <text class="tt-micro" x="40" y="72" text-anchor="middle">vendor said</text>
-      <text class="tt-micro" x="40" y="82" text-anchor="middle">zero</text>
+      <text class="tt-micro" x="40" y="84" text-anchor="middle">zero</text>
 
       <text class="tt-value-absent" x="130" y="22" text-anchor="middle">&mdash;</text>
       <text class="tt-value-absent" x="130" y="41" text-anchor="middle">&mdash;</text>
       <text class="tt-state tt-state-absent" x="130" y="58" text-anchor="middle">ABSENT</text>
       <text class="tt-micro" x="130" y="72" text-anchor="middle">no track,</text>
-      <text class="tt-micro" x="130" y="82" text-anchor="middle">no number</text>
+      <text class="tt-micro" x="130" y="84" text-anchor="middle">no number</text>
 
       <rect class="tt-track" x="186" y="30" width="68" height="12" rx="2" aria-hidden="true" />
       <rect class="tt-fill" x="186" y="30" width="32" height="12" rx="2" aria-hidden="true" />
@@ -474,7 +493,7 @@ if (missingFrames.length) {
       <text class="tt-value-bad" x="220" y="22" text-anchor="middle">47%</text>
       <text class="tt-state tt-state-bad" x="220" y="58" text-anchor="middle">INVENTED</text>
       <text class="tt-micro" x="220" y="72" text-anchor="middle">plausible,</text>
-      <text class="tt-micro" x="220" y="82" text-anchor="middle">unmeasured</text>
+      <text class="tt-micro" x="220" y="84" text-anchor="middle">unmeasured</text>
     </svg>
     <p class="tt-plate-caption">
       A measured zero and an absence are different claims, and the render has
@@ -527,31 +546,31 @@ if (missingFrames.length) {
          the `data-tt` span where a gate reads them. Nothing here is a reversal,
          so nothing here uses the warm hue. -->
     <figure class="fig" data-fig="plate">
-      <svg class="tt9-plate" viewBox="0 0 260 104" role="img"
+      <svg class="tt9-plate" viewBox="0 0 260 108" role="img"
            aria-label="Vendor adapters drawn as one set. The dispatch room seats five of them. The display watches the other two and does not seat them. The drop-file relay sits outside the set, and the display marks its row self-reported.">
         <title>Five adapters are seated, two are watched, and the relay sits outside the set.</title>
 
         <text class="tt9-head" x="2" y="10">VENDOR ADAPTERS</text>
-        <rect class="tt9-set" x="1" y="16" width="258" height="52" rx="3" aria-hidden="true" />
+        <rect class="tt9-set" x="1" y="16" width="258" height="56" rx="3" aria-hidden="true" />
 
         <text class="tt9-label" x="9" y="30">SEATED IN</text>
-        <text class="tt9-label" x="9" y="40">THE ROOM</text>
-        <rect class="tt9-box" x="9" y="46" width="16" height="14" rx="2" aria-hidden="true" />
-        <rect class="tt9-box" x="29" y="46" width="16" height="14" rx="2" aria-hidden="true" />
-        <rect class="tt9-box" x="49" y="46" width="16" height="14" rx="2" aria-hidden="true" />
-        <rect class="tt9-box" x="69" y="46" width="16" height="14" rx="2" aria-hidden="true" />
-        <rect class="tt9-box" x="89" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="9" y="42">THE ROOM</text>
+        <rect class="tt9-box" x="9" y="50" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="29" y="50" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="49" y="50" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="69" y="50" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box" x="89" y="50" width="16" height="14" rx="2" aria-hidden="true" />
 
-        <path class="tt9-band" d="M 132 22 L 132 62" aria-hidden="true" />
+        <path class="tt9-band" d="M 132 22 L 132 66" aria-hidden="true" />
 
         <text class="tt9-label" x="150" y="30">WATCHED,</text>
-        <text class="tt9-label" x="150" y="40">NOT SEATED</text>
-        <rect class="tt9-box-open" x="150" y="46" width="16" height="14" rx="2" aria-hidden="true" />
-        <rect class="tt9-box-open" x="170" y="46" width="16" height="14" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="150" y="42">NOT SEATED</text>
+        <rect class="tt9-box-open" x="150" y="50" width="16" height="14" rx="2" aria-hidden="true" />
+        <rect class="tt9-box-open" x="170" y="50" width="16" height="14" rx="2" aria-hidden="true" />
 
-        <rect class="tt9-box-open" x="9" y="78" width="16" height="14" rx="2" aria-hidden="true" />
-        <text class="tt9-label" x="31" y="86">DROP-FILE RELAY</text>
-        <text class="tt9-note" x="31" y="98">MARKED SELF-REPORTED</text>
+        <rect class="tt9-box-open" x="9" y="80" width="16" height="14" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="31" y="89">DROP-FILE RELAY</text>
+        <text class="tt9-note" x="31" y="101">MARKED SELF-REPORTED</text>
       </svg>
       <figcaption>
         <span class="fig-what">
@@ -696,37 +715,45 @@ if (missingFrames.length) {
            NO VENDOR NAME ENTERS THIS PLATE, ITS TITLE, ITS CAPTION, OR ITS
            `aria-label`. The measured two-direction example below stays as
            prose with no identifying shape, and there is no per-vendor verdict
-           table anywhere on this site. -->
+           table anywhere on this site.
+
+           THE FOUR CELLS WRAP TO TWO ROWS, and the microtext floor is the
+           reason. Four cells across 260 units gave each cell 62 units. At the
+           9px floor the widest line, "IT READ LIKE", measures 65.4 units. A
+           four-across row cannot hold it. Four cells plus their gaps need about
+           261 units, and the plate has 258. The reading order is unchanged,
+           because a wrap reads left to right and then down. The cost is height:
+           the plate grows from 96 units to 152. -->
       <figure class="fig" data-fig="plate">
-        <svg class="tt9-plate" viewBox="0 0 260 96" role="img"
+        <svg class="tt9-plate" viewBox="0 0 260 152" role="img"
              aria-label="Four badge classes. Enforced: a live run measured the restriction holding. Refuted: a live run measured it failing. Unverified: I looked for a result and got none. Claimed: retired, and struck through, because it read like enforced and was not.">
           <title>Three evidence classes are live, and the fourth is retired.</title>
 
           <text class="tt9-head" x="2" y="10">EVERY BADGE NAMES ITS EVIDENCE CLASS</text>
 
-          <rect class="tt9-panel" x="1" y="18" width="62" height="66" rx="2" aria-hidden="true" />
-          <text class="tt9-label" x="32" y="36" text-anchor="middle">ENFORCED</text>
-          <text class="tt9-note" x="32" y="52" text-anchor="middle">A LIVE RUN</text>
-          <text class="tt9-note" x="32" y="63" text-anchor="middle">MEASURED IT</text>
-          <text class="tt9-note" x="32" y="74" text-anchor="middle">HOLDING</text>
+          <rect class="tt9-panel" x="1" y="18" width="128" height="64" rx="2" aria-hidden="true" />
+          <text class="tt9-label" x="65" y="36" text-anchor="middle">ENFORCED</text>
+          <text class="tt9-note" x="65" y="52" text-anchor="middle">A LIVE RUN</text>
+          <text class="tt9-note" x="65" y="64" text-anchor="middle">MEASURED IT</text>
+          <text class="tt9-note" x="65" y="76" text-anchor="middle">HOLDING</text>
 
-          <rect class="tt9-panel" x="66" y="18" width="62" height="66" rx="2" aria-hidden="true" />
-          <text class="tt9-label" x="97" y="36" text-anchor="middle">REFUTED</text>
-          <text class="tt9-note" x="97" y="52" text-anchor="middle">A LIVE RUN</text>
-          <text class="tt9-note" x="97" y="63" text-anchor="middle">MEASURED IT</text>
-          <text class="tt9-note" x="97" y="74" text-anchor="middle">FAILING</text>
+          <rect class="tt9-panel" x="131" y="18" width="128" height="64" rx="2" aria-hidden="true" />
+          <text class="tt9-label" x="195" y="36" text-anchor="middle">REFUTED</text>
+          <text class="tt9-note" x="195" y="52" text-anchor="middle">A LIVE RUN</text>
+          <text class="tt9-note" x="195" y="64" text-anchor="middle">MEASURED IT</text>
+          <text class="tt9-note" x="195" y="76" text-anchor="middle">FAILING</text>
 
-          <rect class="tt9-panel" x="131" y="18" width="62" height="66" rx="2" aria-hidden="true" />
-          <text class="tt9-label" x="162" y="36" text-anchor="middle">UNVERIFIED</text>
-          <text class="tt9-note" x="162" y="52" text-anchor="middle">LOOKED FOR,</text>
-          <text class="tt9-note" x="162" y="63" text-anchor="middle">NO RESULT</text>
+          <rect class="tt9-panel" x="1" y="86" width="128" height="64" rx="2" aria-hidden="true" />
+          <text class="tt9-label" x="65" y="104" text-anchor="middle">UNVERIFIED</text>
+          <text class="tt9-note" x="65" y="120" text-anchor="middle">LOOKED FOR,</text>
+          <text class="tt9-note" x="65" y="132" text-anchor="middle">NO RESULT</text>
 
-          <rect class="tt9-panel" x="196" y="18" width="62" height="66" rx="2" aria-hidden="true" />
-          <text class="tt9-label tt9-warm" x="227" y="36" text-anchor="middle">CLAIMED</text>
-          <path class="tt9-strike" d="M 202 32 L 252 32" aria-hidden="true" />
-          <text class="tt9-note tt9-warm" x="227" y="52" text-anchor="middle">RETIRED</text>
-          <text class="tt9-note" x="227" y="63" text-anchor="middle">IT READ LIKE</text>
-          <text class="tt9-note" x="227" y="74" text-anchor="middle">ENFORCEMENT</text>
+          <rect class="tt9-panel" x="131" y="86" width="128" height="64" rx="2" aria-hidden="true" />
+          <text class="tt9-label tt9-warm" x="195" y="104" text-anchor="middle">CLAIMED</text>
+          <path class="tt9-strike" d="M 169 100 L 221 100" aria-hidden="true" />
+          <text class="tt9-note tt9-warm" x="195" y="120" text-anchor="middle">RETIRED</text>
+          <text class="tt9-note" x="195" y="132" text-anchor="middle">IT READ LIKE</text>
+          <text class="tt9-note" x="195" y="144" text-anchor="middle">ENFORCEMENT</text>
         </svg>
         <figcaption>
           <span class="fig-what">
@@ -930,10 +957,13 @@ if (missingFrames.length) {
         <text class="tt9-note tt9-warm" x="216" y="45" text-anchor="middle">NOTHING FOUND</text>
 
         <path class="tt9-band" d="M 35 62 L 35 54" aria-hidden="true" />
-        <rect class="tt9-panel" x="1" y="62" width="68" height="30" rx="2" aria-hidden="true" />
-        <text class="tt9-label" x="35" y="76" text-anchor="middle">OLD SESSION</text>
-        <text class="tt9-note" x="35" y="87" text-anchor="middle">WEEKS EARLIER</text>
-        <text class="tt9-note" x="78" y="80">IDENTICAL KEY SET</text>
+        <!-- This cell holds "WEEKS EARLIER", which measures 72 units at the 9px
+             microtext floor. The cell was 68 units wide, so it grows to 76 and
+             the note beside it moves right by the same 8 units. -->
+        <rect class="tt9-panel" x="1" y="62" width="76" height="30" rx="2" aria-hidden="true" />
+        <text class="tt9-label" x="39" y="76" text-anchor="middle">OLD SESSION</text>
+        <text class="tt9-note" x="39" y="88" text-anchor="middle">WEEKS EARLIER</text>
+        <text class="tt9-note" x="86" y="80">IDENTICAL KEY SET</text>
 
         <rect class="tt9-panel" x="1" y="98" width="258" height="18" rx="2" aria-hidden="true" />
         <text class="tt9-label" x="130" y="111" text-anchor="middle">INSTRUMENT, NOT DRIFT</text>

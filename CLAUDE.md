@@ -401,6 +401,42 @@ asserts `tnum` survived.
 which drops the effective width to ~375px or less. Test **down to 320px**, not
 just 430 — a layout that only works at 430 will still clip for a real user.
 
+### The microtext floor: no SVG text renders under 9px at 320px
+
+**No `<text>` node inside an `<svg>` may render under 9px at a 320px
+viewport.** The floor binds the RENDERED size, not the declared one. A plate
+scales, so the rendered size is the computed `font-size` times the plate's
+render scale. The render scale is the rendered CSS width divided by the viewBox
+width.
+
+Three decisions this rule records, and the reason for each:
+
+- **The floor is a rule because no gate can be one.** `contrast-check.cjs`
+  skips every node inside an `<svg>`, so a plate nobody can read passes all
+  twenty checks. On plate text the writer is the only control, and a rule is
+  what a writer can follow.
+- **Raise the declared units. Do not scale the plate.** A plate that grows only
+  under a phone breakpoint renders its text smaller again above that
+  breakpoint, which is the opposite of a floor. At 1:1 a declared 9px is a
+  rendered 9px at every width, so the floor becomes a code review instead of a
+  measurement.
+- **The floor costs height, and the plate pays it.** Bigger microtext needs
+  more room, so a dense cell wraps or a viewBox grows. Take the height. A cell
+  that fits only at 7.5px does not fit.
+
+Keep the site's plate discipline and the arithmetic stays trivial. A 260-unit
+viewBox under `max-width: 260px` renders at scale 1.000 down to 320px. **Break
+that discipline and you owe a measurement**, because the scale then decides the
+answer. Measure with the same pinned Playwright the gates use.
+
+**Measured state, 2026-08-30, so a later reader can weigh this section.**
+`projects/telltale.html` meets the floor. It holds 53 plate text nodes, and
+zero of them render under 9px at 320px. The rest of the site does not. 27 class groups and 93 text nodes
+still render under the floor, and most of them sit at 8px. The worst is
+`projects/loop-replay.html` `.axis-label` at 4.25px, where a 640-unit diagram
+sits in a 272px track. **The floor binds new and edited plates now.** A
+site-wide sweep is outstanding work.
+
 ## AI-use posture: method, not confession (voice rule)
 
 Decided 2026-07-11. Copy that references the AI assist states it as directed
