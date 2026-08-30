@@ -142,36 +142,51 @@ import SiteNav from '../../components/SiteNav.astro';
       margin: 0 0 12px;
     }
 
-    /* ---- The two-slot figure caption (ADR-013) --------------------------
-       ORIGIN BLOCK for this rule set. Another page copies these declarations
-       verbatim and names this page and its commit in the copy. They are page-
-       scoped, and not in public/assets/style.css, because a concurrent session
-       owns that file. Consolidation is an open owner call for later.
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
 
-       scripts/figure-contract.cjs fails the build when a figure that carries
-       data-fig holds no .fig-what or no .fig-limit, or holds an empty one. The
-       empty .fig-limit is the failure the slot exists to stop: a figure that
-       ends on a win while its caveat sits somewhere else.
+       ORIGIN COPY. This block is written here first. A later lane copies it
+       verbatim into its own page and names this page and its commit in the
+       copy's comment. It is page-scoped on purpose: a concurrent session owns
+       public/assets/style.css for the tap-target work, and two writers on one
+       shared stylesheet cannot merge. OC-F of the redesign brief carries the
+       consolidation, for after that session merges.
 
-       No padding on .fig. A figure is a grid item of the content track, and
-       padding here would shrink the track a plate measures itself against. */
+       .fig-what states what the figure argues. .fig-limit states what the
+       figure does not show. The gate fails the build on an empty .fig-limit,
+       because a figure that ends on a win while its caveat sits somewhere else
+       is the split ADR-007 refuses.
+
+       The quiet voice is a token, never opacity (ADR-009). Both slots are
+       block-level, so the limit reads as its own line and not as a tail. */
     .fig {
-      margin: 22px 0 6px;
-      min-width: 0;
+      margin: 0 0 22px;
     }
     .fig figcaption {
-      color: var(--muted);
       font-size: 0.92rem;
-      margin: 10px 0 0;
+      line-height: 1.55;
+      margin: 8px 0 0;
     }
-    .fig .fig-what,
-    .fig .fig-limit { display: block; }
-    .fig .fig-limit {
-      margin-top: 6px;
-      padding-left: 12px;
-      border-left: 1px solid var(--border);
+    .fig .fig-what {
+      display: block;
       color: var(--text-secondary);
     }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* COPIED, not authored. The block above is a verbatim copy of the origin
+       block in src/pages/projects/context-architecture.astro at commit
+       9d81caa. A shared grammar is copied and never extracted, because two
+       lanes cannot both edit one stylesheet. Do not edit the copy on its own.
+       Change the origin page first.
+
+       The one declaration this page adds sits below, and it is a layout need
+       and not a change to the grammar. Every .fig here is a grid item of the
+       page grid, and a grid item defaults to its content's minimum width, so a
+       long word inside a figure widens the page. */
+    .fig { min-width: 0; }
 
     /* pp1: the axis board. A STRIP, so it re-lays text and draws nothing.
        Two lists sit under this section today, and the reader has to join a
@@ -181,7 +196,6 @@ import SiteNav from '../../components/SiteNav.astro';
        Two columns above 620px and one column below it, so every row reads at
        320px. min-width: 0 on every cell, because a grid item defaults to its
        content's minimum width and a long word then widens the page. */
-    .pp1-board { margin: 22px 0 6px; }
     .pp1-rows {
       list-style: none;
       margin: 0;
@@ -670,7 +684,7 @@ import SiteNav from '../../components/SiteNav.astro';
          vendor, a lane, a seat identity, a dollar figure, an account or
          billing detail, a machine identity, a repository of any kind, or
          anything internal to the employer. -->
-    <figure class="fig pp1-board" data-fig="strip"
+    <figure class="fig" data-fig="strip"
             aria-label="The capacity review as one board. Three rows report what the axes produced. Three rows state the rulings that followed.">
       <ul class="pp1-rows">
         <li class="pp1-row">
