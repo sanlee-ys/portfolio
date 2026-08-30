@@ -77,19 +77,76 @@
   var MIN_EDGE_PX = 13;
   var MIN_NODE_PX = 15;
 
-  function fontsFor(L) {
-    var box = svg.getBoundingClientRect().width;
+  // ---- The tap floor is the same problem, one axis over ----
+  // `L.h` is a user-space unit under the same sub-1 scale as the type above.
+  // The box therefore shrinks on a phone exactly as the labels did. The narrow
+  // layout's 60 units rendered 46.4px at 390px, 42.3px at 360px, and 36.8px at
+  // 320px. The contract is 44px (`CLAUDE.md`, "Mobile is a contract").
+  // `hit-target.cjs` measured the tap rule at 390px alone. It read the one
+  // width that passed, and it reported the plate sound.
+  //
+  // This file fixes one half. It solves the height against the measured scale.
+  // The gate fixes the other half. It now measures 320, 360, 390, and 430.
+  //
+  // The box WIDTH takes no floor. `minW` is 140 user units. That measures
+  // 85.9px at the tightest scale this plate renders at: 270 drawing pixels for
+  // a 440-unit viewBox, at a 320px viewport. The gate measures both axes at all
+  // four widths. A later change that narrows the box fails there. It does not
+  // pass on a promise in this comment.
+  var MIN_TAP_PX = 44;
+
+  // ---- The scale is measured on the CONTENT box, not the border box ----
+  // `.diagram` carries `border: 1px` (style.css). `getBoundingClientRect()`
+  // returns the border box, and the viewBox maps onto the content box inside
+  // it. Two pixels of frame therefore put every floor solved here under its own
+  // target. At 320px the plate reads 272px and the drawing gets 270px, so the
+  // 13px edge floor painted 12.89px. That is sub-pixel on the type. On the tap
+  // box it is the difference between 44.0px and 43.7px. The gate rounds its own
+  // measurement to whole pixels, and that alone hid the fail.
+  //
+  // This function reads the width alone. It does not take the smaller of the
+  // two axes. `preserveAspectRatio` defaults to `meet`, so the true scale is
+  // the smaller ratio. But `.diagram` sets `height: auto`, so the height
+  // derives from this width. The two ratios then agree to five decimal places.
+  // Measured at 320px: 0.613636 against 0.613617.
+  //
+  // A height read also runs BEFORE `render()` writes this layout's viewBox. A
+  // first paint after a breakpoint cross would then solve against the previous
+  // layout's aspect.
+  function contentWidth() {
+    var r = svg.getBoundingClientRect();
+    var cs = window.getComputedStyle(svg);
+    function edge(a, b) { return (parseFloat(cs[a]) || 0) + (parseFloat(cs[b]) || 0); }
+    return r.width - edge("borderLeftWidth", "borderRightWidth")
+      - edge("paddingLeft", "paddingRight");
+  }
+
+  function metricsFor(L) {
+    var box = contentWidth();
     var vbW = parseFloat(L.viewBox.split(/\s+/)[2]);
-    // A zero width means the plate is not laid out yet (display:none, a
-    // detached tree). Falling back to scale 1 renders the layout's own sizes,
-    // which is the pre-clamp behaviour rather than a division by zero.
+    // A zero or negative width means the plate is not laid out yet
+    // (display:none, a detached tree). Falling back to scale 1 renders the
+    // layout's own sizes, which is the pre-clamp behaviour rather than a
+    // division by zero.
     var scale = box > 0 && vbW > 0 ? box / vbW : 1;
     // Rounded so a one-pixel container change does not produce a "new" size and
     // trip the re-render guard in `apply()` below.
     function solve(base, floorPx) {
       return Math.round(Math.max(base, floorPx / scale) * 10) / 10;
     }
-    return { edge: solve(L.edgeFont, MIN_EDGE_PX), node: solve(L.font, MIN_NODE_PX) };
+    // The tap box rounds UP. The type does not. Half a rendered pixel of type
+    // is invisible. Half a rendered pixel of tap box decides whether the box
+    // clears 44. A round to nearest can land under the floor it solved for.
+    // The result stays quantised to 0.1, so the re-render guard is as stable
+    // here as it is for the type.
+    function solveUp(base, floorPx) {
+      return Math.ceil(Math.max(base, floorPx / scale) * 10) / 10;
+    }
+    return {
+      edge: solve(L.edgeFont, MIN_EDGE_PX),
+      node: solve(L.font, MIN_NODE_PX),
+      h: solveUp(L.h, MIN_TAP_PX),
+    };
   }
 
   var byId = {};
@@ -162,13 +219,19 @@
     // mono advance width AT `L.font`, so when the floor raises the node type it
     // has to travel with it — otherwise the box keeps its old width and the
     // bigger label runs out through the hairline.
+    //
+    // The height comes from `F`, not from `L`. `F` carries the solved tap
+    // floor. The positions do not move with it. They are the non-collinear
+    // triangle that keeps every edge off the third node. Each box grows around
+    // its own centre, so a taller box only moves where `border()` lands an
+    // arrow.
     var charW = L.charW * (F.node / L.font);
     nodes.forEach(function (n) {
       var p = L.pos[n.id];
       n.x = p[0];
       n.y = p[1];
       n.w = Math.max(L.minW, n.label.length * charW + 26);
-      n.h = L.h;
+      n.h = F.h;
     });
 
     // ---- Edges (lines + labels) ----
@@ -251,13 +314,17 @@
   // clears the reader's selected node, so it is gated on the solved sizes
   // ACTUALLY changing. Everything else (a scroll that collapses the URL bar, a
   // vertical-only resize) leaves the figure alone.
+  //
+  // The node height now solves the same way, so the guard reads three values
+  // and not two. A height change alone redraws the figure.
   var mq = window.matchMedia("(max-width: 600px)");
   var shown = null;
 
   function apply() {
     var L = mq.matches ? LAYOUTS.narrow : LAYOUTS.wide;
-    var F = fontsFor(L);
-    if (shown && shown.L === L && shown.F.edge === F.edge && shown.F.node === F.node) return;
+    var F = metricsFor(L);
+    if (shown && shown.L === L
+      && shown.F.edge === F.edge && shown.F.node === F.node && shown.F.h === F.h) return;
     shown = { L: L, F: F };
     render(L, F);
   }

@@ -29,13 +29,18 @@
  * grazing the hairline border brings the whole box to life for as long as the
  * pointer stays on it. Dead, then working, with no code running late.
  *
- * What is checked, per interactive element, at desktop and phone widths:
+ * What is checked, per interactive element, at desktop and every phone width:
  *   1. the centre of its box is a hit target
  *   2. at least MIN_COVERAGE of its box is a hit target
  *   3. its box is at least MIN_TAP px on both axes (the CLAUDE.md tap contract)
  *
- * Separately, at phone width only, every STANDALONE anchor must present the
- * MIN_TAP box. Standalone = the anchor is the only text of its block
+ * Rule 3 runs at 320, 360, 390 and 430, and not at 390 alone. A box drawn in
+ * SVG user space shrinks with the viewport. The system map's nodes rendered
+ * 46.4px at 390px and 36.8px at 320px, from one 60-unit declaration. The
+ * single-width gate therefore reported the passing end of a failing range.
+ *
+ * Separately, at those same phone widths, every STANDALONE anchor must present
+ * the MIN_TAP box. Standalone = the anchor is the only text of its block
  * container: a link that stands as its own paragraph or list entry is a tap
  * target on its own, with no prose around it to catch a missed tap. A link
  * inside a sentence is exempt — WCAG 2.5.8's inline exception, and the ToC
@@ -64,9 +69,21 @@ const { serve } = require('./static-server.cjs');
 
 const ROOT = process.env.SITE_ROOT ? path.resolve(process.env.SITE_ROOT) : process.cwd();
 
-// Desktop and the narrow layout. The diagram swaps layouts at 600px, and the
-// phone width is also where the tap-size rule bites, so both are measured.
-const WIDTHS = [1280, 390];
+// Desktop, then every phone width the mobile contract names. The diagram swaps
+// layouts at 600px, so 1280 measures the wide one. The four phone widths are
+// the set `mobile-qa.cjs` renders, so the two gates now agree on what a phone
+// is.
+//
+// The list was [1280, 390], and one phone width is not a phone. The system
+// map's narrow layout draws its nodes in USER-SPACE units under a sub-1 scale.
+// One 60-unit declaration therefore rendered 46.4px at 390px and 36.8px at
+// 320px. The gate read the one width that passed and reported the plate sound.
+// A reader at 320px (Display Zoom, `CLAUDE.md` "Why 320px matters") got a
+// control seven pixels under the contract.
+//
+// The rule this records: a size that varies with the viewport is measured
+// across the viewport range, never at one point in it.
+const WIDTHS = [1280, 430, 390, 360, 320];
 
 // 60%, not 100%, because a legitimately non-rectangular target (a circle, a
 // diamond) covers only part of its bounding box and must not fail for it — a
@@ -74,11 +91,16 @@ const WIDTHS = [1280, 390];
 // below the threshold, so the gap costs nothing in sensitivity.
 const MIN_COVERAGE = 0.6;
 
-// The CLAUDE.md mobile contract. Applied at phone width only: a desktop
+// The CLAUDE.md mobile contract. Applied at phone widths only: a desktop
 // pointer is precise, a thumb is not, and enforcing it at 1280 would fail
 // legitimately small controls that a mouse handles fine.
+//
+// Every width in this list runs both tap passes: the SVG size check and the
+// standalone-anchor check. The narrowest width is the one that bites, and it
+// is the one the gate did not have.
 const MIN_TAP = 44;
-const TAP_WIDTH = 390;
+const TAP_WIDTHS = [430, 390, 360, 320];
+const isTapWidth = (w) => TAP_WIDTHS.includes(w);
 
 function findHtml(dir) {
   const out = [];
@@ -286,14 +308,14 @@ const ANCHOR_PROBE = () => {
           console.log('        In SVG a shape is only hittable where it is PAINTED. `fill: none` +');
           console.log('        `pointer-events: none` leaves the stroke as the only target. Add');
           console.log('        `pointer-events: all` (or a transparent fill) to the shape.');
-        } else if (w === TAP_WIDTH && (f.width < MIN_TAP || f.height < MIN_TAP)) {
+        } else if (isTapWidth(w) && (f.width < MIN_TAP || f.height < MIN_TAP)) {
           fails++;
           console.log(`  FAIL  ${where}`);
           console.log(`        tap target is ${f.width}x${f.height}px; the mobile contract is ${MIN_TAP}x${MIN_TAP}px minimum.`);
         }
       }
 
-      if (w === TAP_WIDTH) {
+      if (isTapWidth(w)) {
         // Lazy images below the fold have not loaded at `load`, and an anchor
         // wrapping one collapses to a sliver until the image arrives — a 2px
         // reading that is a race, not a tap target (the gallery page measured
@@ -353,5 +375,9 @@ const ANCHOR_PROBE = () => {
     console.error(`\n✗ ${fails} hit-target issue(s). An element that looks interactive must be clickable across its box.`);
     process.exit(1);
   }
-  console.log(`✓ Hit targets sound — ${checked} interactive SVG element(s) across ${pages.length} pages × ${WIDTHS.join('/')}px, ${anchorsChecked} standalone anchor(s) at ${TAP_WIDTH}px.`);
+  // The two counts are checks, not page totals. Each one sums over every width
+  // it ran at, so 87 anchors at four widths report as 348 checks. The widths
+  // print beside the counts for that reason. A reader who sees the number rise
+  // can then see why, without a read of this file.
+  console.log(`✓ Hit targets sound — ${checked} interactive SVG check(s) across ${pages.length} pages × ${WIDTHS.join('/')}px, ${anchorsChecked} standalone anchor check(s) × ${TAP_WIDTHS.join('/')}px.`);
 })().catch(e => { console.error('hit-target error:', e.message); process.exit(1); });
