@@ -1,0 +1,110 @@
+{
+  "source": {
+    "repo": "sanlee-ys/telltale",
+    "sha": "38f262a",
+    "pulledAt": "2026-08-30"
+  },
+  "figures": {
+    "goldens.total": {
+      "value": "132",
+      "kind": "counted",
+      "command": "git ls-tree -r --name-only <sha>, matching internal/<pkg>/testdata/golden/*.txt"
+    },
+    "goldens.zeroVsAbsent": {
+      "value": "3",
+      "kind": "counted",
+      "command": "git ls-tree -r --name-only <sha>, matching paths containing zero-vs-absent",
+      "files": [
+        "internal/history/testdata/golden/zero-vs-absent.txt",
+        "internal/hud/testdata/golden/zero-vs-absent.txt",
+        "internal/snapshot/testdata/golden/zero-vs-absent.json"
+      ]
+    },
+    "tests.total": {
+      "value": "1780",
+      "kind": "counted",
+      "command": "git grep -c -E '^func Test' <sha> -- '*_test.go', summed over paths under internal/ and cmd/",
+      "files": 171
+    },
+    "adapters.vendor": {
+      "value": "7",
+      "kind": "counted",
+      "command": "distinct directories under internal/adapter/ in git ls-tree at <sha>, minus the exclusions below",
+      "included": [
+        "antigravity",
+        "claudecode",
+        "codex",
+        "cursor",
+        "gemini",
+        "grok",
+        "pi"
+      ],
+      "excluded": [
+        "drift",
+        "dropfile",
+        "pins"
+      ]
+    },
+    "race.firstFinish": {
+      "value": "50s",
+      "kind": "cited",
+      "cite": "docs/design.md, \"9.37 /arena: the seats race in worktrees, and the human picks the winner\""
+    },
+    "race.givenUp": {
+      "value": "11 minutes",
+      "kind": "cited",
+      "cite": "docs/design.md, \"9.37 /arena: the seats race in worktrees, and the human picks the winner\""
+    },
+    "stall.streaming": {
+      "value": "21 minutes",
+      "kind": "cited",
+      "cite": "docs/design.md, \"A warm seat's racer could not finish, 2026-08-13 — measured, then fixed\""
+    },
+    "stall.retired": {
+      "value": "18 seconds",
+      "kind": "cited",
+      "cite": "docs/design.md, \"A warm seat's racer could not finish, 2026-08-13 — measured, then fixed\""
+    },
+    "sweep.keysPresent": {
+      "value": "eleven keys",
+      "kind": "cited",
+      "cite": "docs/design.md, \"The `usage` object re-measured 2026-08-29 — the token counts were always beside the cost, and this section's own sweep could not have seen them\""
+    },
+    "sweep.keysMatched": {
+      "value": "one key",
+      "kind": "cited",
+      "cite": "docs/design.md, \"The `usage` object re-measured 2026-08-29 — the token counts were always beside the cost, and this section's own sweep could not have seen them\""
+    }
+  },
+  "frames": {
+    "usage": {
+      "path": "internal/hud/testdata/golden/usage-ascii.txt",
+      "lineStart": 3,
+      "lineEnd": 14,
+      "lines": [
+        " fleet usage  quota is a reading against a limit; spend is a count with none  =========================================",
+        "",
+        " claude  quota relayed by the statusline - 2h ago",
+        "        5h             ########------------    42%  ~ 2h13m",
+        "        7d             #-------------------     6%  ~ 5d00h",
+        "",
+        " codex  quota read from its own store, this scan",
+        "        models         gpt-5.1-codex",
+        "        7d             ###############-----    79%  ~ 22h48m",
+        "",
+        " gemini  no quota reaches disk anywhere telltale can read",
+        "        models         gemini-3-pro"
+      ]
+    },
+    "record": {
+      "path": "internal/council/testdata/golden/arena-record-ascii.txt",
+      "lineStart": 8,
+      "lineEnd": 10,
+      "lines": [
+        "  arena record  ===================================================================================  telltale  5 races  ",
+        "  read from the arena/ and adopt/ branches this repository still holds, t2 through t9: 3 decided by you, 2 nobody was   ",
+        "  adopted from. A race whose branches were dropped is no longer in the record.                                          "
+      ]
+    }
+  }
+}

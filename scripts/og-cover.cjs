@@ -60,6 +60,19 @@ const DIST = path.join(REPO, 'dist');
  */
 const CARDS = [
   {
+    slug: 'telltale',
+    filename: 'og-telltale.png',
+    dateline: 'sanlee.me · telltale',
+    title: 'telltale',
+    standfirst:
+      'A terminal instrument for five coding-agent CLIs, built on one rule: a value nobody measured renders absent, never zero.',
+    proof: [
+      { claim: 'A reading no vendor exposes renders absent', fig: 'em dash, not 0', reversed: false },
+      { claim: 'The badges claimed enforcement one seat had', fig: '1 of 4 measured', reversed: true },
+      { claim: 'The standings refuse to say who won', fig: 'adopted, never won', reversed: false },
+    ],
+  },
+  {
     slug: 'false-green',
     filename: 'og-false-green.png',
     dateline: 'sanlee.me · false green',

@@ -75,6 +75,15 @@ jobs:
       - name: Navigation contract (adversarial suite)
         run: node --test scripts/navigation-check.test.cjs
 
+      # The telltale evidence gate's own adversarial suite. It drives all five
+      # failure modes against fixtures it builds itself: an unknown key, a
+      # rendered value that differs from the record, a page with zero markers
+      # (an inert gate reads exactly like a clean one), a malformed record, and
+      # a frame line that is not ASCII. It also pins the case a page-wide
+      # substring search cannot see — a wrong number typed beside a correct one.
+      - name: Telltale evidence gate (adversarial suite)
+        run: node --test scripts/check-telltale-evidence.test.cjs
+
       # Ports the architecture repo's 'Downstream surfaces' rule down to this repo's
       # ADR tier. Stdlib Python, no venv — this is a static site with no Python
       # toolchain, and a doc linter is not a reason to grow one. Every ADR complies,
@@ -121,6 +130,19 @@ jobs:
       # would silently halve its reach.
       - name: Published metrics match the classifier artifact
         run: node scripts/check-published-metrics.cjs
+        env:
+          SITE_ROOT: dist
+
+      # The telltale page argues that a gauge may not render a number nobody
+      # measured. A page that argues that and then carries hand-typed counts
+      # refutes itself, so every figure and every pasted terminal frame on it is
+      # marked and compared against src/data/telltale-evidence.json, which
+      # scripts/pull-telltale-evidence.cjs re-reads from that repository at a
+      # pinned commit. The comparison is attribute-anchored equality, not a
+      # substring search: a wrong number typed beside a correct one is invisible
+      # to a page-wide search, and this site has a page about exactly that.
+      - name: Telltale figures and frames match the generated record
+        run: node scripts/check-telltale-evidence.cjs
         env:
           SITE_ROOT: dist
 
