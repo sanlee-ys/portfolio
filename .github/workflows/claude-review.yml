@@ -220,8 +220,11 @@ jobs:
             when it starts with a granted prefix — `gh pr comment N --body
             "$(cat <<'EOF' ...)"` is a denied call, not a granted one. A
             backtick inside a double-quoted `--body` string is command
-            substitution too. So do not pass your summary with `--body`:
-            `Write` it to `review-summary.md` and pass `--body-file`.
+            substitution too. So prefer the body file: `Write` your summary
+            to `review-summary.md` and pass `--body-file`. If that one Write
+            is denied, do not retry it — fall back to a single
+            `gh pr comment <N> --body "..."` whose body carries no backtick,
+            no `$`, and no double quote.
 
             Do not run this repo's QA gates (`scripts/*.cjs`, `scripts/*.py`)
             or any other program. The `qa` workflow already ran all of them
@@ -345,6 +348,27 @@ jobs:
           #              rule shape -- and the prompt names that exact file
           #              and bans `--body` for the summary.
           #
+          #              CAUSE FOUND 2026-08-30, third measurement. Run
+          #              33327716725 (PR #240 again) denied
+          #              `Write(review-summary.md)` too -- four calls to the
+          #              exact granted path, at the workspace root, and the
+          #              verdict again went out over a bare `--body`. The rule
+          #              was never consulted: a local repro on the same CLI
+          #              version (2.1.251) returned the engine's own warning,
+          #              "Write(foo-test.md) is not matched by file permission
+          #              checks -- only Edit(path) rules are. Use
+          #              Edit(foo-test.md) instead (Edit rules cover all
+          #              file-editing tools)." There is no Write(path) rule
+          #              namespace at all, on any path shape -- which also
+          #              explains the //tmp/** attempt. The grant is now
+          #              `Edit(review-summary.md)`: the Edit rule namespace,
+          #              covering the Write tool, anchored at the SDK cwd
+          #              (GITHUB_WORKSPACE -- the action passes no cwd option,
+          #              per base-action/src/run-claude-sdk.ts). The prompt
+          #              keeps a legal fallback (one plain `--body` with no
+          #              backticks) so a mismatch degrades to a warning, not
+          #              to silence.
+          #
           # max-turns was 25, on the theory that denied tool calls -- not the
           # ceiling -- were the binding constraint: of the 26 turns PR #101
           # spent, 11 were denials returning nothing. That line invited its own
@@ -365,7 +389,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-5
             --max-turns 40
-            --allowedTools "Read,Grep,Glob,Write(review-summary.md),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
+            --allowedTools "Read,Grep,Glob,Edit(review-summary.md),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
 
       # Turn "the action exited non-zero" into a signal that distinguishes
       # I-found-problems from I-ran-out-of-road. See ADR-005 for the reasoning.
