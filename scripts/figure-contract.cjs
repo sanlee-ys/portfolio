@@ -168,6 +168,24 @@ function classToken(openTag) {
   return '(unnamed)';
 }
 
+/*
+ * One key, built in one place.
+ *
+ * A baseline entry is identified by its page and its figure together, so the
+ * two have to be joined. The separator is a NUL because neither a page path nor
+ * a class token can contain one, which makes a collision impossible: without it
+ * `a.html` + `.p b` and `a.html .p` + `b` are the same key.
+ *
+ * A NUL is also invisible, and that is exactly why this function exists rather
+ * than eight copies of the join. Eight hand-written copies of a character
+ * nobody can see is a defect waiting for the first editor who normalises one of
+ * them, and the gate would then silently stop matching its own baseline.
+ */
+const KEY_SEP = '\u0000';
+function figureKey(page, figure) {
+  return `${page}${KEY_SEP}${figure}`;
+}
+
 function svgsIn(region) {
   return matchAll('<svg\\b[^>]*>[\\s\\S]*?<\\/svg>', 'g', region).map((m) => {
     const open = /<svg\b[^>]*>/.exec(m[0])[0];
@@ -240,7 +258,7 @@ function inventory({ pages }) {
         for (const name of unknown) unknownEntities.push({ rel, name, sample: normalize(raw) });
         const value = normalize(text);
         if (!/[0-9]/.test(value)) continue;
-        const key = `${rel} ${svg.name}`;
+        const key = figureKey(rel, svg.name);
         if (!plates.has(key)) {
           plates.set(key, { page: rel, figure: svg.name, generated: svg.generated, texts: [] });
         }
@@ -251,7 +269,7 @@ function inventory({ pages }) {
 
     for (const fig of figuresIn(region)) {
       if (fig.declared) continue;
-      const key = `${rel} ${fig.name}`;
+      const key = figureKey(rel, fig.name);
       if (!undeclared.has(key)) undeclared.set(key, { page: rel, figure: fig.name });
     }
   }
@@ -341,12 +359,12 @@ function verify({ pages, baseline }) {
 
   // --- R-D, the digit rule ---------------------------------------------------
   const platesByKey = new Map(
-    baseline.digitPlates.map((e) => [`${e.page} ${e.figure}`, e])
+    baseline.digitPlates.map((e) => [figureKey(e.page, e.figure), e])
   );
 
   for (const live of inv.plates) {
     if (live.generated) continue; // a PLOT names its artifact and its commit
-    const key = `${live.page} ${live.figure}`;
+    const key = figureKey(live.page, live.figure);
     const entry = platesByKey.get(key);
     if (!entry) {
       problems.push(
@@ -375,8 +393,8 @@ function verify({ pages, baseline }) {
 
   // Anti-rot for R-D. A stale exemption is an exemption nobody granted.
   for (const entry of baseline.digitPlates) {
-    const key = `${entry.page} ${entry.figure}`;
-    const live = inv.plates.find((p) => `${p.page} ${p.figure}` === key);
+    const key = figureKey(entry.page, entry.figure);
+    const live = inv.plates.find((p) => figureKey(p.page, p.figure) === key);
     if (!live) {
       problems.push(
         `the baseline exempts "${safe(entry.figure, 40)}" on "${safe(entry.page, 60)}", but `
@@ -401,7 +419,7 @@ function verify({ pages, baseline }) {
 
   // --- R-C and R-N, per page -------------------------------------------------
   const undeclaredAllowed = new Set(
-    baseline.undeclaredFigures.map((e) => `${e.page} ${e.figure}`)
+    baseline.undeclaredFigures.map((e) => figureKey(e.page, e.figure))
   );
 
   for (const { rel, html } of pages) {
@@ -419,7 +437,7 @@ function verify({ pages, baseline }) {
 
     for (const fig of figuresIn(region)) {
       if (!fig.declared) {
-        const key = `${rel} ${fig.name}`;
+        const key = figureKey(rel, fig.name);
         if (!undeclaredAllowed.has(key)) {
           problems.push(
             `${safe(rel)}: the figure "${safe(fig.name, 40)}" carries no \`data-fig\`.\n`

@@ -22,9 +22,10 @@ plate ships with no automated contrast check in either theme.
 only control was a reading by eye.
 
 The gap was not theoretical. The `telltale` project learned the same lesson one
-repository over: its README frames were drawn by hand, they drifted several ways
-at once, and its test suite now emits them. [`ADR-012`](ADR-012-telltale-promoted-above-the-router.md)
-recorded that lesson and gated one page's figures. This record gates the rest.
+repository over. A person typed its README frames, and they drifted several ways
+at once. Its test suite now emits them.
+[`ADR-012`](ADR-012-telltale-promoted-above-the-router.md) recorded that lesson
+and gated one page's figures. This record gates the rest.
 
 Two measurements decided the shape of the answer, and both were taken on
 2026-08-30 against a fresh build.
@@ -55,7 +56,7 @@ digit lives in prose or in a caption, where a gate already reads it.
 **A STRIP is preferred over a PLATE whenever N items repeat one shape.** A strip
 is HTML, so its text stays inside `contrast-check.cjs`, its `data-metric` and
 `data-tt` spans travel intact, and it cannot break claim parity. A plate escapes
-all three. Use a plate only when the claim is a shape that words cannot draw.
+all three. Use a plate only when the claim is a shape, and words cannot show it.
 
 ### 2. At most four new SVG figures per page
 
@@ -104,14 +105,14 @@ never carried? Either direction fails.
 **T5.** Is it legible at 320px in both themes, with every state dual-encoded by a
 word plus a shape?
 
-Any "no" means the prose stays. **T1 outranks the wish to draw.** A paragraph
+Any "no" means the prose stays. **T1 outranks the wish to make a figure.** A paragraph
 that mixes registers splits at the sentence: the topology half converts, and the
 argument half stays where it is.
 
 T5 exists because no gate reads a plate. `contrast-check.cjs` exempts SVG text,
 so colour alone must never carry a state. `false-green.astro` already records
-the matching constraint: Geist has no glyph for the symbols a lane would reach
-for, so a state is a word plus a geometry.
+the matching constraint. Geist has no glyph for the symbols a lane would reach
+for. So a state is a word plus a geometry.
 
 ### 6. `scripts/figure-contract.cjs` fails the build on three rules
 
@@ -132,9 +133,9 @@ gate fails a correct figure, and the cheapest way to green a false failure is a
 deletion.
 
 **An entity the gate cannot resolve stops the run.** It cannot say what that
-text renders, and the guess is wrong in both directions: `&frac12;` spells a
-digit and renders none, `&#52;` spells none and renders one.
-`font-coverage.cjs` made the same call for the same reason.
+text renders. The guess is wrong in both directions. `&frac12;` spells a digit
+and renders none. `&#52;` spells none and renders one. `font-coverage.cjs` made
+the same call for the same reason.
 
 ### 7. The baseline exists so the gate never asks a lane to delete a figure
 
@@ -143,16 +144,16 @@ carried a digit when the gate landed, with their exact values and a reason each.
 
 **This is the load-bearing decision in this record.** A gate that reddens nine
 pages on day one has one cheap remedy, and it is deletion.
-[`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md) and ADR-007 forbid that:
-substance is never deleted, and text may be replaced only by a visual that
-carries the same claims on the same page. **A gate that forces a deletion is a
+[`ADR-004`](ADR-004-retire-the-lab-as-the-vehicle.md) and ADR-007 forbid that.
+Substance is never deleted. A visual may replace text only when it carries the
+same claims on the same page. **A gate that forces a deletion is a
 substance deletion with a build failure in front of it.** So the gate binds new
 work, and the baseline records the debt with its reasons rather than hiding it.
 
 The baseline cannot rot. The gate fails when a stored value is no longer on the
 page, and when an entry names a figure that is gone. That is what freezes
-`.eval-plate` and `.ci-plot`, which are frozen historical measurements: a change
-to either one now reddens the build instead of shipping as an ordinary diff.
+`.eval-plate` and `.ci-plot`. Both are frozen historical measurements. A change
+to either one now reddens the build. It no longer ships as an ordinary diff.
 **A new baseline entry needs a line in this record.** An exemption is a rule
 somebody decided to break, and the gate rejects an entry that carries no reason.
 
@@ -164,9 +165,9 @@ and writes nothing. A gate that can rewrite its own baseline can green itself.
 `scripts/mobile-qa.cjs:84-86` loads at `waitUntil: 'domcontentloaded'`,
 evaluates `scrollWidth - clientWidth` once, and never clicks. **A frame that a
 script swaps in after load is never measured by the overflow gate.** The site's
-known silent failure is a `.tt-frame` that loses on CSS specificity, wraps,
-shears every column, and turns the mobile gate green, because a wrapped frame
-cannot overflow.
+known silent failure is a `.tt-frame` that loses on CSS specificity. It wraps
+and it shears every column. It also turns the mobile gate green, because a
+wrapped frame cannot overflow.
 
 So the reader ships un-enhanced. Every frame sits in the served HTML, and
 JavaScript only reduces the set. **It never adds a frame.** The puller asserts
@@ -198,41 +199,41 @@ the habit of ignoring red.
 
 ## Downstream surfaces
 
-- `scripts/figure-contract.cjs` — the gate. Decisions 6 and 7.
-- `scripts/figure-contract.test.cjs` — its adversarial suite. It pins the entity
+- `scripts/figure-contract.cjs`: the gate. Decisions 6 and 7.
+- `scripts/figure-contract.test.cjs`: its adversarial suite. It pins the entity
   decode in both directions, the baseline anti-rot rules, and the inert-gate
   check.
-- `scripts/figure-contract-baseline.json` — the measured debt, nine entries.
+- `scripts/figure-contract-baseline.json`: the measured debt, nine entries.
   **Two are permanent:** `.eval-plate` and `.ci-plot`.
-- `scripts/gates.cjs` and `.github/workflows/qa.yml` — two new steps in each.
-  The count goes from 18 to 20. `CLAUDE.md` records that the runner must stay a
+- `scripts/gates.cjs` and `.github/workflows/qa.yml`: two new steps in each. The
+  count goes from 18 to 20. `CLAUDE.md` records that the runner must stay a
   faithful mirror of the workflow.
-- `CLAUDE.md` — a new operative section, "The figure contract", plus every gate
+- `CLAUDE.md`: a new operative section, "The figure contract", plus every gate
   count.
-- `scripts/build-plots.cjs` and `src/data/figures.json` — the PLOT generator and
-  its record. Decision 1. The generator stays outside `npm run qa`, because it
-  reads sibling repositories and a gate that reaches outside this repository
-  reddens for reasons unrelated to the site. `pull-telltale-evidence.cjs` and
+- `scripts/build-plots.cjs` and `src/data/figures.json`: the PLOT generator and
+  its record. Decision 1. The generator stays outside `npm run qa`. It reads
+  sibling repositories, and a gate that reaches outside this repository reddens
+  for reasons unrelated to the site. `pull-telltale-evidence.cjs` and
   `og-cover.cjs` sit outside for the same reason.
-- `scripts/pull-telltale-evidence.cjs` — decision 9's three admission tests, and
-  the new frame windows. **Not implemented by this record's pull request.**
-- `public/projects/tt-reader.js` and `src/pages/projects/telltale.astro` —
-  decision 8. **Not implemented by this record's pull request.**
-- Every page under `src/pages/projects/` — decisions 1 to 5 bind each figure a
-  later pull request adds. No page changed here.
-- `public/assets/style.css` — **not touched.** Every new caption rule is
+- `scripts/pull-telltale-evidence.cjs`: decision 9's three admission tests, and
+  the new frame windows. **This pull request does not build them.**
+- `public/projects/tt-reader.js` and `src/pages/projects/telltale.astro`:
+  decision 8. **This pull request does not build them.**
+- Every page under `src/pages/projects/`: decisions 1 to 5 bind each figure that
+  a later pull request adds. No page changed here.
+- `public/assets/style.css`: **not touched.** Every new caption rule is
   page-scoped, inside the page's own `<Fragment slot="head">`, with `is:inline`.
   A concurrent session owns that file, and a generated shared surface cannot
-  take a second writer. The cost is a repeated caption block per page, and each
-  copy names its origin page and commit. Consolidation is deferred.
+  take a second writer. The cost is a repeated caption block per page. Each copy
+  names its origin page and commit. Consolidation is deferred.
 
 ## Consequences
 
 **The site does not get shorter, and no pull request may claim that it does.**
 A figure plus a caption costs 150 to 350 rendered pixels, and the substance
 floor forbids the deletion that would pay for it. The claim this system makes is
-a comprehension claim: fewer paragraphs over 120 words, and no section where the
-reader performs arithmetic the page could draw.
+a comprehension claim. It has two parts: fewer paragraphs over 120 words, and no
+section where the reader performs arithmetic the page could show as a figure.
 
 **Two gates now stand between a lane and a published figure, and neither reads
 meaning.** R-D checks a digit. R-C checks that two spans hold text. **A caption
@@ -241,8 +242,8 @@ caption-spine test are readings, not checks. This record does not pretend
 otherwise.
 
 **Nine exemptions ship with the gate.** Every one is a rule this site breaks, in
-writing, with a reason. That is worse than a clean site and better than an
-unenforced doctrine, and it is the only version of this gate that does not push
+writing, with a reason. That is worse than a clean site. It is better than an
+unenforced doctrine. It is also the only version of this gate that does not push
 a lane toward deletion.
 
 **The baseline adds friction to an edit of an old plate.** That is the intent for

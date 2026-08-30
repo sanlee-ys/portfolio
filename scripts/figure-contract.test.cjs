@@ -80,7 +80,7 @@ test('a page with no main contributes no region', () => {
 
 // --- the decode, in both directions -----------------------------------------
 
-test('a numeric entity is decoded before the digit test — the measured false positive', () => {
+test('a numeric entity is decoded before the digit test: the measured false positive', () => {
   /*
    * `netops-lab.astro` reads `wipe &#8594; cfg`. The digits belong to the
    * entity reference and the reader sees an arrow. A gate that read the source,
@@ -136,7 +136,7 @@ test('an entity this gate cannot resolve fails, and names itself', () => {
   assert.match(problems[0], /&sup2;/);
 });
 
-test('a decoded digit still fails — the decode is not an escape hatch', () => {
+test('a decoded digit still fails: the decode is not an escape hatch', () => {
   // `&#52;` is the character `4`. Hiding a count behind an entity must not work.
   const { problems } = verify({
     pages: site('<svg class="p"><text>&#52; rungs</text></svg>'),
@@ -180,7 +180,7 @@ test('a baselined plate passes with the values the baseline lists', () => {
   assert.strictEqual(checked, 1);
 });
 
-test('a NEW digit added to a baselined plate fails — the exemption is per value', () => {
+test('a NEW digit added to a baselined plate fails: the exemption is per value', () => {
   /*
    * The exemption covers what already shipped. Without a per-value check, one
    * grandfathered plate becomes a place to put any number at all.
@@ -306,7 +306,7 @@ test('a declared figure with no .fig-what fails', () => {
   assert.match(problems[0], /holds no `\.fig-what`/);
 });
 
-test('an EMPTY .fig-limit fails — this is the slot that orphans a caveat', () => {
+test('an EMPTY .fig-limit fails: this is the slot that orphans a caveat', () => {
   /*
    * The ADR-007 rider says a figure sequence that ends on a win, with the
    * caveat somewhere else, is a broken split even though nothing moved. A
@@ -335,7 +335,7 @@ test('a caption slot is found when the class sits beside others', () => {
 
 // --- R-N, the declaration rule ----------------------------------------------
 
-test('a new figure with no data-fig fails — the escape hatch is closed', () => {
+test('a new figure with no data-fig fails: the escape hatch is closed', () => {
   /*
    * Without R-N, the whole caption rule is opt-in: a lane omits the attribute
    * and R-C never runs. That is a gate that new work can decline.
