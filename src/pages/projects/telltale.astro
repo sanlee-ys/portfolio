@@ -185,19 +185,18 @@ if (missingFrames.length) {
       margin-top: 6px;
     }
 
-    /* Page-local additions to the copied block, kept separate so the copy
+    /* One page-local addition to the copied block, kept separate so the copy
        above stays byte-identical to its origin. `min-width: 0` matters here
        and not on the origin page: every frame figure is a grid item holding a
        120-column `<pre>`, and a grid item's default `min-width: auto` refuses
        to shrink below its content, so the figure would widen its own track and
-       take the page with it. */
+       take the page with it.
+
+       Nothing else is added. Every frame figure carries BOTH `tt-figure` and
+       `fig`, so the copied `.fig figcaption` rules already style all thirteen
+       captions on this page. A second rule restating the same values is a
+       thing that drifts. */
     .fig { min-width: 0; }
-    .tt-figure figcaption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
 
     /* ---------------------------------------------------------------------
        `tt9-` IS THE SHARED GRAMMAR FOR THE FOUR NEW PLATES ON THIS PAGE.
@@ -315,6 +314,11 @@ if (missingFrames.length) {
     .tt-strip li > * { min-width: 0; }
     .tt-strip .tt-strip-a { color: var(--text); }
     .tt-strip .tt-strip-b { color: var(--muted); }
+    /* `min-width: 0` on the header cells too, for the same reason the row cells
+       get it: a grid item's default `min-width: auto` refuses to shrink below
+       its content. Both header strings break on spaces today, so this is the
+       rule the block already states rather than a fix for a live overflow. */
+    .tt-strip-cols > * { min-width: 0; }
     .tt-strip-cols {
       display: grid;
       grid-template-columns: 1fr;
@@ -795,7 +799,12 @@ if (missingFrames.length) {
          benchmark. A strip cannot carry a ruling at full strength. -->
     <figure class="fig" data-fig="strip">
       <div class="tt-strip">
-        <div class="tt-strip-cols" aria-hidden="true">
+        <!-- NOT `aria-hidden`. These two are column LABELS, and CLAUDE.md's
+             contrast rule names exactly this case: marking something
+             aria-hidden asserts it is decoration that nobody reads, and a
+             label is not decoration. A screen reader should hear the pairing
+             the sighted reader sees. -->
+        <div class="tt-strip-cols">
           <span>The mechanic</span>
           <span>The failure it blocks</span>
         </div>

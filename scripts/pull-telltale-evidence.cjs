@@ -371,6 +371,14 @@ function loadFontRanges() {
   const mono = [];
   for (const [file, entry] of Object.entries(fonts)) {
     if (!entry || !Array.isArray(entry.ranges)) continue;
+    // A malformed entry must stop the run, not be skipped. `inRanges` would
+    // throw an uncaught TypeError on a bare number, and a range this loop
+    // silently dropped would make the coverage test quietly weaker.
+    for (const r of entry.ranges) {
+      if (!Array.isArray(r) || r.length < 2 || !Number.isFinite(r[0]) || !Number.isFinite(r[1])) {
+        fail(`${FONT_MANIFEST}: ${file} carries a range this script cannot read: ${JSON.stringify(r)}`);
+      }
+    }
     all.push(...entry.ranges);
     if (/mono/i.test(file)) mono.push(...entry.ranges);
   }
@@ -485,16 +493,85 @@ function assertAdvanceWidth(key, spec, lines, ranges) {
  * council golden that shows a seat row shows that row directly under it, so the
  * pattern is what keeps a seat row out by construction rather than by care.
  *
- * A VENDOR NAME AS A ROW LABEL IN A READING IS LEGAL and stays legal: the
- * shipped `usage` frame publishes ` gemini  no quota reaches disk anywhere
- * telltale can read`. A vendor name BESIDE a rank, a rate, an adoption, a
- * verdict, or a posture is not, and never becomes so. That is why every pattern
- * below is a PAIRING and not a name.
+ * A VENDOR-LABELLED READING IS LEGAL, AND THE RULE IS ONE LINE WIDE. This is the
+ * precise statement, and an earlier looser one made the shipped record look like
+ * a violation of its own test. The `usage` frame has published this shape since
+ * the record was created:
+ *
+ *     claude  quota relayed by the statusline - 2h ago
+ *            5h             ########------------    42%  ~ 2h13m
+ *
+ * That is a reading against a limit, and it is inside the published boundary by
+ * ruling (GT10 of the redesign brief). The vendor labels its own block; the rate
+ * line is labelled by a WINDOW name and carries no vendor. The refused `agy`
+ * block differs exactly there:
+ *
+ *            gemini-weekly  #######-------------    38%  ~ 3h00m
+ *
+ * One line, one vendor family, one rate. So the rule these patterns enforce is
+ * narrow and mechanical: NO SINGLE LINE MAY CARRY A VENDOR NAME TOGETHER WITH A
+ * RANK, A RATE, AN ADOPTION, A VERDICT, OR A SANDBOX POSTURE. A vendor name as a
+ * row label, on its own line, with a reason or with its own window's reading
+ * underneath, is not that and never was.
+ *
+ * A LINE-SCOPED TEST CANNOT SEE A PAIRING THAT SPANS TWO LINES, AND THAT IS THE
+ * DESIGN, NOT A HOLE. Widening it to a window would reject the frame this record
+ * already publishes and that the owner has already ruled legal.
+ */
+
+/*
+ * TWO LISTS, BECAUSE ONE MATCHING RULE CANNOT SERVE BOTH ENDS.
+ *
+ * A long, unambiguous name is matched as a SUBSTRING. `\bclaude\b` does not
+ * match `claudecode`, because `e` to `c` is not a word boundary, and
+ * `claudecode` is a real adapter directory in the source repository. A
+ * word-boundary match there reads as thorough and is not.
+ *
+ * A short name is matched as a WHOLE WORD. `pi` is also a real adapter
+ * directory, and as a substring it matches `pipe`, `pins`, `copilot`, and
+ * `expired`. A denylist that stops on `pipe` is a denylist somebody switches
+ * off.
+ *
+ * BOTH LISTS ARE COMPLETE ON THEIR OWN. `main()` also appends the live adapter
+ * directory names, so the set cannot drift from the repository it is checking,
+ * but that runs only when this file is the entry point. An importer gets the
+ * static lists, so the static lists must already be right.
  */
 const VENDOR_TOKENS = [
-  'claude', 'claude code', 'codex', 'gemini', 'cursor', 'grok',
-  'antigravity', 'agy', 'copilot', 'openai', 'anthropic', 'google',
+  'claude', 'claudecode', 'codex', 'gemini', 'cursor', 'grok', 'antigravity',
+  'copilot', 'openai', 'anthropic', 'google',
+  // Model and family names the frames already print. A rate beside one of these
+  // identifies a vendor just as well as the vendor's own name does.
+  'gpt', 'sonnet', 'opus', 'haiku', 'composer',
 ];
+
+// Matched as whole words. Short, and each one is a common English fragment.
+const VENDOR_WORDS = ['pi', 'agy', 'cc', 'cx', 'ag', 'cu'];
+
+/*
+ * A rate, a rank, an adoption, or a verdict: the four things a vendor name may
+ * never sit beside. Each is deliberately looser than the one shape seen in the
+ * corpus, because the corpus is not the only thing this will ever read.
+ */
+const RATE_RE = /\d\s*%/;
+const RANK_RE = /\b(?:\d+(?:st|nd|rd|th)\b|rank\s*#?\d|#\d+\s*(?:of|\/)|\bplace\b)/i;
+const ADOPTION_RE = /\b\d+\s*(?:of|\/)\s*\d+\s+adopted\b|\badoption\s*rate\b|\badopted\b\s*\d+\s*%/i;
+const VERDICT_RE = /\bnever raced\b|\b(?:winner|won|beat|outperform\w*|best|worst|fastest|slowest)\b/i;
+// The posture vocabulary, WITHOUT a required column separator. The council
+// goldens are pipe-drawn and the HUD goldens are space-columned, so a pattern
+// that demands a `|` is blind to half the corpus.
+const POSTURE_RE = /\b(?:ro:tools|ro:requested|unsandboxed|sandboxed|workspace-write|danger-full-access|read-only|readonly|on-request|approval\s*:\s*\w+|gated)\b/i;
+
+function hasVendor(line) {
+  const lower = String(line).toLowerCase();
+  // A plain substring test for the long names. No RegExp, so a token carrying
+  // `-`, `.`, or `+` cannot silently change meaning or throw.
+  if (VENDOR_TOKENS.some((v) => lower.indexOf(v) !== -1)) return true;
+  // Whole-word for the short ones. Split on anything that is not a letter or a
+  // digit, so `1 cc claude` and `[ cc |` both yield `cc`.
+  const words = lower.split(/[^a-z0-9]+/);
+  return VENDOR_WORDS.some((v) => words.indexOf(v) !== -1);
+}
 
 const BOUNDARY_RULES = [
   {
@@ -502,31 +579,37 @@ const BOUNDARY_RULES = [
     test: (line) => /\$\s*\d/.test(line),
   },
   {
-    name: 'a per-vendor adoption rate',
-    test: (line) => /\b\d+ of \d+ adopted\b/i.test(line),
+    name: 'an adoption rate',
+    test: (line) => ADOPTION_RE.test(line),
   },
   {
-    name: 'a per-vendor race verdict',
-    test: (line) => /\bnever raced\b/i.test(line),
+    name: 'a race verdict',
+    test: (line) => VERDICT_RE.test(line),
   },
   {
-    // The council room's sandbox posture row: a posture word in a columned row.
-    name: 'a per-vendor sandbox posture row',
-    test: (line) => /\b(ro:tools|ro:requested|unsandboxed|gated)\b.*\|/i.test(line),
+    name: 'a sandbox posture',
+    test: (line) => POSTURE_RE.test(line),
   },
   {
-    // An absolute path into somebody's home directory is a machine identity.
-    // A repository-relative path such as `internal/council/clock.go` is not.
+    // An absolute path into somebody's home directory is a machine identity. A
+    // repository-relative path such as `internal/council/clock.go` is not.
+    // The home-directory branch is NOT anchored on a preceding delimiter: the
+    // MSYS and WSL forms `/c/Users/<name>` and `/mnt/c/Users/<name>` put a
+    // letter immediately before `/Users`, and those are the forms this machine
+    // actually produces.
     name: 'a path outside the telltale repository, or a machine identity',
-    test: (line) => /(^|[\s"'([])(?:[A-Za-z]:[\\/]|\/(?:home|Users|root)\/)/.test(line),
+    test: (line) => /(^|[\s"'([=])[A-Za-z]:[\\/]/.test(line)
+      || /\/(?:home|users|root)\//i.test(line)
+      || /(^|\s)~[\\/]/.test(line)
+      || /%USERPROFILE%|\$HOME\b/i.test(line),
   },
   {
-    name: 'a vendor name beside a percentage',
-    test: (line) => {
-      if (!/\d\s*%/.test(line)) return false;
-      const lower = line.toLowerCase();
-      return VENDOR_TOKENS.some((v) => new RegExp(`\\b${v}\\b`).test(lower));
-    },
+    name: 'a vendor name beside a rate',
+    test: (line) => RATE_RE.test(line) && hasVendor(line),
+  },
+  {
+    name: 'a vendor name beside a rank',
+    test: (line) => RANK_RE.test(line) && hasVendor(line),
   },
 ];
 
@@ -538,9 +621,9 @@ function assertBoundary(key, spec, lines) {
         `T3 boundary: ${spec.path} line ${spec.lineStart + i} (frame "${key}") carries ` +
           `${rule.name}.\n` +
           `  Line: ${JSON.stringify(line.trim().slice(0, 100))}\n` +
-          '  Move the window. This site never publishes a vendor name beside a rank, a ' +
-          'rate, an adoption, a verdict, or a sandbox posture, and it publishes no dollar ' +
-          'figure on a new surface.'
+          '  Move the window. No single line may carry a vendor name together with a ' +
+          'rank, a rate, an adoption, a verdict, or a sandbox posture, and no line may ' +
+          'carry a dollar figure. A vendor name as a row label in a reading is legal.'
       );
     }
   });
@@ -593,7 +676,30 @@ function countVendorAdapters(paths, sha, excluded) {
     );
   }
   const vendors = all.filter((name) => !excluded.includes(name));
+  // Every other counter in this file fails on zero. This one did not, and a
+  // zero vendor count would have been written into a published record and only
+  // caught downstream, by the page disagreeing with it.
+  if (vendors.length === 0) {
+    fail(`counted zero vendor adapters at ${sha}, which cannot be right.`);
+  }
   return { vendors, all, excluded };
+}
+
+/*
+ * Fold the live adapter directory names into the vendor token list. The token
+ * list is hand-written, and a hand-written list of the thing you are checking
+ * drifts from it. This is the same enumeration the record publishes as
+ * `adapters.vendor`, so the two cannot disagree.
+ */
+function extendVendorTokens(names) {
+  for (const name of names) {
+    const token = String(name).toLowerCase();
+    if (token.length < 2) continue;
+    // A short name goes to the whole-word list, for the reason recorded above:
+    // as a substring it would stop on ordinary English.
+    const list = token.length <= 3 ? VENDOR_WORDS : VENDOR_TOKENS;
+    if (list.indexOf(token) === -1) list.push(token);
+  }
 }
 
 // --- citations --------------------------------------------------------------
@@ -680,6 +786,12 @@ function main() {
    */
   const shaArg = process.argv.slice(2).find((a) => a.startsWith('--sha='));
   const requested = shaArg ? shaArg.slice('--sha='.length) : 'HEAD';
+  // No shell is involved (spawnSync with an argv array), so there is no
+  // injection here. A value starting with `-` would still reach git as an
+  // OPTION rather than a revision, which fails with a confusing message.
+  if (!/^[A-Za-z0-9][\w./^~@{}-]*$/.test(requested)) {
+    fail(`--sha=${requested} is not a revision. Pass a commit id or a ref name.`);
+  }
   const sha = (git(repo, ['rev-parse', '--verify', `${requested}^{commit}`], { allowFail: true }) || '').trim();
   if (!sha) fail(`${requested} does not resolve to a commit in ${repo}.`);
   const shortSha = git(repo, ['rev-parse', '--short', sha]).trim();
@@ -714,6 +826,11 @@ function main() {
 
   const tests = countTestFunctions(repo, sha);
   const adapters = countVendorAdapters(paths, sha, ADAPTER_EXCLUSIONS);
+  // Before any frame is read, so the boundary test knows every vendor the
+  // repository actually holds and not only the ones somebody remembered.
+  // `vendors`, not `all`: `drift`, `dropfile`, and `pins` are named helpers and
+  // not vendors, and treating a generic word as a vendor invites a false stop.
+  extendVendorTokens(adapters.vendors);
 
   const figures = {
     'goldens.total': {
@@ -815,4 +932,40 @@ function main() {
   console.log('src/pages/index.astro, then run: npm run qa');
 }
 
-main();
+if (require.main === module) main();
+
+/*
+ * EXPORTED SO THE BOUNDARY CAN BE RE-CHECKED AT BUILD TIME.
+ *
+ * Today this script is the ONLY thing that applies the boundary rules, and it
+ * runs by hand, on one machine, once. `check-telltale-evidence.cjs` validates
+ * the record's shape and compares the page to it; it does not re-apply these
+ * rules. So a hand edit of `src/data/telltale-evidence.json`, or a widened
+ * `FRAMES` range committed without re-running this script, reaches the public
+ * site with every gate green.
+ *
+ * Closing that is a change to `scripts/check-telltale-evidence.cjs`, which this
+ * lane does not own. These exports make it a two-line change for the lane that
+ * does: require this module, and run `assertBoundaryLines` over every
+ * `evidence.frames[key].lines`.
+ */
+module.exports = {
+  FRAMES,
+  VENDOR_TOKENS,
+  VENDOR_WORDS,
+  BOUNDARY_RULES,
+  hasVendor,
+  /*
+   * The boundary rules over a list of lines, as a list of findings rather than
+   * a process exit. Returns [] when the lines are clean.
+   */
+  assertBoundaryLines(lines) {
+    const found = [];
+    lines.forEach((line, i) => {
+      for (const rule of BOUNDARY_RULES) {
+        if (rule.test(line)) found.push({ line: i + 1, rule: rule.name, text: String(line) });
+      }
+    });
+    return found;
+  },
+};

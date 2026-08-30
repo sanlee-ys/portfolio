@@ -185,6 +185,10 @@
    * free, and the reader asked for this jump.
    */
   document.addEventListener('click', function (event) {
+    // A modified click opens a new tab. Changing the frame in THIS tab as well
+    // would move something the reader did not ask to move. The rail handler
+    // guards the same way.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     var el = event.target;
     if (!el || typeof el.closest !== 'function') return;
     var link = el.closest('a[href^="#frame-"]');
@@ -209,13 +213,17 @@
 
   figures[0].parentNode.insertBefore(controls, figures[0]);
 
-  // Last, so a script that throws before this point leaves every frame visible
-  // rather than leaving the page with nothing on it.
-  section.setAttribute('data-enhanced', 'true');
-
   // On load: select, and do nothing else. No fragment write and no focus move.
   // A shared link that names a frame opens on that frame, and a visit with no
   // fragment opens on the first one and stays where the reader is.
   var start = indexOfHash(window.location.hash);
   show(start === -1 ? 0 : start, {});
+
+  // LAST, AND AFTER THE FIRST `show()`. This attribute is what arms the CSS
+  // rule that hides every figure without `data-current`. Setting it before the
+  // first selection means a throw inside that selection leaves the rule armed
+  // with nothing marked current, and the reader renders empty. Setting it after
+  // means any throw leaves all seven frames visible, which is the un-enhanced
+  // page and is always correct.
+  section.setAttribute('data-enhanced', 'true');
 }());
