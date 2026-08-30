@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Replaying and Evaluating AI Agent Improvement Loops · San Lee"
-  description="A recorded-replay viewer for two autonomous improvement runs, showing score progression, iteration edits, and the gap between training and held-out results."
+  description="A recorded-replay viewer for two autonomous improvement runs. It shows score progression, iteration edits, and the gap between training and held-out results."
   canonical="https://sanlee.me/projects/loop-replay.html"
   ogType="website"
   ogImage="/assets/og-loop-replay.png"
@@ -310,6 +310,63 @@ import SiteNav from '../../components/SiteNav.astro';
       margin: 18px 0;
     }
     .honest-callout strong { color: var(--series-c); }
+
+    /* ----- The figure contract's two caption slots (ADR-013) -----
+       ORIGIN COPY. No page shipped a data-fig caption before this one, so
+       there was nothing to copy: a later lane copies this block verbatim and
+       names loop-replay.astro and its commit in the comment above its copy.
+
+       Page-scoped rather than assets/style.css because a concurrent session
+       owns that file for the tap-target work, and two writers on one
+       generated surface cannot be merged. OC-F consolidates the copies after
+       that session merges.
+
+       The tokens are .split-caption's, deliberately: this page already draws
+       a caption in --muted at 0.92rem directly above, and a second caption
+       grammar on one page would read as a second kind of claim. --muted is
+       also a real colour token rather than a faded one -- opacity never dims
+       text on this site (ADR-009), and contrast-check.cjs reads a figcaption
+       because it is HTML and not SVG text. */
+    .fig { margin: 0; }
+    .fig figcaption { color: var(--muted); font-size: 0.92rem; margin: 4px 0 28px; }
+    /* Both slots are blocks so the limit reads as its own line rather than as
+       a tail the eye can run past. The gate requires both to be non-empty;
+       this is what makes the limit legible as well as required. */
+    .fig .fig-what, .fig .fig-limit { display: block; }
+    .fig .fig-limit { margin-top: 6px; }
+
+    /* lr1-pipeline. The prefix is lr1- on every class and on the marker id,
+       so nothing collides with the split map's sm-/split-arrow set above. A
+       duplicate marker id repaints the wrong arrow head and no gate sees it.
+
+       NEUTRAL ONLY, and that is a decision rather than a default. --accent-warm
+       carries exactly one meaning on this site, "a decision that was taken
+       back", and nothing in this plate is a reversal. --series-a/b/c are keyed
+       to the A/B/C split map above and to the chart below, and this plate is
+       about log transport, not about splits -- borrowing one would claim a
+       relationship the figure does not have. So the plate reads in the same
+       ink as the body, and every state it draws is a word, not a hue.
+
+       max-width caps the SVG at 260px, which is under the content column even
+       at a 320px viewport, so these viewBox units are CSS pixels 1:1 -- the
+       same basis the split map above records. SVG text inherits font-family
+       from <body> rather than from the page, so each text class declares it. */
+    .lr1-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 10px;
+    }
+    .lr1-plate .lr1-box { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; }
+    .lr1-plate .lr1-name { fill: var(--text); font-family: var(--font); font-size: 13px; font-weight: 600; }
+    .lr1-plate .lr1-key { fill: var(--muted); font-family: var(--font); font-size: 11.5px; }
+    .lr1-plate .lr1-step { fill: var(--text); font-family: var(--font); font-size: 12px; }
+    .lr1-plate .lr1-note { fill: var(--muted); font-family: var(--font); font-size: 11px; }
+    .lr1-plate .lr1-edge { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+    /* A marker does not inherit the referencing path's stroke, so the head is
+       painted to match the edge rather than left to chance. */
+    .lr1-plate marker path { fill: var(--muted); }
   </style>
   </Fragment>
 
@@ -321,17 +378,17 @@ import SiteNav from '../../components/SiteNav.astro';
     <a class="back" href="defense-news-classifier.html">&larr; Back to the classifier</a>
     <h1>Loop replay</h1>
     <p class="subtitle">
-      A recorded-replay viewer for the autonomous loop&rsquo;s run logs &mdash;
-      both rungs of the
+      This page is a recorded-replay viewer for the autonomous loop&rsquo;s run
+      logs. It covers both rungs of the
       <a href="defense-news-classifier.html#autonomy-ladder">L3 step</a>
-      of the classifier&rsquo;s autonomy ladder: the prompt-optimization loop
-      and the agent-driven ML loop.
+      of the classifier&rsquo;s autonomy ladder. The two rungs are the
+      prompt-optimization loop and the agent-driven ML loop.
     </p>
 
     <p class="lead">
-      The loop optimizes against one set and is graded on two it never gets to
-      touch. This page replays a run so the gap between &ldquo;improved on
-      A&rdquo; and &ldquo;improved on C&rdquo; is visible on the chart.
+      The loop optimizes against one set. Two other sets score the loop, and the
+      loop never touches them. This page replays a run, so the chart shows the
+      gap between &ldquo;improved on A&rdquo; and &ldquo;improved on C&rdquo;.
     </p>
 
     <!-- The three-way split, drawn. All three sets are scored every iteration;
@@ -409,9 +466,9 @@ import SiteNav from '../../components/SiteNav.astro';
     <h2>Score progression</h2>
     <p>
       <span id="chart-metric-line">Category macro-F1 per split, per iteration.</span>
-      The shaded band is the gap between A and C &mdash; the wider it opens,
-      the more the loop improved on the set it was tuned against without
-      improving on real gold text.
+      The shaded band is the gap between A and C. A wider band means the loop
+      improved on the set it optimizes against. It also means the loop did not
+      improve on real gold text.
     </p>
     <div class="chart-legend wide">
       <span><i class="swatch a"></i>A &middot; training (optimized on)</span>
@@ -432,8 +489,8 @@ import SiteNav from '../../components/SiteNav.astro';
       <ul class="stat-strip" id="iter-stats"><!-- filled by JS --></ul>
 
       <div id="iter-baseline" class="iter-baseline-note" hidden>
-        Iteration 0 is the baseline &mdash; scored before any edit, so there is
-        no diff, rationale, or edit summary yet.
+        Iteration 0 is the baseline. The loop scores it before any edit, so it
+        has no diff, no rationale, and no edit summary yet.
       </div>
 
       <div id="iter-edit-block">
@@ -457,68 +514,126 @@ import SiteNav from '../../components/SiteNav.astro';
       <h3>Replay iteration-by-iteration, not just a summary chart</h3>
       <p>A single before/after number hides <strong>when</strong> A and C
         diverge, and which prompt edit caused it. This page steps through every
-        iteration&rsquo;s scores, diff, and rationale, with the chart and the
-        detail panel moving together.</p>
+        iteration&rsquo;s scores, diff, and rationale. The chart and the detail
+        panel move together.</p>
       <p class="tradeoff"><strong>Why:</strong> the loop spec is about a
-        trajectory, not an endpoint &mdash; a viewer that only shows the final
-        delta can&rsquo;t show a run that overfit early and recovered, or one
-        that looked fine on B right up until C caught it.
-        <strong>Tradeoff:</strong> more UI than a static chart would need; kept
-        to plain HTML/CSS/JS (no chart library) to match the rest of the
-        site&rsquo;s stack.</p>
+        trajectory, not an endpoint. A viewer that shows only the final delta
+        cannot show a run that overfit early and then recovered. It cannot show
+        a run that looked correct on B until C found it.
+        <strong>Tradeoff:</strong> this viewer needs more UI than a static
+        chart. I kept it to plain HTML/CSS/JS with no chart library, to match
+        the rest of the site&rsquo;s stack.</p>
     </div>
 
     <div class="decision">
       <p class="tag">Decision</p>
-      <h3>Built against a labeled mock, then swapped for the real run</h3>
-      <p>This viewer shipped first against a <code>--dry-run</code> mock &mdash;
-        a deterministic offline backend, zero API calls, every rationale field
-        prefixed <code>[dry-run]</code> &mdash; because the viewer was the
-        deliverable and a real run costs real money. The mock was labeled as a
-        mock in a banner that named it. The real run landed the next day, and
-        the page now loads it: 1.5M tokens, <code>threshold</code> stop at
+      <h3>Build against a labeled mock, then swap in the real run</h3>
+      <p>This viewer shipped first against a <code>--dry-run</code> mock,
+        because the viewer was the deliverable and a real run costs real money.
+        The mock is a deterministic offline backend with zero API calls, and it
+        prefixes every rationale field <code>[dry-run]</code>. A banner labeled
+        the mock as a mock, and named it. The real run finished the next day,
+        and the page now loads it: 1.5M tokens, <code>threshold</code> stop at
         iteration 2.</p>
-      <p class="tradeoff"><strong>Why:</strong> a viewer that can only be built
-        once real data exists can&rsquo;t be reviewed today. A mock left in
-        place after real data arrives is a stale claim. The design that made
-        both true is the single swappable data file.
-        <strong>Tradeoff:</strong> the swap took a CSS fix the original plan
-        missed &mdash; the &ldquo;real run&rdquo; state had a class but no style,
-        so the banner would have kept its warning colour while claiming a
-        measured result. Cheap to fix once the swap was actually exercised.</p>
+      <p class="tradeoff"><strong>Why:</strong> nobody can review a viewer that
+        needs real data before anyone can build it. A mock left in place after
+        real data arrives is a stale claim. The single swappable data file made
+        both statements true.
+        <strong>Tradeoff:</strong> the swap needed a CSS fix that the original
+        plan missed. The &ldquo;real run&rdquo; state had a class but no style.
+        The banner would therefore have kept its warning colour and claimed a
+        measured result at the same time. The fix was cheap once I exercised
+        the swap.</p>
     </div>
 
     <h2>How this reads a run log</h2>
+
+    <!-- lr1-pipeline. The two rungs' dialects are the only part of this
+         section that is topology: two logs in, one normalizer, one viewer.
+         Everything else here is a log shape, a transport decision, and a
+         procedure, so it stays as the prose and the list below.
+
+         The plate carries the tag key that tells the two dialects apart
+         (type against record) and the negative half of the claim (neither log
+         is edited). The rung numbers and the two diff shapes are in .fig-what,
+         because a hand-drawn figure carries no digit (ADR-013) and because a
+         caption is read by contrast-check.cjs while SVG text is not. -->
+    <figure class="fig" data-fig="plate">
+      <svg class="lr1-plate" viewBox="0 0 260 132" role="img"
+           aria-label="Two run logs enter in different dialects. One tags its records with type. The other tags with record. Both reach one normalizer at parse time, and then the viewer. Neither log is edited.">
+        <defs>
+          <marker id="lr1-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+
+        <rect class="lr1-box" x="2" y="2" width="124" height="42" rx="2" />
+        <text class="lr1-name" x="64" y="21" text-anchor="middle">prompt loop</text>
+        <text class="lr1-key" x="64" y="36" text-anchor="middle">tags: type</text>
+
+        <rect class="lr1-box" x="134" y="2" width="124" height="42" rx="2" />
+        <text class="lr1-name" x="196" y="21" text-anchor="middle">ML loop</text>
+        <text class="lr1-key" x="196" y="36" text-anchor="middle">tags: record</text>
+
+        <!-- One path draws both drops and the join between them, so the two
+             logs read as one convergence and not as two unrelated edges. -->
+        <path class="lr1-edge" d="M 64 44 L 64 53 L 196 53 L 196 44" />
+        <path class="lr1-edge" d="M 130 53 L 130 60" marker-end="url(#lr1-arrow)" />
+
+        <rect class="lr1-box" x="26" y="62" width="208" height="40" rx="2" />
+        <text class="lr1-step" x="130" y="81" text-anchor="middle">normalize at parse time</text>
+        <text class="lr1-note" x="130" y="96" text-anchor="middle">neither log is edited</text>
+
+        <path class="lr1-edge" d="M 130 102 L 130 109" marker-end="url(#lr1-arrow)" />
+
+        <rect class="lr1-box" x="82" y="111" width="96" height="20" rx="2" />
+        <text class="lr1-step" x="130" y="125" text-anchor="middle">the viewer</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">Two run logs in different dialects reach one
+          viewer. Rung 1 tags records with <code>type</code> and writes
+          unified prompt diffs. Rung 2 tags with <code>record</code> and writes
+          one-line experiment diffs.</span>
+        <span class="fig-limit">The plate does not show the log shape or the
+          transport. The paragraph below keeps both, and it keeps the CORS
+          reason.</span>
+      </figcaption>
+    </figure>
+
     <p>
       The run log is <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/optimize/README.md">append-only
       JSONL</a>: a <code>run_metadata</code> line, one <code>iteration</code>
       line per step, and a trailing <code>run_summary</code>. This page ships
       the run log as a plain JS string
-      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/projects/data/loop-replay-real.js"><code>projects/data/loop-replay-real.js</code></a>)
-      rather than fetching a <code>.jsonl</code> file. It renders the same way
-      from disk or from GitHub Pages. A <code>fetch()</code> of a local file
-      hits browser CORS restrictions that a plain
-      <code>&lt;script src&gt;</code> does not. Rung 2&rsquo;s run ships the
-      same way in a second file
-      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/projects/data/loop-replay-run2-real.js"><code>loop-replay-run2-real.js</code></a>).
-      Its source log is gitignored in the classifier repo, so the embed here is
-      the published record. The two rungs&rsquo; logs speak slightly different
-      dialects. Rung 1 tags records with <code>type</code> and ships unified
-      prompt diffs. Rung 2 tags with <code>record</code> and ships one-line
-      experiment diffs. The viewer normalizes both at parse time rather than
-      editing either log. Adding another run is: drop the file in
-      <code>projects/data/</code>, regenerate a template literal from its raw
-      text, and register it in <code>loop-replay.js</code>&rsquo;s run list.
-      Each run carries its own dry-run flag so a mock cannot be shown without
-      its warning banner.
+      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/projects/data/loop-replay-real.js"><code>projects/data/loop-replay-real.js</code></a>).
+      It does not fetch a <code>.jsonl</code> file. The page renders the same
+      way from disk and from GitHub Pages. A <code>fetch()</code> of a local
+      file hits browser CORS restrictions that a plain
+      <code>&lt;script src&gt;</code> does not.
     </p>
 
     <p>
+      Rung 2&rsquo;s run ships the same way in a second file
+      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/projects/data/loop-replay-run2-real.js"><code>loop-replay-run2-real.js</code></a>).
+      The classifier repo gitignores its source log, so the embed here is the
+      published record. Each run carries its own dry-run flag, so the page
+      cannot show a mock without its warning banner.
+    </p>
+
+    <p>To add another run:</p>
+    <ol>
+      <li>Drop the file in <code>projects/data/</code>.</li>
+      <li>Regenerate a template literal from its raw text.</li>
+      <li>Register it in <code>loop-replay.js</code>&rsquo;s run list.</li>
+    </ol>
+
+    <p>
       This viewer does not cover L4&rsquo;s multi-agent audit trail. That log is
-      event-shaped &mdash; triage evidence, a challenge, a backward bounce, a
-      verdict, per row &mdash; not an iteration-by-iteration score curve.
-      Replaying it through this player&rsquo;s chart would flatten the structure
-      the log is built to keep. Its measured result lives in the classifier repo
+      event-shaped: triage evidence, a challenge, a backward bounce, and a
+      verdict, per row. It is not an iteration-by-iteration score curve. A
+      replay through this player&rsquo;s chart would flatten the structure the
+      log exists to keep. Its measured result lives in the classifier repo
       (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/l4_eval.txt"><code>evals/l4_eval.txt</code></a>,
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/020-l4-multi-agent-pipeline.md">ADR-020</a>).
       If it gets a viewer, that viewer is a separate page.
@@ -526,11 +641,11 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <h2>Stack</h2>
     <p>
-      Vanilla HTML/CSS/JS, matching the rest of this site. No chart library, no
-      build step. The chart is a hand-built SVG (same
-      <code>createElementNS</code> pattern as the <a href="the-system.html">system
-      diagram</a>). The run log is parsed as plain JSONL with
-      <code>JSON.parse</code> per line.
+      The page uses vanilla HTML/CSS/JS, and it matches the rest of this site.
+      It uses no chart library and no build step. The chart is a hand-built SVG,
+      with the same <code>createElementNS</code> pattern as the
+      <a href="the-system.html">system diagram</a>. The page parses the run log
+      as plain JSONL, with <code>JSON.parse</code> per line.
     </p>
   </main>
 
