@@ -197,11 +197,62 @@ function svgsIn(region) {
   });
 }
 
+/*
+ * The index of the `>` that closes the tag opening at `start`, or -1.
+ *
+ * Quoted attribute values are skipped, so `<a title="a>b">` closes at the last
+ * `>` and not the one inside the title.
+ */
+function closeOfTag(markup, start) {
+  let quote = null;
+  for (let i = start + 1; i < markup.length; i += 1) {
+    const ch = markup[i];
+    if (quote !== null) {
+      if (ch === quote) quote = null;
+    } else if (ch === '"' || ch === "'") {
+      quote = ch;
+    } else if (ch === '>') {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/*
+ * The text content of a markup fragment: every character that sits outside a
+ * tag, with `joiner` written where each tag was.
+ *
+ * THIS IS NOT A SANITIZER, and nothing in this file ever writes HTML. The
+ * result is tested for a digit and printed through `safe()`.
+ *
+ * It is hand-written rather than a `replace(/<[^>]*>/g, '')` for two reasons,
+ * and CodeQL is right about the first. That pattern is an incomplete
+ * multi-character sanitization: an attribute value holding a `>` ends the match
+ * early and leaves markup in the "text". This gate reads real page markup, so
+ * that is a correctness bug here and not only a lint. The second reason is that
+ * the pattern reads as a sanitizer to every later reader, and one of them will
+ * eventually reuse it where the output does reach a page.
+ */
+function textOf(markup, joiner) {
+  let out = '';
+  let i = 0;
+  while (i < markup.length) {
+    const lt = markup.indexOf('<', i);
+    if (lt === -1) return out + markup.slice(i);
+    out += markup.slice(i, lt);
+    const gt = closeOfTag(markup, lt);
+    if (gt === -1) return out + markup.slice(lt); // an unclosed tag is text
+    out += joiner;
+    i = gt + 1;
+  }
+  return out;
+}
+
 function textNodesIn(svg) {
-  // Inner markup is removed with no replacement: an SVG <tspan> is an inline
-  // run of the same string, so inserting a space would invent one.
+  // The joiner is empty: an SVG <tspan> is an inline run of the same string, so
+  // a space between runs would invent a word break that does not render.
   return matchAll('<text\\b[^>]*>([\\s\\S]*?)<\\/text>', 'g', svg)
-    .map((m) => m[1].replace(/<[^>]*>/g, ''));
+    .map((m) => textOf(m[1], ''));
 }
 
 function figuresIn(region) {
@@ -228,11 +279,34 @@ function unparsedFigureMarkers(region) {
   return raw - parsed;
 }
 
+/*
+ * The text of one caption slot, or null when the slot is absent.
+ *
+ * The close tag is found by counting depth, not by a non-greedy match to the
+ * first one. The caption contract puts the exact numbers inside a `data-metric`
+ * or `data-tt` span INSIDE `.fig-what`, so same-tag nesting is the normal case
+ * rather than an edge case. A non-greedy read stops at the inner `</span>` and
+ * returns the first fragment, which is a silently truncated answer.
+ */
 function slotText(figureBody, slot) {
-  const re = new RegExp(`<(\\w+)\\b[^>]*\\bclass="[^"]*\\b${slot}\\b[^"]*"[^>]*>([\\s\\S]*?)<\\/\\1>`);
-  const m = re.exec(figureBody);
+  const openRe = new RegExp(`<(\\w+)\\b[^>]*\\bclass="[^"]*\\b${slot}\\b[^"]*"[^>]*>`);
+  const m = openRe.exec(figureBody);
   if (!m) return null;
-  return normalize(decodeEntities(m[2].replace(/<[^>]*>/g, ' ')).text);
+  const tag = m[1];
+  const rest = figureBody.slice(m.index + m[0].length);
+  const tagRe = new RegExp(`<${tag}\\b[^>]*>|</${tag}>`, 'g');
+  let depth = 0;
+  let end = rest.length; // an unclosed slot reads to the end of the figure
+  let t;
+  while ((t = tagRe.exec(rest)) !== null) {
+    if (t[0].startsWith('</')) {
+      if (depth === 0) { end = t.index; break; }
+      depth -= 1;
+    } else {
+      depth += 1;
+    }
+  }
+  return normalize(decodeEntities(textOf(rest.slice(0, end), ' ')).text);
 }
 
 /*
@@ -591,5 +665,6 @@ module.exports = {
   inventory,
   validateBaseline,
   verify,
+  textOf,
   BASELINE_PATH,
 };

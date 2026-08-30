@@ -29,6 +29,7 @@ const {
   inventory,
   validateBaseline,
   verify,
+  textOf,
 } = require('./figure-contract.cjs');
 
 // An SVG with text and no digit. Every fixture carries one, so the inert-gate
@@ -324,6 +325,38 @@ test('a caption slot holding only markup and entities is not mistaken for text',
   assert.strictEqual(slotText('<span class="fig-limit"><b>&nbsp;</b></span>', 'fig-limit'), '');
   assert.strictEqual(slotText('<span class="fig-what">One <b>claim</b>.</span>', 'fig-what'),
     'One claim .');
+});
+
+test('a caption slot keeps text AFTER a nested span, which is the normal case', () => {
+  /*
+   * The caption contract puts the exact numbers inside a `data-metric` or
+   * `data-tt` span inside `.fig-what`. A reader that stopped at the first inner
+   * `</span>` would return "The bar never moved at" and drop the rest, which is
+   * a silent truncation, not a failure anyone would see.
+   */
+  const cap = '<span class="fig-what">The bar never moved at '
+    + '<span data-metric="power">p=0.0522</span>, and the caption keeps this half.</span>'
+    + '<span class="fig-limit">A limit.</span>';
+  assert.strictEqual(
+    slotText(cap, 'fig-what'),
+    'The bar never moved at p=0.0522 , and the caption keeps this half.'
+  );
+  assert.strictEqual(slotText(cap, 'fig-limit'), 'A limit.');
+});
+
+test('a > inside an attribute value does not end a tag', () => {
+  /*
+   * The reason this file does not strip tags with `replace(/<[^>]*>/g, '')`.
+   * That pattern ends the match at the `>` inside the title and leaves markup
+   * behind as text, which CodeQL flags as an incomplete sanitization and which
+   * is a correctness bug in a gate that reads real page markup.
+   */
+  assert.strictEqual(textOf('a<b title="x>y">c', ''), 'ac');
+  assert.strictEqual(textOf("a<b title='x>y'>c", ' '), 'a c');
+});
+
+test('an unclosed tag is read as text rather than swallowing the rest', () => {
+  assert.strictEqual(textOf('keep me <span class="x', ''), 'keep me <span class="x');
 });
 
 test('a caption slot is found when the class sits beside others', () => {
