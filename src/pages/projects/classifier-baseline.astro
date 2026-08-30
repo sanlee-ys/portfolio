@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="LLM vs. Logistic Regression Classifier Baseline · San Lee"
-  description="A TF-IDF and logistic-regression baseline compared with an LLM on the same 54 hand-labeled rows, testing whether added model cost was justified."
+  description="A TF-IDF and logistic-regression baseline scores the same 54 hand-labeled rows as the LLM. The comparison tests whether the added model cost is justified."
   canonical="https://sanlee.me/projects/classifier-baseline.html"
   ogType="article"
 >
@@ -68,6 +68,109 @@ import SiteNav from '../../components/SiteNav.astro';
       color: var(--muted);
       font-size: 0.92rem;
       margin: 0 0 6px;
+    }
+
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
+
+       COPY. The origin is src/pages/projects/context-architecture.astro at
+       9d81caa, and the four rules below are that block verbatim. A shared
+       grammar is copied and never extracted: a concurrent session owns
+       public/assets/style.css for the tap-target work, and two writers on one
+       shared stylesheet cannot merge. OC-F of the redesign brief carries the
+       consolidation, for after that session merges.
+
+       .fig-what states what the figure argues. .fig-limit states what the
+       figure does not show. The gate fails the build on an empty .fig-limit,
+       because a figure that ends on a win while its caveat sits somewhere else
+       is the split ADR-007 refuses. */
+    .fig {
+      margin: 0 0 22px;
+    }
+    .fig figcaption {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+    }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* NOT part of the copy above. It is the rule
+       defense-news-classifier.astro added at f131d30, and lane I repeated on
+       faithfulness-judge.astro at bd00680: a caption here names an artifact
+       file, and a file name is one unbreakable token. Without this rule the
+       caption widens the page at 320px and the mobile gate reddens.
+
+       No caption on this page holds a link, and that is deliberate. Lane N
+       measured a link inside a figcaption painting the browser default at
+       1.97:1 on the dark theme, because the house link rules are scoped to
+       `.article-body p a` and `li a`. The two records this strip rests on are
+       already linked from the paragraph above it. An editor who adds a link to
+       a caption here adds a `.fig figcaption a` rule first. */
+    .fig figcaption code { overflow-wrap: anywhere; }
+
+    /* cb-s1. The two label collapses, re-laid as a strip (ADR-013).
+
+       A STRIP and not a plate. The two rows re-lay text nodes that already sat
+       in the card, so the strip cannot break claim parity, and the text stays
+       HTML where contrast-check.cjs still reads it. No gate reads SVG text.
+
+       The counts stay in the rows, because a strip does not move its text
+       node. That is the one carrier difference from .bake-fork above, whose
+       comment records the opposite rule for a plate.
+
+       No hue and no marker. Oxide (--accent-warm) on this page means the
+       baseline's wrong answer inside the live demo, and the demo block's own
+       comment records that reading. A miss the baseline made in a recorded
+       eval is not that state, so every row is a word and a rule, never a
+       colour. This block adds no id to the document.
+
+       Rows below 48rem, two columns above it. The house grammar is al-s1 on
+       autonomy-ladder.astro: the claim, then the thing it resolves to. The
+       strip sits inside a .decision card, whose padding is `22px 0 30px`, so
+       the content track is the full 34rem and no indent narrows it. Nothing
+       here is a link, so scripts/hit-target.cjs has no standalone anchor to
+       measure. */
+    .cb-miss-strip {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+    }
+    .cb-miss-strip li {
+      min-width: 0;
+      border-top: 1px solid var(--border);
+      padding: 11px 0;
+    }
+    .cb-miss-strip li:first-child {
+      border-top: 1px solid var(--rule-strong);
+    }
+    .cb-miss-from {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+    .cb-miss-to {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    @media (min-width: 48rem) {
+      .cb-miss-strip li {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 14rem;
+        gap: 4px 24px;
+        align-items: start;
+      }
+      .cb-miss-to {
+        margin-top: 0;
+      }
     }
   </style>
   </Fragment>
@@ -300,7 +403,7 @@ import SiteNav from '../../components/SiteNav.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="defense-news-classifier.html">&larr; Back to the classifier</a>
     <h1>Why an LLM at All</h1>
-    <p class="subtitle">TF-IDF plus logistic regression, scored on the same gold as the LLM.</p>
+    <p class="subtitle">TF-IDF plus logistic regression. I scored it on the same gold as the LLM.</p>
 
     <p>
       The classifier writeup measures upgrades on top of a language model: a
@@ -308,10 +411,11 @@ import SiteNav from '../../components/SiteNav.astro';
       answer whether the task needs an LLM.
     </p>
     <p>
-      So I built the boring baseline: TF-IDF features into logistic regression,
-      one classifier per axis, trained on 300 real snippets graded by the Opus
-      judge (the scaled set, not v1&rsquo;s synthetic one) and scored once
-      against the same 54 hand-labeled rows. Standard, not tuned.
+      So I built the boring baseline. It puts TF-IDF features into logistic
+      regression, one classifier per axis. I trained it on 300 real snippets
+      that the Opus judge graded, which is the scaled set and not v1&rsquo;s
+      synthetic one. I scored it once against the same 54 hand-labeled rows.
+      Standard, not tuned.
     </p>
 
     <!-- Decision fork: same text, two arms, one human gold set. Percentages
@@ -319,8 +423,8 @@ import SiteNav from '../../components/SiteNav.astro';
          topology, prose keeps the numbers). No oxide: this is a bake-off, not
          a reversal claim. ADR-010 N/A — no interactive nodes. -->
     <svg class="bake-fork" viewBox="0 0 260 148" role="img"
-         aria-label="Decision fork for the classifier bake-off: the same defense-news snippet is scored by a classical TF-IDF logistic-regression baseline and by the LLM, both against the same 54-row human gold set.">
-      <title>Decision fork for the classifier bake-off: the same defense-news snippet is scored by a classical TF-IDF logistic-regression baseline and by the LLM, both against the same 54-row human gold set.</title>
+         aria-label="Decision fork for the classifier bake-off. One defense-news snippet goes to a classical TF-IDF logistic-regression baseline and to the LLM. Both face the same 54-row human gold set.">
+      <title>Decision fork for the classifier bake-off. One defense-news snippet goes to a classical TF-IDF logistic-regression baseline and to the LLM. Both face the same 54-row human gold set.</title>
       <defs>
         <marker id="bf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
@@ -380,10 +484,10 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <p>
       The LLM wins by 20 points on category and 26 on domain. Both arms ran on
-      identical rows, so the gap can be tested: a paired exact McNemar returns
-      <strong>p=0.013</strong> on category and <strong>p=0.0005</strong> on
-      domain. Counted as disagreements, the baseline alone was wrong 14 times to
-      the LLM&rsquo;s 3 on category, and 15 to 1 on domain
+      identical rows, so a test can measure the gap. A paired exact McNemar
+      returns <strong>p=0.013</strong> on category and <strong>p=0.0005</strong>
+      on domain. I also counted the disagreements. The baseline alone was wrong
+      14 times to the LLM&rsquo;s 3 on category, and 15 to 1 on domain
       (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/017-classical-baseline-bakeoff.md">ADR-017</a>,
       full report in
       <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/baseline_eval.txt">baseline_eval.txt</a>).
@@ -391,36 +495,63 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <div class="decision">
       <p class="tag">Where the baseline broke</p>
-      <p>The misses are not spread evenly. The baseline collapses toward
-        whichever class is lexically loud: five of six <code>policy</code>
-        stories came back as <code>operations</code>, and six of eleven
-        <code>land</code> rows came back as <code>air</code>. Those are the
-        labels that depend on what <em>kind of claim</em> an article is making,
-        not which words it contains. A treaty and a deployment share a
-        vocabulary; only one of them is policy.</p>
+      <p>The misses do not spread evenly. The baseline collapses toward
+        whichever class is lexically loud.</p>
+      <!-- cb-s1. Two collapses, one shape. The strip re-lays the two clauses
+           this card already carried, and the counts travel inside them: a
+           strip does not move its text node, so the figures stay where the
+           reader reads them. That is the carrier difference from .bake-fork
+           above, whose comment records the opposite rule for a plate. The two
+           sentences under the strip are the argument, and they stay as
+           prose. -->
+      <figure class="fig cb-s1" data-fig="strip">
+        <ul class="cb-miss-strip" aria-label="Two labels the baseline collapsed, and the class each one collapsed into">
+          <li>
+            <span class="cb-miss-from">five of six <code>policy</code> stories</span>
+            <span class="cb-miss-to">came back as <code>operations</code></span>
+          </li>
+          <li>
+            <span class="cb-miss-from">six of eleven <code>land</code> rows</span>
+            <span class="cb-miss-to">came back as <code>air</code></span>
+          </li>
+        </ul>
+        <figcaption>
+          <span class="fig-what">Both collapses run in one direction. The
+          baseline assigns the lexically louder class, and the quieter class
+          loses its rows to it. ADR-017 and
+          <code>baseline_eval.txt</code> record the bake-off, and the paragraph
+          above links both.</span>
+          <span class="fig-limit">The strip shows two boundaries, not the whole
+          confusion matrix. It does not show why these two boundaries are hard.
+          The two sentences below carry that reason.</span>
+        </figcaption>
+      </figure>
+      <p>Those are the labels that depend on what <em>kind of claim</em> an
+        article makes, not which words it contains. A treaty and a deployment
+        share a vocabulary; only one of them is policy.</p>
       <p class="tradeoff"><strong>What that means for the spend:</strong> the
-        LLM is buying the boundaries that need reading comprehension.</p>
+        LLM buys the boundaries that need reading comprehension.</p>
     </div>
 
     <div class="decision">
       <p class="tag">Two handicaps</p>
-      <p>The training labels came from the Opus judge, not from people, so the
-        baseline was learning to imitate a grader that itself disagrees with
-        humans about 5&ndash;6% of the time, and then it was tested against those
-        humans. Separately, <code>industry</code> had exactly
-        <strong>one</strong> training row, which makes that label structurally
-        unlearnable. The baseline scored 0.000 on it, as it had to.</p>
+      <p>The training labels came from the Opus judge, not from people. So the
+        baseline learned to imitate a grader that itself disagrees with humans
+        about 5&ndash;6% of the time. Then I tested it against those humans.
+        Separately, <code>industry</code> had exactly <strong>one</strong>
+        training row, which makes that label structurally unlearnable. The
+        baseline scored 0.000 on it, as it had to.</p>
       <p class="tradeoff"><strong>Why they stay:</strong> both cut against the
-        baseline. The same class of unfairness inflated the BM25 lift until the
-        baseline was rebuilt. A margin this size survives the caveats.</p>
+        baseline. The same class of unfairness inflated the BM25 lift until I
+        rebuilt the baseline. A margin this size survives the caveats.</p>
     </div>
 
     <h2 id="try-it">Run the loser</h2>
     <p>
-      This is the same fit, running in your tab: the model exported as data,
-      about 208&nbsp;KB over the wire, no server and no key. It is the arm that
-      <a href="#bakeoff">lost the bake-off</a>. Watching the wrong class light
-      up is faster than reading the confusion matrix.
+      This is the same fit, and it runs in your tab. I exported the model as
+      data, about 208&nbsp;KB over the wire, with no server and no key. It is
+      the arm that <a href="#bakeoff">lost the bake-off</a>. Here you watch the
+      wrong class light up. That is faster than a read of the confusion matrix.
     </p>
 
     <div class="wide bdemo" id="baseline-demo">
@@ -446,7 +577,7 @@ import SiteNav from '../../components/SiteNav.astro';
           </div>
           <p class="bdemo-missing"><strong>region: not covered.</strong> The
             shipped classifier assigns a third axis. The baseline never had
-            region labels to train on, so there is nothing to draw here.</p>
+            region labels to train on, so there is nothing to show here.</p>
         </section>
 
         <section class="bdemo-panel" aria-labelledby="bdemo-ref-h">
@@ -466,8 +597,8 @@ import SiteNav from '../../components/SiteNav.astro';
         <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/gold_predictions_v3.csv"><code>evals/gold_predictions_v3.csv</code></a>).
         No API is called from this page.</p>
 
-      <noscript><p class="bdemo-prov">This demo needs JavaScript. Without it the
-        numbers above the fold still stand on their own.</p></noscript>
+      <noscript><p class="bdemo-prov">This demo needs JavaScript. The numbers
+        above the fold do not depend on it.</p></noscript>
     </div>
 
   </main>
