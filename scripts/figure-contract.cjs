@@ -282,8 +282,17 @@ function stripNonMarkup(region) {
 
     if (region.startsWith('<!--', lt)) {
       const end = region.indexOf('-->', lt + 4);
-      // An unterminated comment runs to the end of the region, as it does in a
-      // browser. Keeping the tail would be reading markup nobody can see.
+      /*
+       * An unterminated comment runs to the end of the region, as it does in a
+       * browser. Keeping the tail would be reading markup nobody can see.
+       *
+       * THIS IS WHY THE BRANCH DOES NOT DELEGATE TO `closeOfTag`, which already
+       * knows where a comment ends. The two agree on a terminated comment and
+       * disagree here: `closeOfTag` reports -1, and the generic path below
+       * treats -1 as "an unclosed tag is text" and keeps the rest. That is the
+       * right call for a truncated tag and the wrong one for a comment, which
+       * hides everything after it.
+       */
       if (end === -1) return out;
       i = end + 3;
       continue;
