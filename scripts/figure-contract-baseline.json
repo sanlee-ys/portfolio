@@ -1,0 +1,94 @@
+{
+  "note": "What scripts/figure-contract.cjs already permits. Every entry is a rule this site breaks today, with the reason it breaks it. The gate binds new work. It never asks a lane to delete a figure that already ships, because a gate that forces a deletion is a substance deletion with a build failure in front of it (ADR-004, ADR-007, ADR-013). Add an entry only with an ADR line.",
+  "seededAt": "2026-08-30",
+  "seededFrom": "a fresh `npm run build`, read with `node scripts/figure-contract.cjs --seed`",
+  "measured": "30 SVG text nodes carry a raw digit, across 9 pages. One is a false positive in the source only: `.lab-topo` on netops-lab reads `wipe &#8594; cfg`, and the digits belong to the entity. The gate decodes entities and walks dist/, so it records 29 values across 8 pages.",
+  "digitPlates": [
+    {
+      "page": "projects/autonomy-ladder.html",
+      "figure": ".rung-plate",
+      "texts": ["L1", "L2", "L3", "L4"],
+      "reason": "L1 to L4 are rung names, not counts. A rung name is an identifier. The page's own comment keeps the step sequence in `ol.ladder`, which ADR-004 Decision 5 protects."
+    },
+    {
+      "page": "projects/classifier-baseline.html",
+      "figure": ".bake-fork",
+      "texts": ["n=54"],
+      "reason": "`n=54` labels the sample the fork was measured on. The plate's own comment records the split this gate now enforces: the figure carries topology, and the table below keeps the percentages."
+    },
+    {
+      "page": "projects/defense-news-classifier.html",
+      "figure": ".eval-plate",
+      "texts": ["V1 SYNTHETIC", "97.3%", "V2 REAL", "88.9%", "domain, 54 gold"],
+      "reason": "PERMANENT. A frozen v1-against-v2 record. No lane changes its numbers. The value list is what freezes them: a changed figure fails this gate."
+    },
+    {
+      "page": "projects/defense-news-classifier.html",
+      "figure": ".ci-plot",
+      "texts": ["80", "85", "90", "95", "100", "n=54 · 94.4%", "n=300 · 93.3%", "n=54 · 92.6%", "n=300 · 90.3%"],
+      "reason": "PERMANENT. A frozen measurement, generated from `evals/scale_eval.txt` and deliberately not re-baselined. It is the precedent every new PLOT follows, and a new PLOT declares `data-fig-generated=\"true\"` instead of an entry here."
+    },
+    {
+      "page": "projects/faithfulness-judge.html",
+      "figure": ".trunc-plate",
+      "texts": ["FALSE GAP 0.70 vs 0.43"],
+      "reason": "The two figures name the false tier gap that a token cap invented. The plate draws the harness bug, so the number is the evidence for the refutation beside it. It does not survive a move into prose."
+    },
+    {
+      "page": "projects/false-green.html",
+      "figure": ".two-fail",
+      "texts": ["exit != 0", "exit 0"],
+      "reason": "Exit codes, not measurements. The plate's own comment records that the words FAIL and PASS plus a broken edge already dual-encode the outcome, because Geist has no glyph for the symbols that would replace them."
+    },
+    {
+      "page": "projects/kb-agent-retrieval.html",
+      "figure": ".retr-plate",
+      "texts": ["1", "2", "3"],
+      "reason": "Rank positions on a schematic. The plate's own comment records that the tables below carry the numbers, and that the figure invents no query text."
+    },
+    {
+      "page": "projects/telltale.html",
+      "figure": ".tt-plate",
+      "texts": ["0%", "47%"],
+      "reason": "The plate argues that a measured zero and an absence are different states. It must render the zero to make that argument, so the digit is the claim itself."
+    },
+    {
+      "page": "projects/the-system-run.html",
+      "figure": ".run-plate",
+      "texts": ["3 fields", "2 tags"],
+      "reason": "Labels for a payload shape. The plate's own comment records that the ordered list below carries the five steps and the real payloads."
+    }
+  ],
+  "undeclaredFigures": [
+    {
+      "page": "about.html",
+      "figure": ".sango",
+      "reason": "A photograph with a caption. It argues nothing and it predates the contract."
+    },
+    {
+      "page": "index.html",
+      "figure": ".diagram-wrap",
+      "reason": "It wraps `#system-diagram`, a script-drawn map whose caption is an `aria-live` region. ADR-010 governs its behaviour, and it predates the contract."
+    },
+    {
+      "page": "index.html",
+      "figure": ".sango",
+      "reason": "The same photograph as on about.html. It argues nothing and it predates the contract."
+    },
+    {
+      "page": "lab/gallery.html",
+      "figure": ".lb-figure",
+      "reason": "The lightbox frame on an archived learning artifact. ADR-004, as amended 2026-08-20, rules the lab pages archived. No lane restyles, promotes, or retires them."
+    },
+    {
+      "page": "projects/telltale.html",
+      "figure": ".tt-figure",
+      "reason": "Two frame figures. The text inside each is interpolated from `src/data/telltale-evidence.json`, and `check-telltale-evidence.cjs` already compares it to the record byte for byte."
+    },
+    {
+      "page": "projects/the-system.html",
+      "figure": ".diagram-wrap",
+      "reason": "It wraps `#system-diagram`, the same script-drawn map as on index.html. It predates the contract."
+    }
+  ]
+}
