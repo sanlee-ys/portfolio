@@ -143,6 +143,24 @@ test('a commented-out <text> node is not painted copy: R-D must not fire on it',
   assert.deepStrictEqual(problems, []);
 });
 
+test('a commented-out close tag does not truncate the REAL figure around it', () => {
+  /*
+   * The worst shape of the defect, because the figure it fails is correct.
+   * `figuresIn` matches non-greedily to the first `</figure>`, so a
+   * commented-out close tag ends the body early and the caption slots that
+   * follow it are never seen. Measured against the gate at `fe51fa1`: two R-C
+   * complaints about a figure that holds both slots. The lane reading that
+   * message is pointed at a caption that is already right, and the cheapest way
+   * to green it is to delete the comment.
+   */
+  const fig = '<figure class="f" data-fig="plate">'
+    + '<!-- an earlier draft ended here: </figure> -->'
+    + '<figcaption><span class="fig-what">A claim.</span>'
+    + '<span class="fig-limit">A limit.</span></figcaption></figure>';
+  const { problems } = verify({ pages: site(fig), baseline: emptyBaseline() });
+  assert.deepStrictEqual(problems, []);
+});
+
 test('a real digit that FOLLOWS a comment still fails: the strip removes the comment only', () => {
   // The failure direction of the fix above. A strip that ran on to the next
   // `>` would swallow the plate and report a clean page.
