@@ -30,6 +30,24 @@
  * writing a frame that would fail the font-coverage gate after the page copy is
  * already written.
  *
+ * WHY ASCII PURITY IS NO LONGER THE ADMISSION TEST (ADR-013, measured
+ * 2026-08-30). Purity fails in both directions. Nine of the eighteen files named
+ * `*-ascii.txt` are not pure ASCII, and in every case the character is one of
+ * U+00B7, U+2013, U+2014, or U+2192. The site already ships all four. So purity
+ * rejects renderable frames. And purity detects nothing about COLUMN SHEAR,
+ * which is the failure that actually breaks a frame: one codepoint with no glyph
+ * in the shipped Geist Mono subset falls back to a proportional platform face,
+ * every character after it moves, and no gate on this site can see it.
+ * `contrast-check.cjs` exempts SVG, `mobile-qa.cjs` never measures a wrapped
+ * frame, and a sheared row still fits its box.
+ *
+ * Three tests replace purity, and each one fails the run rather than write the
+ * frame. `assertGlyphCoverage`, `assertAdvanceWidth`, and `assertBoundary` below
+ * carry the reasoning for each.
+ *
+ * `check-telltale-evidence.cjs` still rejects a non-ASCII stored line. That is a
+ * second, narrower control on the record and this script does not replace it.
+ *
  * TWO KINDS OF FIGURE, AND NO THIRD.
  *   - `counted` — recomputed here by the command the record stores.
  *   - `cited`   — measured once inside the telltale project and recorded in its
@@ -66,19 +84,131 @@ const SOURCE_REPO = 'sanlee-ys/telltale';
  *      own three-line header states the claim without naming anybody, so that
  *      is the excerpt.
  *
- * Both files below are pure ASCII, both excerpts are free of dollar figures,
- * and neither names a vendor beside a verdict.
+ * Both rules are enforced mechanically by `assertBoundary` below. The prose here
+ * records WHY each window stops where it stops, because no gate reads meaning
+ * and a line range is the whole review.
+ *
+ * THE WINDOW IS THE REVIEW. `check-telltale-evidence.cjs` compares bytes. It has
+ * no opinion about what a line says. So the admission unit is a line range that
+ * a reader can check in one second against the file, and every window below
+ * records the neighbour lines it refused and the reason.
+ *
+ * Every window below is free of a dollar figure, and every one carries its
+ * declared column width so `assertAdvanceWidth` can check the box.
+ *
+ * `columns` IS THE WIDTH OF THE WINDOW, NOT OF THE TERMINAL. The full panel is
+ * 119 or 120 columns, and a window that does not include a full-width rule line
+ * is narrower than the panel it came from. The caption states this number and
+ * the scroll box is sized from it, so it has to be the width the reader can
+ * measure. `assertAdvanceWidth` fails a declared width that no line reaches.
  */
 const FRAMES = {
+  /*
+   * The shipped frame. Two vendors expose a quota and the display draws it
+   * against its limit; the third exposes none, and the row states the reason in
+   * words instead of drawing a gauge.
+   *
+   * Cut above: line 2, the horizontal rule that opens the panel. Cut below: line
+   * 15, a blank separator, and then the `agy` block at lines 16 to 19 whose line
+   * 18 pairs a vendor-family name with a rate. `assertBoundary` rejects that
+   * line, so the window cannot grow downward.
+   */
   usage: {
     path: 'internal/hud/testdata/golden/usage-ascii.txt',
     lineStart: 3,
     lineEnd: 14,
+    columns: 119,
   },
+  /*
+   * A relayed reading that has gone stale is MARKED, not dropped and not
+   * refreshed by guesswork. Line 5 carries the mark.
+   *
+   * Cut above: line 2, the panel rule. Cut below: line 11, a blank separator
+   * before the `gemini` block.
+   */
+  stale: {
+    path: 'internal/hud/testdata/golden/usage-stale-ascii.txt',
+    lineStart: 3,
+    lineEnd: 10,
+    columns: 119,
+  },
+  /*
+   * An absence names its own search. Two vendors have no quota reaching disk and
+   * each row states a DIFFERENT reason in words: one store holds experiment
+   * values rather than usage, and the other has no window, no ordinal, and no
+   * reset time at all.
+   *
+   * WHY THIS WINDOW IS NOT LINES 12 TO 24. A window that also reached the
+   * `gemini` absent row at line 12 would have to cross the `agy` block, and line
+   * 17 of that block reads a vendor-family quota name beside a rate. GT10 rules
+   * a vendor name beside a rate outside the publication boundary, and
+   * `assertBoundary` rejects the line, so the window stops below the block. The
+   * third absence reason is not lost: the `usage` frame above carries the
+   * `gemini` row at its own line 13.
+   *
+   * Cut above: line 19, a blank separator, and above it the `agy` block. Cut
+   * below: line 25, the closing panel rule.
+   */
+  absent: {
+    path: 'internal/hud/testdata/golden/usage-stale-ascii.txt',
+    lineStart: 20,
+    lineEnd: 24,
+    columns: 75,
+  },
+  /*
+   * The shipped frame. The record states its reach before it states a result.
+   *
+   * Cut above: line 7, blank. Cut below: line 11, blank, and then lines 12 to 20,
+   * the per-vendor adoption table. That table is never published, at any line
+   * range, under any caption: it pairs a named seat with an adoption rate and a
+   * verdict.
+   */
   record: {
     path: 'internal/council/testdata/golden/arena-record-ascii.txt',
     lineStart: 8,
     lineEnd: 10,
+    columns: 120,
+  },
+  /*
+   * The composer box and the gate bar. A person who presses a key is the only
+   * thing that spends a quota.
+   *
+   * Cut above: line 20, the last row of the three-column seat transcript. Its
+   * columns are positionally bound to the named seats on line 5, so a reader can
+   * attribute each sentence to a named vendor. Line 6 above it is the per-vendor
+   * sandbox posture row, which is the hazard the whole window rule exists for.
+   * Nothing is cut below: the file ends at line 24.
+   */
+  gate: {
+    path: 'internal/council/testdata/golden/gated-vs-streaming-ascii.txt',
+    lineStart: 21,
+    lineEnd: 24,
+    columns: 120,
+  },
+  /*
+   * The product's own refusal, rendered in one line. Below sixty columns the
+   * display renders nothing but the reason. The whole file is one line, so
+   * nothing is cut above and nothing is cut below.
+   */
+  floor: {
+    path: 'internal/hud/testdata/golden/floor-width.txt',
+    lineStart: 1,
+    lineEnd: 1,
+    columns: 36,
+  },
+  /*
+   * The sixty-column twin of the gate frame, and the only council window in the
+   * corpus that a 393px reader consumes with no sideways scroll.
+   *
+   * Cut above: line 6, which names a seat beside its state. Above that, line 5
+   * is the council seat row, and lines 3 and 4 each name a vendor beside a state.
+   * All four are refused. Nothing is cut below: the file ends at line 10.
+   */
+  composer: {
+    path: 'internal/council/testdata/golden/composer-clipped-to-one-row-ascii.txt',
+    lineStart: 7,
+    lineEnd: 10,
+    columns: 60,
   },
 };
 
@@ -204,12 +334,299 @@ function showFile(repo, sha, filePath) {
 
 // --- counting ---------------------------------------------------------------
 
-function firstNonAscii(line) {
-  for (const ch of line) {
-    const cp = ch.codePointAt(0);
-    if (cp > 0x7f) return cp;
+// --- frame admission --------------------------------------------------------
+
+const FONT_MANIFEST = path.join(REPO_ROOT, 'scripts', 'font-coverage.json');
+
+function hex(cp) {
+  return `U+${cp.toString(16).toUpperCase().padStart(4, '0')}`;
+}
+
+function inRanges(ranges, cp) {
+  return ranges.some(([lo, hi]) => cp >= lo && cp <= hi);
+}
+
+/*
+ * The codepoints the SHIPPED subsets cover, split two ways.
+ *
+ *   all  — every face on the site. `font-coverage.cjs` fails the build on a
+ *          character outside this set, so a frame outside it reddens a gate
+ *          later, after the page copy is already written.
+ *   mono — the Geist Mono faces only. This is the stricter set, and it is the
+ *          one the column grid depends on. See `assertAdvanceWidth`.
+ *
+ * The manifest is written by `scripts/subset-fonts.py` and re-hashed by
+ * `font-coverage.cjs`. Reading it here rather than parsing woff2 is what lets
+ * this script run with no font toolchain, exactly as that gate does.
+ */
+function loadFontRanges() {
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(FONT_MANIFEST, 'utf8'));
+  } catch (err) {
+    fail(`could not read ${FONT_MANIFEST}: ${err.message}`);
   }
-  return null;
+  const fonts = (manifest && manifest.fonts) || {};
+  const all = [];
+  const mono = [];
+  for (const [file, entry] of Object.entries(fonts)) {
+    if (!entry || !Array.isArray(entry.ranges)) continue;
+    // A malformed entry must stop the run, not be skipped. `inRanges` would
+    // throw an uncaught TypeError on a bare number, and a range this loop
+    // silently dropped would make the coverage test quietly weaker.
+    for (const r of entry.ranges) {
+      if (!Array.isArray(r) || r.length < 2 || !Number.isFinite(r[0]) || !Number.isFinite(r[1])) {
+        fail(`${FONT_MANIFEST}: ${file} carries a range this script cannot read: ${JSON.stringify(r)}`);
+      }
+    }
+    all.push(...entry.ranges);
+    if (/mono/i.test(file)) mono.push(...entry.ranges);
+  }
+  if (all.length === 0) fail(`${FONT_MANIFEST} declares no ranges, so coverage cannot be checked.`);
+  if (mono.length === 0) {
+    fail(`${FONT_MANIFEST} names no Geist Mono face, so column shear cannot be checked.`);
+  }
+  return { all, mono };
+}
+
+/*
+ * T1, GLYPH COVERAGE. Every codepoint in the window has a glyph in a shipped
+ * subset.
+ *
+ * This is the test ASCII purity was standing in for, and it is the correct one:
+ * `font-coverage.cjs` fails the build on any character with no self-hosted
+ * glyph, so a frame that fails here would redden that gate after the caption is
+ * written. Failing at the record is cheaper and names the codepoint.
+ */
+function assertGlyphCoverage(key, spec, lines, ranges) {
+  lines.forEach((line, i) => {
+    for (const ch of line) {
+      const cp = ch.codePointAt(0);
+      if (inRanges(ranges.all, cp)) continue;
+      fail(
+        `T1 glyph coverage: ${spec.path} line ${spec.lineStart + i} (frame "${key}") uses ` +
+          `${hex(cp)}, which no shipped subset covers.\n` +
+          '  A character with no self-hosted glyph is borrowed from a platform face. It ' +
+          'looks correct here and changes shape on somebody else\'s machine, and ' +
+          'scripts/font-coverage.cjs fails the build on it.'
+      );
+    }
+  });
+}
+
+/*
+ * T2, ADVANCE WIDTH. Two assertions, and they fail for different reasons.
+ *
+ * (a) EVERY CODEPOINT RENDERS AT THE MONO ADVANCE. A monospaced face gives every
+ *     glyph one advance, so a codepoint COVERED BY GEIST MONO is safe by
+ *     construction. A codepoint that Geist Mono does not cover is not: the
+ *     browser falls back to a proportional face for that one character, every
+ *     character after it on the row moves, and the frame shears. This is the
+ *     failure ASCII purity never detected. The set is deliberately narrower than
+ *     T1, because a glyph that only the proportional face carries passes T1 and
+ *     still shears a row.
+ *
+ * (b) THE DECLARED COLUMN WIDTH IS THE REAL WIDTH. The caption states a column
+ *     count and the CSS gives the frame its own scroll box, so a line wider than
+ *     the declared width is a wrong caption and a wrong box.
+ *
+ * WHY (b) IS NOT AN EQUALITY ASSERTION, and this is a measured correction to the
+ * design brief. The HUD goldens are RIGHT-TRIMMED: in `usage-ascii.txt` the
+ * window's line lengths run 119, 0, 48, 59, 59, 0, 47, 36, 60, 0, 56, 35. The
+ * council goldens are space-padded to a rectangle and the HUD goldens are not.
+ * So "every line has the same length" would reject the frame this record ALREADY
+ * PUBLISHES, and it would reject it for trailing whitespace that renders as
+ * nothing. Length equality was never the property that mattered. Column
+ * alignment is, and (a) is the test for it: while every codepoint advances by
+ * one column, character N sits in column N on every row.
+ */
+const ASCII_MAX = 0x7f;
+
+function assertAdvanceWidth(key, spec, lines, ranges) {
+  lines.forEach((line, i) => {
+    for (const ch of line) {
+      const cp = ch.codePointAt(0);
+      if (cp <= ASCII_MAX || inRanges(ranges.mono, cp)) continue;
+      fail(
+        `T2 advance width: ${spec.path} line ${spec.lineStart + i} (frame "${key}") uses ` +
+          `${hex(cp)}, which the Geist Mono subset does not cover.\n` +
+          '  Every other codepoint on the row advances one column. This one falls back to ' +
+          'a proportional face, so every character after it moves and the frame shears. ' +
+          'A sheared frame still fits its box, so no gate on this site can see it.'
+      );
+    }
+  });
+
+  if (!Number.isInteger(spec.columns) || spec.columns <= 0) {
+    fail(`T2 advance width: frame "${key}" declares no \`columns\`, so its box is unchecked.`);
+  }
+  const widest = lines.reduce((max, l) => Math.max(max, [...l].length), 0);
+  if (widest > spec.columns) {
+    fail(
+      `T2 advance width: frame "${key}" declares ${spec.columns} columns and its widest ` +
+        `line is ${widest} (${spec.path} line ${spec.lineStart + lines.findIndex(
+          (l) => [...l].length === widest
+        )}).\n` +
+        '  The caption states the column count and the scroll box is sized from it.'
+    );
+  }
+  if (widest !== spec.columns) {
+    fail(
+      `T2 advance width: frame "${key}" declares ${spec.columns} columns and no line ` +
+        `reaches it; the widest is ${widest}.\n` +
+        '  A declared width no line uses is a wrong caption. Correct `columns` to the ' +
+        'measured width, or widen the window.'
+    );
+  }
+}
+
+/*
+ * T3, BOUNDARY CONTENT. A denylist, applied line by line, that fails the run
+ * rather than write the frame.
+ *
+ * THE POSTURE PATTERN IS THE ONE THAT MATTERS, and it is the correction a review
+ * round produced. A denylist built only from dollar signs, adoption rates, and
+ * percentages does NOT match the council room's second row, which pairs each
+ * named seat with its sandbox setting. Publishing that names which settings do
+ * not contain writes, which is a bypass instruction, and it attaches a negative
+ * finding to a named third-party product on a sample of one operator. Every
+ * council golden that shows a seat row shows that row directly under it, so the
+ * pattern is what keeps a seat row out by construction rather than by care.
+ *
+ * A VENDOR-LABELLED READING IS LEGAL, AND THE RULE IS ONE LINE WIDE. This is the
+ * precise statement, and an earlier looser one made the shipped record look like
+ * a violation of its own test. The `usage` frame has published this shape since
+ * the record was created:
+ *
+ *     claude  quota relayed by the statusline - 2h ago
+ *            5h             ########------------    42%  ~ 2h13m
+ *
+ * That is a reading against a limit, and it is inside the published boundary by
+ * ruling (GT10 of the redesign brief). The vendor labels its own block; the rate
+ * line is labelled by a WINDOW name and carries no vendor. The refused `agy`
+ * block differs exactly there:
+ *
+ *            gemini-weekly  #######-------------    38%  ~ 3h00m
+ *
+ * One line, one vendor family, one rate. So the rule these patterns enforce is
+ * narrow and mechanical: NO SINGLE LINE MAY CARRY A VENDOR NAME TOGETHER WITH A
+ * RANK, A RATE, AN ADOPTION, A VERDICT, OR A SANDBOX POSTURE. A vendor name as a
+ * row label, on its own line, with a reason or with its own window's reading
+ * underneath, is not that and never was.
+ *
+ * A LINE-SCOPED TEST CANNOT SEE A PAIRING THAT SPANS TWO LINES, AND THAT IS THE
+ * DESIGN, NOT A HOLE. Widening it to a window would reject the frame this record
+ * already publishes and that the owner has already ruled legal.
+ */
+
+/*
+ * TWO LISTS, BECAUSE ONE MATCHING RULE CANNOT SERVE BOTH ENDS.
+ *
+ * A long, unambiguous name is matched as a SUBSTRING. `\bclaude\b` does not
+ * match `claudecode`, because `e` to `c` is not a word boundary, and
+ * `claudecode` is a real adapter directory in the source repository. A
+ * word-boundary match there reads as thorough and is not.
+ *
+ * A short name is matched as a WHOLE WORD. `pi` is also a real adapter
+ * directory, and as a substring it matches `pipe`, `pins`, `copilot`, and
+ * `expired`. A denylist that stops on `pipe` is a denylist somebody switches
+ * off.
+ *
+ * BOTH LISTS ARE COMPLETE ON THEIR OWN. `main()` also appends the live adapter
+ * directory names, so the set cannot drift from the repository it is checking,
+ * but that runs only when this file is the entry point. An importer gets the
+ * static lists, so the static lists must already be right.
+ */
+const VENDOR_TOKENS = [
+  'claude', 'claudecode', 'codex', 'gemini', 'cursor', 'grok', 'antigravity',
+  'copilot', 'openai', 'anthropic', 'google',
+  // Model and family names the frames already print. A rate beside one of these
+  // identifies a vendor just as well as the vendor's own name does.
+  'gpt', 'sonnet', 'opus', 'haiku', 'composer',
+];
+
+// Matched as whole words. Short, and each one is a common English fragment.
+const VENDOR_WORDS = ['pi', 'agy', 'cc', 'cx', 'ag', 'cu'];
+
+/*
+ * A rate, a rank, an adoption, or a verdict: the four things a vendor name may
+ * never sit beside. Each is deliberately looser than the one shape seen in the
+ * corpus, because the corpus is not the only thing this will ever read.
+ */
+const RATE_RE = /\d\s*%/;
+const RANK_RE = /\b(?:\d+(?:st|nd|rd|th)\b|rank\s*#?\d|#\d+\s*(?:of|\/)|\bplace\b)/i;
+const ADOPTION_RE = /\b\d+\s*(?:of|\/)\s*\d+\s+adopted\b|\badoption\s*rate\b|\badopted\b\s*\d+\s*%/i;
+const VERDICT_RE = /\bnever raced\b|\b(?:winner|won|beat|outperform\w*|best|worst|fastest|slowest)\b/i;
+// The posture vocabulary, WITHOUT a required column separator. The council
+// goldens are pipe-drawn and the HUD goldens are space-columned, so a pattern
+// that demands a `|` is blind to half the corpus.
+const POSTURE_RE = /\b(?:ro:tools|ro:requested|unsandboxed|sandboxed|workspace-write|danger-full-access|read-only|readonly|on-request|approval\s*:\s*\w+|gated)\b/i;
+
+function hasVendor(line) {
+  const lower = String(line).toLowerCase();
+  // A plain substring test for the long names. No RegExp, so a token carrying
+  // `-`, `.`, or `+` cannot silently change meaning or throw.
+  if (VENDOR_TOKENS.some((v) => lower.indexOf(v) !== -1)) return true;
+  // Whole-word for the short ones. Split on anything that is not a letter or a
+  // digit, so `1 cc claude` and `[ cc |` both yield `cc`.
+  const words = lower.split(/[^a-z0-9]+/);
+  return VENDOR_WORDS.some((v) => words.indexOf(v) !== -1);
+}
+
+const BOUNDARY_RULES = [
+  {
+    name: 'a dollar figure',
+    test: (line) => /\$\s*\d/.test(line),
+  },
+  {
+    name: 'an adoption rate',
+    test: (line) => ADOPTION_RE.test(line),
+  },
+  {
+    name: 'a race verdict',
+    test: (line) => VERDICT_RE.test(line),
+  },
+  {
+    name: 'a sandbox posture',
+    test: (line) => POSTURE_RE.test(line),
+  },
+  {
+    // An absolute path into somebody's home directory is a machine identity. A
+    // repository-relative path such as `internal/council/clock.go` is not.
+    // The home-directory branch is NOT anchored on a preceding delimiter: the
+    // MSYS and WSL forms `/c/Users/<name>` and `/mnt/c/Users/<name>` put a
+    // letter immediately before `/Users`, and those are the forms this machine
+    // actually produces.
+    name: 'a path outside the telltale repository, or a machine identity',
+    test: (line) => /(^|[\s"'([=])[A-Za-z]:[\\/]/.test(line)
+      || /\/(?:home|users|root)\//i.test(line)
+      || /(^|\s)~[\\/]/.test(line)
+      || /%USERPROFILE%|\$HOME\b/i.test(line),
+  },
+  {
+    name: 'a vendor name beside a rate',
+    test: (line) => RATE_RE.test(line) && hasVendor(line),
+  },
+  {
+    name: 'a vendor name beside a rank',
+    test: (line) => RANK_RE.test(line) && hasVendor(line),
+  },
+];
+
+function assertBoundary(key, spec, lines) {
+  lines.forEach((line, i) => {
+    for (const rule of BOUNDARY_RULES) {
+      if (!rule.test(line)) continue;
+      fail(
+        `T3 boundary: ${spec.path} line ${spec.lineStart + i} (frame "${key}") carries ` +
+          `${rule.name}.\n` +
+          `  Line: ${JSON.stringify(line.trim().slice(0, 100))}\n` +
+          '  Move the window. No single line may carry a vendor name together with a ' +
+          'rank, a rate, an adoption, a verdict, or a sandbox posture, and no line may ' +
+          'carry a dollar figure. A vendor name as a row label in a reading is legal.'
+      );
+    }
+  });
 }
 
 function countTestFunctions(repo, sha) {
@@ -259,7 +676,30 @@ function countVendorAdapters(paths, sha, excluded) {
     );
   }
   const vendors = all.filter((name) => !excluded.includes(name));
+  // Every other counter in this file fails on zero. This one did not, and a
+  // zero vendor count would have been written into a published record and only
+  // caught downstream, by the page disagreeing with it.
+  if (vendors.length === 0) {
+    fail(`counted zero vendor adapters at ${sha}, which cannot be right.`);
+  }
   return { vendors, all, excluded };
+}
+
+/*
+ * Fold the live adapter directory names into the vendor token list. The token
+ * list is hand-written, and a hand-written list of the thing you are checking
+ * drifts from it. This is the same enumeration the record publishes as
+ * `adapters.vendor`, so the two cannot disagree.
+ */
+function extendVendorTokens(names) {
+  for (const name of names) {
+    const token = String(name).toLowerCase();
+    if (token.length < 2) continue;
+    // A short name goes to the whole-word list, for the reason recorded above:
+    // as a substring it would stop on ordinary English.
+    const list = token.length <= 3 ? VENDOR_WORDS : VENDOR_TOKENS;
+    if (list.indexOf(token) === -1) list.push(token);
+  }
 }
 
 // --- citations --------------------------------------------------------------
@@ -331,8 +771,30 @@ function main() {
     fail(`${repo} has uncommitted changes to tracked files. Commit or stash them first.`);
   }
 
-  const sha = git(repo, ['rev-parse', 'HEAD']).trim();
-  const shortSha = git(repo, ['rev-parse', '--short', 'HEAD']).trim();
+  /*
+   * The commit is PINNED, and the pin is an argument rather than whatever HEAD
+   * happens to be. Every `counted` figure below is recomputed from the tree at
+   * this commit, so a newer commit silently re-baselines `goldens.total`,
+   * `tests.total`, and `adapters.vendor`. Those are published figures. Moving
+   * one is a decision about what the page claims, not a side effect of running
+   * a script on a day when the sibling repository had moved on.
+   *
+   *     node scripts/pull-telltale-evidence.cjs --repo=<path> --sha=38f262a
+   *
+   * With no `--sha` it reads HEAD, which is the original behaviour. Diff the
+   * output before committing it either way: if a counted figure moved, stop.
+   */
+  const shaArg = process.argv.slice(2).find((a) => a.startsWith('--sha='));
+  const requested = shaArg ? shaArg.slice('--sha='.length) : 'HEAD';
+  // No shell is involved (spawnSync with an argv array), so there is no
+  // injection here. A value starting with `-` would still reach git as an
+  // OPTION rather than a revision, which fails with a confusing message.
+  if (!/^[A-Za-z0-9][\w./^~@{}-]*$/.test(requested)) {
+    fail(`--sha=${requested} is not a revision. Pass a commit id or a ref name.`);
+  }
+  const sha = (git(repo, ['rev-parse', '--verify', `${requested}^{commit}`], { allowFail: true }) || '').trim();
+  if (!sha) fail(`${requested} does not resolve to a commit in ${repo}.`);
+  const shortSha = git(repo, ['rev-parse', '--short', sha]).trim();
 
   // The page links readers to a public commit. An unpushed HEAD would name one
   // that nobody else can resolve.
@@ -364,6 +826,11 @@ function main() {
 
   const tests = countTestFunctions(repo, sha);
   const adapters = countVendorAdapters(paths, sha, ADAPTER_EXCLUSIONS);
+  // Before any frame is read, so the boundary test knows every vendor the
+  // repository actually holds and not only the ones somebody remembered.
+  // `vendors`, not `all`: `drift`, `dropfile`, and `pins` are named helpers and
+  // not vendors, and treating a generic word as a vendor invites a false stop.
+  extendVendorTokens(adapters.vendors);
 
   const figures = {
     'goldens.total': {
@@ -407,6 +874,7 @@ function main() {
 
   // --- frames ---------------------------------------------------------------
 
+  const fontRanges = loadFontRanges();
   const frames = {};
   for (const [key, spec] of Object.entries(FRAMES)) {
     const text = showFile(repo, sha, spec.path);
@@ -417,20 +885,24 @@ function main() {
     if (spec.lineEnd > all.length) {
       fail(`${spec.path} has ${all.length} lines, and the frame wants ${spec.lineEnd}.`);
     }
+    if (spec.lineStart < 1 || spec.lineStart > spec.lineEnd) {
+      fail(`frame "${key}" declares the line range ${spec.lineStart}-${spec.lineEnd}.`);
+    }
     const lines = all.slice(spec.lineStart - 1, spec.lineEnd).map((l) => l.replace(/\r$/, ''));
-    lines.forEach((line, i) => {
-      const cp = firstNonAscii(line);
-      if (cp !== null) {
-        fail(
-          `${spec.path} line ${spec.lineStart + i} contains U+${cp
-            .toString(16)
-            .toUpperCase()
-            .padStart(4, '0')}. A pasted frame must be pure ASCII — an "-ascii" ` +
-            'suffix is not proof, and this would fail the font-coverage gate later.'
-        );
-      }
-    });
-    frames[key] = { path: spec.path, lineStart: spec.lineStart, lineEnd: spec.lineEnd, lines };
+
+    // The three admission tests, in order. Each one fails the run rather than
+    // write a frame the site cannot render or must not publish.
+    assertGlyphCoverage(key, spec, lines, fontRanges);
+    assertAdvanceWidth(key, spec, lines, fontRanges);
+    assertBoundary(key, spec, lines);
+
+    frames[key] = {
+      path: spec.path,
+      lineStart: spec.lineStart,
+      lineEnd: spec.lineEnd,
+      columns: spec.columns,
+      lines,
+    };
   }
 
   const record = {
@@ -451,10 +923,49 @@ function main() {
     console.log(`  ${key.padEnd(24)} ${fig.kind.padEnd(8)} ${fig.value}`);
   }
   for (const [key, frame] of Object.entries(frames)) {
-    console.log(`  frame ${key.padEnd(18)} ${frame.lines.length} lines from ${frame.path}`);
+    console.log(
+      `  frame ${key.padEnd(18)} lines ${frame.lineStart}-${frame.lineEnd}, ` +
+        `${frame.columns} cols, from ${frame.path}`
+    );
   }
   console.log('\nNow update the rendered values in src/pages/projects/telltale.astro and');
   console.log('src/pages/index.astro, then run: npm run qa');
 }
 
-main();
+if (require.main === module) main();
+
+/*
+ * EXPORTED SO THE BOUNDARY CAN BE RE-CHECKED AT BUILD TIME.
+ *
+ * Today this script is the ONLY thing that applies the boundary rules, and it
+ * runs by hand, on one machine, once. `check-telltale-evidence.cjs` validates
+ * the record's shape and compares the page to it; it does not re-apply these
+ * rules. So a hand edit of `src/data/telltale-evidence.json`, or a widened
+ * `FRAMES` range committed without re-running this script, reaches the public
+ * site with every gate green.
+ *
+ * Closing that is a change to `scripts/check-telltale-evidence.cjs`, which this
+ * lane does not own. These exports make it a two-line change for the lane that
+ * does: require this module, and run `assertBoundaryLines` over every
+ * `evidence.frames[key].lines`.
+ */
+module.exports = {
+  FRAMES,
+  VENDOR_TOKENS,
+  VENDOR_WORDS,
+  BOUNDARY_RULES,
+  hasVendor,
+  /*
+   * The boundary rules over a list of lines, as a list of findings rather than
+   * a process exit. Returns [] when the lines are clean.
+   */
+  assertBoundaryLines(lines) {
+    const found = [];
+    lines.forEach((line, i) => {
+      for (const rule of BOUNDARY_RULES) {
+        if (rule.test(line)) found.push({ line: i + 1, rule: rule.name, text: String(line) });
+      }
+    });
+    return found;
+  },
+};
