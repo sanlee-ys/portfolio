@@ -96,9 +96,11 @@ import SiteNav from '../../components/SiteNav.astro';
        rather than extracted: a concurrent session owns
        public/assets/style.css, and two writers on one shared file cannot
        merge. OC-F carries the consolidation for later.
-       ORIGIN: this page. At 9f4e070, the commit this work branched from,
-       no page carried a .fig block, so this is the first copy. A later
-       lane copies this block and names this page as its origin.
+       ORIGIN: src/pages/projects/context-architecture.astro, at commit
+       9d81caa (pull request #247). That page holds the origin block and it
+       merged first. This page branched from 9f4e070, before the origin
+       merged, so the declarations below are a page-local variant of the
+       origin grammar and not a byte copy. Change the origin page first.
        .fig-what is the claim voice (--text-secondary, per the rule at the
        top of style.css). .fig-limit is the note voice (--muted), the same
        token .lab-topo-caption already passes the contrast gate with. */

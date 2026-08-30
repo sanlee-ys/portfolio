@@ -215,11 +215,25 @@ const PLOTS = [
           + 'pattern. Never fall back to another view: the three views carry different counts.'
         );
       }
+      // Bound the read at the next view. An unbounded slice runs to the end of
+      // the file, so a deleted view-2 `Paired:` line would match view 3's line
+      // and publish view 3's counts under view 2's n, in silence. View 3 states
+      // the same two counts today, so no value check below would catch it.
+      const rest = text.slice(head.index);
+      const nextView = /^\*\*3\. /m.exec(rest);
+      if (!nextView) {
+        throw new Error(
+          'fj2-discordant: the "3." view heading does not follow the canonical view in this '
+          + 'artifact.\n'
+          + '  The three views bound each other. Without that heading this parser cannot tell '
+          + 'the canonical view from the view below it.'
+        );
+      }
       const paired = /^Paired: Opus (\d+) \/ Sonnet (\d+), \*\*McNemar exact p = ([0-9.]+)\*\*/m
-        .exec(text.slice(head.index));
+        .exec(rest.slice(0, nextView.index));
       if (!paired) {
         throw new Error(
-          'fj2-discordant: no "Paired:" line follows the canonical view in this artifact.\n'
+          'fj2-discordant: no "Paired:" line sits inside the canonical view in this artifact.\n'
           + '  A missing count must never become a zero. A row of zero marks would read as a '
           + 'measured tie.'
         );
@@ -606,9 +620,20 @@ function main(argv) {
 
   if (check) {
     const current = fs.existsSync(OUT_PATH) ? fs.readFileSync(OUT_PATH, 'utf8') : '';
-    // `generatedAt` moves every day and says nothing about the figures, so it
-    // is not part of the comparison.
-    const strip = (s) => s.replace(/"generatedAt": "[^"]*"/, '"generatedAt": "-"');
+    /*
+     * `generatedAt` moves every day and says nothing about the figures, so it is
+     * not part of the comparison.
+     *
+     * The line endings are normalised for the same reason. This repository has
+     * no `.gitattributes` and `core.autocrlf` is true on the Windows host, so
+     * git writes CRLF into the checkout while this script writes LF. Without
+     * this the check reported drift on every Windows clone, on a file whose
+     * figures had not moved. A self-check that cries wolf is a self-check
+     * nobody runs.
+     */
+    const strip = (s) => s
+      .replace(/\r\n/g, '\n')
+      .replace(/"generatedAt": "[^"]*"/, '"generatedAt": "-"');
     if (strip(current) !== strip(json)) {
       console.error('✗ build-plots: src/data/figures.json is not what the registry produces.');
       console.error('  Re-run without --check, then commit the result.');

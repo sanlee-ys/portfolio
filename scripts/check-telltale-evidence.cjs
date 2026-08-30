@@ -72,6 +72,23 @@
 const fs = require('fs');
 const path = require('path');
 
+/*
+ * THE PUBLICATION BOUNDARY, RE-APPLIED TO THE RECORD AT BUILD TIME.
+ *
+ * `scripts/pull-telltale-evidence.cjs` applies the boundary rules when it cuts a
+ * window. It runs by hand, on one machine, once. So until this line existed, a
+ * hand edit of `src/data/telltale-evidence.json`, or a widened window committed
+ * without re-running the puller, reached the public site with every gate green.
+ * The puller's own header records that gap and exports these rules to close it.
+ *
+ * The rules live there and are not copied here on purpose. Two copies of a
+ * denylist drift, and the copy that stops matching is the one nobody reads.
+ *
+ * Requiring the puller runs nothing: it declares constants and functions, and
+ * its `main()` sits behind a `require.main === module` check.
+ */
+const { assertBoundaryLines } = require('./pull-telltale-evidence.cjs');
+
 const REPO_ROOT = path.resolve(__dirname, '..');
 const EVIDENCE_PATH = path.join(REPO_ROOT, 'src', 'data', 'telltale-evidence.json');
 
@@ -243,6 +260,20 @@ function validateEvidence(evidence) {
         );
       }
     });
+    /*
+     * The boundary binds the RECORD, not only the puller. See the require at the
+     * top of this file for why. A finding here is a publication defect, so the
+     * remedy is to move the window in the puller and re-run it. It is never a
+     * hand edit of this record.
+     */
+    for (const finding of assertBoundaryLines(frame.lines)) {
+      problems.push(
+        `frame "${safe(key)}" line ${finding.line} carries ${finding.rule}.\n` +
+          `  Line: ${JSON.stringify(safe(finding.text, 100))}\n` +
+          '  The publication boundary binds this record. Move the window in ' +
+          'scripts/pull-telltale-evidence.cjs and re-run it. Never hand-edit a frame.'
+      );
+    }
   }
 
   return problems;
@@ -432,4 +463,5 @@ module.exports = {
   verify,
   ageWarning,
   REQUIRED_PAGE,
+  EVIDENCE_PATH,
 };

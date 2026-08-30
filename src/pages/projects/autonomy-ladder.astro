@@ -347,10 +347,10 @@ import SiteNav from '../../components/SiteNav.astro';
         <span class="fig-what">One L2 question, asked three ways, returned
         three different verdicts. The neighbor documents fixed 0 domain calls
         and broke 4
-        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>).
+        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/012-retire-bm25-grounding.md">ADR-012</a>).
         The few-shot exemplars scored 91.0% against a 90.0% baseline on an
         n=300 paired test, and p=0.70
-        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/019-knn-exemplar-fewshot.md">ADR-019</a>).
+        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/019-knn-exemplar-fewshot.md">ADR-019</a>).
         L3 below measures the keyword features.</span>
         <span class="fig-limit">The strip holds no number. Every number sits
         in the caption above, and in the two linked records. A reader can
@@ -367,7 +367,7 @@ import SiteNav from '../../components/SiteNav.astro';
       prompt-optimization loop. It gained on the set it tuned against, and it
       slipped on held-out gold. Rung 2 is an agent that does error-driven
       feature engineering on a trained baseline
-      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/018-agent-driven-ml-loop.md">ADR-018</a>).
+      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/018-agent-driven-ml-loop.md">ADR-018</a>).
       It scored +6.0 on the validation split it could see, and
       <strong>&minus;8.6 on the human-labeled set it could not</strong>. The
       loop&rsquo;s design gave the held-out set veto power, and it used it.
@@ -381,7 +381,7 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
     <p>
       The pipeline still lost
-      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/020-l4-multi-agent-pipeline.md">ADR-020</a>).
+      (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/020-l4-multi-agent-pipeline.md">ADR-020</a>).
       The critic&rsquo;s restraint lived only in its prompt. It challenged
       4&times; more often than its charter allowed. Outside its target it
       broke more labels than it fixed. That is the repo&rsquo;s first

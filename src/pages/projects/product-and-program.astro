@@ -144,10 +144,12 @@ import SiteNav from '../../components/SiteNav.astro';
 
     /* The two-slot figure caption (ADR-013, gate rule R-C).
 
-       ORIGIN COPY. This block is written here first. A later lane copies it
-       verbatim into its own page and names this page and its commit in the
-       copy's comment. It is page-scoped on purpose: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
+       COPY. The origin is src/pages/projects/context-architecture.astro at
+       commit 9d81caa (pull request #247), and the four rules below are that
+       block verbatim. Change the origin page first, then re-copy here. The
+       comment under the rules repeats this. It is page-scoped on purpose: a
+       concurrent session owns public/assets/style.css for the tap-target
+       work, and two writers on one
        shared stylesheet cannot merge. OC-F of the redesign brief carries the
        consolidation, for after that session merges.
 
