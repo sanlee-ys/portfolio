@@ -1,16 +1,206 @@
 ---
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
+import figures from '../../data/figures.json';
+
+/* The plot geometry. scripts/build-plots.cjs computed every number below from a
+   named artifact at a pinned commit, and this page interpolates it. The page
+   types no coordinate and no count, so the marks cannot drift from the
+   measurement. `discordant.artifact` and `discordant.sha` also fill the caption,
+   so the provenance line cannot disagree with the geometry above it. */
+const discordant = figures.plots['fj2-discordant'];
+if (!discordant) {
+  throw new Error(
+    'faithfulness-judge: src/data/figures.json holds no "fj2-discordant" plot. '
+    + 'Run: node scripts/build-plots.cjs --repo=<path to faithfulness-judge> '
+    + '--repo=<path to defense-news-classifier>'
+  );
+}
+const dp = discordant.geometry;
+const dpCommit = discordant.sha.slice(0, 7);
+const dpValue = (label) => {
+  const found = discordant.values.find((v) => v.label === label);
+  if (!found) {
+    throw new Error(`faithfulness-judge: the "fj2-discordant" plot holds no "${label}" value.`);
+  }
+  return found.value;
+};
+const dpN = dpValue('paired claims');
+const dpWins = dpValue('premium right, cheap wrong');
+const dpLosses = dpValue('cheap right, premium wrong');
+/* The artifact carries four decimal places and this page has always published
+   two. The rounding happens here rather than in the caption text, so the
+   published figure is derived from the artifact and never typed. */
+const dpP = dpValue('McNemar exact p').toFixed(2);
 ---
 <Base
   title="Evaluating an LLM Faithfulness Judge · San Lee"
-  description="An LLM-as-judge evaluated on 193 hand-labeled claims from public defense text, including the token-limit bug that created a false model-tier gap."
+  description="I measured an LLM-as-judge on 193 hand-labeled claims from public defense text. A token-limit bug created a false model-tier gap."
   canonical="https://sanlee.me/projects/faithfulness-judge.html"
   ogType="article"
   ogImage="/assets/og-faithfulness-judge.png"
 >
   <Fragment slot="head">
   <style is:inline>
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
+
+       COPY. The origin is src/pages/projects/context-architecture.astro at
+       9d81caa, and the four rules below are that block verbatim. A shared
+       grammar is copied and never extracted: a concurrent session owns
+       public/assets/style.css for the tap-target work, and two writers on one
+       shared stylesheet cannot merge. OC-F of the redesign brief carries the
+       consolidation, for after that session merges. */
+    .fig {
+      margin: 0 0 22px;
+    }
+    .fig figcaption {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+    }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Added here, and not part of the copied block. It is the rule
+       defense-news-classifier.astro added at f131d30, for the same reason: a
+       caption on this page names an artifact path, and a path is one
+       unbreakable token that is wider than the content track at 320px. Without
+       this rule the caption widens the page and the mobile gate reddens.
+
+       No caption on this page holds a link, and that is deliberate. Lane N
+       measured a link inside a figcaption painting the browser default at
+       1.97:1 on the dark theme, because the house link rules are scoped to
+       `.article-body p a` and `li a`. This page names the artifact inside a
+       `code` element and links the repository from the Stack section instead.
+       An editor who adds a link to a caption here adds a `.fig figcaption a`
+       rule first. */
+    .fig figcaption code { overflow-wrap: anywhere; }
+
+    /* Two new plates, one grammar (ADR-013). Page-scoped.
+
+       max-width 260 keeps one viewBox unit at one CSS pixel down to 320px. The
+       container is .wrap, whose gutter is 24px each side, so a 320px phone
+       gives a plate 272px and the plate renders at 260. Both plates sit at the
+       top level of .article-body, so 272px is the real measurement.
+
+       The shared parts carry an `fj-` prefix and the per-plate parts carry
+       `fj1-` and `fj2-`. Neither plate needs a marker or a gradient, so this
+       block adds no id to the document and cannot repaint another plate's
+       arrow head.
+
+       Both plates are monochrome. Oxide (--accent-warm) on this site marks a
+       decision that was taken back, and the .judge-plate comment below records
+       that reading for this page. Nothing on these two plates was taken back,
+       so every state is a word plus a shape: a solid cell against a dashed
+       cell on fj1, and a solid mark against a hollow mark on fj2.
+
+       SVG text inherits from <body>, so every text class names its own font. */
+    .fj-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 0;
+    }
+    .fj-plate .fj-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .fj-plate .fj-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .fj-plate .fj-state {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .fj-plate .fj-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+
+    /* fj1-nested. One outer set, two cells inside it.
+
+       THE CELLS ARE NOT TO SCALE, and the caption says so. A hand-drawn
+       plate that sized a cell by a count would publish that count as a width,
+       with no producer and no gate. The counts stay in the caption, where
+       a reader reads them.
+
+       The dash is the shape for the least crisp call a labeler makes, which is
+       the rubric's own word for the hedged class. The solid cell is the crisp
+       one. */
+    .fj1-plate .fj1-outer {
+      fill: none;
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .fj1-plate .fj1-crisp {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .fj1-plate .fj1-soft {
+      fill: var(--bg);
+      stroke: var(--muted);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+
+    /* fj2-discordant. THE ORIGIN COPY of the discordant-pair grammar.
+
+       Three pages on this site run a paired comparison, and none of them showed
+       the discordant pairs. This block is written here first. A later lane
+       copies the rules below and the <figure> markup on the page, verbatim, and
+       names this page and its commit in the copy's comment. A shared grammar is
+       copied and never extracted, for the reason the caption block above gives.
+
+       WHAT A COPYING LANE CHANGES, AND NOTHING ELSE.
+         1. The `fj2-` prefix becomes that page's own prefix.
+         2. The two row labels become that comparison's two directions.
+         3. The verdict word becomes that comparison's verdict.
+         4. A NEW definition in the PLOTS registry of scripts/build-plots.cjs,
+            with that page's own artifact, its own commit, and its own key. A
+            copying page never reads `fj2-discordant`: these counts belong to
+            this study.
+
+       WHY THE MARKS ARE GENERATED. The count IS the geometry here: one mark per
+       discordant pair. A typed row of marks is a published count with no
+       producer, which is what ADR-013 refuses. build-plots.cjs reads the counts
+       out of a pinned artifact and writes the x of every mark into
+       src/data/figures.json, so a row cannot drift from the measurement.
+
+       WHY THE TWO ROWS SHARE A LEFT EDGE. The reader compares two lengths, not
+       two positions. The fill and the row label dual-encode the direction, so
+       the plate needs no second hue. */
+    .fj2-plate .fj2-rule {
+      stroke: var(--border);
+      stroke-width: 1;
+    }
+    .fj2-plate .fj2-win {
+      fill: var(--text);
+      stroke: none;
+    }
+    .fj2-plate .fj2-loss {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+
     /* Claim-vs-source plate (portfolio ADR-004). Page-scoped: the unit of the
        study, not a metrics chart (the κ table already carries the numbers).
        Max-width 260 keeps viewBox units 1:1 with CSS px on every gate width
@@ -169,21 +359,23 @@ import SiteNav from '../../components/SiteNav.astro';
     <p class="subtitle">Can an LLM judge catch a made-up claim?</p>
 
     <p class="lead">
-      Every LLM system I build is graded by another LLM at some point. This
-      project measures the grader. It takes answers generated over public
-      defense text, breaks them into individual claims, has a person label each
-      one against its cited source, and then asks two model tiers to do the same
-      job blind. The deliverable is a number for how far the judge can be
-      trusted, and where it cannot.
+      Another LLM grades every LLM system I build at some point. This project
+      measures the grader. It takes answers generated over public defense text
+      and breaks them into individual claims. A person labels each claim against
+      its cited source. Two model tiers then do the same job blind. The
+      deliverable is a number for how far the judge can be trusted, and where it
+      cannot.
     </p>
 
-    <!-- Unit of the study: one claim read against its cited source, labeled
-         supported or unsupported. Not a κ chart — the metrics table below
-         already has the numbers. Schematic only; no invented sample text as
-         a real quote, no fake screenshots. ADR-010 N/A — no interactive nodes. -->
+    <!-- The unit of the study: one claim, read against its cited source and
+         labeled supported or unsupported. This is not a κ chart. The metrics
+         table below already carries the numbers. The drawing is schematic
+         only. It invents no sample text as a real quote, and it shows no fake
+         screenshot. ADR-010 does not apply, because nothing here is an
+         interactive node. -->
     <svg class="judge-plate" viewBox="0 0 260 132" role="img"
-         aria-label="The unit of the faithfulness study: a claim is read against its cited source and labeled supported or unsupported. Source passage flows into a claim sentence; the binary verdict is supported or unsupported.">
-      <title>The unit of the faithfulness study: a claim is read against its cited source and labeled supported or unsupported. Source passage flows into a claim sentence; the binary verdict is supported or unsupported.</title>
+         aria-label="The unit of the faithfulness study. A cited source passage leads to one claim sentence. A person reads the claim against that source. The binary verdict is supported or unsupported.">
+      <title>The unit of the faithfulness study. A person reads one claim against its cited source, and the binary verdict is supported or unsupported.</title>
       <defs>
         <marker id="jp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
@@ -191,7 +383,8 @@ import SiteNav from '../../components/SiteNav.astro';
         </marker>
       </defs>
 
-      <!-- Top row: Source → Claim. Glyph lines stand for a passage, not a real quote. -->
+      <!-- Top row: the source leads to the claim. The glyph lines stand for a
+           passage, not for a real quote. -->
       <text class="jp-lane" x="4" y="12">SOURCE</text>
       <rect class="jp-box" x="4" y="18" width="100" height="48" rx="2" />
       <g class="jp-glyph" aria-hidden="true">
@@ -208,8 +401,9 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="jp-title" x="191" y="42" text-anchor="middle">asserted sentence</text>
       <text class="jp-micro" x="191" y="58" text-anchor="middle">one gold unit</text>
 
-      <!-- Bottom row: binary verdict under the pair. Word + stroke dual-encode;
-           oxide only on unsupported (the class the study is built to catch). -->
+      <!-- Bottom row: the binary verdict under the pair. A word plus a stroke
+           dual-encode the state. Oxide marks unsupported only, which is the
+           class the study is built to find. -->
       <path class="jp-edge" d="M 130 68 L 130 84" marker-end="url(#jp-arrow)" aria-hidden="true" />
       <text class="jp-lane" x="4" y="100">VERDICT</text>
       <rect class="jp-ok" x="4" y="106" width="122" height="22" rx="2" />
@@ -233,49 +427,128 @@ import SiteNav from '../../components/SiteNav.astro';
       </tbody>
     </table>
     <p>
-      Both tiers land in what the statistics literature calls substantial
-      agreement. Either is usable as an automated faithfulness check. The
-      premium tier edges the cheap one on &kappa;, and the confidence intervals
-      overlap at this sample size. The gap is not resolvable from this data.
+      Both tiers sit in what the statistics literature calls substantial
+      agreement. Either tier is usable as an automated faithfulness check. The
+      premium tier edges the cheap one on &kappa;. The confidence intervals
+      overlap at this sample size. This data cannot resolve the gap.
     </p>
     <p>
-      Those figures are measured against a gold set I audited in August, blind,
-      under a selection rule committed before I looked at a single label.
-      <strong>28 of the 30 claims it pulled came back unchanged</strong>. That
-      consistency is the finding. The audit also moved Opus from 0.751 to 0.762.
-      Restricted to the corrections that landed on claims neither judge had
-      gotten wrong, it is 0.752, flat. The audit had reached one claim both
-      judges failed, and removing it lifts agreement arithmetically. The check
-      was pre-registered. It is
-      <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/002-solid-tier-call.md#phase-2-result-2026-08-02">published both ways</a>.
+      I measured those figures against a gold set. I audited that gold set in
+      August, blind, under a selection rule that I committed before I read a
+      single label. <strong>28 of the 30 claims it pulled came back
+      unchanged</strong>. That consistency is the finding. The audit also moved
+      Opus from 0.751 to 0.762.
     </p>
     <p>
-      Unsupported recall is <strong>97.9% versus 89.6%</strong>. Those
-      percentages are 47 versus 43 catches out of 48, and that 48 folds in
-      hedged half-claims alongside outright fabrications. Restrict it to
-      fabrication proper, the 36 claims the source flatly does not back, and the
-      two tiers are <strong>identical</strong>: 35 of 36 each, missing the same
-      claim. All four of the disagreeing pairs behind the gap are hedged claims,
-      which the rubric itself calls the least crisp call a labeler makes.
-      McNemar&rsquo;s exact test on those four gives
-      <strong>p&nbsp;=&nbsp;0.125</strong>: the direction is consistent, with no
-      reversals in 48 chances, but four pairs cannot size an effect. An earlier
-      version of this page reported that gap as the reason to pay for the
-      premium tier, and called it recall on the fabrication class. The test and
-      the restriction are the two corrections.
+      Count only the corrections on claims that neither judge got wrong, and the
+      figure is 0.752, flat. The audit reached one claim that both judges
+      failed. The removal of that claim lifts agreement arithmetically. I
+      pre-registered the check, and
+      <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/002-solid-tier-call.md#phase-2-result-2026-08-02">the record publishes it both ways</a>.
+    </p>
+
+    <!-- fj1-nested. Hand-drawn, so it carries no digit (ADR-013): every count
+         sits in .fig-what and in the prose. What it shows is containment, which
+         is the one thing the prose can only assert. The whole recall gap lives
+         inside the hedged cell, and the fabrication cell is identical for both
+         tiers. The two cells are NOT to scale, and .fig-limit says so, because
+         a cell sized by a count would publish that count as a width. -->
+    <figure class="fj1-nested fig" data-fig="plate">
+      <svg class="fj1-plate fj-plate" viewBox="0 0 260 132" role="img"
+           aria-label="The unsupported class holds two cells. One cell is fabrication, where both tiers are identical. The other cell is hedged, where the whole tier gap sits. Every disagreeing pair sits in the hedged cell.">
+        <title>The whole tier gap sits in the hedged cell. On fabrication the two tiers are identical.</title>
+
+        <text class="fj-lane" x="4" y="12">THE UNSUPPORTED CLASS</text>
+        <rect class="fj1-outer" x="4" y="18" width="252" height="106" rx="2" />
+
+        <rect class="fj1-crisp" x="14" y="28" width="232" height="44" rx="2" />
+        <text class="fj-title" x="24" y="46">FABRICATION</text>
+        <text class="fj-state" x="236" y="46" text-anchor="end">IDENTICAL</text>
+        <text class="fj-micro" x="24" y="62">both tiers miss the same claim</text>
+
+        <rect class="fj1-soft" x="14" y="76" width="232" height="44" rx="2" />
+        <text class="fj-title" x="24" y="94">HEDGED</text>
+        <text class="fj-state" x="236" y="94" text-anchor="end">THE WHOLE GAP</text>
+        <text class="fj-micro" x="24" y="110">every disagreeing pair sits here</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">Unsupported recall is <strong>97.9% versus
+          89.6%</strong>, or 47 versus 43 catches out of 48. That 48 folds
+          hedged half-claims in with outright fabrications. On fabrication
+          proper, the 36 claims the source flatly does not back, the two tiers
+          are <strong>identical</strong>. Each finds 35 of 36, and both miss the
+          same claim.</span>
+        <span class="fig-limit">The two cells are not to scale, and the plate
+          holds no count and no p-value. It does not show how wide the recall
+          gap is, or how few pairs sit behind it.</span>
+      </figcaption>
+    </figure>
+
+    <p>
+      All four disagreeing pairs behind the gap are hedged claims, which the
+      rubric itself calls the least crisp call a labeler makes.
+      McNemar&rsquo;s exact test on those four pairs gives
+      <strong>p&nbsp;=&nbsp;0.125</strong>. The direction is consistent, with no
+      reversals in 48 chances. Four pairs cannot size an effect.
     </p>
     <p>
-      So <strong>neither axis separates the tiers on this set</strong>. Paired
-      across all 189 claims, the premium judge is right where the cheap one is
-      wrong six times and wrong where it&rsquo;s right three times, which is
-      <strong>p&nbsp;=&nbsp;0.51</strong>. The cheap tier is good enough and
-      escalation is not evidenced.
+      An earlier version of this page reported that gap as the reason to pay for
+      the premium tier. That version called the gap recall on the fabrication
+      class. The test and the restriction are the two corrections.
+    </p>
+
+    <!-- fj2-discordant. A PLOT, and the origin of the discordant-pair grammar.
+         Every mark x is interpolated from src/data/figures.json, which
+         scripts/build-plots.cjs read out of a pinned commit; the page types no
+         coordinate and no count. The count IS the geometry: one mark per
+         discordant pair, so the two rows are as long as the data. A paired test
+         reads only these pairs, and the caption says which pairs it leaves out.
+         The verdict word carries the outcome, because two short rows cannot.
+         Zero digits in the SVG. ADR-010 does not apply: nothing here is a
+         control. -->
+    <figure class="fj2-discordant fig" data-fig="plot">
+      <svg class="fj2-plate fj-plate" viewBox="0 0 260 104" role="img"
+           data-fig-generated="true"
+           aria-label={`Two rows of marks, one for each direction of disagreement. The top row has ${dpWins} marks, where the premium judge is right and the cheap one is wrong. The bottom row has ${dpLosses} marks, where the cheap judge is right and the premium one is wrong. This test does not separate the two tiers.`}>
+        <title>{`${dpWins} discordant pairs run one way and ${dpLosses} run the other. This test does not separate the tiers.`}</title>
+
+        <text class="fj-lane" x="4" y="12">PREMIUM RIGHT, CHEAP WRONG</text>
+        {dp.winsX.map((x) => (
+          <rect class="fj2-win" x={x} y="18" width={dp.markW} height={dp.markH} rx="1" />
+        ))}
+
+        <text class="fj-lane" x="4" y="52">CHEAP RIGHT, PREMIUM WRONG</text>
+        {dp.lossesX.map((x) => (
+          <rect class="fj2-loss" x={x} y="58" width={dp.markW} height={dp.markH} rx="1" />
+        ))}
+
+        <line class="fj2-rule" x1={dp.trackX0} y1="86" x2={dp.trackX1} y2="86" />
+        <text class="fj-lane" x="4" y="100">VERDICT</text>
+        <text class="fj-state" x="256" y="100" text-anchor="end">NOT SEPARATED</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">Paired across all {dpN} claims, the premium judge
+          is right where the cheap one is wrong {dpWins} times. It is wrong
+          where the cheap one is right {dpLosses} times. One mark is one pair.
+          McNemar&rsquo;s exact test on those pairs gives
+          <strong>p&nbsp;=&nbsp;{dpP}</strong>. Geometry from
+          <code>{discordant.artifact}</code> at {dpCommit}.</span>
+        <span class="fig-limit">The plate shows only the pairs where the two
+          tiers disagree. It leaves out every pair they agree on, because the
+          test does not read those. It also does not show the &kappa; axis,
+          which the table above carries.</span>
+      </figcaption>
+    </figure>
+
+    <p>
+      So <strong>neither axis separates the tiers on this set</strong>. The cheap
+      tier is good enough and escalation is not evidenced.
     </p>
 
     <h2>The result I almost published instead</h2>
 
     <svg class="trunc-plate" viewBox="0 0 260 132" role="img"
-         aria-label="A token cap cut the cheap judge before its verdict on 20 percent of claims. Scoring counted each empty as a disagreement, which invented a tier gap of 0.70 versus 0.43. The gap was a harness bug.">
+         aria-label="A token cap cut the cheap judge before its verdict on 20 percent of claims. I counted each empty as a disagreement, and that invented a tier gap of 0.70 versus 0.43. The gap was a harness bug.">
       <title>max_tokens cut the cheap tier before the verdict. The 0.70 vs 0.43 gap was a bug.</title>
       <defs>
         <marker id="tp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
@@ -302,127 +575,136 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="tp-bad-text" x="130" y="115" text-anchor="middle">FALSE GAP  0.70 vs 0.43</text>
     </svg>
     <p class="trunc-plate-caption">
-      A token cap cut the cheap tier before the verdict on 20% of the set.
-      Scoring counted each empty as a miss. The gap was my harness.
+      A token cap cut the cheap tier before the verdict on 20% of the set. I
+      counted each empty as a miss. The gap was my harness.
     </p>
 
     <div class="decision">
       <p class="tag">A truncation setting that looked like a finding</p>
       <p>The first scoring run showed Opus at 0.70 and Sonnet at
-        <strong>0.43</strong>. A clean tier gap. It was one commit from
-        shipping.</p>
-      <p>It was false. I had set <code>max_tokens=10</code> to force a one-word
-        verdict out of the judge. Opus complied. Sonnet tended to open with a
-        short clause of reasoning first, so on <strong>39 of the 191 claims
-        then scored</strong>,
-        a full 20%, it was cut off before it ever reached the verdict word. My
-        scoring counted every unparsed verdict as a disagreement, so a fifth of
-        Sonnet&rsquo;s answers were scored as wrong when they were simply
-        missing. On the 152 claims it actually finished, Sonnet was already at
-        about 0.70, which is where it sits today.</p>
-      <p>What caught it was reading the misjudgment log before publishing.
-        Sonnet&rsquo;s failures did not look like judgment errors, which are
-        scattered and arguable. They looked <em>empty</em>.</p>
+        <strong>0.43</strong>. That was a clean tier gap. One commit would have
+        shipped it.</p>
+      <p>It was false. I set <code>max_tokens=10</code> to force a one-word
+        verdict out of the judge. Opus complied. Sonnet tended to reason in a
+        short clause first. So the cap cut it off before it ever reached the
+        verdict word, on <strong>39 of the 191 claims then scored</strong>, a
+        full 20%.</p>
+      <p>I counted every unparsed verdict as a disagreement. So my score marked
+        a fifth of Sonnet&rsquo;s answers wrong, and those answers were simply
+        absent. On the 152 claims it actually finished, Sonnet was already at
+        about 0.70. That is where it sits today.</p>
+      <p>I found it when I read the misjudgment log before I published.
+        Sonnet&rsquo;s misses did not look like judgment errors. A judgment
+        error is scattered and arguable. They looked <em>empty</em>.</p>
       <p class="tradeoff"><strong>The lesson:</strong> inspect the raw outputs
-        before believing a surprising metric. A number can be reproducible and
+        before you believe a surprising metric. A number can be reproducible and
         still measure the harness. Constrain a critical output
         <em>structurally</em>, not with a token budget.</p>
     </div>
 
     <p>
-      The fix took two tries. Prefilling the assistant&rsquo;s reply, seeding
-      the response so the model continues from a fixed token, is the standard
-      trick for forcing a format, and these models reject it. What works is a
-      forced tool call: a <code>record_verdict</code> tool whose schema
-      constrains the verdict to the label set, with the tool choice pinned so
-      the model has to use it. The model can reason as long as it likes, and the
-      verdict arrives in a structured block that cannot be truncated into
-      ambiguity. That is the same pattern the classifier uses to guarantee
-      valid labels.
+      The fix took two tries. A prefill of the assistant&rsquo;s reply is the
+      standard trick for a forced format. It seeds the response, so the model
+      continues from a fixed token. These models reject it.
     </p>
     <p>
-      Counting unparsed verdicts as disagreements is harsh. Dropping them would
-      have discarded 20% of the set and hidden the truncation. The strict rule
-      is what made the bug visible. Full decision record in
-      <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/001-both-tiers-substantial.md">ADR-001</a>.
+      A forced tool call works. A <code>record_verdict</code> tool has a schema
+      that constrains the verdict to the label set. I pin the tool choice, so
+      the model has to use it. The model can reason as long as it likes. The
+      verdict arrives in a structured block that truncation cannot make
+      ambiguous. That is the same pattern the classifier uses to guarantee valid
+      labels.
+    </p>
+    <p>
+      The rule that counts an unparsed verdict as a disagreement is harsh. A
+      rule that dropped those verdicts discards 20% of the set and hides the
+      truncation. The strict rule made the bug visible.
+      <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/001-both-tiers-substantial.md">ADR-001</a>
+      carries the full decision record.
     </p>
 
     <h2>What this grades against</h2>
     <p>
-      The <a href="defense-news-classifier.html">classifier</a> is graded
-      against cheap, objective labels: a story is about procurement or it is
-      not, and two careful people will mostly agree. This project grades against
-      expensive, subjective ones. Deciding whether a specific sentence is
-      supported by a specific cited passage takes real reading. The boundaries
-      are arguable, and a hedged half-claim is a judgment call. It reuses the
-      classifier&rsquo;s machinery, the judge harness, the Wilson intervals, the
-      gold-set discipline, and points it at the opposite ground-truth regime.
+      I grade the <a href="defense-news-classifier.html">classifier</a> against
+      cheap, objective labels. A story is about procurement or it is not, and
+      two careful people will mostly agree. This project grades against
+      expensive, subjective ones. A person must read the passage and the
+      sentence closely to decide whether one supports the other. The boundaries
+      are arguable, and a hedged half-claim is a judgment call.
     </p>
     <p>
-      The classifier retired BM25 grounding after measuring it, then declined
-      tiered model routing after measuring that. Here the cheap tier is again
-      close enough that escalation is hard to justify on overall agreement.
-      Three independent measurements land on <em>escalation barely pays</em>.
-      That is why the default across this system is the cheaper model until an
-      eval says otherwise.
+      This project reuses the classifier&rsquo;s machinery: the judge harness,
+      the Wilson intervals, and the gold-set discipline. It points that
+      machinery at the opposite ground-truth regime.
+    </p>
+    <p>
+      The classifier measured BM25 grounding and retired it. It then measured
+      tiered model routing and declined that. Here the cheap tier is again close
+      enough that escalation is hard to justify on overall agreement. Three
+      independent measurements reach the same verdict: <em>escalation barely
+      pays</em>. That is why the default across this system is the cheaper model
+      until an eval says otherwise.
     </p>
 
     <h2>What this number does not establish</h2>
     <p>
-      The limits, also stated on the repo&rsquo;s front page:
+      The repo&rsquo;s front page also states these limits:
     </p>
     <ul>
-      <li><strong>One labeler.</strong> The gold set is my labels alone, with no
-        inter-annotator agreement measured. That makes the ground truth one
-        person&rsquo;s consistent reading of a written rubric, not a validated
-        consensus. A judge agreeing with this gold at 0.762 has not been shown
-        to agree with humans in general at 0.762, and adding a second labeler is
-        the single thing that would upgrade the claim. <strong>The August audit
-        does not change this.</strong> It was the same person re-reading his own
-        labels, blind to the verdicts, which measures whether the gold is
-        self-consistent and cannot measure whether it is right. A consistency
-        audit is never inter-annotator agreement.</li>
-      <li><strong>The gold set has been audited twice, and moved both times.</strong>
-        The first pass caught two claims labeled supported that were filler with
-        no factual assertion, which the rubric excludes. The second, the blind
-        one, found a third instance the first pass had missed &mdash; and
-        reversed one of the first pass&rsquo;s own calls, where the claim does
-        assert that the source omits a detail and so is a correct refusal rather
-        than filler. The second audit is also the evidence that the first was
+      <li><strong>One labeler.</strong> The gold set is my labels alone, and I
+        measured no inter-annotator agreement. So the ground truth is what one
+        person consistently read out of a written rubric. It is not a validated
+        consensus. Agreement with this gold at 0.762 does not show agreement
+        with humans in general at 0.762. A second labeler is the single thing
+        that would upgrade the claim. <strong>The August audit does not change
+        this.</strong> The same person re-read his own labels, blind to the
+        verdicts. That measures whether the gold is self-consistent, and it
+        cannot measure whether the gold is right. A consistency audit is never
+        inter-annotator agreement.</li>
+      <li><strong>I audited the gold set twice, and it moved both times.</strong>
+        The first pass found two claims labeled supported that were filler with
+        no factual assertion. The rubric excludes filler. The second pass was
+        the blind one. It found a third instance that the first pass missed. It
+        also reversed one of the first pass&rsquo;s own calls. There the claim
+        does assert that the source omits a detail, so it is a correct refusal
+        and not filler. The second audit is also the evidence that the first was
         incomplete.</li>
-      <li><strong>189 scored claims</strong> out of 193, with four excluded as
-        non-claims. The intervals are about nine points wide. Any difference
-        smaller than that is noise, and that includes both the tier gap in
-        &kappa; and the recall gap, whose denominator is only 48.</li>
-      <li><strong>Floor tier by design.</strong> One pass, no judge prompt
-        tuning, no ensembles, no retrieval. This measures the ruler as built,
-        not the best ruler obtainable.</li>
-      <li><strong>Short passages from one domain.</strong> Public defense
-        reporting, skewed toward operations and procurement. Faithfulness
-        judging over long documents or technical specifications is untested
-        here.</li>
+      <li>The set holds <strong>189 scored claims</strong> out of 193. I
+        excluded four as non-claims. The intervals are about nine points wide.
+        Any difference smaller than that is noise. That includes the tier gap in
+        &kappa; and the recall gap. The recall denominator is only 48.</li>
+      <li><strong>Floor tier by design.</strong> The judge makes one pass. I
+        tuned no judge prompt, built no ensemble, and added no retrieval. This
+        measures the ruler as built, not the best ruler obtainable.</li>
+      <li><strong>Short passages from one domain.</strong> The source is public
+        defense reporting, and it skews toward operations and procurement. This
+        project does not measure a faithfulness judge over long documents or
+        technical specifications.</li>
       <li><strong>A floor:</strong> below about 0.6 I would not trust an
-        automated verdict unreviewed. Both judges clear that. Neither clears the
-        bar for treating a verdict as final without a human in the loop on
+        automated verdict unreviewed. Both judges clear that floor. Neither
+        judge clears the bar for a final verdict with no human in the loop on
         anything consequential.</li>
     </ul>
 
     <h2>Stack</h2>
     <p>
-      Python, the Anthropic SDK (Sonnet and Opus as the two judges under test),
-      forced tool-use for the verdict schema, Cohen&rsquo;s &kappa; and Wilson
-      intervals computed directly, pytest on mocked calls. Source text is public
-      DVIDS reporting; nothing proprietary or non-public is used anywhere in the
-      project. The repo is public:
+      The stack is Python and the Anthropic SDK, with Sonnet and Opus as the two
+      judges under test. It uses forced tool-use for the verdict schema. It
+      computes Cohen&rsquo;s &kappa; and the Wilson intervals directly. pytest
+      runs on mocked calls.
+    </p>
+    <p>
+      The source text is public DVIDS reporting. The project uses nothing
+      proprietary and nothing non-public. The repo is public:
       <a href="https://github.com/sanlee-ys/faithfulness-judge">github.com/sanlee-ys/faithfulness-judge</a>.
       The gold set, the labeling guide, the misjudgment log, and the ADR that
-      documents the bug are checkable.
+      records the bug are checkable.
     </p>
 
     <h2>What it demonstrates</h2>
     <p>
       The first scoring run printed a dramatic tier gap. The misjudgment log
-      showed the cheap tier had been cut off. The published result is the one
+      showed that a cap cut off the cheap tier. The published result is the one
       that survived that check: both judges are good enough, and escalation is
       not evidenced.
     </p>

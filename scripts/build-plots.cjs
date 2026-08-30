@@ -165,6 +165,127 @@ const PLOTS = [
       };
     },
   },
+
+  /*
+   * fj2-discordant, on `src/pages/projects/faithfulness-judge.astro`.
+   *
+   * WHAT IT ARGUES. A paired test reads only the pairs where the two judges
+   * disagree. Six of those pairs go one way and three go the other, and that is
+   * the whole evidence base behind p = 0.51. The count IS the geometry here: one
+   * mark per discordant pair, so the two rows are as long as the data and no
+   * longer. Prose can only assert the imbalance; two rows of marks show it.
+   *
+   * WHY THIS ARTIFACT. `decisions/002-solid-tier-call.md` is the audit that made
+   * the current gold canonical, and its "three views" section is the one place
+   * that carries the paired counts for the canonical view beside its own n. The
+   * repository README carries the same p rounded to three places, so two
+   * readings agree and the page publishes one.
+   *
+   * WHY A SHA AND NOT THE TAG. The repository's only tag, v1.0.0, is dated
+   * 2026-07-19 and predates the August audit, so it carries the superseded
+   * figures. A tag that names the wrong measurement is worse than a sha.
+   *
+   * WHY THE MODEL NAMES STAY IN THIS PARSER. The artifact writes the two
+   * directions as model names. The page writes them as "the premium judge" and
+   * "the cheap one", which is its own vocabulary, so the labels below use the
+   * page's words and no model name reaches `src/data/figures.json`. The pattern
+   * still matches the names in a fixed order, and it throws when it does not:
+   * a positional read would invert the two directions in silence.
+   *
+   * COPYING THIS PLOT. The discordant-pair grammar on that page is written to be
+   * copied by another paired comparison. A copying lane adds its own definition
+   * here, with its own artifact, and points its page at its own key. It does not
+   * point at this key, because these counts belong to this study.
+   */
+  {
+    key: 'fj2-discordant',
+    repo: 'faithfulness-judge',
+    ref: 'cee33107796de3871bae0f5003ba6c9256985c2e',
+    artifact: 'decisions/002-solid-tier-call.md',
+    viewBox: [0, 0, 260, 104],
+    extract(text) {
+      // The canonical view. Two other views sit in the same section with their
+      // own counts, so the heading is the anchor and not the first `Paired:`.
+      const head = /\*\*2\. Fully audited gold[^*\n]*CANONICAL\*\*[^\n]*?\bn = (\d+)/.exec(text);
+      if (!head) {
+        throw new Error(
+          'fj2-discordant: the "Fully audited gold - CANONICAL" view is not in this artifact '
+          + 'at this commit.\n'
+          + '  The ADR was reformatted, or the wrong commit is pinned. Re-read it and fix the '
+          + 'pattern. Never fall back to another view: the three views carry different counts.'
+        );
+      }
+      const paired = /^Paired: Opus (\d+) \/ Sonnet (\d+), \*\*McNemar exact p = ([0-9.]+)\*\*/m
+        .exec(text.slice(head.index));
+      if (!paired) {
+        throw new Error(
+          'fj2-discordant: no "Paired:" line follows the canonical view in this artifact.\n'
+          + '  A missing count must never become a zero. A row of zero marks would read as a '
+          + 'measured tie.'
+        );
+      }
+      const n = Number(head[1]);
+      const wins = Number(paired[1]);
+      const losses = Number(paired[2]);
+      const p = Number(paired[3]);
+      for (const [label, value] of [['n', n], ['wins', wins], ['losses', losses]]) {
+        if (!Number.isInteger(value) || value <= 0) {
+          throw new Error(`fj2-discordant: "${label}" read as "${value}", which is not a count.`);
+        }
+      }
+      if (!Number.isFinite(p) || p <= 0 || p > 1) {
+        throw new Error(`fj2-discordant: p read as "${paired[3]}", which is not a p-value.`);
+      }
+      if (wins + losses > n) {
+        throw new Error(
+          `fj2-discordant: ${wins} + ${losses} discordant pairs is more than the ${n} pairs `
+          + 'scored. The three numbers came from different views.'
+        );
+      }
+      return [
+        { label: 'paired claims', value: n },
+        { label: 'premium right, cheap wrong', value: wins },
+        { label: 'cheap right, premium wrong', value: losses },
+        { label: 'McNemar exact p', value: p },
+      ];
+    },
+    layout(values, viewBox) {
+      const at = (label) => {
+        const found = values.find((v) => v.label === label);
+        if (!found) throw new Error(`fj2-discordant: layout wanted "${label}" and did not get it.`);
+        return found.value;
+      };
+      // Both rows start at the same x, so the reader compares two lengths and
+      // not two positions. The mark is 12 units wide at a viewBox width of 260,
+      // which is 12 CSS pixels at 320px, because max-width 260 holds one unit at
+      // one pixel.
+      const TRACK = [4, 256];
+      const MARK_W = 12;
+      const MARK_GAP = 5;
+      const MARK_H = 16;
+      const row = (count) => {
+        const width = count * MARK_W + (count - 1) * MARK_GAP;
+        if (TRACK[0] + width > TRACK[1]) {
+          throw new Error(
+            `fj2-discordant: ${count} marks need ${round(width)} units and the track holds `
+            + `${TRACK[1] - TRACK[0]}.\n`
+            + '  Widen the track or shrink the mark deliberately. Never drop a mark: the row '
+            + 'length is the measurement.'
+          );
+        }
+        return Array.from({ length: count }, (_, i) => round(TRACK[0] + i * (MARK_W + MARK_GAP)));
+      };
+      if (MARK_H > viewBox[3]) throw new Error('fj2-discordant: the mark is taller than the plate.');
+      return {
+        trackX0: TRACK[0],
+        trackX1: TRACK[1],
+        markW: MARK_W,
+        markH: MARK_H,
+        winsX: row(at('premium right, cheap wrong')),
+        lossesX: row(at('cheap right, premium wrong')),
+      };
+    },
+  },
 ];
 
 /*

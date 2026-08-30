@@ -35,6 +35,55 @@
         "firstX": 80.42,
         "rerunX": 186.75
       }
+    },
+    "fj2-discordant": {
+      "repo": "sanlee-ys/faithfulness-judge",
+      "sha": "cee33107796de3871bae0f5003ba6c9256985c2e",
+      "artifact": "decisions/002-solid-tier-call.md",
+      "command": "git -C <faithfulness-judge> show cee33107796de3871bae0f5003ba6c9256985c2e:decisions/002-solid-tier-call.md",
+      "viewBox": [
+        0,
+        0,
+        260,
+        104
+      ],
+      "values": [
+        {
+          "label": "paired claims",
+          "value": 189
+        },
+        {
+          "label": "premium right, cheap wrong",
+          "value": 6
+        },
+        {
+          "label": "cheap right, premium wrong",
+          "value": 3
+        },
+        {
+          "label": "McNemar exact p",
+          "value": 0.5078
+        }
+      ],
+      "geometry": {
+        "trackX0": 4,
+        "trackX1": 256,
+        "markW": 12,
+        "markH": 16,
+        "winsX": [
+          4,
+          21,
+          38,
+          55,
+          72,
+          89
+        ],
+        "lossesX": [
+          4,
+          21,
+          38
+        ]
+      }
     }
   }
 }
