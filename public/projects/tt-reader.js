@@ -54,8 +54,21 @@
 
   var index = 0;
 
+  /*
+   * A rail link is matched to its frame BY ITS href, never by its position in
+   * the rail. The two lists are written by hand in the same order today, and a
+   * later edit that reorders one and not the other would silently select the
+   * wrong frame. An href cannot drift that way.
+   */
+  function railFor(i) {
+    for (var n = 0; n < railLinks.length; n += 1) {
+      if (indexOfHash(railLinks[n].getAttribute('href')) === i) return railLinks[n];
+    }
+    return null;
+  }
+
   function label(i) {
-    var link = railLinks[i];
+    var link = railFor(i);
     return link ? link.textContent.trim() : String(i + 1);
   }
 
@@ -88,7 +101,27 @@
   controls.appendChild(next);
   controls.appendChild(status);
 
-  function show(i, moveFocus) {
+  /*
+   * `opts.writeHash` — rewrite the fragment. `opts.moveFocus` — focus the
+   * figure without scrolling to it.
+   *
+   * THE FRAGMENT IS WRITTEN ON SELECTION ONLY, NEVER ON LOAD, AND THAT IS
+   * MEASURED. An earlier version rewrote it on load so a shared link would
+   * always name the visible frame. Measured at 390px: a plain visit with no
+   * fragment landed at scrollY 12298 of a 21582px page, deep inside the
+   * reader. Writing a fragment during load puts the browser's own
+   * scroll-to-fragment behaviour back in play, and the page then moves the
+   * reader's viewport without being asked. ADR-010 forbids exactly that.
+   *
+   * It also destroyed a legitimate deep link: `#see-it` was rewritten to
+   * `#frame-usage` before the browser had navigated to the heading.
+   *
+   * A pointer link from elsewhere on the page does not write the fragment
+   * either. The browser is about to navigate to it, and letting it do so is
+   * what buys the history entry and the reduced-motion-aware scroll.
+   */
+  function show(i, opts) {
+    var o = opts || {};
     if (i < 0) i = 0;
     if (i > figures.length - 1) i = figures.length - 1;
     index = i;
@@ -97,9 +130,12 @@
       if (n === index) fig.setAttribute('data-current', 'true');
       else fig.removeAttribute('data-current');
     });
-    railLinks.forEach(function (link, n) {
-      if (n === index) link.setAttribute('aria-current', 'true');
-      else link.removeAttribute('aria-current');
+    railLinks.forEach(function (link) {
+      if (indexOfHash(link.getAttribute('href')) === index) {
+        link.setAttribute('aria-current', 'true');
+      } else {
+        link.removeAttribute('aria-current');
+      }
     });
 
     prev.disabled = index === 0;
@@ -107,13 +143,13 @@
     status.textContent = 'Frame ' + (index + 1) + ' of ' + figures.length
       + ': ' + label(index) + '.';
 
-    // The fragment is rewritten so the frame on screen is the frame a shared
-    // link opens. No history entry, and no scroll.
-    if (window.history && window.history.replaceState) {
+    // No history entry: stepping seven frames would otherwise bury the page
+    // under seven of them and Back would walk them one at a time.
+    if (o.writeHash && window.history && window.history.replaceState) {
       window.history.replaceState(null, '', '#' + keys[index]);
     }
 
-    if (moveFocus) figures[index].focus({ preventScroll: true });
+    if (o.moveFocus) figures[index].focus({ preventScroll: true });
   }
 
   function indexOfHash(hash) {
@@ -121,13 +157,15 @@
     return keys.indexOf(hash.replace(/^#/, ''));
   }
 
-  railLinks.forEach(function (link, n) {
+  railLinks.forEach(function (link) {
     link.addEventListener('click', function (event) {
       // Let a modified click open a new tab: the anchor is real and the target
       // renders on its own with no script.
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      var at = indexOfHash(link.getAttribute('href'));
+      if (at === -1) return; // an unknown target: let the browser have it
       event.preventDefault();
-      show(n, true);
+      show(at, { moveFocus: true, writeHash: true });
     });
   });
 
@@ -152,19 +190,21 @@
     var link = el.closest('a[href^="#frame-"]');
     if (!link || link.closest('.tt-reader-rail')) return;
     var at = indexOfHash(link.getAttribute('href'));
-    if (at !== -1) show(at, false);
+    // No `writeHash`: the browser is about to set the fragment itself, and
+    // letting it navigate is what buys the history entry and the scroll.
+    if (at !== -1) show(at, {});
   });
 
   prev.addEventListener('click', function () {
-    show(index - 1, true);
+    show(index - 1, { moveFocus: true, writeHash: true });
   });
   next.addEventListener('click', function () {
-    show(index + 1, true);
+    show(index + 1, { moveFocus: true, writeHash: true });
   });
 
   window.addEventListener('hashchange', function () {
     var at = indexOfHash(window.location.hash);
-    if (at !== -1 && at !== index) show(at, false);
+    if (at !== -1 && at !== index) show(at, {});
   });
 
   figures[0].parentNode.insertBefore(controls, figures[0]);
@@ -173,6 +213,9 @@
   // rather than leaving the page with nothing on it.
   section.setAttribute('data-enhanced', 'true');
 
+  // On load: select, and do nothing else. No fragment write and no focus move.
+  // A shared link that names a frame opens on that frame, and a visit with no
+  // fragment opens on the first one and stays where the reader is.
   var start = indexOfHash(window.location.hash);
-  show(start === -1 ? 0 : start, false);
+  show(start === -1 ? 0 : start, {});
 }());

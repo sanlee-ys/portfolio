@@ -151,41 +151,52 @@ if (missingFrames.length) {
       margin: 0 0 18px;
     }
 
-    /* ---------------------------------------------------------------------
-       THE TWO-SLOT CAPTION (portfolio ADR-013). `.fig-what` states what the
-       figure argues. `.fig-limit` states what it does not show.
-       `scripts/figure-contract.cjs` fails the build when either slot is
-       missing or empty, so the caveat cannot drift into body prose while the
-       figure ends on a win.
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
 
-       THIS BLOCK IS PAGE-SCOPED, AND THAT IS A DECISION, NOT AN OVERSIGHT. A
-       concurrent session owns `public/assets/style.css` for the tap-target
-       work, and two writers on one stylesheet cannot be merged. Every page
-       that adds a figure therefore carries its own copy of this block. This
-       page is the ORIGIN copy: a later page copies it verbatim and names this
-       page and its commit in a comment. OC-F carries the consolidation into
-       `style.css` after the concurrent session merges.
-       --------------------------------------------------------------------- */
+       COPIED VERBATIM from src/pages/projects/context-architecture.astro at
+       9d81caa (PR #247), which is the origin copy. Do not edit this block
+       here; edit the origin and re-copy. It is page-scoped on purpose: a
+       concurrent session owns public/assets/style.css for the tap-target work,
+       and two writers on one shared stylesheet cannot merge. OC-F of the
+       redesign brief carries the consolidation, for after that session merges.
+
+       .fig-what states what the figure argues. .fig-limit states what the
+       figure does not show. The gate fails the build on an empty .fig-limit,
+       because a figure that ends on a win while its caveat sits somewhere else
+       is the split ADR-007 refuses.
+
+       The quiet voice is a token, never opacity (ADR-009). Both slots are
+       block-level, so the limit reads as its own line and not as a tail. */
     .fig {
-      margin: 20px 0 22px;
-      min-width: 0;
+      margin: 0 0 22px;
     }
-    .fig figcaption,
+    .fig figcaption {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+    }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Page-local additions to the copied block, kept separate so the copy
+       above stays byte-identical to its origin. `min-width: 0` matters here
+       and not on the origin page: every frame figure is a grid item holding a
+       120-column `<pre>`, and a grid item's default `min-width: auto` refuses
+       to shrink below its content, so the figure would widen its own track and
+       take the page with it. */
+    .fig { min-width: 0; }
     .tt-figure figcaption {
       color: var(--muted);
       font-size: 0.92rem;
-      line-height: 1.5;
-      margin-top: 8px;
-    }
-    .fig-what,
-    .fig-limit { display: block; }
-    .fig-limit {
-      margin-top: 6px;
-      /* A quieter colour token, never `opacity` (ADR-009). `--muted` already
-         passes the rendered-pixel gate in both themes, so the limit slot is
-         separated by a rule and by spacing rather than by a fainter grey. */
-      border-top: 1px solid var(--border);
-      padding-top: 6px;
+      line-height: 1.55;
+      margin: 8px 0 0;
     }
 
     /* ---------------------------------------------------------------------
