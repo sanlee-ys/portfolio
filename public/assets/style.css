@@ -1499,6 +1499,45 @@ main.wrap > .measure { grid-column: full; }
 /* Spacing for the "read the full writeup" link beneath the homepage diagram. */
 .diagram-more { margin: 14px 0 8px; }
 
+/* ---- Thumbable standalone links, phone and tablet ------------------------
+   Measured at 390px: every link below stood alone as the only text of its
+   block and drew a 15-21px-tall box — the one control on its card, at a
+   third of the 44px contract. The .diagram-more case is the homepage
+   flagship and router cards; .repo-grid is the four repo names on
+   the-system; .selected-work is the About page's three work links.
+   hit-target.cjs now measures every standalone anchor at 390px, so a
+   regression on any of them fails the build.
+
+   The 900px cutoff and its reasoning are the nav and ToC blocks': below it a
+   finger is plausible; above it this is a pointer target, and the padding
+   would only move the hover cursor's edge away from the ink.
+
+   Two mechanisms, chosen by what sits next to the link. Vertical padding on
+   a non-replaced INLINE element grows the tap box and moves nothing — it
+   does not change line height — so it is the fix wherever the neighbours
+   are prose, figures, or rules that claim no taps of their own. Where link
+   rows stack on each other, inline padding would only overlap the rows and
+   give the overlap to whichever row paints later; those get inline-block,
+   so the pitch grows into real bands, the way the ToC block's does.
+
+   Do NOT reach for inline-flex here — a flex anchor does not wrap its text,
+   and the standalone card link on product-and-program must wrap at 320px.
+   The inline .card-link case (a link inside a sentence on the project pages)
+   keeps the ToC block's ruling: prose links stay under the WCAG 2.5.8
+   inline exception, untouched. That includes the one .diagram-more link
+   that sits mid-sentence (the-system's "watch one note go through it"), so
+   the padding keys on the .standalone modifier rather than on .diagram-more
+   alone. A new standalone card link that forgets the modifier fails the
+   hit-target gate, so the class cannot silently rot. */
+@media (max-width: 900px) {
+  .diagram-more.standalone .card-link { padding: 15px 0; }
+  .repo-grid strong a { padding: 14px 0; }
+  .selected-work p a {
+    display: inline-block;
+    padding: 12px 0;
+  }
+}
+
 /* Footer — the colophon rule that closes the issue. 2px of ink, the same
    weight that opens every section, so the document is bounded top and bottom
    by the same mark. */

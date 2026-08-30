@@ -68,6 +68,16 @@ import SiteNav from '../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 18px;
     }
+    /* The way-back rows are stacked link rows, so each link grows into its
+       own 44px band below 900px — inline-block, the pitch-grows mechanism
+       from the thumbable-links block in style.css. hit-target.cjs measures
+       standalone anchors at 390px, so a regression here fails the build. */
+    @media (max-width: 900px) {
+      .way-back a {
+        display: inline-block;
+        padding: 12px 0;
+      }
+    }
   </style>
   </Fragment>
 
@@ -103,7 +113,7 @@ import SiteNav from '../components/SiteNav.astro';
       A stale link, or a path that never existed.
     </p>
     <p>Here is the way back:</p>
-    <ul>
+    <ul class="way-back">
       <li><a href="/index.html">The front page</a></li>
       <li><a href="/projects/the-system.html">The System</a> &middot; <a href="/projects/defense-news-classifier.html">Defense News Classifier</a> &middot; <a href="/projects/product-and-program.html">Product &amp; Program</a></li>
       <li><a href="/glossary.html">Glossary</a> &middot; <a href="/colophon.html">Colophon</a> &middot; <a href="/resume.html">Résumé</a></li>

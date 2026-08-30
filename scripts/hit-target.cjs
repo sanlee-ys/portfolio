@@ -34,6 +34,16 @@
  *   2. at least MIN_COVERAGE of its box is a hit target
  *   3. its box is at least MIN_TAP px on both axes (the CLAUDE.md tap contract)
  *
+ * Separately, at phone width only, every STANDALONE anchor must present the
+ * MIN_TAP box. Standalone = the anchor is the only text of its block
+ * container: a link that stands as its own paragraph or list entry is a tap
+ * target on its own, with no prose around it to catch a missed tap. A link
+ * inside a sentence is exempt — WCAG 2.5.8's inline exception, and the ToC
+ * block in style.css records this repo's ruling on it. The miss this catches
+ * shipped for months: .card-link on the homepage cards rendered as a
+ * 15px-tall inline box, the only control on the card, and no gate saw it
+ * because the SVG probe above never looked at HTML anchors.
+ *
  * Run from the repo root:   node scripts/hit-target.cjs
  * Requires Playwright and a Chromium binary.
  */
@@ -191,6 +201,45 @@ const PROBE = ({ minCoverage }) => {
   return results;
 };
 
+/*
+ * Runs in the page, at phone width only. HTML anchors hit-test correctly (a
+ * text box is its own target), so unlike the SVG probe there is nothing to
+ * sample — the failure mode here is SIZE. An anchor that is the only text of
+ * its block container is a standalone tap target and owes the full MIN_TAP
+ * box. An anchor inside a sentence is exempt: WCAG 2.5.8's inline exception,
+ * which the ToC block in style.css adopts deliberately — padding a link
+ * inside prose would ruin the leading to fix a problem the exception already
+ * covers.
+ *
+ * `seen` counts every visible anchor, exempt or not, for the zero-found
+ * guard below: the pages are static HTML, so "no anchors anywhere" means the
+ * walk or the render broke, not that there is nothing to check.
+ */
+const ANCHOR_PROBE = () => {
+  const BLOCKISH = ['block', 'list-item', 'flex', 'grid', 'table', 'table-cell', 'flow-root'];
+  const results = [];
+  let seen = 0;
+  for (const a of document.querySelectorAll('a[href]')) {
+    const r = a.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) continue; // hidden: not a target at all
+    seen++;
+    let block = a.parentElement;
+    while (block && !BLOCKISH.includes(getComputedStyle(block).display)) block = block.parentElement;
+    if (!block) continue;
+    // Text equality, not childless-ness: an image-only anchor in a bare
+    // figure is standalone (both sides empty), and :only-child cannot see
+    // text nodes at all.
+    if (block.textContent.trim() !== a.textContent.trim()) continue;
+    results.push({
+      label: (a.textContent.trim() || a.getAttribute('aria-label') || a.getAttribute('href')).slice(0, 40),
+      block: block.tagName.toLowerCase() + (block.className ? `.${String(block.className).trim().split(/\s+/)[0]}` : ''),
+      width: Math.round(r.width),
+      height: Math.round(r.height),
+    });
+  }
+  return { seen, results };
+};
+
 (async () => {
   const pages = findHtml('.').sort();
   // A gate that rendered no pages must not report success (`ADR-006`).
@@ -214,6 +263,8 @@ const PROBE = ({ minCoverage }) => {
 
   let fails = 0;
   let checked = 0;
+  let anchorsSeen = 0;
+  let anchorsChecked = 0;
   for (const w of WIDTHS) {
     await page.setViewportSize({ width: w, height: 900 });
     for (const rel of pages) {
@@ -241,6 +292,31 @@ const PROBE = ({ minCoverage }) => {
           console.log(`        tap target is ${f.width}x${f.height}px; the mobile contract is ${MIN_TAP}x${MIN_TAP}px minimum.`);
         }
       }
+
+      if (w === TAP_WIDTH) {
+        // Lazy images below the fold have not loaded at `load`, and an anchor
+        // wrapping one collapses to a sliver until the image arrives — a 2px
+        // reading that is a race, not a tap target (the gallery page measured
+        // both ways on back-to-back runs). Force every image in and wait, so
+        // the anchor pass measures the laid-out page. A broken image resolves
+        // through onerror, keeps its sliver, and fails honestly.
+        await page.evaluate(() => Promise.all(Array.from(document.images, (img) => {
+          img.loading = 'eager';
+          return img.complete ? null : new Promise((r) => { img.onload = img.onerror = r; });
+        })));
+        const { seen, results } = await page.evaluate(ANCHOR_PROBE);
+        anchorsSeen += seen;
+        for (const f of results) {
+          anchorsChecked++;
+          if (f.width >= MIN_TAP && f.height >= MIN_TAP) continue;
+          fails++;
+          console.log(`  FAIL  ${rel} @${w}px  <a> "${f.label}"`);
+          console.log(`        standalone link (the only text in its <${f.block}>) is ${f.width}x${f.height}px; the mobile contract is ${MIN_TAP}x${MIN_TAP}px minimum.`);
+          console.log('        A link inside a sentence is exempt (WCAG 2.5.8 inline exception). A link');
+          console.log('        that stands alone owes the full box — vertical padding on the inline');
+          console.log('        anchor grows the tap box without moving the layout around it.');
+        }
+      }
     }
   }
 
@@ -264,9 +340,18 @@ const PROBE = ({ minCoverage }) => {
     process.exit(1);
   }
 
+  // The same rule for the anchor pass: every page on this site carries links,
+  // so an empty result set is a broken walk, not a clean run.
+  if (anchorsSeen === 0) {
+    console.error('\n✗ hit-target: found no anchors anywhere in the build.');
+    console.error('  Every page carries links, so "none found" means the walk or the render');
+    console.error('  broke rather than that there is nothing to check.');
+    process.exit(1);
+  }
+
   if (fails) {
     console.error(`\n✗ ${fails} hit-target issue(s). An element that looks interactive must be clickable across its box.`);
     process.exit(1);
   }
-  console.log(`✓ Hit targets sound — ${checked} interactive element(s) across ${pages.length} pages × ${WIDTHS.join('/')}px.`);
+  console.log(`✓ Hit targets sound — ${checked} interactive SVG element(s) across ${pages.length} pages × ${WIDTHS.join('/')}px, ${anchorsChecked} standalone anchor(s) at ${TAP_WIDTH}px.`);
 })().catch(e => { console.error('hit-target error:', e.message); process.exit(1); });

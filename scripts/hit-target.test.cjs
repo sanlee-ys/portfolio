@@ -48,7 +48,14 @@ function runGate(dir) {
  * a <g> carrying the role and the tabindex, an unfilled <rect>, and a <text>
  * that opts out of pointer events. `extra` is spliced into the rect's rule,
  * which is the single line the whole bug turned on.
+ *
+ * Every fixture carries PROSE_LINK: the gate now refuses a build with no
+ * anchors at all, and an anchor inside a sentence is the one shape that is
+ * present without being asserted on — so it doubles as a standing check that
+ * the inline exemption holds on every run.
  */
+const PROSE_LINK = '<p>See <a href="#n">notes</a> in the text.</p>';
+
 const NODE_PAGE = (extraRectCss) => `<!doctype html><html><head><title>t</title><style>
   body { margin: 0; }
   svg { display: block; width: 600px; height: 300px; }
@@ -60,7 +67,7 @@ const NODE_PAGE = (extraRectCss) => `<!doctype html><html><head><title>t</title>
     <rect x="100" y="100" width="171" height="57"></rect>
     <text x="185" y="132" text-anchor="middle">alpha</text>
   </g>
-</svg></body></html>`;
+</svg>${PROSE_LINK}</body></html>`;
 
 // ---- The defect this gate was written for -------------------------------
 
@@ -107,7 +114,7 @@ test('decoration that merely INHERITS cursor:pointer does not fail', () => {
       <circle class="dot" cx="200" cy="100" r="7"></circle>
       <rect class="hit" x="120" y="20" width="160" height="160"
             role="button" tabindex="0" aria-label="column"></rect>
-    </svg></body></html>`,
+    </svg>${PROSE_LINK}</body></html>`,
   });
   const { status, out } = runGate(dir);
   assert.strictEqual(status, 0, `unfilled decoration must not fail the gate:\n${out}`);
@@ -129,7 +136,7 @@ test('a control clipped by its own SVG viewport is measured on the visible part'
     <svg id="d" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
       <rect class="hit" x="-100" y="20" width="260" height="160"
             role="button" tabindex="0" aria-label="edge column"></rect>
-    </svg></body></html>`,
+    </svg>${PROSE_LINK}</body></html>`,
   });
   const { status, out } = runGate(dir);
   assert.strictEqual(status, 0, `a clipped-but-hittable control must pass:\n${out}`);
@@ -147,7 +154,7 @@ test('a control clipped ENTIRELY out of its SVG fails rather than being skipped'
     <svg id="d" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
       <rect class="hit" x="-500" y="20" width="200" height="160"
             role="button" tabindex="0" aria-label="offscreen"></rect>
-    </svg></body></html>`,
+    </svg>${PROSE_LINK}</body></html>`,
   });
   const { status } = runGate(dir);
   assert.notStrictEqual(status, 0, 'an unreachable control must fail, not be waved through');
@@ -161,7 +168,7 @@ test('a build with no interactive SVG at all FAILS rather than passing vacuously
    * it finds no pages", one level down.
    */
   const dir = makeFixture({
-    'index.html': '<!doctype html><html><head><title>t</title></head><body><p>No figures.</p></body></html>',
+    'index.html': `<!doctype html><html><head><title>t</title></head><body><p>No figures.</p>${PROSE_LINK}</body></html>`,
   });
   const { status, out } = runGate(dir);
   assert.notStrictEqual(status, 0);
@@ -187,9 +194,120 @@ test('a fully hittable control below the 44px tap minimum FAILS at phone width',
     <svg id="d" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
       <rect class="hit" x="10" y="10" width="20" height="20"
             role="button" tabindex="0" aria-label="tiny"></rect>
-    </svg></body></html>`,
+    </svg>${PROSE_LINK}</body></html>`,
   });
   const { status, out } = runGate(dir);
   assert.notStrictEqual(status, 0, 'a 20x20 control is hittable but not tappable');
   assert.match(out, /tap target/);
+});
+
+// ---- Standalone anchors (the card-link class of miss) ---------------------
+
+/*
+ * A compliant SVG control plus one anchor that is the only text of its
+ * paragraph. `extraLinkCss` is spliced into the anchor's rule — the padding
+ * fix is the single line under test, exactly as NODE_PAGE splices the fill.
+ */
+const STANDALONE_LINK_PAGE = (extraLinkCss) => `<!doctype html><html><head><title>t</title><style>
+  body { margin: 0; }
+  svg { display: block; width: 300px; height: 120px; }
+  .hit { fill: transparent; }
+  .more a { text-decoration: none; ${extraLinkCss} }
+</style></head><body>
+<svg id="d" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+  <rect class="hit" x="10" y="10" width="60" height="60"
+        role="button" tabindex="0" aria-label="ok"></rect>
+</svg>
+<p class="more"><a href="#w">Read the writeup</a></p>
+</body></html>`;
+
+test('a standalone anchor under 44px FAILS at phone width', () => {
+  // Default type: the anchor's box is ~19px tall — the .card-link miss.
+  const dir = makeFixture({ 'index.html': STANDALONE_LINK_PAGE('') });
+  const { status, out } = runGate(dir);
+  assert.notStrictEqual(status, 0, 'a bare standalone link is a sub-44 tap target and must fail');
+  assert.match(out, /standalone link/);
+});
+
+test('the same anchor with vertical padding PASSES', () => {
+  // The .diagram-more fix: inline padding grows the box past 44 and moves
+  // no layout.
+  const dir = makeFixture({ 'index.html': STANDALONE_LINK_PAGE('padding: 15px 0;') });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, `expected a pass, got:\n${out}`);
+});
+
+test('a sub-44 anchor inside a sentence is EXEMPT', () => {
+  /*
+   * The WCAG 2.5.8 inline exception, which style.css's ToC block adopts on
+   * purpose: padding a link inside prose ruins the leading. The gate must
+   * hold that ruling, or it would fail every prose page on the site.
+   */
+  const dir = makeFixture({
+    'index.html': `<!doctype html><html><head><title>t</title><style>
+      body { margin: 0; }
+      svg { display: block; width: 300px; height: 120px; }
+      .hit { fill: transparent; }
+    </style></head><body>
+    <svg id="d" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+      <rect class="hit" x="10" y="10" width="60" height="60"
+            role="button" tabindex="0" aria-label="ok"></rect>
+    </svg>
+    <p>Read the <a href="#n">notes</a> for the full story.</p>
+    </body></html>`,
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, `an inline prose link must not fail the gate:\n${out}`);
+});
+
+test('an anchor wrapping a below-the-fold lazy image is measured LOADED', () => {
+  /*
+   * `waitUntil: 'load'` does not wait for loading="lazy" images below the
+   * fold, so an anchor wrapping one measures ~2px tall until the image
+   * arrives — a race, not a tap target. The gallery page measured both ways
+   * on back-to-back runs. The gate forces images in before the anchor pass;
+   * without that wait this fixture fails flakily.
+   */
+  const PNG_1X1 = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  const dir = makeFixture({
+    'p.png': PNG_1X1,
+    'index.html': `<!doctype html><html><head><title>t</title><style>
+      body { margin: 0; }
+      svg { display: block; width: 300px; height: 120px; }
+      .hit { fill: transparent; }
+      .tile img { display: block; width: 200px; height: auto; }
+    </style></head><body>
+    <svg id="d" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+      <rect class="hit" x="10" y="10" width="60" height="60"
+            role="button" tabindex="0" aria-label="ok"></rect>
+    </svg>
+    ${PROSE_LINK}
+    <div style="height: 3000px"></div>
+    <p class="tile"><a href="#z"><img loading="lazy" src="p.png" alt="tile"></a></p>
+    </body></html>`,
+  });
+  const { status, out } = runGate(dir);
+  assert.strictEqual(status, 0, `a loaded 200px image tile must pass:\n${out}`);
+});
+
+test('a build with no anchors at all FAILS rather than passing vacuously', () => {
+  // Same rule as the SVG guard one section up: every real page carries
+  // links, so an empty anchor walk is a broken walk.
+  const dir = makeFixture({
+    'index.html': `<!doctype html><html><head><title>t</title><style>
+      body { margin: 0; }
+      svg { display: block; width: 300px; height: 120px; }
+      .hit { fill: transparent; }
+    </style></head><body>
+    <svg id="d" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+      <rect class="hit" x="10" y="10" width="60" height="60"
+            role="button" tabindex="0" aria-label="ok"></rect>
+    </svg></body></html>`,
+  });
+  const { status, out } = runGate(dir);
+  assert.notStrictEqual(status, 0);
+  assert.match(out, /no anchors/);
 });
