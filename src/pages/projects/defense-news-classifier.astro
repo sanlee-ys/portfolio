@@ -176,40 +176,36 @@ const pwCommit = dncPower.sha.slice(0, 7);
       margin: 0 0 18px;
     }
 
-    /* ==================================================================
-       THE TWO-SLOT CAPTION GRAMMAR (ADR-013). ORIGIN PAGE: this file.
-       A later lane COPIES this block verbatim into its own page-scoped
-       <style is:inline>, with a comment naming this page and the commit
-       it copied from. It is copied and never extracted, because a
-       concurrent session owns public/assets/style.css and two lanes
-       cannot both write one stylesheet. OC-F carries the consolidation
-       for after that session merges.
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
 
-       The margin reset is load-bearing. A <figure> carries a 40px
-       browser side margin, and a 260px plate inside one then renders
-       below 1:1 at every gate width.
-       ================================================================== */
+       COPY. The origin is src/pages/projects/context-architecture.astro at
+       9d81caa, and the four rules below are that block verbatim. A shared
+       grammar is copied and never extracted: a concurrent session owns
+       public/assets/style.css for the tap-target work, and two writers on one
+       shared stylesheet cannot merge. OC-F of the redesign brief carries the
+       consolidation, for after that session merges. */
     .fig {
-      margin: 18px 0 20px;
-      padding: 0;
+      margin: 0 0 22px;
     }
     .fig figcaption {
       font-size: 0.92rem;
+      line-height: 1.55;
       margin: 8px 0 0;
     }
     .fig .fig-what {
       display: block;
       color: var(--text-secondary);
-      font-weight: 500;
     }
     .fig .fig-limit {
       display: block;
-      margin-top: 4px;
       color: var(--muted);
+      margin-top: 6px;
     }
-    /* An artifact path is one long token and the content track at 320px is
-       narrower than it. Without this the caption widens the page and the
-       mobile gate reddens. */
+
+    /* Added here, and not part of the copied block. This page is the first
+       whose caption names an artifact PATH, and a path is one unbreakable
+       token that is wider than the content track at 320px. Without this rule
+       the caption widens the page and the mobile gate reddens. */
     .fig figcaption code { overflow-wrap: anywhere; }
 
     /* dnc1-power. A PLOT: every x below is interpolated from
