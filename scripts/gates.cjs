@@ -140,9 +140,9 @@ function runSiteGate(label, script) {
 }
 
 /*
- * Ordered cheapest-first, which is also build-independent-first. The seven checks
+ * Ordered cheapest-first, which is also build-independent-first. The eight checks
  * above the line need no `dist/`, no browser and no network, and finish in
- * seconds; the nine below either walk the built site or launch a browser —
+ * seconds; the ten below either walk the built site or launch a browser —
  * contrast-check renders every page in both themes, mobile-qa renders 64
  * page-widths, hit-target hit-tests every control at two widths. A missing ADR
  * section should redden in two seconds, not after a full render pass.
@@ -188,6 +188,12 @@ const CHECKS = [
     run: () => runNodeTest('navigation-check suite', ['scripts/navigation-check.test.cjs']),
   },
   {
+    label: 'telltale evidence gate (adversarial suite)',
+    needsSite: false,
+    run: () =>
+      runNodeTest('telltale-evidence suite', ['scripts/check-telltale-evidence.test.cjs']),
+  },
+  {
     label: 'ADRs list their downstream surfaces',
     needsSite: false,
     run: runAdrLint,
@@ -207,6 +213,15 @@ const CHECKS = [
     label: 'published metrics match the classifier artifact',
     needsSite: true,
     run: () => runSiteGate('check-published-metrics', 'scripts/check-published-metrics.cjs'),
+  },
+  {
+    // needsSite on purpose. This gate reads `dist/`, and `runNodeTest` never
+    // calls `siteRootMissing()`, so a cheap-group placement would throw ENOENT
+    // on a clone that was never built and break the documented contract that
+    // the build-independent checks still run there.
+    label: 'telltale figures and frames match the generated record',
+    needsSite: true,
+    run: () => runSiteGate('check-telltale-evidence', 'scripts/check-telltale-evidence.cjs'),
   },
   {
     label: 'private-repo guard (never name/link/describe a private repo)',

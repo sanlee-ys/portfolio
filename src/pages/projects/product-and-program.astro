@@ -99,6 +99,48 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 12px;
     }
+
+    /* Capacity-gate plate (portfolio ADR-004, ADR-012). Page-scoped: the three
+       moves that made the review a measurement rather than an opinion. Same
+       geometry as the homepage .method-plate on purpose — this gate is that
+       method turned on the build capacity itself. Open pipeline, no oxide: the
+       gate returned a clear answer, and a step down on evidence is not a
+       reversal. It carries no number, so it cannot go stale. ADR-010 N/A. */
+    .gp-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 18px 0 6px;
+    }
+    .gp-plate .gp-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .gp-plate .gp-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .gp-plate .gp-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+    .gp-plate .gp-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .gp-plate marker path { fill: var(--muted); }
+    .gp-plate-caption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 12px;
+    }
   </style>
   </Fragment>
 
@@ -284,6 +326,99 @@ import SiteNav from '../../components/SiteNav.astro';
         <tr><td>Simulated program (no real cross-team coordination)</td><td>Low (honesty)</td><td>Stated plainly; the reasoning and artifacts are real, the org is not</td></tr>
       </tbody>
     </table>
+
+    <h2 id="capacity-gate">I pre-registered six axes for a capacity review, then measured that nothing wrote to them.</h2>
+    <p>
+      The same evidence gate this record applies to a model choice, applied to
+      the build capacity behind the work. On a fixed date I wrote the review
+      down: six evidence axes, a close date, and a rule that nothing changes
+      until the close. Then I let the axes decide.
+    </p>
+
+    <svg class="gp-plate" viewBox="0 0 260 72" role="img"
+         aria-label="How the capacity review was run: pre-register the evidence axes before any evidence exists, freeze every change until the close date, then rule on the record that accumulated. The gate returned a step down.">
+      <title>Pre-register the axes, freeze until the close, rule on the record.</title>
+      <defs>
+        <marker id="gp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <rect class="gp-box" x="2" y="6" width="76" height="40" rx="2" />
+      <text class="gp-title" x="40" y="24" text-anchor="middle">PRE-REGISTER</text>
+      <text class="gp-micro" x="40" y="38" text-anchor="middle">axes first</text>
+      <path class="gp-edge" d="M 78 26 L 90 26" marker-end="url(#gp-arrow)" aria-hidden="true" />
+      <rect class="gp-box" x="92" y="6" width="76" height="40" rx="2" />
+      <text class="gp-title" x="130" y="24" text-anchor="middle">FREEZE</text>
+      <text class="gp-micro" x="130" y="38" text-anchor="middle">no changes</text>
+      <path class="gp-edge" d="M 168 26 L 180 26" marker-end="url(#gp-arrow)" aria-hidden="true" />
+      <rect class="gp-box" x="182" y="6" width="76" height="40" rx="2" />
+      <text class="gp-title" x="220" y="24" text-anchor="middle">CLOSE</text>
+      <text class="gp-micro" x="220" y="38" text-anchor="middle">on the record</text>
+      <text class="gp-micro" x="130" y="64" text-anchor="middle">the gate said step down</text>
+    </svg>
+    <p class="gp-plate-caption">
+      Two design choices did all the work: the axes were written before the
+      evidence existed, and nothing changed until the close.
+    </p>
+
+    <p>
+      Those two choices are the whole method. Because the axes were written
+      first, nothing could pick its own success criterion after the fact.
+      Because every change was frozen until the close, nothing could be cut on
+      a bad week or kept on a good anecdote. The close came early, on a full
+      month of evidence, for the only reason that justifies closing early: the
+      last stretch added no new evidence on any axis.
+    </p>
+
+    <h3>The results, by axis</h3>
+    <p>
+      <strong>This section reports by evidence axis, never by lane and never by
+      name.</strong> An axis is a question. A lane is a seat, and a seat maps to
+      somebody&rsquo;s product &mdash; so reporting by lane would turn a
+      one-operator measurement into a public claim about a third party. That is
+      the difference between a measurement and an opinion with a table around
+      it.
+    </p>
+    <ul class="ledger">
+      <li><strong>One axis produced repeated, measured value.</strong> Independent review loops raised real findings; most were confirmed and fixed before merge, and the noise rate was nil. This is the axis that earned its keep.</li>
+      <li><strong>The capacity axis produced the opposite of what I expected.</strong> No friction events at all &mdash; and, going the other way, dated directives in my own operating rules telling sessions to spend the headroom rather than conserve it. Capacity was never the binding constraint.</li>
+      <li><strong>The remaining axes produced no dated unique result</strong> in a month that gave them the chance to.</li>
+    </ul>
+
+    <h3>The rulings, as principles</h3>
+    <ul class="ledger">
+      <li><strong>Capacity that was never consumed is unproven, not proven.</strong> So the top tier steps down, and the first month on the lower tier is itself the next measurement.</li>
+      <li><strong>A parked upgrade was declined</strong>, because no recorded event showed that capacity ever blocking anything.</li>
+      <li><strong>A seat is retained for demonstrated unique value.</strong> Attachment to a tier is not evidence.</li>
+    </ul>
+    {/* Owner call, still open: whether this section names figures rather than
+        only the mechanism. It ships with the mechanism and no figures. If that
+        is ever released it is three sentences and nothing else — one above
+        this block, one clause in the first ruling, one in the closing
+        paragraph. These markers are Astro comments, not HTML comments, so they
+        do not reach the published page: a note about what a page deliberately
+        withholds should not itself be published. */}
+    <p class="ex-caption">
+      The limit on this reading, at the point of the claim: one month, one
+      operator, one body of work, and no controlled comparison. It is a routing
+      decision for me. It is not a verdict on anybody&rsquo;s product.
+    </p>
+
+    <p class="tradeoff">
+      <strong>The result:</strong> the six axes were pre-registered and nothing
+      ever wrote to them. There was no friction log, no tally file, and no
+      dead-rows list, so the evidence had to be reconstructed at the end out of
+      dated records. The gate still returned a clear answer, because the answer
+      was lopsided. <strong>A closer result would have been unrecoverable.</strong>
+    </p>
+    <p>
+      The lesson: pre-registration without an instrument is half a measurement.
+      I built a gauge for this same capacity, and it does not write this log
+      today. That is the open item, and naming it is the only honest place to
+      end.
+    </p>
+    <p class="diagram-more"><a class="card-link" href="telltale.html">telltale, the instrument for the same capacity <span class="arrow">&rarr;</span></a></p>
 
     <h2>What it demonstrates</h2>
     <p>
