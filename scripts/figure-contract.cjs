@@ -202,8 +202,17 @@ function svgsIn(region) {
  *
  * Quoted attribute values are skipped, so `<a title="a>b">` closes at the last
  * `>` and not the one inside the title.
+ *
+ * A comment ends at `-->` and not at the first `>` inside it. Every plate on
+ * this site is preceded by a comment that records its design rationale, and
+ * those comments hold `>` characters. Without this branch the tail of such a
+ * comment reads as page text.
  */
 function closeOfTag(markup, start) {
+  if (markup.startsWith('<!--', start)) {
+    const end = markup.indexOf('-->', start + 4);
+    return end === -1 ? -1 : end + 2;
+  }
   let quote = null;
   for (let i = start + 1; i < markup.length; i += 1) {
     const ch = markup[i];

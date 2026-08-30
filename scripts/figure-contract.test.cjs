@@ -355,6 +355,20 @@ test('a > inside an attribute value does not end a tag', () => {
   assert.strictEqual(textOf("a<b title='x>y'>c", ' '), 'a c');
 });
 
+test('a comment ends at --> and its text does not leak into the page text', () => {
+  /*
+   * Every plate on this site is preceded by a comment recording its design
+   * rationale, and those comments contain `>`. A reader that ended a comment at
+   * the first `>` would put the rest of the rationale into the string the digit
+   * rule tests, and several of those comments contain digits.
+   */
+  assert.strictEqual(textOf('a<!-- ADR-004 Decision 5 -> keep -->b', ''), 'ab');
+  assert.strictEqual(
+    slotText('<span class="fig-limit"><!-- n=54 -> table -->A limit.</span>', 'fig-limit'),
+    'A limit.'
+  );
+});
+
 test('an unclosed tag is read as text rather than swallowing the rest', () => {
   assert.strictEqual(textOf('keep me <span class="x', ''), 'keep me <span class="x');
 });
