@@ -36,8 +36,8 @@
  *
  * Rule 3 runs at 320, 360, 390 and 430, and not at 390 alone. A box drawn in
  * SVG user space shrinks with the viewport. The system map's nodes rendered
- * 46.4px at 390px and 36.8px at 320px from one 60-unit declaration, so the
- * single-width gate reported the passing end of a failing range.
+ * 46.4px at 390px and 36.8px at 320px, from one 60-unit declaration. The
+ * single-width gate therefore reported the passing end of a failing range.
  *
  * Separately, at those same phone widths, every STANDALONE anchor must present
  * the MIN_TAP box. Standalone = the anchor is the only text of its block

@@ -101,8 +101,8 @@
   // it. Two pixels of frame therefore put every floor solved here under its own
   // target. At 320px the plate reads 272px and the drawing gets 270px, so the
   // 13px edge floor painted 12.89px. That is sub-pixel on the type. On the tap
-  // box it is the difference between 44.0px and 43.7px, and only the gate's own
-  // rounding hid that fail.
+  // box it is the difference between 44.0px and 43.7px. The gate rounds its own
+  // measurement to whole pixels, and that alone hid the fail.
   //
   // This function reads the width alone. It does not take the smaller of the
   // two axes. `preserveAspectRatio` defaults to `meet`, so the true scale is
@@ -136,7 +136,7 @@
     }
     // The tap box rounds UP. The type does not. Half a rendered pixel of type
     // is invisible. Half a rendered pixel of tap box decides whether the box
-    // clears 44, and a round to nearest can land under the floor it solved for.
+    // clears 44. A round to nearest can land under the floor it solved for.
     // The result stays quantised to 0.1, so the re-render guard is as stable
     // here as it is for the type.
     function solveUp(base, floorPx) {

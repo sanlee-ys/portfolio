@@ -205,7 +205,7 @@ test('a fully hittable control below the 44px tap minimum FAILS at phone width',
 
 /*
  * The system map's shape, reduced to one rect. The SVG takes a fraction of the
- * viewport over a viewBox, so every box inside it is a USER-SPACE unit and it
+ * viewport over a viewBox. Every box inside it is a USER-SPACE unit, so it
  * shrinks with the screen. `unitH` is the node's declared height in those
  * units. It is the single number the real defect turned on.
  *
@@ -338,8 +338,8 @@ test('an anchor wrapping a below-the-fold lazy image is measured LOADED', () => 
 
 test('the success line names every width the gate measured', () => {
   /*
-   * A gate that stops measuring a width is this suite's own subject, one level
-   * up. Both probes pass over a width nobody renders, and the run stays green.
+   * A gate that drops a width is this suite's own subject, one level up. Both
+   * probes pass over a width nobody renders, and the run stays green.
    * The reported set is the only evidence a reader has, so this test pins it.
    * A change that drops 320 from either list fails here. It does not arrive as
    * a faster gate.
