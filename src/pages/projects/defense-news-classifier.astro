@@ -9,7 +9,7 @@ import figures from '../../data/figures.json';
    never types a coordinate, so the figure cannot drift from the measurement.
    `dncPower.artifact` and `dncPower.sha` also fill the caption, so the
    provenance line cannot disagree with the geometry above it. */
-const dncPower = figures.plots['dnc1-power'];
+const dncPower = figures.plots?.['dnc1-power'];
 if (!dncPower) {
   throw new Error(
     'defense-news-classifier: src/data/figures.json holds no "dnc1-power" plot. '
@@ -525,7 +525,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
         Across 162 grounded classifications, grounding fixed a domain call
         <strong>zero</strong> times and broke four.</p>
       <p>So I retired it
-        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/012-retire-bm25-grounding.md">ADR-012</a>).
+        (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/012-retire-bm25-grounding.md">ADR-012</a>).
         It came out of the shipped path and out of the CI gate. The retrieval
         code, the corpus, and the measurement scripts stay in the repo, dormant
         and reproducible. The verdict is that BM25 does not justify itself.</p>
@@ -648,7 +648,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
         stayed in the record: a new field in the schema flipped one benign
         snippet into a model refusal. The measurement apparatus changed the
         behavior it measured. The full verdict is in
-        <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/013-decline-tiered-routing.md">ADR-013</a>.
+        <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/013-decline-tiered-routing.md">ADR-013</a>.
         A separate project measured
         <a href="faithfulness-judge.html">how reliable an LLM judge is</a>, and
         it landed on the same verdict. Three independent measurements now state

@@ -1,6 +1,7 @@
 {
   "note": "What scripts/figure-contract.cjs already permits. Every entry is a rule this site breaks today, with the reason it breaks it. The gate binds new work. It never asks a lane to delete a figure that already ships, because a gate that forces a deletion is a substance deletion with a build failure in front of it (ADR-004, ADR-007, ADR-013). Add an entry only with an ADR line.",
   "seededAt": "2026-08-30",
+  "amended": "2026-08-30, by the integrator pass. The `.tt-figure` entry on projects/telltale.html was removed. Its recorded reason read `Two frame figures`, and the page carries seven. Re-measured with `--seed`: all seven now declare `data-fig=\"frame\"`, so R-N never consults the entry and the exemption granted nothing. The gate's anti-rot check covers `digitPlates` only, so a stale `undeclaredFigures` entry cannot redden the build. That gap is recorded for the owner and is not closed here.",
   "seededFrom": "a fresh `npm run build`, read with `node scripts/figure-contract.cjs --seed`",
   "measured": "30 SVG text nodes carry a raw digit, across 9 pages. One is a false positive in the source only: `.lab-topo` on netops-lab reads `wipe &#8594; cfg`, and the digits belong to the entity. The gate decodes entities and walks dist/, so it records 29 values across 8 pages.",
   "digitPlates": [
@@ -79,11 +80,6 @@
       "page": "lab/gallery.html",
       "figure": ".lb-figure",
       "reason": "The lightbox frame on an archived learning artifact. ADR-004, as amended 2026-08-20, rules the lab pages archived. No lane restyles, promotes, or retires them."
-    },
-    {
-      "page": "projects/telltale.html",
-      "figure": ".tt-figure",
-      "reason": "Two frame figures. The text inside each is interpolated from `src/data/telltale-evidence.json`, and `check-telltale-evidence.cjs` already compares it to the record byte for byte."
     },
     {
       "page": "projects/the-system.html",

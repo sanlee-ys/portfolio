@@ -12,6 +12,7 @@
  */
 const test = require('node:test');
 const assert = require('node:assert');
+const fs = require('node:fs');
 
 const {
   figuresIn,
@@ -22,7 +23,9 @@ const {
   verify,
   ageWarning,
   REQUIRED_PAGE,
+  EVIDENCE_PATH,
 } = require('./check-telltale-evidence.cjs');
+const { assertBoundaryLines } = require('./pull-telltale-evidence.cjs');
 
 // A minimal well-formed record. Each test copies it and breaks one thing.
 function goodEvidence() {
@@ -250,6 +253,73 @@ test('a frame with no lines fails', () => {
   const problems = validateEvidence(evidence);
   assert.strictEqual(problems.length, 1);
   assert.match(problems[0], /carries no `lines`/);
+});
+
+// --- the publication boundary, re-applied to the record ---------------------
+
+/*
+ * These four are the record-side half of the boundary. The puller applies the
+ * same rules when it cuts a window, but the puller runs by hand and this gate
+ * runs on every build. Without these, a hand edit of telltale-evidence.json and
+ * a widened window committed without re-running the puller both ship green.
+ * One case per rule class, because a denylist that stops matching one class
+ * still reports clean.
+ */
+
+test('a frame line carrying a sandbox posture fails at the record', () => {
+  // GT11: the posture row sits directly under every council seat row, which is
+  // why no council seat row is admitted at any line range.
+  const evidence = goodEvidence();
+  evidence.frames.council.lines = [
+    'SEAT  CTX',
+    '[   ro:tools  tokens  |  ro:requested  |  unsandboxed  |  gated',
+  ];
+  const problems = validateEvidence(evidence);
+  assert.strictEqual(problems.length, 1);
+  assert.match(problems[0], /line 2 carries a sandbox posture/);
+  assert.match(problems[0], /Never hand-edit a frame/);
+});
+
+test('a frame line carrying a dollar figure fails at the record', () => {
+  const evidence = goodEvidence();
+  evidence.frames.council.lines = ['SEAT  COST', 'a     $2.41'];
+  const problems = validateEvidence(evidence);
+  assert.strictEqual(problems.length, 1);
+  assert.match(problems[0], /line 2 carries a dollar figure/);
+});
+
+test('a frame line carrying an adoption rate fails at the record', () => {
+  const evidence = goodEvidence();
+  evidence.frames.council.lines = ['STANDINGS', '3 of 5 adopted'];
+  const problems = validateEvidence(evidence);
+  assert.strictEqual(problems.length, 1);
+  assert.match(problems[0], /line 2 carries an adoption rate/);
+});
+
+test('a frame line carrying a machine identity fails at the record', () => {
+  const evidence = goodEvidence();
+  evidence.frames.council.lines = ['PATH', '  /home/someone/telltale'];
+  const problems = validateEvidence(evidence);
+  assert.strictEqual(problems.length, 1);
+  assert.match(problems[0], /line 2 carries a path outside the telltale repository/);
+});
+
+test('the shipped frames pass the boundary rules', () => {
+  /*
+   * The record this site actually publishes. A rule that only ever runs against
+   * a fixture proves the fixture, not the site. This reads the real file, so a
+   * later hand edit reddens `node --test` before it reddens the site gate.
+   */
+  const evidence = JSON.parse(fs.readFileSync(EVIDENCE_PATH, 'utf8'));
+  const frames = evidence.frames || {};
+  assert.ok(Object.keys(frames).length > 0, 'the record ships no frames, so this test is inert');
+  for (const [key, frame] of Object.entries(frames)) {
+    assert.deepStrictEqual(
+      assertBoundaryLines(frame.lines),
+      [],
+      `the shipped frame "${key}" breaks the publication boundary`
+    );
+  }
 });
 
 // --- the age report is a warning, never a failure ---------------------------

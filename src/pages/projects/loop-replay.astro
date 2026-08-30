@@ -312,9 +312,11 @@ import SiteNav from '../../components/SiteNav.astro';
     .honest-callout strong { color: var(--series-c); }
 
     /* ----- The figure contract's two caption slots (ADR-013) -----
-       ORIGIN COPY. No page shipped a data-fig caption before this one, so
-       there was nothing to copy: a later lane copies this block verbatim and
-       names loop-replay.astro and its commit in the comment above its copy.
+       ORIGIN: src/pages/projects/context-architecture.astro, at commit
+       9d81caa (pull request #247). That page holds the origin block and it
+       merged first. This page branched before the origin merged, so the
+       declarations below are a page-local variant of the origin grammar and
+       not a byte copy. The third paragraph records why the tokens differ.
 
        Page-scoped rather than assets/style.css because a concurrent session
        owns that file for the tap-target work, and two writers on one
@@ -606,7 +608,7 @@ import SiteNav from '../../components/SiteNav.astro';
       JSONL</a>: a <code>run_metadata</code> line, one <code>iteration</code>
       line per step, and a trailing <code>run_summary</code>. This page ships
       the run log as a plain JS string
-      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/projects/data/loop-replay-real.js"><code>projects/data/loop-replay-real.js</code></a>).
+      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/public/projects/data/loop-replay-real.js"><code>projects/data/loop-replay-real.js</code></a>).
       It does not fetch a <code>.jsonl</code> file. The page renders the same
       way from disk and from GitHub Pages. A <code>fetch()</code> of a local
       file hits browser CORS restrictions that a plain
@@ -615,7 +617,7 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <p>
       Rung 2&rsquo;s run ships the same way in a second file
-      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/projects/data/loop-replay-run2-real.js"><code>loop-replay-run2-real.js</code></a>).
+      (<a href="https://github.com/sanlee-ys/portfolio/blob/main/public/projects/data/loop-replay-run2-real.js"><code>loop-replay-run2-real.js</code></a>).
       The classifier repo gitignores its source log, so the embed here is the
       published record. Each run carries its own dry-run flag, so the page
       cannot show a mock without its warning banner.
@@ -635,7 +637,7 @@ import SiteNav from '../../components/SiteNav.astro';
       replay through this player&rsquo;s chart would flatten the structure the
       log exists to keep. Its measured result lives in the classifier repo
       (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/evals/l4_eval.txt"><code>evals/l4_eval.txt</code></a>,
-      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/020-l4-multi-agent-pipeline.md">ADR-020</a>).
+      <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/020-l4-multi-agent-pipeline.md">ADR-020</a>).
       If it gets a viewer, that viewer is a separate page.
     </p>
 

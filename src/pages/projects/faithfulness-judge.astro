@@ -8,7 +8,7 @@ import figures from '../../data/figures.json';
    types no coordinate and no count, so the marks cannot drift from the
    measurement. `discordant.artifact` and `discordant.sha` also fill the caption,
    so the provenance line cannot disagree with the geometry above it. */
-const discordant = figures.plots['fj2-discordant'];
+const discordant = figures.plots?.['fj2-discordant'];
 if (!discordant) {
   throw new Error(
     'faithfulness-judge: src/data/figures.json holds no "fj2-discordant" plot. '
@@ -32,6 +32,19 @@ const dpLosses = dpValue('cheap right, premium wrong');
    two. The rounding happens here rather than in the caption text, so the
    published figure is derived from the artifact and never typed. */
 const dpP = dpValue('McNemar exact p').toFixed(2);
+/* One mark per discordant pair is the whole argument of fj2, and the mark list
+   and the count come from two separate fields of one record. Nothing else ties
+   them together. A record whose geometry and whose values disagree would
+   publish a wrong count as a row length, and no gate reads an SVG rect. So
+   check the invariant here and fail the build. */
+if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
+  throw new Error(
+    'faithfulness-judge: the "fj2-discordant" geometry and its values disagree. '
+    + `winsX holds ${dp.winsX.length} marks against a count of ${dpWins}. `
+    + `lossesX holds ${dp.lossesX.length} marks against a count of ${dpLosses}. `
+    + 'Re-run: node scripts/build-plots.cjs --repo=<path to faithfulness-judge>'
+  );
+}
 ---
 <Base
   title="Evaluating an LLM Faithfulness Judge · San Lee"
@@ -441,7 +454,7 @@ const dpP = dpValue('McNemar exact p').toFixed(2);
     </p>
     <p>
       Count only the corrections on claims that neither judge got wrong, and the
-      figure is 0.752, flat. The audit reached one claim that both judges
+      Opus figure is 0.752, flat. The audit reached one claim that both judges
       failed. The removal of that claim lifts agreement arithmetically. I
       pre-registered the check, and
       <a href="https://github.com/sanlee-ys/faithfulness-judge/blob/main/decisions/002-solid-tier-call.md#phase-2-result-2026-08-02">the record publishes it both ways</a>.
@@ -455,7 +468,7 @@ const dpP = dpValue('McNemar exact p').toFixed(2);
          a cell sized by a count would publish that count as a width. -->
     <figure class="fj1-nested fig" data-fig="plate">
       <svg class="fj1-plate fj-plate" viewBox="0 0 260 132" role="img"
-           aria-label="The unsupported class holds two cells. One cell is fabrication, where both tiers are identical. The other cell is hedged, where the whole tier gap sits. Every disagreeing pair sits in the hedged cell.">
+           aria-label="The unsupported class holds two cells. One cell is fabrication, where both tiers are identical. The other cell is hedged, where the whole tier gap sits. Every recall disagreement sits in the hedged cell.">
         <title>The whole tier gap sits in the hedged cell. On fabrication the two tiers are identical.</title>
 
         <text class="fj-lane" x="4" y="12">THE UNSUPPORTED CLASS</text>
@@ -469,7 +482,7 @@ const dpP = dpValue('McNemar exact p').toFixed(2);
         <rect class="fj1-soft" x="14" y="76" width="232" height="44" rx="2" />
         <text class="fj-title" x="24" y="94">HEDGED</text>
         <text class="fj-state" x="236" y="94" text-anchor="end">THE WHOLE GAP</text>
-        <text class="fj-micro" x="24" y="110">every disagreeing pair sits here</text>
+        <text class="fj-micro" x="24" y="110">every recall disagreement sits here</text>
       </svg>
       <figcaption>
         <span class="fig-what">Unsupported recall is <strong>97.9% versus

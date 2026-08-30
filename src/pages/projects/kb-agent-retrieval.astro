@@ -9,7 +9,7 @@ import figures from '../../data/figures.json';
    types no coordinate and no count, so a mark cannot drift from the
    measurement. `quantum.artifact` and `quantum.sha` also fill the caption, so
    the provenance line cannot disagree with the geometry above it. */
-const quantum = figures.plots['kb3-quantum'];
+const quantum = figures.plots?.['kb3-quantum'];
 if (!quantum) {
   throw new Error(
     'kb-agent-retrieval: src/data/figures.json holds no "kb3-quantum" plot. '
