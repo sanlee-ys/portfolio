@@ -31,6 +31,18 @@
  * HOW A FRAME OPTS IN. The `data-tt-frame` key names the entry in `frames`:
  *     <pre class="tt-frame" data-tt-frame="council" tabindex="0">...</pre>
  *
+ * THE TWO MARKER TYPES CARRY DIFFERENT WEIGHT, AND THAT IS DELIBERATE. A figure
+ * is typed into the page by hand, so the equality check below is what stops a
+ * mistyped count from shipping. A frame is interpolated from the record by the
+ * page, so page-versus-record drift is impossible by construction rather than
+ * detected after the fact — the stronger guarantee, and the right one for 120
+ * columns of terminal output where one retyped space is invisible to a reader
+ * and fatal to the alignment. The frame assertions below therefore earn their
+ * keep on what is left: that every key on the page resolves to a stored frame,
+ * and that every stored line is pure ASCII. Do not read the frame equality
+ * check as protection against a hand edit of the page; there is nothing there
+ * to hand-edit.
+ *
  * DO NOT USE `data-metric` FOR THESE FIGURES. That key space belongs to the
  * classifier artifact, and `check-published-metrics.cjs` exits 1 on a key it
  * does not know.

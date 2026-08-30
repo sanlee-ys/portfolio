@@ -2,10 +2,23 @@
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 import evidence from '../../data/telltale-evidence.json';
-// Only the provenance line reads the record at render time. Every FIGURE below
-// is typed into the markup and compared against this same file by
-// scripts/check-telltale-evidence.cjs — interpolating them here instead would
-// make the gate compare the record to itself, which is not a check.
+/*
+ * The record is read at render time in two places, and the two are protected
+ * differently on purpose.
+ *
+ * FIGURES are typed into the markup as literals. `check-telltale-evidence.cjs`
+ * then compares the rendered text to this file, so the gate does real work: a
+ * mistyped count fails the build. Interpolating a figure here would make the
+ * gate compare the record to itself, which is not a check.
+ *
+ * FRAMES are interpolated from `evidence.frames`, so page-versus-record drift
+ * is impossible by construction rather than merely detected. That is the
+ * stronger guarantee, and it is the right one here: a frame is 120 columns of
+ * terminal output where a single retyped space is invisible to a reader and
+ * fatal to the alignment. The gate's frame half therefore checks what is left
+ * to check — that every `data-tt-frame` key on the page resolves to a stored
+ * frame, and that every stored line is pure ASCII.
+ */
 const src = evidence.source;
 ---
 <Base

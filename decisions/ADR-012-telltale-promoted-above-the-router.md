@@ -96,8 +96,19 @@ at 320px, and no gate fails on it.
 
 ## Consequences
 
-- The homepage skip link now lands on the flagship block rather than on the
-  router. The target is still work content, so the link keeps its meaning.
+- The homepage skip link lands on the flagship block rather than on the router.
+  The target is still work content, so the link keeps its meaning.
+- The two halves ship as two changes. The page, the capacity-gate section, the
+  generator, both checks and this record land first; the homepage block lands
+  after, because it links to a page that must exist before the link gate runs.
+  This record states the decision, not the state of `index.astro` on any given
+  day.
+- A figure and a frame are protected differently, and the difference is
+  intentional. A figure is typed into the page by hand and the gate compares it
+  to the record, so a mistyped count fails the build. A frame is interpolated
+  from the record, so drift is impossible by construction rather than detected;
+  that is the stronger guarantee for 120 columns of terminal output, where one
+  retyped space is invisible to a reader and fatal to the alignment.
 - The generator runs by hand and stays outside `npm run qa`, for the same
   reason `og-cover.cjs` does. It writes a source asset and it reads another
   repository, and a gate that reaches outside this repo reddens for reasons
