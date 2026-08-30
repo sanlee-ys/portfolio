@@ -131,6 +131,30 @@
     });
   });
 
+  /*
+   * A POINTER LINK FROM ELSEWHERE ON THE PAGE MUST NOT LAND ON A HIDDEN FRAME.
+   *
+   * Sections above the reader carry ordinary anchors such as
+   * `<a href="#frame-usage">`. With the enhancement on, that figure is
+   * `display: none` unless it is the current one, and an element with no box is
+   * a destination the browser cannot scroll to. Worse, when the fragment is
+   * ALREADY `#frame-usage` the click changes nothing, no `hashchange` fires,
+   * and the link is simply dead.
+   *
+   * So select the frame first, synchronously, and then let the browser do the
+   * navigation itself. That is ADR-010: an ordinary `<a href="#id">` gives a
+   * history entry, a linkable hash, and reduced-motion-aware scrolling for
+   * free, and the reader asked for this jump.
+   */
+  document.addEventListener('click', function (event) {
+    var el = event.target;
+    if (!el || typeof el.closest !== 'function') return;
+    var link = el.closest('a[href^="#frame-"]');
+    if (!link || link.closest('.tt-reader-rail')) return;
+    var at = indexOfHash(link.getAttribute('href'));
+    if (at !== -1) show(at, false);
+  });
+
   prev.addEventListener('click', function () {
     show(index - 1, true);
   });
