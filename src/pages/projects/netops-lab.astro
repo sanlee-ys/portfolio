@@ -4,7 +4,7 @@ import SiteNav from '../../components/SiteNav.astro';
 ---
 <Base
   title="Zero-Touch Network Device Provisioning Lab · San Lee"
-  description="An end-to-end network automation lab that takes a factory-blank MikroTik device to a verified configuration after one power cycle."
+  description="An end-to-end network automation lab takes a factory-blank MikroTik device to a checked configuration after one power cycle."
   canonical="https://sanlee.me/projects/netops-lab.html"
   ogType="article"
   ogImage="/assets/og-netops-lab.png"
@@ -91,6 +91,136 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.92rem;
       margin: 0 0 6px;
     }
+
+    /* The two-slot figure caption (ADR-013). Page-scoped, and copied
+       rather than extracted: a concurrent session owns
+       public/assets/style.css, and two writers on one shared file cannot
+       merge. OC-F carries the consolidation for later.
+       ORIGIN: this page. At 9f4e070, the commit this work branched from,
+       no page carried a .fig block, so this is the first copy. A later
+       lane copies this block and names this page as its origin.
+       .fig-what is the claim voice (--text-secondary, per the rule at the
+       top of style.css). .fig-limit is the note voice (--muted), the same
+       token .lab-topo-caption already passes the contrast gate with. */
+    .fig {
+      margin: 18px 0 6px;
+      min-width: 0;
+    }
+    .fig svg {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+    }
+    .fig figcaption { margin: 8px 0 0; }
+    .fig .fig-what,
+    .fig .fig-limit {
+      display: block;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    .fig .fig-what { color: var(--text-secondary); }
+    .fig .fig-limit {
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* The three new figures. Prefixes nl1-, nl2- and nl3- keep every
+       marker id and class unique against the lt- prefix above, because a
+       duplicate marker id repaints the wrong arrow head and no gate sees
+       it. Two hues only: --accent marks the one side path that was open,
+       and the one node no script can enter. --accent-warm means a
+       reversal on this site, and nothing on this page is a reversal, so
+       it does not appear here either (same rule as .lab-topo).
+       Every state is dual-encoded by a word and a shape, because
+       contrast-check.cjs exempts SVG text and no gate reads a plate.
+       At max-width 260 the viewBox units are CSS px 1:1 down to 320px. */
+    .nl1-doors .nl1-box,
+    .nl2-hostkey .nl2-row,
+    .nl3-devmode .nl3-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .nl1-doors .nl1-name,
+    .nl2-hostkey .nl2-state,
+    .nl3-devmode .nl3-step {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+    }
+    .nl1-doors .nl1-disp,
+    .nl2-hostkey .nl2-verdict,
+    .nl3-devmode .nl3-sub {
+      fill: var(--text-secondary);
+      font-family: var(--font);
+      font-size: 10px;
+    }
+    .nl1-doors .nl1-group,
+    .nl2-hostkey .nl2-kicker {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .nl1-doors .nl1-id,
+    .nl3-devmode .nl3-id {
+      fill: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .nl1-doors .nl1-edge,
+    .nl3-devmode .nl3-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* A closed side path stops at a bar and never reaches the device. The
+       bar is the shape half of the dual encoding; the disposition word
+       under the name is the word half. */
+    .nl1-doors .nl1-stop {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    /* The open path, and the hand node. Accent, a filled mark, and an
+       uppercase word, exactly as .lt-hand / .lt-hand-mark /
+       .lt-hand-label already encode the one hand in .lab-topo. */
+    .nl1-doors .nl1-open,
+    .nl3-devmode .nl3-hand-box {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+    }
+    .nl1-doors .nl1-open-mark,
+    .nl3-devmode .nl3-hand-mark { fill: var(--accent); stroke: none; }
+    .nl1-doors .nl1-open-label,
+    .nl2-hostkey .nl2-mark-label,
+    .nl3-devmode .nl3-hand-label {
+      fill: var(--accent);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .nl2-hostkey .nl2-dot {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1;
+    }
+    .nl2-hostkey .nl2-row-marked {
+      fill: var(--bg);
+      stroke: var(--accent);
+      stroke-width: 1.5;
+    }
+    .nl2-hostkey .nl2-dot-marked { fill: var(--accent); stroke: none; }
+    .nl1-doors marker path { fill: var(--muted); }
+    .nl1-doors marker path.nl1-head-open { fill: var(--accent); }
+    .nl3-devmode marker path { fill: var(--muted); }
   </style>
   </Fragment>
 
@@ -104,9 +234,9 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <p class="lead">
       This is a physical lab: one MikroTik router, one Raspberry Pi, on a desk.
-      The goal was a reliable wipe-to-provisioned cycle &mdash; power on a blank
-      device, touch nothing, and have it come up fully configured. That cycle
-      is the apparatus for a later experiment: an agent severing its own
+      The goal was a reliable wipe-to-provisioned cycle. Power on a blank
+      device, touch nothing, and it comes up fully configured. That cycle
+      is the apparatus for a later experiment: an agent that severs its own
       management access. Without a cheap way back, every failed run is a
       manual rebuild.
     </p>
@@ -129,11 +259,11 @@ import SiteNav from '../../components/SiteNav.astro';
       serial adapter, no reset-button timing.
     </p>
     <p>
-      Since then the cycle has shed its last hand
+      Since then the cycle shed its last hand
       (<a href="https://github.com/sanlee-ys/netops-lab/blob/main/decisions/008-unattended-wipe-cycle.md">decision 008</a>,
-      2026-08-03): a repeat cycle issues that same reboot over SSH, so a routine
+      2026-08-03). A repeat cycle issues that same reboot over SSH, so a routine
       wipe is one command with no physical step at all. The power pull survives
-      in exactly two places &mdash; a factory-blank board&rsquo;s first boot, and a router
+      in exactly two places: a factory-blank board&rsquo;s first boot, and a router
       that is already unreachable over its management path.
     </p>
 
@@ -143,8 +273,8 @@ import SiteNav from '../../components/SiteNav.astro';
          power is the only hand in the apparatus. No 1–5 numbering here —
          sequence stays on ol.cycle (ADR-004 Decision 5 floor). -->
     <svg class="lab-topo" viewBox="0 0 260 150" role="img"
-         aria-label="Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step, needed on a factory-blank first boot, is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.">
-      <title>Wipe-to-provision lab: Raspberry Pi Netinstall host linked to the router over an isolated Ethernet path for BOOTP and TFTP; the only human step, needed on a factory-blank first boot, is power-cycling the router; the router’s final re-arm step closes the loop so the next wipe can start.</title>
+         aria-label="Wipe-to-provision lab. The Raspberry Pi Netinstall host links to the router over an isolated Ethernet path for BOOTP and TFTP. The only human step is to power-cycle the router on a factory-blank first boot. The router’s final re-arm step closes the loop so the next wipe can start.">
+      <title>Wipe-to-provision lab. The Raspberry Pi Netinstall host links to the router over an isolated Ethernet path for BOOTP and TFTP. The only human step is to power-cycle the router on a factory-blank first boot. The router’s final re-arm step closes the loop so the next wipe can start.</title>
       <defs>
         <marker id="lt-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto">
@@ -197,16 +327,16 @@ import SiteNav from '../../components/SiteNav.astro';
     </svg>
     <p class="lab-topo-caption">
       Power is the only hand in the loop, and only on a factory-blank first
-      boot. Netinstall, the blank-router offer, OS and default config, and
-      re-arm are automated; re-arm is the return edge that makes the next wipe
-      start without rebuilding the host. On repeat cycles even the hand goes
-      away: the reboot is issued over SSH.
+      boot. Netinstall, the blank-router offer, the OS and default config, and
+      the re-arm all run automatically. Re-arm is the return edge that starts
+      the next wipe with no rebuild of the host. On repeat cycles even the hand
+      is not needed: a repeat cycle issues the reboot over SSH.
     </p>
 
     <ol class="cycle" aria-label="One wipe-to-provisioned cycle">
       <li>
         <p class="cycle-step"><span class="cycle-num">1</span>Start Netinstall on the Pi</p>
-        <p class="cycle-note">It carries its own BOOTP and TFTP server, so nothing else has to be running.</p>
+        <p class="cycle-note">It carries its own BOOTP and TFTP server, so nothing else has to run.</p>
       </li>
       <li data-actor="hand">
         <p class="cycle-step"><span class="cycle-num">2</span>Pull the power, plug it back in<span class="cycle-actor">by hand</span></p>
@@ -217,18 +347,18 @@ import SiteNav from '../../components/SiteNav.astro';
         <p class="cycle-note">It tries Ethernet once on boot, then falls through to its own flash if nothing answers.</p>
       </li>
       <li>
-        <p class="cycle-step"><span class="cycle-num">4</span>Fresh OS, then our default configuration</p>
-        <p class="cycle-note">A management address, a firewall, and an SSH key it has never seen before.</p>
+        <p class="cycle-step"><span class="cycle-num">4</span>Fresh OS, then my default configuration</p>
+        <p class="cycle-note">A management address, a firewall, and an SSH key that it never saw before.</p>
       </li>
       <li>
         <p class="cycle-step"><span class="cycle-num">5</span>It re-arms itself for the next run</p>
-        <p class="cycle-note">The last statement in the config script, deliberately: if it is refused, everything else has already applied.</p>
+        <p class="cycle-note">The last statement in the config script, deliberately: if the router refuses it, everything else already applied.</p>
       </li>
     </ol>
     <p class="cycle-close">
-      On a factory-blank first boot, exactly one of the five needs a person:
-      pulling the power and plugging it back in. On every cycle after that,
-      none of them do &mdash; the reboot goes over SSH and the whole loop is one
+      On a factory-blank first boot, exactly one of the five needs a person.
+      That person pulls the power and plugs it back in. On every cycle after
+      that, none of them do: the reboot goes over SSH and the whole loop is one
       command.
     </p>
     <p>
@@ -242,10 +372,10 @@ import SiteNav from '../../components/SiteNav.astro';
     <h2 id="the-finding-the-barriers-were-on-the-host-not">The finding: the barriers were on the host, not the device</h2>
     <p>
       After a fresh install, RouterOS leaves the admin account with a blank
-      password and demands you change it interactively before doing anything.
-      That looks like it kills unattended provisioning outright, and I had
-      already started designing around it &mdash; which would have meant putting
-      a credential into a public repository or building machinery to inject one
+      password. It demands that you change the password interactively before
+      you do anything. That looks like it makes unattended provisioning
+      impossible, and I already began the design around it. That design would
+      need a credential in a public repository, or machinery that injects one
       at provision time.
     </p>
 
@@ -266,112 +396,263 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <p>
       The host-key prompt is not incidental, and it does not go away. Netinstall
-      regenerates the router&rsquo;s SSH host keys on every cycle, so the
-      device&rsquo;s identity legitimately changes every single time by design.
-      The lazy fix is to disable host-key checking, which throws away a real
-      protection to silence a prompt. What it actually wants is a
-      <em>separate</em> known-hosts file for the lab, so a provisioning script
-      can discard one file per cycle without touching anything else, and
-      still refuse a <em>changed</em> key mid-cycle &mdash; which is the case
-      that would genuinely mean something is wrong.
+      regenerates the router&rsquo;s SSH host keys on every cycle. The
+      device&rsquo;s identity therefore changes every single time, legitimately
+      and by design.
     </p>
     <p>
+      The lazy fix is to disable host-key checking. That removes a real
+      protection to silence a prompt. What the lab actually wants is a
+      <em>separate</em> known-hosts file, so a provisioning script discards one
+      file per cycle and touches nothing else. It still refuses a
+      <em>changed</em> key mid-cycle, which is the case that would genuinely
+      mean something is wrong.
+    </p>
+
+    <!-- Three states of one host key, with the discriminating case marked.
+         The plate carries the set. The argument above it stays as prose: a
+         disabled host-key check removes a real protection to silence a
+         prompt. Accent, a filled mark, and the word REFUSE dual-encode the
+         marked row, because contrast-check.cjs exempts SVG text and no gate
+         reads a plate. No digit here, so the counts stay in the prose. -->
+    <figure class="fig" data-fig="plate">
+      <svg class="nl2-hostkey" viewBox="0 0 260 118" role="img"
+           aria-label="Three states of the router SSH host key. A new key after a wipe is expected. The same key is known. A key that changed mid-cycle is refused.">
+        <title>Three states of the router SSH host key. A new key after a wipe is expected. The same key is known. A key that changed mid-cycle is refused.</title>
+        <text class="nl2-kicker" x="2" y="10">Host key</text>
+
+        <rect class="nl2-row" x="2" y="18" width="256" height="28" rx="2" />
+        <circle class="nl2-dot" cx="18" cy="32" r="3.5" />
+        <text class="nl2-state" x="32" y="36">a new key after a wipe</text>
+        <text class="nl2-verdict" x="250" y="36" text-anchor="end">expected</text>
+
+        <rect class="nl2-row" x="2" y="50" width="256" height="28" rx="2" />
+        <circle class="nl2-dot" cx="18" cy="64" r="3.5" />
+        <text class="nl2-state" x="32" y="68">the same key</text>
+        <text class="nl2-verdict" x="250" y="68" text-anchor="end">known</text>
+
+        <rect class="nl2-row-marked" x="2" y="82" width="256" height="28" rx="2" />
+        <circle class="nl2-dot-marked" cx="18" cy="96" r="4" />
+        <text class="nl2-state" x="32" y="100">a key that changed mid-cycle</text>
+        <text class="nl2-mark-label" x="250" y="100" text-anchor="end">Refuse</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">Netinstall regenerates the host keys on every
+          cycle, so a new key is the normal case and not a warning. A
+          lab-scoped known-hosts file discards one file per cycle and still
+          refuses the one state that means something is wrong.</span>
+        <span class="fig-limit">It does not show the passphrase prompt, which
+          stops a script too and is a separate problem.</span>
+      </figcaption>
+    </figure>
+
+    <p>
       The device end is unattended. What remains is host-side automation hygiene
-      on the machine driving it: a lab-only known-hosts file, and a key the
+      on the machine that drives it: a lab-only known-hosts file, and a key the
       script can use without a prompt. Those two would have blocked every later
       piece of automation in this lab.
     </p>
 
     <h2 id="three-back-doors-one-shape">Three back doors, one shape</h2>
     <p>
-      The eventual experiment asks whether an agent working on a live router can
-      avoid locking itself out. That question is only meaningful if being locked
-      out is actually possible, so the provisioning config has to be deliberate
-      about every path into the device &mdash; not just the obvious one.
+      The eventual experiment asks whether an agent on a live router can avoid a
+      self-lockout. That question is only meaningful if a lockout is actually
+      possible. So the provisioning config has to be deliberate about every path
+      into the device, and not just the obvious one.
     </p>
     <p>
       The Pi reaches the router through exactly one firewall rule: SSH, from one
-      address, on one interface, sitting above a deny-everything-else rule. That
-      rule is the surface the experiment is meant to attack. Three other ways in
-      turned up, and they are all the same shape: a management path that
-      survives the failure being studied.
+      address, on one interface, above a deny-everything-else rule. That rule is
+      the surface the experiment is meant to attack. I found three other ways
+      in, and they are all the same shape: a management path that survives the
+      failure under study.
     </p>
+
+    <!-- One intended path in, and the three side paths I found later. Each
+         side path carries its own disposition, and the one that was open is
+         marked. The map carries the set; the reasoning stays as prose in the
+         list below it. Accent marks the open path. Oxide means a reversal on
+         this site and nothing here is a reversal, so oxide does not appear
+         (the same rule .lab-topo records above). No digit renders here, and
+         that is deliberate. IPv6 and layer-2 each carry a digit, so the plate
+         says link-local and the prose below keeps both names in full. -->
+    <figure class="fig" data-fig="map">
+      <svg class="nl1-doors" viewBox="0 0 260 150" role="img"
+           aria-label="The paths into the router. The intended path is SSH, the path under test. I found three side paths later. MAC-Winbox is restricted to the LAN side. Link-local is open by default. RoMON is off by default. Only the link-local path was open.">
+        <title>The paths into the router. The intended path is SSH, the path under test. I found three side paths later. MAC-Winbox is restricted to the LAN side. Link-local is open by default. RoMON is off by default. Only the link-local path was open.</title>
+        <defs>
+          <marker id="nl1-head" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+          <marker id="nl1-head-open" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path class="nl1-head-open" d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+
+        <rect class="nl1-box" x="192" y="16" width="64" height="124" rx="2" />
+        <text class="nl1-id" x="224" y="82" text-anchor="middle">Router</text>
+
+        <text class="nl1-group" x="2" y="10">Intended</text>
+        <text class="nl1-name" x="2" y="24">SSH</text>
+        <text class="nl1-disp" x="2" y="36">the path under test</text>
+        <path class="nl1-edge" d="M 118 28 L 188 28" marker-end="url(#nl1-head)" />
+
+        <text class="nl1-group" x="2" y="56">Found later</text>
+
+        <text class="nl1-name" x="2" y="70">MAC-Winbox</text>
+        <text class="nl1-disp" x="2" y="82">LAN side only</text>
+        <path class="nl1-edge" d="M 118 74 L 168 74" />
+        <path class="nl1-stop" d="M 172 67 L 172 81" />
+
+        <text class="nl1-name" x="2" y="98">link-local</text>
+        <text class="nl1-open-label" x="66" y="98">Open</text>
+        <text class="nl1-disp" x="2" y="110">open by default</text>
+        <circle class="nl1-open-mark" cx="118" cy="102" r="4" />
+        <path class="nl1-open" d="M 122 102 L 188 102" marker-end="url(#nl1-head-open)" />
+
+        <text class="nl1-name" x="2" y="126">RoMON</text>
+        <text class="nl1-disp" x="2" y="138">off by default</text>
+        <path class="nl1-edge" d="M 118 130 L 168 130" />
+        <path class="nl1-stop" d="M 172 123 L 172 137" />
+      </svg>
+      <figcaption>
+        <span class="fig-what">Three side paths share one shape with the path
+          under test: each survives the failure the experiment studies.
+          MAC-Winbox and RoMON are closed. Link-local is open by default, so a
+          failed lockout would have produced a wrong answer in silence.</span>
+        <span class="fig-limit">It does not show that the enumeration of paths
+          has no obvious end. That argument stays in the prose.</span>
+      </figcaption>
+    </figure>
+
     <ul>
-      <li><strong>MAC-Winbox.</strong> MikroTik&rsquo;s layer-2 management,
-        which works with no IP configured anywhere. Left restricted to the LAN
-        side, so the Pi has no layer-2 fallback and can genuinely lock itself
-        out &mdash; while my desktop, on the other side, keeps it and stays the
-        recovery post.</li>
-      <li><strong>IPv6 link-local.</strong> The one I nearly missed. RouterOS
-        brings up link-local IPv6 automatically, and my config had no IPv6
-        firewall rules at all, which means IPv6 input was allowed by default. An
-        agent could have destroyed every IPv4 path I had carefully narrowed and
+      <li><strong>MAC-Winbox.</strong> This is MikroTik&rsquo;s layer-2
+        management, and it works with no IP configured anywhere. I left it
+        restricted to the LAN side. The Pi therefore has no layer-2 fallback and
+        can genuinely lock itself out. My desktop, on the other side, keeps it
+        and stays the recovery post.</li>
+      <li><strong>IPv6 link-local.</strong> This is the one I nearly missed.
+        RouterOS brings up link-local IPv6 automatically, and my config had no
+        IPv6 firewall rules at all. So IPv6 input stayed open by default. An
+        agent could have destroyed every IPv4 path I narrowed so carefully, and
         the Pi would still have connected over IPv6. That failure would not have
-        looked like a broken experiment; it would have quietly produced a wrong
+        looked like a broken experiment. It would have quietly produced a wrong
         answer.</li>
-      <li><strong>RoMON.</strong> Another layer-2 overlay, found while reading an
-        unrelated diagnostic. Off by default on this device &mdash; a restrictive
-        shipping mode doing me a favour I hadn&rsquo;t asked for.</li>
+      <li><strong>RoMON.</strong> This is another layer-2 overlay, and I found
+        it while I read an unrelated diagnostic. It is off by default on this
+        device. A restrictive shipping mode helped me here, and I did not ask
+        for it.</li>
     </ul>
     <p>
-      I found the second path by applying the question from the first, and the
-      third by accident. <strong>&ldquo;Locked out&rdquo; only means something
-      once every independent path in has been enumerated</strong>, and there is
-      no obvious point at which that enumeration is finished.
+      I found the second path when I applied the question from the first. I
+      found the third by accident. <strong>&ldquo;Locked out&rdquo; only means
+      something after an enumeration of every independent path in</strong>, and
+      there is no obvious point at which that enumeration is finished.
     </p>
 
     <h2 id="a-deferred-item-that-turned-out-not-to-be">A deferred item that turned out not to be deferrable</h2>
     <p>
-      RouterOS has a feature called device-mode that gates whole categories of
-      functionality, and changing it requires physical confirmation &mdash; a
-      power cycle within a five-minute window. You cannot do it over SSH alone,
-      which is precisely the point of it.
+      RouterOS has a feature called device-mode, and it gates whole categories
+      of functionality. A change to device-mode requires physical confirmation:
+      a power cycle within a five-minute window. You cannot make that change
+      over SSH alone, which is precisely the point of it.
     </p>
     <p>
-      I had noted device-mode as relevant to the <em>later</em> experiment and
-      filed it accordingly. It then blocked the current one: the command that
-      arms the router for its next wipe cycle is gated behind a device-mode flag,
-      and a factory board ships with it off. So the provisioning script&rsquo;s
-      final line could not run on a fresh device, and no amount of scripting
-      could fix that, because the resolution requires someone to physically pull
-      a plug.
+      I recorded device-mode as relevant to the <em>later</em> experiment, and I
+      filed it accordingly. It then blocked the current one. The command that
+      arms the router for its next wipe cycle is gated behind a device-mode
+      flag. A factory board ships with that flag off. So the provisioning
+      script&rsquo;s final line could not run on a fresh device. No script could
+      fix that, because the resolution requires someone to physically pull a
+      plug.
     </p>
     <p>
       &ldquo;This only affects a later phase&rdquo; was an assumption I recorded
-      as though it were a finding, about the one subsystem whose entire purpose
-      is to block things. The decision record now carries the correction in
-      place rather than a tidy rewrite.
+      as though it were a finding. It was about the one subsystem whose entire
+      purpose is to block things. The decision record now carries the correction
+      in place rather than a tidy rewrite.
     </p>
+
+    <!-- The dependency chain, drawn once. It runs one way and it ends in a
+         node no script can enter, which is the whole reason a deferred item
+         stopped the current build. The accent box and the filled mark plus
+         BY HAND reuse the .lab-topo hand encoding above, so one page states
+         "a person is required" in one grammar. No digit renders here: the
+         first node is the script's last line, and ol.cycle keeps the step
+         numbers (ADR-004 Decision 5 floor). -->
+    <figure class="fig" data-fig="map">
+      <svg class="nl3-devmode" viewBox="0 0 260 120" role="img"
+           aria-label="A dependency chain. The script's last line re-arms the router. That line is gated behind the device-mode flag, and a factory board ships with the flag off. The flag needs physical confirmation at the device. No script can enter that last step.">
+        <title>A dependency chain. The script's last line re-arms the router. That line is gated behind the device-mode flag, and a factory board ships with the flag off. The flag needs physical confirmation at the device. No script can enter that last step.</title>
+        <defs>
+          <marker id="nl3-head" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+
+        <rect class="nl3-box" x="2" y="2" width="256" height="26" rx="2" />
+        <text class="nl3-step" x="130" y="19" text-anchor="middle">re-arm, the last line of the script</text>
+
+        <path class="nl3-edge" d="M 130 28 L 130 36" marker-end="url(#nl3-head)" />
+
+        <rect class="nl3-box" x="2" y="36" width="256" height="32" rx="2" />
+        <text class="nl3-step" x="130" y="51" text-anchor="middle">gated behind the device-mode flag</text>
+        <text class="nl3-sub" x="130" y="63" text-anchor="middle">off on a factory board</text>
+
+        <path class="nl3-edge" d="M 130 68 L 130 76" marker-end="url(#nl3-head)" />
+
+        <rect class="nl3-hand-box" x="2" y="76" width="256" height="32" rx="2" />
+        <text class="nl3-step" x="130" y="91" text-anchor="middle">physical confirmation at the device</text>
+        <circle class="nl3-hand-mark" cx="100" cy="100" r="4" />
+        <text class="nl3-hand-label" x="110" y="103">By hand</text>
+
+        <text class="nl3-sub" x="130" y="117" text-anchor="middle">no script can enter this node</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">The chain runs one way, and it ends outside the
+          script. The re-arm line depends on the device-mode flag, and the flag
+          depends on a person at the device. That is why a deferred item blocked
+          the current build.</span>
+        <span class="fig-limit">It does not show the resolution: someone has to
+          pull the power at the device. That claim stays in the prose.</span>
+      </figcaption>
+    </figure>
+
     <p>
-      The flag survives a reinstall, so enabling it is a one-time cost per
-      device rather than a tax on every cycle. That answer also kept a RouterOS
-      version upgrade off the critical path, which is where it would have gone
-      if the flag had reset.
+      The flag survives a reinstall. I therefore pay to enable it one time for
+      each device, and not on every cycle. That answer also kept a RouterOS
+      version upgrade off the critical path. A flag that reset would have put
+      that upgrade on the critical path.
     </p>
 
     <h2 id="what-this-does-not-establish">What this does not establish</h2>
     <ul>
       <li><strong>This is not standards-based ZTP.</strong> Real zero-touch
-        provisioning has a trust story &mdash; RFC 8572, BRSKI, a certificate
-        authority, a device proving what it is before accepting configuration.
-        This has none of that. The trust model is that I plugged in the cable
-        myself. It is the operational mechanics of unattended provisioning
-        without the security substrate that makes it safe at scale.</li>
+        provisioning has a trust story: RFC 8572, BRSKI, a certificate
+        authority, and a device that proves what it is before it accepts
+        configuration. This has none of that. The trust model is that I plugged
+        in the cable myself. It is the operational mechanics of unattended
+        provisioning without the security substrate that makes it safe at
+        scale.</li>
       <li><strong>One device, one model, one OS version.</strong> A handful of
         cycles on a single board. Nothing here is a claim about how MikroTik
-        hardware behaves in general, let alone anyone else&rsquo;s.</li>
+        hardware behaves in general. Nothing here is a claim about any other
+        maker&rsquo;s hardware.</li>
       <li><strong>Unattended within a session, not across a reboot.</strong> The
         provisioning host holds its SSH key in an agent that a human has to
-        unlock after the Pi restarts. That is a deliberate trade I made against
-        a passphrase-free key, and it lands squarely on the experiment this lab
-        exists for, since an unattended lab is exactly the scenario where a
-        reboot is most likely.</li>
+        unlock after the Pi restarts. I made that trade deliberately against a
+        passphrase-free key. It affects the experiment this lab exists for,
+        because an unattended lab is exactly the scenario where a reboot is most
+        likely.</li>
       <li><strong>One thing is unresolved.</strong> The setting that
-        re-arms the router lives in the bootloader, not the OS, so it may have
-        survived the reinstall on its own rather than being re-applied by my
-        script. Both produce identical output. This board is armed either way; a
-        truly factory board might not be, and I have not yet run the test that
-        distinguishes them.</li>
+        re-arms the router lives in the bootloader, not the OS. It may have
+        survived the reinstall on its own, and not from a re-application by my
+        script. Both produce identical output. This board is armed either way. A
+        truly factory board might not be armed, and I have not yet run the test
+        that distinguishes them.</li>
       <li><strong>The actual experiment is not built.</strong> The self-lockout
         question is the reason this lab exists, and everything above is the
         apparatus for it.</li>
@@ -379,36 +660,37 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <h2 id="stack">Stack</h2>
     <p>
-      MikroTik hEX (RouterOS 7, ARM), Raspberry Pi 5 running Raspberry Pi OS
-      from NVMe, MikroTik Netinstall under <code>qemu-user-static</code>, BOOTP
-      and TFTP served on an isolated point-to-point link, RouterOS scripting for
+      MikroTik hEX (RouterOS 7, ARM), Raspberry Pi 5 with Raspberry Pi OS
+      on NVMe, MikroTik Netinstall under <code>qemu-user-static</code>, BOOTP
+      and TFTP on an isolated point-to-point link, RouterOS scripting for
       the provisioning configuration, and a shell wrapper so a full cycle is one
       command. The repo is public:
-      <a href="https://github.com/sanlee-ys/netops-lab">github.com/sanlee-ys/netops-lab</a>
-      &mdash; the provisioning script, the decision records, and a field log of
-      what broke and what the symptoms actually meant are all checkable.
+      <a href="https://github.com/sanlee-ys/netops-lab">github.com/sanlee-ys/netops-lab</a>.
+      It carries the provisioning script, the decision records, and a field log
+      of what failed and what the symptoms actually meant. All of them are
+      checkable.
     </p>
     <p>
-      The field log is as detailed as the design docs. The two things that cost
-      the most time in this build were an Ethernet link that would not come up
-      until I disabled a power-saving feature on the host network card, and an
-      interface that reported a perfectly correct IP address while no cable was
-      attached to it.
+      The field log is as detailed as the design docs. Two things cost the most
+      time in this build. The first was an Ethernet link that would not come up
+      until I disabled a power-saving feature on the host network card. The
+      second was an interface that reported a perfectly correct IP address while
+      no cable was attached to it.
     </p>
 
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
-      The recovery mechanism was built before the experiment that needs it. The
-      forced-password-change problem would have taken a day to solve properly and
-      did not exist; one command established that. The IPv6 hole would have taken
-      no time at all to leave in place, and would have invalidated the results
-      without a visible failure.
+      I built the recovery mechanism before the experiment that needs it. The
+      forced-password-change problem would have taken a day to solve properly,
+      and it did not exist. One command established that. The IPv6 hole would
+      have taken no time at all to leave in place, and it would have invalidated
+      the results without a visible failure.
     </p>
     <p>
       Most of what I do professionally is measured on software I can re-run
-      until it is right. Hardware is less forgiving about that, and a management
-      plane you are reaching through is less forgiving still &mdash; every change
-      is potentially the change that ends the session. That is why the lab
+      until it is right. Hardware is less forgiving about that. A management
+      plane you reach through is less forgiving still. Every change is
+      potentially the change that ends the session. That is why the lab
       exists.
     </p>
   </main>
