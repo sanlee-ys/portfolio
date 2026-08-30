@@ -2,10 +2,42 @@
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 import Term from '../../components/Term.astro';
+import figures from '../../data/figures.json';
+
+/* The plot geometry. scripts/build-plots.cjs computed every number below from a
+   named artifact at a pinned commit, and this page interpolates it. The page
+   types no coordinate and no count, so a mark cannot drift from the
+   measurement. `quantum.artifact` and `quantum.sha` also fill the caption, so
+   the provenance line cannot disagree with the geometry above it. */
+const quantum = figures.plots['kb3-quantum'];
+if (!quantum) {
+  throw new Error(
+    'kb-agent-retrieval: src/data/figures.json holds no "kb3-quantum" plot. '
+    + 'Run: node scripts/build-plots.cjs --repo=<path to kb-agent> '
+    + '--repo=<path to faithfulness-judge> --repo=<path to defense-news-classifier>'
+  );
+}
+const qg = quantum.geometry;
+const qCommit = quantum.sha.slice(0, 7);
+const qValue = (label) => {
+  const found = quantum.values.find((v) => v.label === label);
+  if (!found) {
+    throw new Error(`kb-agent-retrieval: the "kb3-quantum" plot holds no "${label}" value.`);
+  }
+  return found.value;
+};
+const qPairs = qValue('eligible pairs');
+const qWins = qValue('hybrid right, dense wrong');
+const qLosses = qValue('dense right, hybrid wrong');
+const qPoints = qValue('points per query');
+/* This page publishes the p-value at four decimal places, and the artifact
+   carries four. The rounding happens here rather than in the caption text, so
+   the published figure is derived from the artifact and never typed. */
+const qP = qValue('McNemar exact p').toFixed(4);
 ---
 <Base
   title="Measuring RAG Retrieval Quality with A/B Tests · San Lee"
-  description="A 27-query gold set and three paired A/B tests measure kb-agent retrieval quality, leading to an evidence-based decision not to enable hybrid search by default."
+  description="A 27-query gold set and three paired A/B tests measure kb-agent retrieval quality. The evidence decided against hybrid search as the default."
   canonical="https://sanlee.me/projects/kb-agent-retrieval.html"
   ogType="article"
   ogImage="/assets/og-kb-agent-retrieval.png"
@@ -156,6 +188,208 @@ import Term from '../../components/Term.astro';
       font-size: 0.92rem;
       margin: 0 0 18px;
     }
+
+    /* The two-slot figure caption (ADR-013, gate rule R-C).
+
+       COPY. The origin is src/pages/projects/context-architecture.astro at
+       9d81caa, and the four rules below are that block verbatim. A shared
+       grammar is copied and never extracted: a concurrent session owns
+       public/assets/style.css for the tap-target work, and two writers on one
+       shared stylesheet cannot merge. OC-F of the redesign brief carries the
+       consolidation, for after that session merges.
+
+       .fig-what states what the figure argues. .fig-limit states what the
+       figure does not show. The gate fails the build on an empty .fig-limit,
+       because a figure that ends on a win while its caveat sits somewhere else
+       is the split ADR-007 refuses.
+
+       NOT COPIED, AND THE NEXT LANE NEEDS IT. autonomy-ladder.astro at 8772e5b
+       adds a `.fig figcaption a` rule, because a link inside a figcaption is
+       neither `.article-body p a` nor `.article-body li a` and falls to the
+       browser default, which measures 1.97:1 on the dark theme. No caption on
+       this page carries a link, so the rule would be dead CSS here. A lane that
+       puts the first link in a caption on this page copies that rule with it. */
+    .fig {
+      margin: 0 0 22px;
+    }
+    .fig figcaption {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+    .fig .fig-what {
+      display: block;
+      color: var(--text-secondary);
+    }
+    .fig .fig-limit {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    /* A caption that names an artifact carries a long file path. It breaks
+       inside the word rather than widening the page at 320px. */
+    .fig figcaption code {
+      overflow-wrap: anywhere;
+    }
+
+    /* One plate grammar, three new plates (ADR-004, ADR-013). Page-scoped.
+
+       COPY. The five text rules below are
+       src/pages/projects/faithfulness-judge.astro at bd00680, from line 105,
+       with the `fj-` prefix changed to `kb-`. The two plates above this page
+       already carry the `rp-` and `hp-` prefixes, so nothing collides, and the
+       two marker ids these plates add carry a digit for the same reason.
+
+       All three new plates are monochrome. Oxide (--accent-warm) on this page
+       marks the miss the eval exists to find and the default that was taken
+       back, and both readings are recorded above. Nothing on these three plates
+       is either one, so every state is a word plus a shape: a solid box against
+       a dashed box, and a filled mark against an empty row.
+
+       SVG text inherits from <body>, so every text class names its own font.
+       Max-width 260 keeps one viewBox unit at one CSS pixel down to 320px. The
+       plates sit inside .decision, which has no horizontal padding, so the
+       measured container is the article track and not a narrower one. */
+    .kb-plate {
+      display: block;
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      margin: 4px 0 0;
+    }
+    .kb-plate .kb-lane {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .kb-plate .kb-title {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .kb-plate .kb-state {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .kb-plate .kb-micro {
+      fill: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+
+    /* kb1-ranks. Two ranked lists that agree on one file.
+
+       NEITHER LIST IS PLACED AT ITS MEASURED RANK, and the caption says so. A
+       hand-drawn plate that placed a row at its measured rank would publish
+       that rank as a position, with no producer and no gate. The ranks stay in
+       the caption, where a reader reads them.
+
+       The dashed band is the stub the query asked for, and it is the state the
+       page argues about. Solid against dashed is the shape and the words carry
+       the rest, because Geist has no glyph for the symbols that would replace
+       them (the .two-fail comment on false-green.astro records that). */
+    .kb1-plate .kb1-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .kb1-plate .kb1-agree {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .kb1-plate .kb1-want {
+      fill: var(--bg);
+      stroke: var(--muted);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+    }
+    .kb1-plate .kb1-want-text {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .kb1-plate .kb1-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .kb1-plate marker path { fill: var(--muted); }
+
+    /* kb2-paired. The comparison method, shown once for all three changes.
+
+       THE TIE CELL IS DASHED AND HAS NO EDGE OUT OF IT. McNemar's exact test
+       reads the discordant pairs and nothing else, so the absence is the claim,
+       and it is shown as an absence and stated in the caption as well.
+
+       A marker does not inherit the referencing path's stroke, so this plate
+       declares its own. */
+    .kb2-plate .kb2-box {
+      fill: var(--bg);
+      stroke: var(--rule-strong);
+      stroke-width: 1;
+    }
+    .kb2-plate .kb2-tie {
+      fill: var(--bg);
+      stroke: var(--muted);
+      stroke-width: 1;
+      stroke-dasharray: 4 3;
+    }
+    .kb2-plate .kb2-edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+    .kb2-plate marker path { fill: var(--muted); }
+
+    /* kb3-quantum. A COPY of the discordant-pair grammar.
+
+       THE ORIGIN is src/pages/projects/faithfulness-judge.astro at bd00680,
+       the `fj2-discordant` block at lines 164 to 202. That comment names the
+       four things a copy changes and nothing else: the prefix, the two row
+       labels, the verdict word, and a new definition in the PLOTS registry of
+       scripts/build-plots.cjs with this page's own artifact, its own commit and
+       its own key. This page never reads `fj2-discordant`, because those counts
+       belong to that study.
+
+       WHY THE MARKS ARE GENERATED. The count IS the geometry here: one mark per
+       discordant pair. A typed row of marks is a published count with no
+       producer, which is what ADR-013 refuses. build-plots.cjs reads the counts
+       out of a pinned artifact and writes the x of every mark into
+       src/data/figures.json, so a row cannot drift from the measurement.
+
+       WHY ONE SLOT IS ONE QUERY HERE. The origin sizes its mark at a fixed 12
+       units. This copy sizes it at the track divided by the pairs the gold set
+       scores, so the mark's width IS the percentage points one query is worth.
+       The whole scale therefore comes out of the denominator and not out of a
+       hand, which is what the figure argues.
+
+       WHY THE SECOND ROW IS EMPTY. Nothing ran the other way. That is a
+       measured zero and not an absence, so the row is shown as it measured and
+       the caption states the count.
+
+       WHY THE TWO ROWS SHARE A LEFT EDGE. The reader compares two lengths, not
+       two positions. The fill and the row label dual-encode the direction, so
+       the plate needs no second hue. */
+    .kb3-plate .kb3-rule {
+      stroke: var(--border);
+      stroke-width: 1;
+    }
+    .kb3-plate .kb3-win {
+      fill: var(--text);
+      stroke: none;
+    }
+    .kb3-plate .kb3-loss {
+      fill: var(--bg);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
   </style>
   </Fragment>
 
@@ -165,18 +399,18 @@ import Term from '../../components/Term.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>Retrieval, Measured</h1>
-    <p class="subtitle">kb-agent had never measured its own retrieval. Three paired A/B changes later, hybrid stayed off the default.</p>
+    <p class="subtitle">kb-agent never measured its own retrieval. Three paired A/B changes later, hybrid stayed off the default.</p>
 
     <p class="lead">
-      kb-agent is the <Term id="rag">RAG</Term> agent in <a href="the-system.html">the system</a>: it
-      answers questions about my own projects out of a small knowledge base. Its
-      second milestone was supposed to be a shared retrieval backbone, with the
-      <Term id="classification">classifier</Term> calling it over HTTP instead of standing up its own vector
+      kb-agent is the <Term id="rag">RAG</Term> agent in <a href="the-system.html">the system</a>,
+      and it answers questions about my own projects out of a small knowledge
+      base. I planned its second milestone as a shared retrieval backbone: the
+      <Term id="classification">classifier</Term> would call it over HTTP instead of its own vector
       store. That consumer shipped its own lexical retriever, so the backbone had
-      nobody left to serve. Retiring it left an untested assumption: that
-      kb-agent&rsquo;s retrieval was good enough to be another project&rsquo;s
-      substrate. Nothing had measured it. My own kickoff note is blunt about it.
-      Every quality claim about the search tool was a vibe.
+      nobody left to serve. I retired the backbone, and that left an untested
+      assumption: kb-agent&rsquo;s retrieval was good enough to be another
+      project&rsquo;s substrate. Nothing measured it, and my own kickoff note is
+      blunt about that. Every quality claim about the search tool was a vibe.
     </p>
 
     <p>
@@ -185,12 +419,13 @@ import Term from '../../components/Term.astro';
     </p>
 
     <!-- Unit of the retrieval eval: one query, ranked chunks, objective path
-         match against a hand-labeled gold set. Not a recall chart — the tables
-         below carry the numbers. No LLM judge at this layer (prose below).
-         Schematic only; no invented query text as a real quote. ADR-010 N/A. -->
+         match against a hand-labeled gold set. It is not a recall chart. The
+         tables below carry the numbers. No LLM judge runs at this layer, and
+         the prose below states that. It is schematic only, and it invents no
+         query text as a real quote. ADR-010 does not apply. -->
     <svg class="retr-plate" viewBox="0 0 260 132" role="img"
-         aria-label="The unit of the retrieval eval: a query returns ranked chunks, then each result is judged by an objective path match against a hand-labeled gold set. Verdict is hit or miss. No LLM judge at this layer.">
-      <title>The unit of the retrieval eval: a query returns ranked chunks, then each result is judged by an objective path match against a hand-labeled gold set. Verdict is hit or miss. No LLM judge at this layer.</title>
+         aria-label="The unit of the retrieval eval. A query returns ranked chunks. An objective path match judges each result against a hand-labeled gold set. The verdict is hit or miss. No LLM judge runs at this layer.">
+      <title>The unit of the retrieval eval. A query returns ranked chunks. An objective path match judges each result against a hand-labeled gold set. The verdict is hit or miss. No LLM judge runs at this layer.</title>
       <defs>
         <marker id="rp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                 markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
@@ -235,15 +470,15 @@ import Term from '../../components/Term.astro';
     </svg>
     <p class="retr-plate-caption">
       One query, a ranked list, an objective path match. The tables below
-      measure how often the right source file lands in the top&nbsp;k &mdash;
-      with no LLM judge at this layer.
+      measure how often the right source file is in the top&nbsp;k. No LLM
+      judge runs at this layer.
     </p>
 
     <nav class="toc" aria-labelledby="toc-heading">
       <p class="toc-heading" id="toc-heading">On this page</p>
       <ol>
         <li><a href="#the-baseline">The baseline, and the two suspicions it named</a></li>
-        <li><a href="#three-changes">Three changes, each one A/B&rsquo;d</a></li>
+        <li><a href="#three-changes">Three changes, and an A/B test for each one</a></li>
         <li><a href="#the-negative-result">The one I built and did not ship</a></li>
         <li><a href="#what-the-numbers-support">What the numbers actually support</a></li>
         <li><a href="#what-this-does-not-establish">What this does not establish</a></li>
@@ -257,25 +492,25 @@ import Term from '../../components/Term.astro';
     <p>
       27 queries, hand-labeled, weighted to the corpus rather than split evenly:
       8 about projects, 5 about libraries, 10 about my plain-language notes, and
-      4 adversarial. The corpus is lopsided, so an even split would have
-      misrepresented what retrieval actually searches. Each label is a query
-      paired with the source file or files that should come back, and the metrics
-      are recall at 1, 3 and 5 plus <Term id="recall-mrr">MRR</Term>, with k=5 chosen to match the search
+      4 adversarial. The corpus is lopsided, so an even split would misrepresent
+      what retrieval actually searches. Each label is a query with the source
+      file or files that should come back. The metrics are recall at 1, 3 and 5,
+      plus <Term id="recall-mrr">MRR</Term>. I chose k=5 to match the search
       tool&rsquo;s own default.
     </p>
 
     <p>
-      There is <strong>no LLM <Term id="judge-model">judge</Term> at this layer</strong>. The label is an
-      objective path match. A judge would re-score a question a person has
-      already answered, and add variance plus a validation burden. Retrieval
-      quality stays separate from answer quality. Conflating the two is how a RAG
-      system hides bad retrieval behind a capable model. If answer quality gets
-      measured later, that layer can have a judge. It stays off this one.
+      There is <strong>no LLM <Term id="judge-model">judge</Term> at this layer</strong>, and the label is
+      an objective path match. A judge would re-score a question a person
+      already answered, and it would add variance and a validation burden.
+      Retrieval quality stays separate from answer quality. A RAG system that
+      conflates the two hides bad retrieval behind a capable model. If I measure
+      answer quality later, that layer can have a judge. It stays off this one.
     </p>
 
     <p>
-      The tool takes an optional <code>kind</code> filter. The gap between
-      running with it and running without it is the largest split on this page.
+      The tool takes an optional <code>kind</code> filter. The gap between a run
+      with it and a run without it is the largest split on this page.
     </p>
 
     <table class="metrics">
@@ -294,37 +529,88 @@ import Term from '../../components/Term.astro';
     </p>
 
     <p>
-      The first run also turned two vague suspicions into named misses. I had
-      left repo boilerplate and generated report files indexed as notes on
-      purpose, to measure whether they hurt retrieval. They were sitting in the
-      top five of the misses. And I had assumed the model usually passed the
-      kind filter. It did not.
+      The first run also turned two vague suspicions into named misses. I left
+      repo boilerplate and generated report files indexed as notes on purpose,
+      to measure whether they hurt retrieval. They sat in the top five of the
+      misses. I also assumed the model usually passed the kind filter. It did
+      not.
     </p>
 
-    <h2 id="three-changes">Three changes, each one A/B&rsquo;d</h2>
+    <h2 id="three-changes">Three changes, and an A/B test for each one</h2>
 
     <p>
-      Every change ran through a paired comparison layer vendored from the
-      classifier&rsquo;s <Term id="eval">eval</Term> rather than re-derived: same queries both arms,
-      per-query win, loss and tie counts, McNemar&rsquo;s exact test on the
-      discordant pairs, and a harness-health section that reports dropped or
-      unpairable rows. A comparison that quietly shrinks its own denominator
-      still prints a confident number.
+      Every change ran through one paired comparison layer. I vendored that
+      layer from the classifier&rsquo;s <Term id="eval">eval</Term> rather than re-derived it. A
+      comparison that quietly shrinks its own denominator still prints a
+      confident number.
     </p>
+
+    <!-- kb2-paired. A PLATE, and the method for all three changes below it.
+         Zero digits: this plate carries the shape of the comparison, and every
+         count from every comparison sits in the tables and the prose. The TIE
+         cell is dashed and has no edge out of it, because the test reads the
+         discordant pairs and nothing else. ADR-010 does not apply: nothing here
+         is a control. -->
+    <figure class="kb2-paired fig" data-fig="plate">
+      <svg class="kb2-plate kb-plate" viewBox="0 0 260 118" role="img"
+           aria-label="The paired comparison method. Both arms answer the same queries. Each query returns a win, a loss or a tie. McNemar's exact test reads only the wins and the losses. A harness-health section reports every dropped or unpairable row.">
+        <title>Both arms answer the same queries. The test reads only the discordant pairs.</title>
+        <defs>
+          <marker id="kb2-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+
+        <text class="kb-lane" x="4" y="10">BOTH ARMS</text>
+        <rect class="kb2-box" x="4" y="14" width="252" height="20" rx="2" />
+        <text class="kb-title" x="130" y="28" text-anchor="middle">the same queries</text>
+
+        <path class="kb2-edge" d="M 44 35 L 44 43" marker-end="url(#kb2-arrow)" aria-hidden="true" />
+        <path class="kb2-edge" d="M 130 35 L 130 43" marker-end="url(#kb2-arrow)" aria-hidden="true" />
+        <path class="kb2-edge" d="M 216 35 L 216 43" marker-end="url(#kb2-arrow)" aria-hidden="true" />
+
+        <rect class="kb2-box" x="4" y="48" width="80" height="20" rx="2" />
+        <text class="kb-state" x="44" y="62" text-anchor="middle">WIN</text>
+        <rect class="kb2-box" x="90" y="48" width="80" height="20" rx="2" />
+        <text class="kb-state" x="130" y="62" text-anchor="middle">LOSS</text>
+        <rect class="kb2-tie" x="176" y="48" width="80" height="20" rx="2" />
+        <text class="kb-state" x="216" y="62" text-anchor="middle">TIE</text>
+
+        <path class="kb2-edge" d="M 44 69 L 44 77" marker-end="url(#kb2-arrow)" aria-hidden="true" />
+        <path class="kb2-edge" d="M 130 69 L 130 77" marker-end="url(#kb2-arrow)" aria-hidden="true" />
+
+        <rect class="kb2-box" x="4" y="82" width="252" height="20" rx="2" />
+        <text class="kb-title" x="130" y="96" text-anchor="middle">McNemar exact, discordant only</text>
+
+        <text class="kb-micro" x="130" y="114" text-anchor="middle">health: dropped and unpairable rows reported</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">Both arms answer the same queries, and each
+          query returns a win, a loss or a tie. McNemar&rsquo;s exact test then
+          reads the discordant pairs, which are the wins and the losses.
+          A harness-health section reports every dropped or unpairable
+          row.</span>
+        <span class="fig-limit">The plate shows the method and no result. It
+          carries no query, no arm and no count. Every figure from these three
+          comparisons sits in the cards and the tables below.</span>
+      </figcaption>
+    </figure>
 
     <div class="decision">
       <p class="tag">Change 1<span class="code-ref">PR #71</span></p>
       <h3>Filter the boilerplate out of the notes ingest</h3>
       <p>
-        The notes sweep globbed whole repositories for Markdown, so README
-        files, <code>CLAUDE.md</code> files and generated reports were indexed
-        alongside real content and crowded it out of the top results. The filter
-        excludes those from the notes sweep only, and logs what it skipped rather
-        than dropping files silently. The index went from 47 source files to 44.
+        The notes sweep globbed whole repositories for Markdown. It indexed
+        README files, <code>CLAUDE.md</code> files and generated reports
+        alongside real content. Those files crowded the real content out of the
+        top results. The filter excludes them from the notes sweep only. It
+        records what it skipped, and it never drops a file in silence. The index went
+        from 47 source files to 44.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> hit@5 rose from 88.9% to 92.6%, recall@1
-        from 0.630 to 0.741, MRR from 0.744 to 0.807, and the kind-filtered arm
+        from 0.630 to 0.741, and MRR from 0.744 to 0.807. The kind-filtered arm
         went from 0.852 to 0.963 at recall@1. Per query that is one win, zero
         losses, 26 ties. The claim is one recovered miss and no regressions, not
         the percentage.
@@ -337,33 +623,33 @@ import Term from '../../components/Term.astro';
       <p>
         This is prompt and tool-description text, not a retrieval change. It
         aims at the gap in the table above, and it needed a different
-        instrument: a harness that makes one real model call per gold query with
-        the real system prompt and the real tool list, then grades the first tool
-        call. Did it reach for the search tool with a kind, and was the kind
-        right. No tools execute and no loop runs, so the measurement is model
+        instrument. That harness makes one real model call per gold query, with
+        the real system prompt and the real tool list. It then grades the first
+        tool call. Did it reach for the search tool with a kind, and was the kind
+        right. No tool executes and no loop runs, so the measurement is model
         behaviour rather than retrieval.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> the rate at which the model supplies a kind
-        went from 0.370 to 0.889, and the rate at which that kind is also correct
-        from 0.370 to 0.852. 15 wins, zero losses, 12 ties. This model rejects
-        the temperature parameter as deprecated, so sampling cannot be pinned;
-        each arm was run three times and the figures are medians. The <Term id="baseline">baseline</Term>
+        went from 0.370 to 0.889, and the correct-kind rate from 0.370 to 0.852.
+        15 wins, zero losses, 12 ties. This model rejects the temperature
+        parameter as deprecated, so I cannot pin the sampling. I ran each arm
+        three times and the figures are medians. The <Term id="baseline">baseline</Term>
         spread was 0.333 to 0.407 and the candidate 0.889 to 0.926. Those ranges
         do not overlap, so the median of three is worth quoting.
       </p>
       <p>
-        This does not show that answers got better. It shows the <Term id="agent">agent</Term> now lands
-        more often on the setting the retrieval eval had already measured as the
-        stronger one.
+        This does not show that answers got better. It shows that the <Term id="agent">agent</Term> now
+        picks the stronger setting more often. The retrieval eval already
+        measured that setting as the stronger one.
       </p>
     </div>
 
     <h2 id="the-negative-result">The one I built and did not ship</h2>
 
     <svg class="hyb-plate" viewBox="0 0 260 118" role="img"
-         aria-label="Hybrid retrieval versus dense-only. MRR is identical to four decimals. The paraphrase miss the hybrid was built to rescue is still a miss. Dense-only stayed the default.">
-      <title>MRR identical. The miss hybrid was built to fix is still a miss. Declined.</title>
+         aria-label="Hybrid retrieval against dense-only. MRR is identical to four decimals. I built hybrid to rescue one paraphrase miss, and that miss stands. Dense-only stayed the default.">
+      <title>MRR identical. I built hybrid to fix one miss, and that miss stands. Declined.</title>
       <text class="hp-lane" x="4" y="12">DENSE ONLY</text>
       <rect class="hp-box" x="4" y="18" width="122" height="40" rx="2" />
       <text class="hp-title" x="65" y="36" text-anchor="middle">MRR same</text>
@@ -379,28 +665,28 @@ import Term from '../../components/Term.astro';
       <text class="hp-micro" x="130" y="108" text-anchor="middle">built it, measured it, did not ship it</text>
     </svg>
     <p class="hyb-plate-caption">
-      MRR identical to four decimals. The one miss it was built to rescue
-      is still a miss.
+      MRR identical to four decimals. I built it to rescue one miss, and that
+      miss stands.
     </p>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>Change 3<span class="code-ref">PR #73 &middot; ADR-010</span></p>
       <h3>Hybrid lexical and dense retrieval</h3>
       <p>
-        This was the change the whole milestone was pointed at. The hypothesis
-        was specific. Four of the 27 queries exist for this decision: two pairs,
-        each an exact-jargon phrasing against a paraphrase of the same need,
-        placed where lexical and dense retrieval ought to disagree. One of them
-        was still a miss after change 1, and it was the paraphrase half. That is
-        the textbook dense failure a lexical leg is supposed to rescue.
+        The whole milestone pointed at this change. The hypothesis was specific:
+        four of the 27 queries exist for this decision. They are two pairs, and
+        each pair sets an exact-jargon phrase against a paraphrase of the same
+        need. I placed them where lexical and dense retrieval ought to disagree.
+        One of them was still a miss after change 1, and it was the paraphrase
+        half. That is the textbook dense failure a lexical leg should rescue.
       </p>
       <p>
         I built the lexical leg against the same chunk corpus already in the
-        vector store, fused with the dense ranking by Reciprocal Rank Fusion at
-        k=60, left at the canonical value rather than tuned, because tuning k on
-        the same 27 queries that judge the outcome is fitting on the test set.
-        Ranks fuse; scores do not, since a cosine distance and a <Term id="bm25">BM25</Term> score share
-        no scale and any weighted blend needs a constant fitted on that same
+        vector store. I fused it with the dense ranking by Reciprocal Rank
+        Fusion at k=60. I left k at the canonical value and did not tune it. A
+        tune of k on the same 27 queries that judge the outcome fits the test
+        set. Ranks fuse and scores do not: a cosine distance and a <Term id="bm25">BM25</Term> score
+        share no scale. Any weighted blend needs a constant fitted on that same
         data.
       </p>
       <table class="metrics">
@@ -417,28 +703,74 @@ import Term from '../../components/Term.astro';
         and it is one query.
       </p>
       <p>
-        <strong>The one thing hybrid was built to fix, it does not fix.</strong>
-        That paraphrase query is still a miss under hybrid. Running the lexical
-        leg on its own explains why: BM25&rsquo;s own top three results for it are
-        all the same notes file, with the project stub it should have found only
-        fourth. The paraphrase&rsquo;s surface terms point at the notes file just
-        as hard as the embedding does.
+        <strong>I built hybrid to fix one thing, and it does not fix it.</strong>
+        That paraphrase query is still a miss under hybrid. A run of the lexical
+        leg on its own explains why. The paraphrase&rsquo;s surface terms point
+        at the notes file just as hard as the embedding does.
       </p>
+
+      <!-- kb1-ranks. A PLATE. Zero digits: the two ranks this argument turns on
+           are in the caption, where a gate reads them, and neither list is
+           placed at its measured rank. The dashed band is the stub the query
+           asked for. ADR-010 does not apply: nothing here is a control. -->
+      <figure class="kb1-ranks fig" data-fig="plate">
+        <svg class="kb1-plate kb-plate" viewBox="0 0 260 132" role="img"
+             aria-label="Two retrievers, lexical and dense. Each one returns the same notes file at the top of its list. The project stub the query asked for sits below both lists.">
+          <title>Both retrievers return the same notes file first. The project stub sits below both lists.</title>
+          <defs>
+            <marker id="kb1-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+              <path d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+          </defs>
+
+          <text class="kb-lane" x="4" y="12">LEXICAL</text>
+          <rect class="kb1-box" x="4" y="18" width="122" height="38" rx="2" />
+          <text class="kb-title" x="65" y="35" text-anchor="middle">top of the list</text>
+          <text class="kb-micro" x="65" y="50" text-anchor="middle">one notes file</text>
+
+          <text class="kb-lane" x="134" y="12">DENSE</text>
+          <rect class="kb1-box" x="134" y="18" width="122" height="38" rx="2" />
+          <text class="kb-title" x="195" y="35" text-anchor="middle">top of the list</text>
+          <text class="kb-micro" x="195" y="50" text-anchor="middle">one notes file</text>
+
+          <path class="kb1-edge" d="M 65 58 L 65 68" marker-end="url(#kb1-arrow)" aria-hidden="true" />
+          <path class="kb1-edge" d="M 195 58 L 195 68" marker-end="url(#kb1-arrow)" aria-hidden="true" />
+
+          <rect class="kb1-agree" x="4" y="74" width="252" height="22" rx="2" />
+          <text class="kb-state" x="130" y="89" text-anchor="middle">SAME WRONG FILE</text>
+
+          <rect class="kb1-want" x="4" y="106" width="252" height="24" rx="2" />
+          <text class="kb1-want-text" x="130" y="122" text-anchor="middle">PROJECT STUB, BELOW BOTH LISTS</text>
+        </svg>
+        <figcaption>
+          <span class="fig-what">Both retrievers return the same notes file at
+            the top of the list, so the two rankings agree. BM25 on its own
+            returns that one file as its whole top three, and the project stub
+            it should return arrives only fourth. Dense retrieval misses the
+            stub as well.</span>
+          <span class="fig-limit">The plate does not show a rank position and it
+            does not show either cut-off, because neither list is placed at its
+            measured rank. It shows one query. The prose below carries the
+            second surviving miss, which reads the same way.</span>
+        </figcaption>
+      </figure>
+
       <p>
         Both retrievers prefer the same wrong file. So the query was never a
-        lexical-versus-dense failure. It is corpus crowding, a topically adjacent
-        notes file out-competing a project stub, and no fusion of two retrievers
-        that agree can repair it. The other surviving miss reads the same way.
-        That falsifies the premise the experiment was built on.
+        lexical-versus-dense failure. It is corpus crowding: a topically
+        adjacent notes file out-competes a project stub. No fusion of two
+        retrievers that agree can repair it. The other surviving miss reads the
+        same way. That falsifies the premise I built the experiment on.
       </p>
       <p class="tradeoff">
         <strong>The result:</strong> the default stayed dense only. MRR is
-        identical to four decimal places across both arms, recall@1 drops, and
-        under the kind filter, the setting change 2 steers the model toward,
-        hybrid is strictly worse on every metric that moved. Against that, the
-        lexical leg is a second retriever, a second dependency, an in-memory
-        index and a cache-invalidation surface carried on every search. A default
-        should not change on a wash.
+        identical to four decimal places across both arms, and recall@1 drops.
+        Under the kind filter, hybrid is strictly worse on every metric that
+        moved, and that filter is the setting change 2 steers the model toward.
+        Against that, the lexical leg is a second retriever, a second
+        dependency, an in-memory index and a cache-invalidation surface on every
+        search. A default should not change on a wash.
       </p>
       <p>
         Both paths stay in the tree behind one constant. One flag re-runs the
@@ -449,13 +781,13 @@ import Term from '../../components/Term.astro';
     <h2 id="what-the-numbers-support">What the numbers actually support</h2>
 
     <p>
-      n = 27. At that size a single query is 3.7 percentage points, so the
-      significance line carries more weight than the recall deltas. Two of the
-      three changes rest on <strong>one discordant pair</strong>, at McNemar p =
-      1.0000. That p-value does not mean hybrid is worse. It means the experiment
-      did not clear the bar to change a default. It also does not prove change 1.
-      That is why the claim is written as &ldquo;regressed nothing&rdquo; rather
-      than as a percentage.
+      n = 27, so a single query is 3.7 percentage points and the significance
+      line carries more weight than the recall deltas. Two of the three changes
+      rest on <strong>one discordant pair</strong>, at McNemar p = 1.0000. That
+      p-value does not mean hybrid is worse. It means the experiment did not
+      clear the bar to change a default. It also does not prove change 1. I
+      therefore write the claim as &ldquo;regressed nothing&rdquo; rather than
+      as a percentage.
     </p>
 
     <p class="flow-line">
@@ -463,56 +795,100 @@ import Term from '../../components/Term.astro';
       points.
     </p>
 
+    <!-- kb3-quantum. A PLOT, and a copy of the discordant-pair grammar that
+         originates on faithfulness-judge.astro at bd00680. Every mark x and the
+         mark width itself are interpolated from src/data/figures.json, which
+         scripts/build-plots.cjs read out of a pinned commit; the page types no
+         coordinate and no count. One slot is one query, so the mark's width IS
+         the points one query is worth at this denominator. The second row is a
+         measured zero, not an absence. ADR-010 does not apply: nothing here is
+         a control. -->
+    <figure class="kb3-quantum fig" data-fig="plot">
+      <svg class="kb3-plate kb-plate" viewBox="0 0 260 104" role="img"
+           data-fig-generated="true"
+           aria-label={`Two rows of marks, one row for each direction of disagreement. One mark is one query out of the ${qPairs} pairs the gold set scores. Hybrid is right where dense is wrong in ${qWins}. Dense is right where hybrid is wrong in ${qLosses}. The comparison did not clear the bar to change a default.`}>
+        <title>{`Discordant pairs: ${qWins} one way and ${qLosses} the other, out of ${qPairs}. The comparison did not clear the bar.`}</title>
+
+        <text class="kb-lane" x="4" y="12">HYBRID RIGHT, DENSE WRONG</text>
+        {qg.winsX.map((x) => (
+          <rect class="kb3-win" x={x} y="18" width={qg.markW} height={qg.markH} rx="1" />
+        ))}
+
+        <text class="kb-lane" x="4" y="52">DENSE RIGHT, HYBRID WRONG</text>
+        {qg.lossesX.map((x) => (
+          <rect class="kb3-loss" x={x} y="58" width={qg.markW} height={qg.markH} rx="1" />
+        ))}
+
+        <line class="kb3-rule" x1={qg.trackX0} y1="86" x2={qg.trackX1} y2="86" />
+        <text class="kb-lane" x="4" y="100">VERDICT</text>
+        <text class="kb-state" x="256" y="100" text-anchor="end">DID NOT CLEAR</text>
+      </svg>
+      <figcaption>
+        <span class="fig-what">One mark is one query, out of the {qPairs} pairs
+          the gold set scores. One mark is therefore {qPoints} percentage points
+          at this denominator. Hybrid is right where dense is wrong in
+          {qWins} of them, and dense is right where hybrid is wrong in
+          {qLosses}. McNemar&rsquo;s exact test on those pairs gives
+          <strong>p&nbsp;=&nbsp;{qP}</strong>. Geometry from
+          <code>{quantum.artifact}</code> at {qCommit}.</span>
+        <span class="fig-limit">The plate shows only the pairs where the two
+          arms disagree. It leaves out every tied pair, because the test does not
+          read those. It shows the hybrid comparison alone, and it does not show
+          the recall deltas or the MRR, which the tables above carry.</span>
+      </figcaption>
+    </figure>
+
     <p>
       The kind-steering result is the largest effect on the page and the least
       comparable to the other two. It is a model-behaviour measurement over three
-      unpinned runs against a corpus-independent instrument, not a retrieval
-      measurement. I have kept the two reported separately.
+      unpinned runs against a corpus-independent instrument. It is not a
+      retrieval measurement. I report the two separately.
     </p>
 
     <h2 id="what-this-does-not-establish">What this does not establish</h2>
     <ul>
       <li><strong>This is a per-KB measurement.</strong> 260 chunks across 44
         files, one embedding model, one corpus. Nothing here is a claim that
-        hybrid retrieval is useless in general, only that on this knowledge base
-        at this size it did not earn a default.</li>
+        hybrid retrieval is useless in general. The claim is that on this
+        knowledge base at this size it did not earn a default.</li>
       <li><strong>Retrieval, not answers.</strong> recall@k and MRR say the right
         chunk was retrievable. They say nothing about whether the agent&rsquo;s
         final answer was good. There is no answer-quality eval in this repo.
         That split is the design, not a gap.</li>
-      <li><strong>One labeler, and the labels were drafted before they were
-        reviewed.</strong> Queries and proposed labels were drafted against the
-        actual stub contents and I reviewed every entry before merge, which is
-        the hand-label pass. One label is arguably wrong: a question about a
-        packaging tool is labeled as a note where the library slice is
-        defensible, and it is the residual miss on the kind-correct axis.
-        Changing it after seeing the result would be tuning the answer key to the
-        outcome, so it stands as labeled.</li>
-      <li><strong>The remaining misses point somewhere I have not gone.</strong>
-        Both are corpus crowding, which is a question about chunking and about
+      <li><strong>One labeler, and I drafted the labels before I reviewed
+        them.</strong> I drafted the queries and the proposed labels against the
+        actual stub contents. I then reviewed every entry before merge, and that
+        review is the hand-label pass. One label is arguably wrong: a question
+        about a packaging tool is labeled as a note, where the library slice is
+        defensible. That label is the residual miss on the kind-correct axis. A
+        change to it after the result would tune the answer key to the outcome,
+        so it stands as labeled.</li>
+      <li><strong>The remaining misses point somewhere I did not go.</strong>
+        Both are corpus crowding. That is a question about chunking and about
         what the stubs say, not about which retriever runs. That is the
         measurement that would actually move them, and it is not built.</li>
-      <li><strong>The knowledge base drifts.</strong> The first baseline, taken
-        two weeks earlier, no longer reproduced when the A/B ran, so both arms of
-        every comparison were re-measured on the same day against the same index.
-        Figures from different weeks on this project are not comparable, and the
-        ones on this page are same-day pairs.</li>
+      <li><strong>The knowledge base drifts.</strong> I took the first baseline
+        two weeks earlier, and it no longer reproduced when the A/B ran. So I
+        re-measured both arms of every comparison on the same day, against the
+        same index. Figures from different weeks on this project are not
+        comparable, and the ones on this page are same-day pairs.</li>
     </ul>
 
     <h2 id="stack">Stack</h2>
     <p>
-      Python, ChromaDB with the local <code>all-MiniLM-L6-v2</code> embedding
-      model so retrieval needs no API key and no network, <code>rank-bm25</code>
-      for the lexical leg, a hand-written recall@k and MRR harness, and a
-      paired-comparison layer vendored from the classifier&rsquo;s eval rather
-      than rewritten. The repo is public:
+      Python, and ChromaDB with the local <code>all-MiniLM-L6-v2</code>
+      embedding model, so retrieval needs no API key and no network.
+      <code>rank-bm25</code> runs the lexical leg. A hand-written recall@k and
+      MRR harness measures both arms. I vendored the paired-comparison layer
+      from the classifier&rsquo;s eval rather than rewrote it. The repo is public:
       <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a>.
-      The <Term id="gold-set">gold set</Term>, both eval harnesses, the decision record for the negative
-      result and the per-query rank tables behind every figure above are all
-      checkable:
-      <a href="https://github.com/sanlee-ys/kb-agent/blob/main/eval/gold_set.yaml">the gold set</a>,
-      <a href="https://github.com/sanlee-ys/kb-agent/blob/main/decisions/ADR-010-hybrid-bm25-retrieval-measured-and-not-defaulted.md">ADR-010</a>,
-      and the three pull requests
+      Everything behind every figure above is checkable. That is the
+      <Term id="gold-set">gold set</Term>, both eval harnesses, the decision record for the negative
+      result, and the per-query rank tables. Read
+      <a href="https://github.com/sanlee-ys/kb-agent/blob/main/eval/gold_set.yaml">the gold set</a>
+      and
+      <a href="https://github.com/sanlee-ys/kb-agent/blob/main/decisions/ADR-010-hybrid-bm25-retrieval-measured-and-not-defaulted.md">ADR-010</a>.
+      The three pull requests
       (<a href="https://github.com/sanlee-ys/kb-agent/pull/71">#71</a>,
       <a href="https://github.com/sanlee-ys/kb-agent/pull/74">#74</a>,
       <a href="https://github.com/sanlee-ys/kb-agent/pull/73">#73</a>)
@@ -521,11 +897,12 @@ import Term from '../../components/Term.astro';
 
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
-      The same discipline as the <a href="defense-news-classifier.html">classifier</a>,
-      applied to a different problem: build the measurement before the change,
-      then let it decide. The third change was designed around a specific
-      hypothesis, built to completion, and reported as falsifying its own
-      premise. The miss I had aimed the milestone at was corpus crowding, not a
+      This page shows the same discipline as the
+      <a href="defense-news-classifier.html">classifier</a>, applied to a
+      different problem. Build the measurement before the change, then let it
+      decide. I designed the third change around a specific hypothesis, and I
+      built it to completion. I then reported it as a result that falsifies its
+      own premise. The miss I aimed the milestone at was corpus crowding, not a
       lexical-versus-dense gap.
     </p>
   </main>

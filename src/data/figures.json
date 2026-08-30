@@ -84,6 +84,54 @@
           38
         ]
       }
+    },
+    "kb3-quantum": {
+      "repo": "sanlee-ys/kb-agent",
+      "sha": "c90dd9c3ed15aca0ac1de35e66192fe71d8774e9",
+      "artifact": "decisions/ADR-010-hybrid-bm25-retrieval-measured-and-not-defaulted.md",
+      "command": "git -C <kb-agent> show c90dd9c3ed15aca0ac1de35e66192fe71d8774e9:decisions/ADR-010-hybrid-bm25-retrieval-measured-and-not-defaulted.md",
+      "viewBox": [
+        0,
+        0,
+        260,
+        104
+      ],
+      "values": [
+        {
+          "label": "eligible pairs",
+          "value": 27
+        },
+        {
+          "label": "hybrid right, dense wrong",
+          "value": 1
+        },
+        {
+          "label": "dense right, hybrid wrong",
+          "value": 0
+        },
+        {
+          "label": "tied pairs",
+          "value": 26
+        },
+        {
+          "label": "McNemar exact p",
+          "value": 1
+        },
+        {
+          "label": "points per query",
+          "value": 3.7
+        }
+      ],
+      "geometry": {
+        "trackX0": 4,
+        "trackX1": 256,
+        "markW": 7.33,
+        "markH": 16,
+        "winsX": [
+          4
+        ],
+        "lossesX": []
+      }
     }
   }
 }
