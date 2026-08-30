@@ -286,6 +286,182 @@ const PLOTS = [
       };
     },
   },
+
+  /*
+   * kb3-quantum, on `src/pages/projects/kb-agent-retrieval.astro`.
+   *
+   * WHAT IT ARGUES. The whole hybrid result is one discordant pair out of the
+   * 27 the gold set scores, and nothing ran the other way. At that denominator
+   * one query is worth 3.7 percentage points, so a recall delta of one query
+   * says less than the significance line does. Prose can only assert that a
+   * sample is small; a mark whose width IS one query out of the whole track
+   * shows it.
+   *
+   * COPIED GRAMMAR. The discordant-pair grammar originates on
+   * `src/pages/projects/faithfulness-judge.astro` at bd00680. The origin block
+   * names the four things a copy changes: the prefix, the two row labels, the
+   * verdict word, and a new definition here with its own artifact, commit and
+   * key. This is that definition. It never reads `fj2-discordant`, because
+   * those counts belong to that study.
+   *
+   * WHY THIS ARTIFACT. `decisions/ADR-010-...md` is the decision record for the
+   * negative result, and it is the one committed file that carries the paired
+   * counts, the p-value, the harness-health denominator, and the value of one
+   * query, all at the same commit. The counts are also readable in the page's
+   * own tables, so two readings agree and the page publishes one.
+   *
+   * WHY A SHA AND NOT THE TAG. The repository's only tag, v1.0.0, predates the
+   * v2 retrieval milestone entirely, so it does not carry this file at all.
+   * This sha is the commit at which the artifact last changed.
+   *
+   * WHY THE UNFILTERED BLOCK IS SLICED OUT BY BOTH HEADINGS. The artifact
+   * carries two paired comparisons with the same sentence shape: the unfiltered
+   * arm, which is the one this page reports, and the kind-filtered arm, whose
+   * per-pair line reads `candidate 0, baseline 0, ties 27`. A pattern that
+   * matched the first `Per-pair:` would still match after a re-order, and it
+   * would publish the wrong comparison at exit 0. So the block is cut at both
+   * ends, and a missing end heading is a stop.
+   *
+   * WHY A ZERO IS ALLOWED HERE AND A MISSING NUMBER IS NOT. One direction of
+   * this comparison measured zero, and zero is the finding. An absent count is
+   * a different state, and a row drawn from an absent count would read as that
+   * measured zero. So the pattern must match the literal count, and only the
+   * pattern failing is a stop.
+   */
+  {
+    key: 'kb3-quantum',
+    repo: 'kb-agent',
+    ref: 'c90dd9c3ed15aca0ac1de35e66192fe71d8774e9',
+    artifact: 'decisions/ADR-010-hybrid-bm25-retrieval-measured-and-not-defaulted.md',
+    viewBox: [0, 0, 260, 104],
+    extract(text) {
+      const stop = (why) => {
+        throw new Error(
+          `kb3-quantum: ${why}\n`
+          + '  The ADR was reformatted, or the wrong commit is pinned. Re-read it and fix the '
+          + 'pattern. A count this parser cannot find must never become a zero: zero is a '
+          + 'measured state on this figure, and a row drawn from a missing number would read '
+          + 'as that measurement.'
+        );
+      };
+
+      // The harness-health line, which is the denominator the page reports.
+      const health = /Harness health clean on both comparisons:\s+(\d+) groups,\s+(\d+) structural pairs,\s+(\d+) eligible pairs, zero dropped rows/
+        .exec(text);
+      if (!health) stop('the harness-health line is not in this artifact at this commit.');
+      const [groups, structural, eligible] = health.slice(1, 4).map(Number);
+      if (groups !== structural || structural !== eligible) {
+        stop(
+          `the harness-health line reads ${groups} groups, ${structural} structural pairs and `
+          + `${eligible} eligible pairs. The page reports one denominator, so a split one is a `
+          + 'different claim.'
+        );
+      }
+
+      // The unfiltered comparison only. See the header comment.
+      const head = /\*\*Unfiltered \(the hard setting/.exec(text);
+      if (!head) stop('the "Unfiltered" comparison heading is not in this artifact.');
+      const rest = text.slice(head.index);
+      const tail = /\*\*With `--kind-filter`/.exec(rest);
+      if (!tail) {
+        stop(
+          'the "With --kind-filter" heading no longer follows the unfiltered comparison, so '
+          + 'this parser cannot tell the two comparisons apart.'
+        );
+      }
+      const block = rest.slice(0, tail.index);
+
+      const pairs = /Per-pair: candidate (\d+), baseline (\d+), \*\*ties (\d+)\*\*/.exec(block);
+      if (!pairs) stop('no "Per-pair:" line sits inside the unfiltered comparison.');
+      const wins = Number(pairs[1]);
+      const losses = Number(pairs[2]);
+      const ties = Number(pairs[3]);
+
+      const mcnemar = /\*\*McNemar exact p = ([0-9.]+)\*\*/.exec(block);
+      if (!mcnemar) stop('no "McNemar exact p" line sits inside the unfiltered comparison.');
+      const p = Number(mcnemar[1]);
+
+      // The value of one query at this denominator. The page publishes it, so
+      // it is read rather than assumed, and then checked against the
+      // denominator. Two readings that disagree are a stop.
+      const quantum = /one query is worth ([0-9.]+) percentage points/.exec(text);
+      if (!quantum) stop('the artifact no longer states what one query is worth.');
+      const points = Number(quantum[1]);
+
+      for (const [label, value] of [['wins', wins], ['losses', losses], ['ties', ties]]) {
+        if (!Number.isInteger(value) || value < 0) {
+          throw new Error(`kb3-quantum: "${label}" read as "${value}", which is not a count.`);
+        }
+      }
+      if (wins + losses + ties !== eligible) {
+        throw new Error(
+          `kb3-quantum: ${wins} + ${losses} + ${ties} does not equal the ${eligible} eligible `
+          + 'pairs. The counts came from different comparisons.'
+        );
+      }
+      if (!Number.isFinite(p) || p <= 0 || p > 1) {
+        throw new Error(`kb3-quantum: p read as "${mcnemar[1]}", which is not a p-value.`);
+      }
+      const derived = Math.round((100 / eligible) * 10) / 10;
+      if (points !== derived) {
+        throw new Error(
+          `kb3-quantum: the artifact says one query is worth ${points} points, and ${eligible} `
+          + `pairs make it ${derived}. The two readings disagree, so neither is publishable.`
+        );
+      }
+
+      return [
+        { label: 'eligible pairs', value: eligible },
+        { label: 'hybrid right, dense wrong', value: wins },
+        { label: 'dense right, hybrid wrong', value: losses },
+        { label: 'tied pairs', value: ties },
+        { label: 'McNemar exact p', value: p },
+        { label: 'points per query', value: points },
+      ];
+    },
+    layout(values, viewBox) {
+      const at = (label) => {
+        const found = values.find((v) => v.label === label);
+        if (!found) throw new Error(`kb3-quantum: layout wanted "${label}" and did not get it.`);
+        return found.value;
+      };
+      const n = at('eligible pairs');
+      // The track holds every scored pair, so ONE SLOT IS ONE QUERY. That is
+      // what makes the mark's width the 3.7 points the page reports: the whole
+      // scale comes out of the denominator and nothing here is chosen to look
+      // right. Both rows start at the same x, so the reader compares two
+      // lengths and not two positions.
+      const TRACK = [4, 256];
+      const MARK_GAP = 2;
+      const MARK_H = 16;
+      const slot = round((TRACK[1] - TRACK[0]) / n);
+      const markW = round(slot - MARK_GAP);
+      if (markW <= 0) {
+        throw new Error(
+          `kb3-quantum: ${n} pairs leave ${slot} units per query, and the gap is ${MARK_GAP}.\n`
+          + '  There is no mark left to draw. Widen the track or shrink the gap deliberately.'
+        );
+      }
+      if (MARK_H > viewBox[3]) throw new Error('kb3-quantum: the mark is taller than the plate.');
+      const row = (count) => {
+        if (count > n) {
+          throw new Error(
+            `kb3-quantum: ${count} marks is more than the ${n} pairs the track holds.\n`
+            + '  Never drop a mark: the row length is the measurement.'
+          );
+        }
+        return Array.from({ length: count }, (_, i) => round(TRACK[0] + i * slot));
+      };
+      return {
+        trackX0: TRACK[0],
+        trackX1: TRACK[1],
+        markW,
+        markH: MARK_H,
+        winsX: row(at('hybrid right, dense wrong')),
+        lossesX: row(at('dense right, hybrid wrong')),
+      };
+    },
+  },
 ];
 
 /*
