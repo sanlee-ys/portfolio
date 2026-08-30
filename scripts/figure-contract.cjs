@@ -139,6 +139,10 @@ function normalize(text) {
  * keeps site chrome — the nav, the footer, the theme toggle — outside a rule
  * written for editorial figures. <main> does not nest, so the first open tag
  * and the first close tag bound it.
+ *
+ * The region is then reduced to what a browser will turn into ELEMENTS: every
+ * comment goes, and so does the body of every <style> and <script> island. See
+ * `stripNonMarkup` for why that reduction belongs here and not in each reader.
  */
 function contentRegion(html) {
   const open = /<main\b[^>]*>/.exec(html);
@@ -147,7 +151,7 @@ function contentRegion(html) {
   if (!cls.includes('wrap') && !cls.includes('article-body')) return null;
   const start = open.index + open[0].length;
   const end = html.indexOf('</main>', start);
-  return end === -1 ? html.slice(start) : html.slice(start, end);
+  return stripNonMarkup(end === -1 ? html.slice(start) : html.slice(start, end));
 }
 
 function matchAll(source, flags, text) {
@@ -225,6 +229,82 @@ function closeOfTag(markup, start) {
     }
   }
   return -1;
+}
+
+// The elements whose content is text for a parser, never markup.
+const RAW_TEXT_ELEMENTS = new Set(['style', 'script']);
+
+/*
+ * The region with every span a browser does NOT turn into elements removed:
+ * comments, and the bodies of <style> and <script> islands. `contentRegion`
+ * calls it, so every reader below gets the reduced region and no reader has to
+ * remember. (It is declared here, beside `closeOfTag`, which it uses; the call
+ * above it is a hoisted function declaration.)
+ *
+ * WHY IT IS NEEDED AT ALL. #244 taught `closeOfTag` that a comment ends at
+ * `-->` and not at the first `>` inside it. That repaired every reader built on
+ * it — `textOf`, `slotText`, `closingIndexOf` — and it did not reach the layer
+ * ABOVE. `svgsIn`, `figuresIn`, `textNodesIn` and `unparsedFigureMarkers` each
+ * run a regex over raw markup, so markup a comment switched off still reads as
+ * markup on the page. Measured 2026-08-30 against the gate at `fe51fa1`: a
+ * commented-out <figure> fails R-N, a commented-out declared <figure> fails R-C
+ * twice, and a commented-out <text> node holding a digit fails R-D. Sixteen
+ * shipped pages carry 100 comments inside <main>, because every plate on this
+ * site is preceded by a comment recording its design rationale. The complaint
+ * names markup no reader will ever see, and the cheapest way to green a false
+ * failure is to delete the comment that explains the figure.
+ *
+ * A STYLE ISLAND IS THE SAME DEFECT IN DIFFERENT CLOTHES. `[data-fig="plate"]`
+ * in a CSS rule is a selector, not an attribute, and it is counted as a
+ * `data-fig` the gate could not parse. A `<figure>` named inside a CSS comment
+ * is documentation, and it is checked for caption slots it will never have.
+ * Both are markup-shaped text the browser never makes an element from. Today
+ * every island on this site sits ABOVE <main>, which is the only reason the
+ * gate is green — a position nobody promised to hold, not a property of the
+ * parser.
+ *
+ * COMMENTS ARE DELETED, NOT BLANKED, and that is the same call `textNodesIn`
+ * makes about a <tspan>. Removing a comment node joins the text runs either
+ * side of it, which is what the reader sees: `n=<!-- note -->54` renders
+ * `n=54`. Blanking would write `n= 54` and invent a word break, which would
+ * then not match the baseline value the page still renders.
+ *
+ * The pass runs left to right, so position decides precedence: a <style> inside
+ * a comment is comment, and a comment inside a <style> is style.
+ */
+function stripNonMarkup(region) {
+  let out = '';
+  let i = 0;
+  while (i < region.length) {
+    const lt = region.indexOf('<', i);
+    if (lt === -1) return out + region.slice(i);
+    out += region.slice(i, lt);
+
+    if (region.startsWith('<!--', lt)) {
+      const end = region.indexOf('-->', lt + 4);
+      // An unterminated comment runs to the end of the region, as it does in a
+      // browser. Keeping the tail would be reading markup nobody can see.
+      if (end === -1) return out;
+      i = end + 3;
+      continue;
+    }
+
+    const gt = closeOfTag(region, lt);
+    if (gt === -1) return out + region.slice(lt); // an unclosed tag is text
+    const openTag = region.slice(lt, gt + 1);
+    out += openTag;
+    i = gt + 1;
+
+    const tag = (openTag.match(/^<([a-zA-Z][\w-]*)/) || [])[1];
+    if (!tag || openTag.endsWith('/>') || !RAW_TEXT_ELEMENTS.has(tag.toLowerCase())) continue;
+    // Raw text runs to the close tag and no `<` inside it opens anything, which
+    // is why this cannot be left to the ordinary tag walk above.
+    const close = new RegExp(`</${tag}\\s*>`, 'i').exec(region.slice(i));
+    if (!close) return out;
+    out += close[0];
+    i += close.index + close[0].length;
+  }
+  return out;
 }
 
 /*
@@ -694,6 +774,7 @@ if (require.main === module) {
 module.exports = {
   decodeEntities,
   normalize,
+  stripNonMarkup,
   contentRegion,
   svgsIn,
   textNodesIn,
