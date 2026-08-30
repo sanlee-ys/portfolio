@@ -52,9 +52,9 @@ const OUT_PATH = path.join(REPO_ROOT, 'src', 'data', 'figures.json');
  * ---------------------------------------------------------------------------
  * THE PLOT REGISTRY
  * ---------------------------------------------------------------------------
- * Empty on purpose. This lane ships the machinery; the first plot ships with
- * the page that needs it, because a plot definition asserts what an artifact
- * says, and no lane may assert that without reading the artifact.
+ * A plot definition asserts what an artifact says, so only a lane that read the
+ * artifact may add one. Each entry below names the file it read, and the caption
+ * on the page repeats that name and the commit.
  *
  * A definition carries six fields. Copy this shape:
  *
@@ -83,7 +83,89 @@ const OUT_PATH = path.join(REPO_ROOT, 'src', 'data', 'figures.json');
  *   3. Every digit the page shows comes from `values`. The caption names the
  *      repository, the artifact, and the commit, in `.fig-what`.
  */
-const PLOTS = [];
+const PLOTS = [
+  /*
+   * dnc1-power, on `src/pages/projects/defense-news-classifier.astro`.
+   *
+   * WHAT IT ARGUES. One pre-registered bar, and one prompt clause measured twice
+   * against it. The first run reverted at p=0.0522. A re-run on twice the rows
+   * landed at p=0.0002 and shipped. The bar never moved. Prose can only assert
+   * that a threshold held; a shared axis draws it.
+   *
+   * WHY THIS ARTIFACT. The pre-registration is the one committed file that
+   * carries all three numbers: the bar, and both verdicts. Both eval reports
+   * name it as canonical for the decision rule. Each p-value was also read in
+   * the report that produced it, at this same commit:
+   * `evals/region_clause_ab.txt` gives 0.0522 and `evals/region_clause_rerun.txt`
+   * gives 0.0002. Two readings agree, so the page publishes one.
+   *
+   * WHY A LOG AXIS, AND WHY IT IS NOT A KINDNESS. A p-value is read in decades.
+   * On a linear axis 0.0002 and zero paint the same pixel, and the reader loses
+   * the whole gain of the second run. On a log axis the first run lands about
+   * one pixel off the bar, which is the honest picture: it missed by 0.0022, and
+   * the page says the experiment lacked the power to decide. The verdict word on
+   * each row is what carries the outcome, because one pixel cannot.
+   */
+  {
+    key: 'dnc1-power',
+    repo: 'defense-news-classifier',
+    ref: 'v3.2.1',
+    artifact: 'docs/specs/global-boundary-clause-rerun.md',
+    viewBox: [0, 0, 260, 132],
+    extract(text) {
+      const one = (label, pattern) => {
+        const m = pattern.exec(text);
+        if (!m) {
+          throw new Error(
+            `dnc1-power: "${label}" is not in this artifact at this commit.\n`
+            + '  The spec was reformatted, or the wrong file is pinned. Re-read it and fix the '
+            + 'pattern. A missing p-value must never become a default.'
+          );
+        }
+        const value = Number(m[1]);
+        if (!Number.isFinite(value) || value <= 0 || value > 1) {
+          throw new Error(`dnc1-power: "${label}" read as "${m[1]}", which is not a p-value.`);
+        }
+        return { label, value };
+      };
+      return [
+        one('pre-registered bar', /^\|\s*Pre-registered bar\s*\|\s*p < ([0-9.]+)\s*\|/m),
+        one(
+          'first run, region McNemar p',
+          /^\|\s*McNemar exact, two-sided\s*\|\s*\*\*p = ([0-9.]+)\*\*\s*\|/m
+        ),
+        one('re-run, region McNemar p', /^\|\s*1\. Region [^|]*\|[^|]*\bp = ([0-9.]+)\)[^|]*\|/m),
+      ];
+    },
+    layout(values) {
+      const at = (label) => {
+        const found = values.find((v) => v.label === label);
+        if (!found) throw new Error(`dnc1-power: layout wanted "${label}" and did not get it.`);
+        return found.value;
+      };
+      // The axis spans four decades, p = 1 down to p = 0.0001. Left is less
+      // evidence, right is more.
+      const DECADES = [0, -4];
+      const TRACK = [24, 200];
+      const x = (p) => {
+        if (p < 1e-4 || p > 1) {
+          throw new Error(
+            `dnc1-power: p=${p} sits outside the drawn axis (1 down to 0.0001).\n`
+            + '  Widen the axis deliberately. Never clamp a point onto a bar it did not reach.'
+          );
+        }
+        return scale(DECADES, TRACK, Math.log10(p));
+      };
+      return {
+        axisX0: TRACK[0],
+        axisX1: TRACK[1],
+        barX: x(at('pre-registered bar')),
+        firstX: x(at('first run, region McNemar p')),
+        rerunX: x(at('re-run, region McNemar p')),
+      };
+    },
+  },
+];
 
 /*
  * ---------------------------------------------------------------------------
