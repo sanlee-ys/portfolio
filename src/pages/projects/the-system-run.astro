@@ -314,7 +314,13 @@ import SiteNav from '../../components/SiteNav.astro';
              plate does not repeat it. The seam that let the drift through is
              shown on the-system.html, and .fig-limit links there rather than
              showing it a second time in a second grammar. Zero digits here.
-             Every count stays in the notes above. -->
+             Every count stays in the notes above.
+
+             data-place="spine" here is DECLARATIVE and it paints nothing. The
+             rules that read data-place are direct-child selectors, and this
+             figure sits inside a list item. The attribute states the per-kind
+             width policy for a plate, so a later move of this figure to the
+             article grid keeps the policy it already carries. -->
         <figure class="fig" data-fig="plate" data-place="spine">
           <span class="fig-label">Plate 02</span>
           <svg class="tsr1-hygiene" viewBox="0 0 260 96" role="img"
