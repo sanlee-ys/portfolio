@@ -11,17 +11,27 @@ import SiteNav from '../components/SiteNav.astro';
   <Fragment slot="head">
   <style is:inline>
     /* Used-here plate. Textbook vs this system's meaning. No oxide:
-       this is a glossary, not a reversal. */
-    .gloss-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       this is a glossary, not a reversal.
+
+       The plate now sits in the MONOGRAPH figure ladder (ADR-014). The
+       wrapper is the .fig fig--plate div, so style.css owns the width cap
+       (--fig-plate), the night ground, the pocket edition, and the owned
+       margin. The four declarations that stated those here are DELETED
+       rather than out-cascaded, per the ladder's own rule. What stays is
+       page-scoped: the stroke, the fill, and the type inside this one
+       drawing. */
+    /* The box stroke reads --stroke-figure, not --rule-strong (ADR-014,
+       amendment A2). The two tokens are the same hex in light. In dark the
+       figure token is #b0a591 against the global rule's #6b6252, so the
+       night retune reaches the plate and leaves every rule outside the
+       figure layer at its July value. I0 moved the two prototype pages'
+       plates and left each remaining page's plate to that page's lane.
+       fill: var(--bg) is deliberate and unchanged: --bg is scoped to
+       --fig-ground inside a dark figure, so the knockout tracks the lifted
+       ground instead of punching a darker hole in it. */
     .gloss-plate .gp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .gloss-plate .gp-lane {
@@ -37,21 +47,26 @@ import SiteNav from '../components/SiteNav.astro';
       font-size: 11px;
       font-weight: 500;
     }
-    .gloss-plate .gp-micro {
-      fill: var(--muted);
-      font-family: var(--mono);
-      font-size: 8px;
-    }
+    /* .gp-micro is DELETED. No <text> node on this page ever carried it, so
+       it drew nothing; it declared 8px, which the microtext floor now
+       forbids (CLAUDE.md, ADR-014 section 5). A dead below-floor rule is a
+       trap for the next editor of this plate. */
     .gloss-plate .gp-edge {
       fill: none;
       stroke: var(--muted);
       stroke-width: 1.5;
     }
     .gloss-plate marker path { fill: var(--muted); }
+    /* The caption now sits INSIDE the figure wrapper, so the PL-2 ladder in
+       style.css does not reach it: the ladder owns direct children of
+       main.wrap only. 14px is the value the consolidated .fig figcaption
+       grammar states, so the plate and its caption sit at one distance
+       everywhere on the site. The old bottom margin is gone; the wrapper
+       owns the air under the figure now. */
     .gloss-plate-caption {
       color: var(--muted);
       font-size: 0.92rem;
-      margin: 0 0 18px;
+      margin: 14px 0 0;
     }
   </style>
   </Fragment>
@@ -66,6 +81,15 @@ import SiteNav from '../components/SiteNav.astro';
       Terms used on this site, each defined as it is used here and tied to a
       decision.
     </p>
+    <!-- The plate takes its number and its kind in the five-kind vocabulary
+         (ADR-014, PL-3): a real span with a hand-authored digit, in flow,
+         one line above the artwork, at every width. It is the only figure on
+         this page, so it is Plate 01. The wrapper is a div and never a
+         <figure>: figure-contract.cjs fails a <figure> that carries no
+         data-fig, and a data-fig figure owes two caption slots this
+         one-slot caption does not have. -->
+    <div class="fig fig--plate">
+    <span class="fig-label">Plate 01</span>
     <svg class="gloss-plate" viewBox="0 0 260 72" role="img"
          aria-label="These are not textbook definitions. Each term is defined the way it was used in this system, and why it mattered here.">
       <title>Textbook meaning on the left. How I used it here on the right.</title>
@@ -86,6 +110,7 @@ import SiteNav from '../components/SiteNav.astro';
     <p class="gloss-plate-caption">
       Filter the list. Each entry points at a decision on this site.
     </p>
+    </div>
 
     <input
       type="search"

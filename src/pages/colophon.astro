@@ -11,17 +11,27 @@ import SiteNav from '../components/SiteNav.astro';
   <Fragment slot="head">
   <style is:inline>
     /* How-it-was-made plate. I set, it types, I check. Open pipeline,
-       no oxide: this is the method, not a reversal. */
-    .made-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       no oxide: this is the method, not a reversal.
+
+       The plate now sits in the MONOGRAPH figure ladder (ADR-014). The
+       wrapper is the .fig fig--plate div, so style.css owns the width cap
+       (--fig-plate), the night ground, the pocket edition, and the owned
+       margin. The four declarations that stated those here are DELETED
+       rather than out-cascaded, per the ladder's own rule. What stays is
+       page-scoped: the stroke, the fill, and the type inside this one
+       drawing. */
+    /* The box stroke reads --stroke-figure, not --rule-strong (ADR-014,
+       amendment A2). The two tokens are the same hex in light. In dark the
+       figure token is #b0a591 against the global rule's #6b6252, so the
+       night retune reaches the plate and leaves every rule outside the
+       figure layer at its July value. I0 moved the two prototype pages'
+       plates and left each remaining page's plate to that page's lane.
+       fill: var(--bg) is deliberate and unchanged: --bg is scoped to
+       --fig-ground inside a dark figure, so the knockout tracks the lifted
+       ground instead of punching a darker hole in it. */
     .made-plate .md-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .made-plate .md-title {
@@ -30,10 +40,17 @@ import SiteNav from '../components/SiteNav.astro';
       font-size: 10px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). The
+       plate holds a 260-unit viewBox and renders at scale 1.046 in a 320px
+       viewport, so a declared 9px renders at 9.42px. The rule says raise the
+       declared unit and never scale the plate, because a plate that grows
+       only under a phone breakpoint renders smaller again above it. The
+       three labels are byte-exact; the longest, "then it ships", measures
+       70.4 units at 9px inside a 76-unit box, so nothing overflows. */
     .made-plate .md-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .made-plate .md-edge {
       fill: none;
@@ -41,10 +58,16 @@ import SiteNav from '../components/SiteNav.astro';
       stroke-width: 1.5;
     }
     .made-plate marker path { fill: var(--muted); }
+    /* The caption now sits INSIDE the figure wrapper, so the PL-2 ladder in
+       style.css does not reach it: the ladder owns direct children of
+       main.wrap only. 14px is the value the consolidated .fig figcaption
+       grammar states, so the plate and its caption sit at one distance
+       everywhere on the site. The old bottom margin is gone; the wrapper
+       owns the air under the figure now. */
     .made-plate-caption {
       color: var(--muted);
       font-size: 0.92rem;
-      margin: 0 0 18px;
+      margin: 14px 0 0;
     }
   </style>
   </Fragment>
@@ -59,6 +82,15 @@ import SiteNav from '../components/SiteNav.astro';
       How I built this site. The method, and the session record that is its
       evidence.
     </p>
+    <!-- The plate takes its number and its kind in the five-kind vocabulary
+         (ADR-014, PL-3): a real span with a hand-authored digit, in flow,
+         one line above the artwork, at every width. It is the only figure on
+         this page, so it is Plate 01. The wrapper is a div and never a
+         <figure>: figure-contract.cjs fails a <figure> that carries no
+         data-fig, and a data-fig figure owes two caption slots this
+         one-slot caption does not have. -->
+    <div class="fig fig--plate">
+    <span class="fig-label">Plate 01</span>
     <svg class="made-plate" viewBox="0 0 260 72" role="img"
          aria-label="How I built this site. I set the direction. An agent did most of the typing. I checked the output against the real repos before it shipped.">
       <title>I set the aim. The agent types. I check the output.</title>
@@ -83,6 +115,7 @@ import SiteNav from '../components/SiteNav.astro';
     <p class="made-plate-caption">
       I set the direction. Claude typed. The ledger is the proof.
     </p>
+    </div>
     <p>
       I built this site the way I would run any small project with an agent. I
       set the direction, the contracts, and the bar. Claude did most of the
