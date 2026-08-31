@@ -12,19 +12,20 @@ import SiteNav from '../../components/SiteNav.astro';
   <Fragment slot="head">
   <style is:inline>
     /* JTBD pipeline strip (portfolio ADR-004). Page-scoped: open four-stage
-       flow for this product framing, not a shared diagram type. Max-width 260
-       keeps viewBox units 1:1 with CSS px on every gate width (same measured
-       discipline as .backedge / .lab-topo / .two-fail). */
-    .jtbd-strip {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       flow for this product framing, not a shared diagram type.
+
+       The plate geometry moved to the gallery ladder (ADR-014). The wrapper
+       is .fig.fig--plate, and style.css caps the artwork at --fig-plate. This
+       rule therefore sets no width, no max-width, and no margin. The ladder
+       is the one owner of all three.
+
+       The 1:1 unit discipline goes with them, so this plate owes a
+       measurement. I measured it on 2026-08-31. The plate renders at 272px in
+       a 320px viewport, which is scale 1.046. Declared units meet the 9px
+       microtext floor here. The scale does not meet it for them. */
     .jtbd-strip .jtbd-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .jtbd-strip .jtbd-title {
@@ -33,10 +34,11 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). */
     .jtbd-strip .jtbd-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .jtbd-strip .jtbd-edge {
       fill: none;
@@ -51,22 +53,11 @@ import SiteNav from '../../components/SiteNav.astro';
       stroke-linecap: round;
     }
     .jtbd-strip marker path { fill: var(--muted); }
-    .jtbd-strip-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 6px;
-    }
 
     /* Now / Next / Later plate. Page-scoped: sequence, not the item list
        (the three columns below carry those). Solid / hairline / dashed
-       dual-encode horizon. No oxide: this is a roadmap, not a reversal. */
-    .nnl-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       dual-encode horizon. No oxide: this is a roadmap, not a reversal.
+       Geometry: the gallery ladder owns it, as on .jtbd-strip above. */
     .nnl-plate .nn-now {
       fill: var(--bg);
       stroke: var(--text);
@@ -74,7 +65,7 @@ import SiteNav from '../../components/SiteNav.astro';
     }
     .nnl-plate .nn-next {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .nnl-plate .nn-later {
@@ -89,15 +80,11 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). */
     .nnl-plate .nn-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
-    }
-    .nnl-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 12px;
+      font-size: 9px;
     }
 
     /* Capacity-gate plate (portfolio ADR-004, ADR-012). Page-scoped: the three
@@ -105,17 +92,11 @@ import SiteNav from '../../components/SiteNav.astro';
        geometry as the homepage .method-plate on purpose — this gate is that
        method turned on the build capacity itself. Open pipeline, no oxide: the
        gate returned a clear answer, and a step down on evidence is not a
-       reversal. It carries no number, so it cannot go stale. ADR-010 N/A. */
-    .gp-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       reversal. It carries no number, so it cannot go stale. ADR-010 N/A.
+       Geometry: the gallery ladder owns it, as on .jtbd-strip above. */
     .gp-plate .gp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .gp-plate .gp-title {
@@ -125,10 +106,11 @@ import SiteNav from '../../components/SiteNav.astro';
       font-weight: 600;
       letter-spacing: 0.04em;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). */
     .gp-plate .gp-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .gp-plate .gp-edge {
       fill: none;
@@ -136,59 +118,28 @@ import SiteNav from '../../components/SiteNav.astro';
       stroke-width: 1.5;
     }
     .gp-plate marker path { fill: var(--muted); }
+
+    /* The two-slot caption grammar left this page (ADR-014, OC-F closed).
+
+       This page carried a COPY of the origin block in
+       src/pages/projects/context-architecture.astro at commit 9d81caa (pull
+       request #247). The copy existed because a concurrent session owned
+       public/assets/style.css and two writers on one stylesheet cannot merge.
+       That session merged. The MONOGRAPH integration then gave .fig, .fig
+       figcaption, .fig-what, and .fig-limit one home in style.css. This lane
+       deletes the copy rather than keep it in step by hand.
+
+       Three single-slot captions stay page-scoped, below. They caption bare
+       plates inside a div.fig wrapper and not inside a figure element. They
+       hold no .fig-limit, and no gate reads them. Each one carries the class
+       fig-what, which puts it in the consolidated note voice. The rule below
+       sets the box only, because style.css owns the voice. */
+    .jtbd-strip-caption,
+    .nnl-plate-caption,
     .gp-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 12px;
+      max-width: var(--content);
+      margin: 14px auto 0;
     }
-
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
-
-       COPY. The origin is src/pages/projects/context-architecture.astro at
-       commit 9d81caa (pull request #247), and the four rules below are that
-       block verbatim. Change the origin page first, then re-copy here. The
-       comment under the rules repeats this. It is page-scoped on purpose: a
-       concurrent session owns public/assets/style.css for the tap-target
-       work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges.
-
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses.
-
-       The quiet voice is a token, never opacity (ADR-009). Both slots are
-       block-level, so the limit reads as its own line and not as a tail. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    /* COPIED, not authored. The block above is a verbatim copy of the origin
-       block in src/pages/projects/context-architecture.astro at commit
-       9d81caa. A shared grammar is copied and never extracted, because two
-       lanes cannot both edit one stylesheet. Do not edit the copy on its own.
-       Change the origin page first.
-
-       The one declaration this page adds sits below, and it is a layout need
-       and not a change to the grammar. Every .fig here is a grid item of the
-       page grid, and a grid item defaults to its content's minimum width, so a
-       long word inside a figure widens the page. */
-    .fig { min-width: 0; }
 
     /* pp1: the axis board. A STRIP, so it re-lays text and draws nothing.
        Two lists sit under this section today, and the reader has to join a
@@ -241,21 +192,13 @@ import SiteNav from '../../components/SiteNav.astro';
 
     /* pp2: three independent measurements, one verdict. The claim recurs on
        four pages and is drawn on none, so it is drawn once here. Hand-drawn,
-       so it holds no digit: the figures stay in the bullets above it. Max-
-       width 260 keeps one viewBox unit at one CSS pixel down to 320px, and
-       the figure carries no padding, so the container is the content track.
+       so it holds no digit: the figures stay in the bullets above it. The
+       gallery ladder owns the geometry (ADR-014), as on .jtbd-strip above.
        Its own marker id and its own marker, because a marker does not inherit
        the stroke of the path that references it. */
-    .pp2-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 4px 0 0;
-    }
     .pp2-plate .pp2-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .pp2-plate .pp2-verdict {
@@ -270,10 +213,11 @@ import SiteNav from '../../components/SiteNav.astro';
       font-weight: 600;
       letter-spacing: 0.04em;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). */
     .pp2-plate .pp2-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .pp2-plate .pp2-edge {
       fill: none;
@@ -375,7 +319,14 @@ import SiteNav from '../../components/SiteNav.astro';
          Firehose → Triage → Queryable KB → Brief. Three L→R muted edges only.
          No return edge, and no oxide, because this is not a failure claim and
          not a reversal claim. ADR-010 does not apply. There is no interactive
-         node here. -->
+         node here.
+
+         Plate 01 of six (ADR-014). A bare plate takes a div.fig wrapper and
+         never a figure element. A figure carries the two-slot caption rule,
+         and this plate holds one caption slot. data-place="spine" states the
+         width policy for the kind: a plate sits on the content track. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 01</span>
     <svg class="jtbd-strip" viewBox="0 0 260 72" role="img"
          aria-label="Triage sorts the defense-news firehose by relevance and category into a queryable knowledge base. The analyst briefs from a prepared store, and not from a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.">
       <title>Triage sorts the defense-news firehose by relevance and category into a queryable knowledge base. The analyst briefs from a prepared store, and not from a raw feed. Stages in order: Firehose, Triage, Queryable KB, Brief.</title>
@@ -423,10 +374,11 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="jtbd-micro" x="162" y="60" text-anchor="middle">ask store</text>
       <text class="jtbd-micro" x="228" y="60" text-anchor="middle">analyze</text>
     </svg>
-    <p class="jtbd-strip-caption">
+    <p class="fig-what jtbd-strip-caption">
       Firehose in; brief out. Triage and a queryable knowledge base sit in the
       middle, so the analyst does not spend analysis time on the sort.
     </p>
+    </div>
 
     <h2>Who it is for</h2>
     <p>
@@ -472,7 +424,8 @@ import SiteNav from '../../components/SiteNav.astro';
          Three muted edges converge on one verdict box. No oxide, because a
          measurement that returns a "no" is not a decision taken back.
          ADR-010 does not apply. There is no interactive node here. -->
-    <figure class="fig" data-fig="plate">
+    <figure class="fig" data-fig="plate" data-place="spine">
+      <span class="fig-label">Plate 02</span>
       <svg class="pp2-plate" viewBox="0 0 260 96" role="img"
            aria-label="Three boxes point down into one verdict box. The three are the retired retrieval layer, the premium-model escalation, and the judge-reliability study. Each one is marked measured. The verdict box reads: the same verdict.">
         <title>Three independent measurements, and one verdict.</title>
@@ -519,6 +472,10 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <h2>Roadmap (program framing)</h2>
     <p>I sequenced the work Now / Next / Later. I harvested the sequence from delivery.</p>
+    <!-- Plate 03 of six (ADR-014). Bare plate, so the wrapper is a div.fig
+         and not a figure element. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 03</span>
     <svg class="nnl-plate" viewBox="0 0 260 72" role="img"
          aria-label="Program sequence. Now is shipped, Next is queued, Later is deferred. Later includes explicit non-goals.">
       <title>Now shipped, Next queued, Later deferred.</title>
@@ -533,10 +490,11 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="nn-micro" x="218" y="38" text-anchor="middle">deferred</text>
       <text class="nn-micro" x="130" y="64" text-anchor="middle">harvested from delivery</text>
     </svg>
-    <p class="nnl-plate-caption">
+    <p class="fig-what nnl-plate-caption">
       Solid is shipped. Hairline is queued. Dashed is deferred, and it includes
       the things I will not build.
     </p>
+    </div>
     <div class="roadmap">
       <div>
         <h3>Now</h3>
@@ -587,8 +545,9 @@ import SiteNav from '../../components/SiteNav.astro';
          the row, and the row keeps a pointer here, so the register still lists
          six risks. No oxide. --accent-warm marks a decision that I took back,
          and a risk that fired is not that. -->
-    <figure class="fig" id="risk-drift" data-fig="strip"
+    <figure class="fig" id="risk-drift" data-fig="strip" data-place="spine"
             aria-label="The one risk in the register that happened: silent contract drift between separate repos.">
+      <span class="fig-label">Strip 04</span>
       <ul class="pp3-rows">
         <li class="pp3-row">
           <p class="pp3-label">Risk</p>
@@ -625,6 +584,10 @@ import SiteNav from '../../components/SiteNav.astro';
       nothing changes until the close. Then I let the axes decide.
     </p>
 
+    <!-- Plate 05 of six (ADR-014). Bare plate, so the wrapper is a div.fig
+         and not a figure element. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 05</span>
     <svg class="gp-plate" viewBox="0 0 260 72" role="img"
          aria-label="How I ran the capacity review. I pre-registered the evidence axes before any evidence existed. I froze every change until the close. Then I ruled on the record. The gate returned a step down.">
       <title>Pre-register the axes, freeze until the close, rule on the record.</title>
@@ -647,10 +610,11 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="gp-micro" x="220" y="38" text-anchor="middle">on the record</text>
       <text class="gp-micro" x="130" y="64" text-anchor="middle">the gate said step down</text>
     </svg>
-    <p class="gp-plate-caption">
+    <p class="fig-what gp-plate-caption">
       Two design choices did all the work. I wrote the axes before the evidence
       existed, and nothing changed until the close.
     </p>
+    </div>
 
     <p>
       Those two choices are the whole method. I wrote the axes first, so nothing
@@ -686,8 +650,9 @@ import SiteNav from '../../components/SiteNav.astro';
          vendor, a lane, a seat identity, a dollar figure, an account or
          billing detail, a machine identity, a repository of any kind, or
          anything internal to the employer. -->
-    <figure class="fig" data-fig="strip"
+    <figure class="fig" data-fig="strip" data-place="spine"
             aria-label="The capacity review as one board. Three rows report what the axes produced. Three rows state the rulings that followed.">
+      <span class="fig-label">Strip 06</span>
       <ul class="pp1-rows">
         <li class="pp1-row">
           <p class="pp1-claim">One axis produced repeated, measured value.</p>
