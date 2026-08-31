@@ -192,10 +192,11 @@
        --text-secondary #383533 ........ 11.65:1  (was 10.89)
        --muted #5f5c58 ................. 6.37:1   (was 5.81)  labels, dates
        --accent #1d4e73 ................ 8.41:1   (was 7.86)  hex unchanged
-       --accent-quiet #3e6785 .......... 5.77:1   (was 5.39)  hex unchanged
        --accent-warm #5e1f0d ........... 11.98:1  (was 11.20) hex unchanged
        --rule-strong #423f3c ........... 10.01:1  (was 9.23)
-       --border #dedbd8 ................ 1.32:1   (was 1.32)  pinned by ratio
+       --border ........................ ~1.3:1   alpha ink; pinned by ratio
+     --accent-quiet is RETIRED (ADR-014, MONOGRAPH landing). It carried one
+     consumer at the end. Every former consumer now reads --muted.
      All of them clear 4.5:1 for body text, which matters because both accents
      are used ON TEXT here (tags, IDs, chips), not only on rules and markers.
      The figures above were stale before this pass — they described the tokens
@@ -218,13 +219,10 @@
      belongs on paper. */
   --accent: #1d4e73;
   --accent-soft: rgba(29, 78, 115, 0.10);
-  /* The ink, one step back — for a mark that belongs to the link colour but
-     should not compete with the words around it (currently the flow line's
-     arrows). It is the value `--accent` at `opacity: 0.85` used to composite
-     to on the old cream, written down instead of computed at paint time so a
-     checker can read it. The hex is unchanged by the ground change and reads
-     5.77:1 on this paper, up from 5.39:1 on the cream. */
-  --accent-quiet: #3e6785;
+  /* --accent-quiet stood here until the MONOGRAPH landing (ADR-014). The token
+     held one job at the end: a quieter blue for the flow line's arrows. The
+     metadata ink already carries that rank, so the arrows read --muted now and
+     the token is deleted. One token fewer is one drift surface fewer. */
   /* ---- The second hue: reversal ----------------------------------------
      A correction-ink counterpart to the blue, and it carries ONE meaning:
      this is the record of something that was built and then taken back —
@@ -260,8 +258,16 @@
      not findable by colour alone. The hue is now reinforcement rather than the
      signal, which is the right order for it. */
   --accent-warm: #5e1f0d;
-  --accent-warm-soft: rgba(94, 31, 13, 0.10);
-  --border: #dedbd8;
+  /* The reversal wash, one step up from the July 0.10 (ADR-014): a hatched or
+     washed cell must read at gallery scale, where a plate hangs at 24rem. The
+     PL-11 sweep checks every SVG fill site in both themes; no text sits on the
+     raised fill. */
+  --accent-warm-soft: rgba(94, 31, 13, 0.16);
+  /* The hairline is alpha ink now, not a solid hex (ADR-014). An alpha rule
+     keeps one temperature on every ground it crosses: the paper, a code tint,
+     and the lifted dark figure ground below. The rendered ratio stays ~1.3:1
+     on the bare ground, which is what a hairline is. */
+  --border: rgba(30, 28, 27, 0.14);
   --btn-text: #ffffff;
   --shadow: rgba(28, 25, 23, 0.10);
   /* ---- Two weights of rule ---------------------------------------------
@@ -293,6 +299,35 @@
   --radius-sm: 2px;
   --radius: 2px;
   --radius-lg: 3px;
+  /* ---- MONOGRAPH tokens (ADR-014) --------------------------------------
+     The figure stroke. It carries every strong plate stroke inside the
+     figure layer, so the night retune reaches the plates and nothing else.
+     Light is byte-equal to --rule-strong. Every rule outside the figures
+     keeps its July value (PL-10 scope, amendment A2). */
+  --stroke-figure: #423f3c;
+  /* The figure ground. Transparent on paper: a plate sits on the page. The
+     dark theme lifts it (see the night block), the READOUT graft. */
+  --fig-ground: transparent;
+  /* The tick: the cell-level rule. The rule law, stated once:
+     A CELL TAKES A TICK. A SECTION TAKES A RULE. Full-width 2px rules
+     survive on flow architecture only - the masthead, the section heads,
+     the decision entries, the tables, the footer. */
+  --tick: 2rem;
+  /* The spacing ladder. The article grids add margins and never collapse
+     them (PL-2), so each gap below is exactly ONE of these values, owned by
+     the block under the gap. The rhythm section applies them. */
+  --space-section: clamp(72px, 11vw, 120px);
+  --space-figure: clamp(36px, 7vw, 64px);
+  --space-block: 28px;
+  --space-tight: 12px;
+  /* The gallery ladder for figures. A 260-unit plate hangs at 24rem
+     (~1.48x); a dense plate steps down to 20rem; a plot takes 30rem. */
+  --fig-plate: 24rem;
+  --fig-plate-compact: 20rem;
+  --fig-plot: 30rem;
+  /* Landing scope for the diff idiom: a deleted line takes the reversal
+     hue. The bar test passes literally - a deleted line was cut. */
+  --diff-del: var(--accent-warm);
   /* ---- The two tracks (ADR-008) ---------------------------------------
      --content is the prose measure. --wide is where objects with an intrinsic
      width go: tables, the diagram, the multi-column grids. They are
@@ -434,16 +469,27 @@ html[data-theme="dark"] {
   --muted: #9a9081;
   --accent: #9cb8d2;
   --accent-soft: rgba(156, 184, 210, 0.13);
-  --accent-quiet: #889fb5; /* see the light-theme note; 6.77:1 here */
   /* Same correction as the light oxide, in the other direction: at #e0a163 the
      night copper measured 8.33:1 against prose at 10.93:1 — the same emphasis
      inversion. #ffbe77 is 11.36:1, and going UP rather than down is what keeps
      the chroma; a copper darkened to parity on this ground would have gone
      muddy where a lightened one stays plainly copper. */
   --accent-warm: #ffbe77;
-  --accent-warm-soft: rgba(255, 190, 119, 0.14);
-  --border: #332d24;
+  /* One step up from July's 0.14, with the light raise (ADR-014, PL-11). */
+  --accent-warm-soft: rgba(255, 190, 119, 0.22);
+  /* Designed asymmetry: bone ink at low alpha, not the light value inverted. */
+  --border: rgba(236, 228, 213, 0.17);
   --rule-strong: #6b6252;
+  /* PL-10: the rank ink > strong > quiet must hold inside a plate. At night
+     the plate quiet voice is --muted (#9a9081, 6.0:1), so the strong stroke
+     sits above it: #b0a591 measures 7.6:1 on --bg, and ink is 15:1. The July
+     dark --rule-strong (3.1:1) is untouched outside the figure layer. */
+  --stroke-figure: #b0a591;
+  /* The lifted dark figure ground (READOUT graft, ADR-014): ~1.3:1 over the
+     page ground, so a plate reads as a mounted print at night. Inside a
+     figure, --bg is scoped to this value so knockout rects track the lifted
+     ground instead of punching darker holes; see the figure system. */
+  --fig-ground: #322a1e;
   --highlight: rgba(224, 161, 99, 0.15);
   --btn-text: #16130f;
   --shadow: rgba(0, 0, 0, 0.45);
@@ -756,13 +802,17 @@ em, i, cite {
    than a text serif's, so the same string set at 64px looks looser at the
    same tracking. This is the amount that closes it without the letters
    touching at the clamp ceiling. */
+/* THE MONOGRAPH DISPLAY JUMP (ADR-014). The growth concentrates at display
+   level: the masthead, the section titles, and the article h1 step up, and h2
+   down is near-unchanged. Faces and weights stay July's. Tracking tightens as
+   the size grows, the standard correction at a larger dose. */
 .hero h1 {
   font-family: var(--font);
-  font-size: clamp(2.6rem, 6.7vw, 4rem);
+  font-size: clamp(2.8rem, 7.6vw, 4.6rem);
   font-weight: var(--display-weight);
-  line-height: 1.02;
+  line-height: 1.0;
   margin: 0 0 20px;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
 }
 
 /* Hero identity line: the warm, first-person "who I am" statement, and the
@@ -953,10 +1003,33 @@ em, i, cite {
 .proof li {
   position: relative;
   counter-increment: proof;
-  border-top: 2px solid var(--rule-strong);
-  padding: 11px 0 0;
+  padding: 13px 0 0;
   display: flex;
   flex-direction: column;
+}
+
+/* ---- The tick system (ADR-014) ------------------------------------------
+   The rule law: A CELL TAKES A TICK. A SECTION TAKES A RULE. A cell's
+   full-width top rule becomes 2px of ink, 2rem long, top-left, and
+   whitespace does the rest of the separation. Full-width 2px rules survive
+   on flow architecture only: the masthead, the section heads, the decision
+   entries, the tables, the footer.
+   The tick is a pseudo-element box, never a background-image on the cell:
+   contrast-check.cjs refuses to resolve text over an ancestor
+   background-image, and a pseudo with no text resolves cleanly. The legend's
+   .mark-swatch already teaches the same border construction. */
+.proof li::after,
+.doors-index li::after,
+.stat-strip li::after,
+.repo-grid li::after,
+.roadmap > div::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--tick);
+  height: 2px;
+  background: var(--rule-strong);
 }
 
 /* 01 / 02 / 03 — a counter, not typed numerals, for the same reason the
@@ -1091,19 +1164,24 @@ em, i, cite {
 .proof a strong {
   display: block;
   margin-top: auto;
-  padding-top: 6px;
-  font-family: var(--mono);
+  padding-top: 10px;
+  /* The proof band is the homepage's first display moment (ADR-014, SHARPEN
+     graft on the monograph's native threshold): the figure crosses the
+     1.5rem display-metric line, so it renders in Geist at weight 500 with
+     tabular figures, over the claim that compresses around it. */
+  font-family: var(--font);
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-  /* rem, NOT em. It was 0.94em of the claim, so it tracked the claim's size —
-     and the claim came down a step when the band was reset as an index (see
-     the note above `.proof a`). The figure is the one thing in this band a
-     skeptic actually checks; it holds the 0.94rem it has always had and the
-     claim compresses around it. */
-  font-size: 0.94rem;
-  letter-spacing: -0.015em;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
   color: var(--text);
   white-space: nowrap;
+}
+@media (max-width: 360px) {
+  /* The longest figure sets wider than a 320px container at 1.5rem. The
+     figure keeps its display size and wraps inside its own cell. */
+  .proof a strong { white-space: normal; }
 }
 /* The stressed word inside a claim ("accuracy <em>fell</em>"). It used to be
    spelled out here because the band is a link and a link is where an inherited
@@ -1162,15 +1240,20 @@ em, i, cite {
   background: var(--accent-warm);
 }
 
-.proof li[data-outcome="reversal"] { border-top-color: var(--accent-warm); }
+/* A tick host carries the DOUBLED tick (ADR-014): 2px, a 1px gap, then the
+   1px companion - the same geometry as the full-width doubled mark, 2rem
+   long. Box-sizing is border-box, so a 4px box with a 2px top and a 1px
+   bottom border leaves exactly the 1px gap. Every geometry property is
+   restated over the shared tick rule, or the mark lands wrong. */
 .proof li[data-outcome="reversal"]::after {
-  content: "";
-  position: absolute;
+  top: 0;
   left: 0;
-  right: 0;
-  top: 3px;
-  height: 1px;
-  background: var(--accent-warm);
+  right: auto;
+  width: var(--tick);
+  height: 4px;
+  background: none;
+  border-top: 2px solid var(--accent-warm);
+  border-bottom: 1px solid var(--accent-warm);
 }
 .proof li[data-outcome="reversal"]::before { color: var(--accent-warm); }
 
@@ -1283,23 +1366,44 @@ em, i, cite {
    Nothing else about the ruled-head construction moved. */
 .section-title {
   font-family: var(--font);
-  font-size: clamp(1.75rem, 4.3vw, 2.2rem);
+  /* The monograph step (ADR-014): up from clamp(1.75rem, 4.3vw, 2.2rem). The
+     vertical margins moved to the rhythm ladder, which owns every gap inside
+     the article grids (PL-2). */
+  font-size: clamp(1.9rem, 4.6vw, 2.6rem);
   font-weight: var(--display-weight);
   line-height: 1.15;
-  margin: 76px 0 8px;
+  margin: 0;
   padding-top: 18px;
   border-top: 2px solid var(--rule-strong);
-  letter-spacing: -0.026em;
+  letter-spacing: -0.028em;
+}
+
+/* The section folio, on the homepage too (TITLE BLOCK graft, ADR-014): the
+   folio numeral and the title read as one construction at every width, the
+   same idiom the article h2 carries. A counter, not typed numerals - a
+   hand-typed index is one edit away from a lie (PL-4 governs FIGURE digits,
+   which stay hand-authored; a section folio was always a counter here). */
+main.wrap { counter-reset: folio; }
+main.wrap .section-title { counter-increment: folio; }
+main.wrap .section-title::before {
+  content: counter(folio);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin-right: 0.6em;
 }
 
 .section-sub {
   color: var(--text-secondary);
-  margin: 0 0 34px;
+  margin: 0;
 }
 
-/* Every section's intro paragraph sits the same distance below its title,
-   whether or not it carries an intro class. */
-.section-title + p { margin-top: 0; }
+/* The old `.section-title + p { margin-top: 0 }` rule retired with the rhythm
+   ladder (ADR-014): a heading holds its first block at --space-tight, and the
+   ladder owns that gap for every heading, intro class or not. */
 
 /* ---- Breakout grid (ADR-008) -------------------------------------------
    REPLACES the "One content column" rule that stood here until 2026-07-27.
@@ -1363,15 +1467,43 @@ em, i, cite {
    and nothing 404'd. */
 main.wrap > .measure { grid-column: full; }
 
+/* ---- PL-1: the reader grid fix (ADR-014) --------------------------------
+   The wide promotion below is a DIRECT-CHILD selector, and all seven telltale
+   frames sit inside <section class="tt-reader">, so the promotion never
+   reached them. The section is promoted to the full track and re-establishes
+   the page grid inside itself - the same construction main.wrap > .measure
+   uses above. Figures inside .decision are not promoted; they keep the
+   entry's own measure (A5). */
+main.wrap > .tt-reader { grid-column: full; }
+.tt-reader {
+  display: grid;
+  grid-template-columns: var(--page-grid);
+}
+.tt-reader > * {
+  grid-column: content;
+  /* A grid item's default min-width refuses to shrink below its content.
+     Every child gets the explicit zero, so a 120-column frame scrolls inside
+     its own box and never widens the page. */
+  min-width: 0;
+}
+.tt-reader > figure:not([data-place="spine"]) { grid-column: wide; }
+.tt-reader > .tt-reader-rail { grid-column: wide; }
+
 /* Promoted. The rule for adding to this list: an object belongs on `wide` if
    its CONTENT has an intrinsic width — a table with columns, an SVG with a
    viewBox, a grid with a minimum track. Prose never does, which is why prose
    is the thing that gets constrained. `.wide` is the escape hatch for
-   page-local artifacts (the gallery's masonry columns). */
+   page-local artifacts (the gallery's masonry columns). Bare `figure` and
+   `.fig` joined the list with the MONOGRAPH figure ladder (ADR-014): every
+   direct-child figure wrapper rides the wide track and its artwork centres.
+   The :not() arm is the `data-place` opt-out (TITLE BLOCK graft): a figure
+   pinned to the spine stays on the content track by construction, not by a
+   specificity race. */
 :is(main.wrap, .measure) > :is(
   table,
   pre,
-  figure.diagram-wrap,
+  figure,
+  .fig,
   .diagram,
   .stat-strip,
   .repo-grid,
@@ -1379,7 +1511,76 @@ main.wrap > .measure { grid-column: full; }
   .toc,
   .notes-list,
   .wide
-) { grid-column: wide; }
+):not([data-place="spine"]) { grid-column: wide; }
+
+/* ---- Named widths via data-place (TITLE BLOCK graft, ADR-014) -----------
+   data-place="spine" pins the content track; data-place="sheet" pins the
+   wide track. Per-kind defaults: plate and strip sit on the spine, and
+   frame, map, and plot take the sheet. The sheet arm needs only to beat the
+   content default above; the spine arm is the :not() opt-out on the
+   promotion list. */
+:is(main.wrap, .measure, .tt-reader) > [data-place="sheet"] { grid-column: wide; }
+
+/* ---- PL-2: the additive rhythm (ADR-014) --------------------------------
+   main.wrap, .measure, and .tt-reader are grid containers, so margins ADD
+   and never collapse. The ladder therefore gives every direct child ONE
+   owned top margin and no bottom margin, and each gap equals exactly one
+   stated value:
+     section seam ........ --space-section
+     around a figure ..... --space-figure
+     any other block ..... --space-block
+     head to first block . --space-tight
+   The per-block vertical margins these rules supersede are DELETED at their
+   shipped sites, not out-cascaded: the ladder is the one owner of grid
+   rhythm. A shipped margin that survives below (pre, table, .ci-plot, the
+   entry internals) serves a NESTED context the ladder does not reach, and
+   the ladder outranks it for direct children by specificity, not by source
+   order. No !important anywhere in this system. */
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > * {
+  margin-top: var(--space-block);
+  margin-bottom: 0;
+}
+/* Air around a figure. The gap above the figure and the gap under it are the
+   same owned value. */
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > :is(figure, .fig) {
+  margin-top: var(--space-figure);
+}
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > :is(figure, .fig) + * {
+  margin-top: var(--space-figure);
+}
+/* The section seam. On the homepage a section is a direct child; on the
+   article pages the seam sits above each h2. */
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > :is(section, .section-title, h2) {
+  margin-top: var(--space-section);
+}
+/* A heading holds its first block close. */
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > :is(h1, h2, h3, .section-title) + * {
+  margin-top: var(--space-tight);
+}
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > .ledger-intro + * {
+  margin-top: var(--space-tight);
+}
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > .stat-strip + .stat-note {
+  margin-top: 8px;
+}
+/* The Contents return owns the section seam; the head under it sits close.
+   Its 44px box lives inside the seam air, so the seam grows by the box and
+   the tight gap only. */
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > .toc-return {
+  margin-top: var(--space-section);
+}
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > .toc-return + h2 {
+  margin-top: var(--space-tight);
+}
+/* Reader chrome sits tight under its own intro. */
+main.wrap .tt-reader > .tt-reader-rail { margin-top: 16px; }
+main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
+/* The first block of a grid never opens a gap of its own. Written as
+   :is(:first-child) so it carries (0,3,1) and closes the section rule above
+   on a first-child section by source order, not by luck. */
+:is(main.wrap, main.wrap .measure, main.wrap .tt-reader) > :is(:first-child) {
+  margin-top: 0;
+}
 
 /* The marginalia system that turns these two tracks into a MARGIN lives at
    the very bottom of this file, not here. It has to: several of its rules
@@ -1496,8 +1697,9 @@ main.wrap > .measure { grid-column: full; }
   .card-link .arrow { transition: none; }
 }
 
-/* Spacing for the "read the full writeup" link beneath the homepage diagram. */
-.diagram-more { margin: 14px 0 8px; }
+/* The "read the full writeup" link beneath the homepage diagram. Its gap
+   belongs to the rhythm ladder now (ADR-014). */
+.diagram-more { margin: 0; }
 
 /* ---- Thumbable standalone links, phone and tablet ------------------------
    Measured at 390px: every link below stood alone as the only text of its
@@ -1505,8 +1707,8 @@ main.wrap > .measure { grid-column: full; }
    third of the 44px contract. The .diagram-more case is the homepage
    flagship and router cards; .repo-grid is the four repo names on
    the-system; .selected-work is the About page's three work links.
-   hit-target.cjs now measures every standalone anchor at 390px, so a
-   regression on any of them fails the build.
+   hit-target.cjs now measures every standalone anchor at 320/360/390/430px,
+   so a regression on any of them fails the build.
 
    The 900px cutoff and its reasoning are the nav and ToC blocks': below it a
    finger is plausible; above it this is a pointer target, and the padding
@@ -1677,7 +1879,7 @@ main.wrap > .measure { grid-column: full; }
 .about p { color: var(--text-secondary); margin: 0 0 16px; }
 
 /* ---- Project writeup components ---- */
-.article-body .lead { font-size: 1.18rem; line-height: 1.55; color: var(--text); margin: 0 0 26px; }
+.article-body .lead { font-size: 1.18rem; line-height: 1.55; color: var(--text); margin: 0; }
 
 /* "On this page" — an in-page map for the long writeups. Measured: the
    classifier is 3,194 words, 14.5 minutes, 10.1 screens at 900px tall. A ToC
@@ -1711,20 +1913,32 @@ main.wrap > .measure { grid-column: full; }
    sits; it changes what it is made of.
 ------------------------------------------------------------------------ */
 .toc {
-  margin: 30px 0 8px;
+  margin: 0; /* the rhythm ladder owns the gap (ADR-014) */
   padding: 14px 0 18px;
   border-top: 2px solid var(--rule-strong);
   border-bottom: 1px solid var(--border);
 }
 
+/* Chrome caps collapse to two registers (ADR-014): 0.72rem/600/0.14em for
+   block heads and 0.68rem/600/0.12em for labels. The doors nav is excluded:
+   its phone packing is a measured fit, and a re-track re-wraps the row. */
 .toc-heading {
   margin: 0 0 12px;
   font-family: var(--font);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-weight: 600;
   color: var(--muted);
+}
+/* The strip column heads and group labels (telltale) take the block-head
+   register. This is their consolidated home; the page island's copy retires
+   with lane I2. */
+.tt-strip-cols,
+.tt-s2-group {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
 }
 
 .toc ol {
@@ -1810,13 +2024,13 @@ main.wrap > .measure { grid-column: full; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 20px 32px;
-  margin: 22px 0;
+  margin: 0; /* the rhythm ladder owns the gap (ADR-014) */
   padding: 0;
   list-style: none;
 }
 .repo-grid li {
-  border-top: 1px solid var(--rule-strong);
-  padding: 12px 0 0;
+  position: relative;
+  padding: 13px 0 0; /* the tick replaces the full-width rule (ADR-014) */
 }
 .repo-grid strong {
   display: block;
@@ -1831,7 +2045,7 @@ main.wrap > .measure { grid-column: full; }
    remaining place on the site where a number sat inside a coloured disc. On
    paper a numbered step is a numeral in a ruled box, so that is what it is:
    square, hairline, mono, no fill. */
-.flow { list-style: none; counter-reset: step; padding: 0; margin: 18px 0; }
+.flow { list-style: none; counter-reset: step; padding: 0; margin: 0; }
 .flow li {
   position: relative;
   padding: 3px 0 18px 42px;
@@ -2031,7 +2245,7 @@ main.wrap > .measure { grid-column: full; }
   font-family: var(--font);
   font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em; /* the label register (ADR-014) */
   line-height: 1.45;
   color: var(--text-secondary);
   font-weight: 600;
@@ -2074,11 +2288,11 @@ main.wrap > .measure { grid-column: full; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 22px 32px;
-  margin: 22px 0;
+  margin: 0; /* the rhythm ladder owns the gap (ADR-014) */
 }
 .roadmap > div {
-  border-top: 1px solid var(--rule-strong);
-  padding: 12px 0 0;
+  position: relative;
+  padding: 13px 0 0; /* the tick replaces the full-width rule (ADR-014) */
 }
 .roadmap h3 {
   margin: 0 0 10px;
@@ -2092,8 +2306,8 @@ main.wrap > .measure { grid-column: full; }
 .roadmap ul { margin: 0; padding-left: 1.1rem; }
 .roadmap li { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 6px; }
 
-/* Interactive system diagram (SVG, Tier 3) */
-.diagram-wrap { margin: 18px 0; }
+/* Interactive system diagram (SVG, Tier 3). Its margins moved to the figure
+   system and the rhythm ladder (ADR-014). */
 /* Static text version of the system flow, sitting just above the interactive map.
    The map is the enhancement; this line is the seam in plain words, so the flow
    survives JS-off, mobile, screenshots, and a screen reader skimming the page. */
@@ -2105,15 +2319,13 @@ main.wrap > .measure { grid-column: full; }
   color: var(--muted);
   margin: 0 0 14px;
 }
-/* --accent-quiet, not `--accent` at 0.85. This one was never a violation: the
-   fade composited to 5.39:1 on paper and 6.77:1 at night, both comfortably
-   over. It is written as a token anyway, because the value of the rule "text
-   is never dimmed with opacity" is that it holds without exceptions — an
-   exception that happens to pass today is how the next author learns the fade
-   is available, and the next fade lands on something quieter. The token is set
-   to the pixel the fade was already producing, so the arrows render exactly as
-   they did. */
-.flow-line .flow-arrow { color: var(--accent-quiet); }
+/* --muted, and this line is where --accent-quiet retired (ADR-014). The old
+   token held a quieter blue for these arrows alone. The arrows are metadata
+   between mono names, and the metadata ink already carries that rank at 6.4:1
+   on paper and 6.0:1 at night. A one-consumer token was a drift surface, so
+   the consumer repoints and the token is deleted. The no-opacity rule stands:
+   a quieter thing takes a quieter token, never a fade. */
+.flow-line .flow-arrow { color: var(--muted); }
 /* The system map, drawn as a PLATE: a figure pasted onto the page, with a
    printed border and a caption under it.
 
@@ -2176,7 +2388,7 @@ main.wrap > .measure { grid-column: full; }
    `fill: transparent`; either works, and neither is optional. */
 .node rect {
   fill: none;
-  stroke: var(--rule-strong);
+  stroke: var(--stroke-figure); /* the figure layer's stroke rank (ADR-014) */
   stroke-width: 1;
   cursor: pointer;
   pointer-events: all;
@@ -2235,6 +2447,316 @@ main.wrap > .measure { grid-column: full; }
    ~150px and must be free to wrap at 320. */
 .diagram-detail .card-link { margin-left: 0.4em; }
 
+/* ===========================================================================
+   THE FIGURE SYSTEM: the gallery ladder (ADR-014, MONOGRAPH)
+   ---------------------------------------------------------------------------
+   Two designed measures, one optical centre: 34rem for prose, the ladder for
+   figures. Every direct-child figure wrapper rides the wide track (see the
+   promotion list) and its artwork centres. Plates hang at --fig-plate
+   (~1.48x of a 260-unit viewBox); dense plates step to --fig-plate-compact;
+   plots take --fig-plot; frames, maps, and strips take the wide track.
+   Figures nested inside .decision keep the entry's measure (A5).
+   This is also the ONE home for the caption grammar the thirteen page
+   islands carry as copies (OC-F closed). Each page lane deletes its local
+   copy in that page's own PR; until then the island copy wins ties by
+   source order, which is the same rendered result.
+   =========================================================================== */
+figure[data-fig],
+.fig,
+figure.diagram-wrap {
+  margin: var(--space-figure) 0;
+  /* The block padding gives the lifted night ground its air; the inline
+     padding drops at phone widths (PL-6, the pocket edition below), so a
+     260-unit plate still renders at 1:1 in a 320px viewport. */
+  padding: 12px 14px;
+  background: var(--fig-ground);
+  min-width: 0;
+}
+/* The lifted dark figure ground (READOUT graft). --bg is scoped to the
+   ground so every knockout rect (fill: var(--bg)) tracks the lifted ground
+   instead of punching a darker hole. --muted steps up one rank inside dark
+   figures: the July value measures 4.50:1 on the lifted ground, and the
+   contrast gate's floor is 4.5:1 - a coin flip is not a margin. */
+html[data-theme="dark"] :is(figure[data-fig], .fig, figure.diagram-wrap) {
+  --bg: var(--fig-ground);
+  --muted: #a89d8a;
+}
+
+/* The plate scale. The drawing floats centered; nothing frames it. The
+   island plate classes (telltale, the homepage method plate) are listed here
+   as their consolidated home. */
+figure[data-fig="plate"] > svg,
+.fig--plate > svg {
+  display: block;
+  width: 100%;
+  max-width: min(100%, var(--fig-plate));
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+.article-body .tt9-plate,
+.article-body .tt-plate,
+.method-plate {
+  max-width: min(100%, var(--fig-plate));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* The figure label (A1, A6): in flow, one line above the artwork, at every
+   width, with hand-authored digits in a real span (PL-3, PL-4). The five
+   kinds are the complete vocabulary: Plate, Strip, Plot, Map, Frame. No
+   margin tenancy: a label off a wide figure's edge lands in the outer
+   gutter, on its own vertical line, and it does not fit below ~1240px. */
+.fig-label {
+  display: block;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+/* A reversal FIGURE: the doubled oxide tick above the artwork, the label in
+   oxide, and an sr-only "Reversed. " in the markup - the same convention the
+   decision entries and the proof band teach. */
+:is(figure, .fig)[data-outcome="reversal"] {
+  position: relative;
+  padding-top: 13px;
+}
+:is(figure, .fig)[data-outcome="reversal"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--tick);
+  height: 4px;
+  border-top: 2px solid var(--accent-warm);
+  border-bottom: 1px solid var(--accent-warm);
+}
+:is(figure, .fig)[data-outcome="reversal"] > .fig-label { color: var(--accent-warm); }
+
+/* The caption grammar, one home. The what-slot argues in the note voice; the
+   limit-slot concedes in the metadata ink under the .ex-caption idiom - one
+   hairline, an indent - so a limit looks like a caveat. Never oxide: a limit
+   is not a reversal. Captions keep the prose measure and centre under the
+   artwork. */
+.fig figcaption,
+figure[data-fig] figcaption,
+.fig--plate .tt-plate-caption {
+  max-width: var(--content);
+  margin: 14px auto 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+:is(.fig, figure[data-fig]) .fig-what {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+:is(.fig, figure[data-fig]) .fig-limit {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--muted);
+  border-left: 1px solid var(--border);
+  padding: 2px 0 2px 12px;
+  margin-top: 10px;
+}
+figcaption a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+figcaption code { overflow-wrap: anywhere; }
+
+/* The figure stroke (A2): every strong plate stroke inside the figure layer
+   reads --stroke-figure, so the night retune reaches the plates and nothing
+   else. Warm and accent strokes keep their own tokens. The island plate
+   classes here are the two prototype pages' plates (their markup lands with
+   lanes I1/I2); every other page's lane moves its own plate strokes in that
+   page's PR. */
+.tt9-set,
+.tt9-band,
+.tt9-panel,
+.tt9-box-open,
+.tt-plate .tt-track,
+.method-plate .mp-box { stroke: var(--stroke-figure); }
+
+/* Strips ride the wide track; the claim cell is capped so the mechanic stays
+   a readable line. A page island's single-column override (tt-s2) keeps
+   winning on specificity. */
+@media (min-width: 34rem) {
+  .tt-strip li,
+  .tt-strip-cols { grid-template-columns: minmax(0, 38rem) minmax(0, 1fr); }
+}
+
+/* PL-6, the pocket edition: at phone widths a framed or padded construction
+   drops its inline borders and inline padding, and keeps block rules only. A
+   260-unit plate must render at 1:1 or better in a 320px viewport. */
+@media (max-width: 640px) {
+  figure[data-fig],
+  .fig,
+  figure.diagram-wrap {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .diagram {
+    border-left: 0;
+    border-right: 0;
+  }
+  .article-body pre.tt-frame {
+    background: none;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* ===========================================================================
+   THE FRAME READER, DE-CARDED (ADR-014)
+   ---------------------------------------------------------------------------
+   Same frames, same anchors, same script, same aria-current. The tabs drop
+   the July card chrome and take the doors' active idiom: a plain label, and
+   the current one carries a 2px ink underline plus weight. One control-edge
+   token, --rule-strong, at 3:1 or better in both themes (PL-5). All seven
+   labels stay (PL-9); at phone widths they ride one scrolling row. The
+   telltale island still carries the July chrome and wins ties until lane I2
+   deletes it; this block is the system's home.
+   =========================================================================== */
+.tt-reader-rail {
+  gap: 0 10px;
+  margin: 16px 0 0;
+}
+/* The .article-body li a prose-link rule outranks a bare rail selector, so
+   the tab rules carry the page scope. */
+.article-body .tt-reader-rail a {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0 6px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+.article-body .tt-reader-rail a[aria-current] {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 8px;
+}
+.article-body .tt-reader-rail a:hover { color: var(--text); }
+.tt-reader-rail a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* The rail's folio span (EVIDENCE ATLAS graft): a chrome digit BESIDE each
+   label's anchor, never inside it - the enhancement script derives its live
+   status line from the anchor's textContent, and a digit inside the link
+   would garble that announcement. Hand-authored digits (PL-4). */
+.tt-rail-no {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  margin-right: 8px;
+}
+@media (max-width: 640px) {
+  .tt-reader-rail {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  /* A flex item shrinks below its content under nowrap and the labels then
+     overpaint each other. Each item keeps its intrinsic width; the row is
+     the thing that scrolls. */
+  .tt-reader-rail li { flex: 0 0 auto; }
+  .article-body .tt-reader-rail a { white-space: nowrap; }
+}
+/* The step controls: ghost boxes on the one control edge. The status is a
+   mono readout and sits on the same row. */
+.tt-reader-step {
+  border: 1px solid var(--rule-strong);
+  border-radius: 0;
+  background: none;
+  color: var(--text);
+  font-size: 0.78rem;
+}
+.tt-reader-step:disabled {
+  color: var(--muted);
+  border-color: var(--border);
+}
+.tt-reader-status {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+}
+
+/* ===========================================================================
+   LONG-PAGE NAV: typographic, zero JS (ADR-014)
+   ---------------------------------------------------------------------------
+   The nav device is numbered figures, display folios, and the Contents
+   return. No sticky rail, declared and accepted.
+   =========================================================================== */
+/* The Contents return (A3): a 44px box (PL-7), right-aligned inside the
+   section seam air, only on a page that holds the target id (PL-8). */
+.toc-return {
+  display: flex;
+  justify-content: flex-end;
+}
+/* Page-scoped for the same reason as the rail: the prose-link rule outranks
+   a bare class selector. */
+.article-body .toc-return a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  font-family: var(--font);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+.article-body .toc-return a:hover,
+.article-body .toc-return a:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.article-body .toc-return a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* The Contents' figure entries (EVIDENCE ATLAS graft): each section row may
+   carry a quiet comma-run of the figure numbers that section holds - plain
+   text, not anchors, so the phone pays no 44px-per-figure cost. Inline at
+   the section boundary, never floating: no fixed index key ships. */
+.toc-figs {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
 /* Writeup headings, rebalanced against the homepage scale above. These were
    flat values (2.2 / 1.3rem) while the homepage clamped, so a project page's
    title was smaller than the homepage's section titles at desktop width —
@@ -2244,11 +2766,13 @@ main.wrap > .measure { grid-column: full; }
    alone. */
 .article-body h1 {
   font-family: var(--font);
-  font-size: clamp(2.2rem, 5.2vw, 3.05rem);
+  /* The monograph step (ADR-014): up from clamp(2.2rem, 5.2vw, 3.05rem),
+     just under the homepage masthead. */
+  font-size: clamp(2.4rem, 5.6vw, 3.35rem);
   font-weight: var(--display-weight);
-  line-height: 1.06;
-  margin: 20px 0 10px;
-  letter-spacing: -0.033em;
+  line-height: 1.04;
+  margin: 0;
+  letter-spacing: -0.036em;
 }
 /* The article's standfirst, and the same gesture as the homepage tagline. Two
    pages, one rule: the sentence directly under a title is the note voice —
@@ -2265,7 +2789,7 @@ main.wrap > .measure { grid-column: full; }
   color: var(--text-secondary);
   font-size: 1.15rem;
   line-height: 1.45;
-  margin: 0 0 34px;
+  margin: 0; /* the rhythm ladder owns the gap (ADR-014) */
 }
 
 /* ---- Section folios ------------------------------------------------------
@@ -2285,23 +2809,27 @@ main.wrap > .measure { grid-column: full; }
   counter-increment: folio;
   font-family: var(--font);
   font-weight: var(--display-weight);
-  margin: 56px 0 14px;
+  margin: 0; /* the rhythm ladder owns the seam (ADR-014) */
   padding-top: 20px;
   border-top: 2px solid var(--rule-strong);
   font-size: clamp(1.5rem, 3.35vw, 1.82rem);
   line-height: 1.2;
   letter-spacing: -0.022em;
 }
+/* The display folio (ADR-014): 1.25rem mono in the metadata ink, in flow
+   beside the head at EVERY width. The TITLE BLOCK graft unifies the section
+   head into one folio-plus-title construction, so the folio no longer moves
+   to the desktop margin; the kickers, tags, and ledger numerals keep their
+   marginalia unchanged. */
 .article-body h2::before {
   content: counter(folio);
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
-  font-size: 0.72rem;
+  font-size: 1.25rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   color: var(--muted);
-  margin-right: 0.7em;
-  vertical-align: 0.28em;
+  margin-right: 0.6em;
 }
 .article-body h3 {
   font-family: var(--font);
@@ -2349,7 +2877,7 @@ main.wrap > .measure { grid-column: full; }
 .article-body pre code { background: none; padding: 0; border-radius: 0; font-size: inherit; }
 
 /* Example run: a numbered trace carrying real request/response data. */
-.example-run { list-style: none; counter-reset: ex; padding: 0; margin: 20px 0 0; }
+.example-run { list-style: none; counter-reset: ex; padding: 0; margin: 0; }
 .example-run > li { counter-increment: ex; margin: 0 0 22px; }
 .example-run .ex-step { font-weight: 600; margin: 0; display: flex; align-items: center; }
 .example-run .ex-step::before {
@@ -2405,7 +2933,7 @@ main.wrap > .measure { grid-column: full; }
 .cycle {
   list-style: none;
   padding: 0;
-  margin: 22px 0 0;
+  margin: 0;
   position: relative;
   counter-reset: cyc;
 }
@@ -2475,7 +3003,7 @@ main.wrap > .measure { grid-column: full; }
   color: var(--text-secondary);
 }
 
-.timeline { list-style: none; padding: 0; margin: 24px 0 0; position: relative; }
+.timeline { list-style: none; padding: 0; margin: 0; position: relative; }
 .timeline::before {
   content: "";
   position: absolute;
@@ -2523,7 +3051,7 @@ main.wrap > .measure { grid-column: full; }
    State is encoded three ways on purpose -- marker SHAPE, marker fill, and the
    chip's TEXT -- so the reader never depends on color alone to tell shipped
    from retired from half-done. */
-.ladder { list-style: none; padding: 0; margin: 22px 0 0; position: relative; }
+.ladder { list-style: none; padding: 0; margin: 0; position: relative; }
 .ladder::before {
   content: "";
   position: absolute;
@@ -2654,7 +3182,7 @@ main.wrap > .measure { grid-column: full; }
   height: auto;
   margin: 10px 0 0;
 }
-.backedge .be-box { fill: var(--bg); stroke: var(--rule-strong); stroke-width: 1; }
+.backedge .be-box { fill: var(--bg); stroke: var(--stroke-figure); stroke-width: 1; }
 .backedge .be-label { fill: var(--text); font-family: var(--mono); font-size: 12px; font-weight: 500; }
 .backedge .be-edge { fill: none; stroke: var(--muted); stroke-width: 1.5; }
 /* The one edge the table could not draw, so it gets the accent. */
@@ -2894,7 +3422,7 @@ main.wrap > .measure { grid-column: full; }
 .notes-list {
   list-style: none;
   padding: 0;
-  margin: 16px 0 10px;
+  margin: 0; /* the rhythm ladder owns the gap (ADR-014) */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 0 32px;
@@ -2941,7 +3469,7 @@ main.wrap > .measure { grid-column: full; }
 .orientation {
   position: relative;
   /* full column width, like every other block in <main> */
-  margin: 52px 0 8px;
+  margin: 0; /* the rhythm ladder owns the seam (ADR-014) */
   padding: 18px 0 24px;
   border-top: 2px solid var(--rule-strong);
   border-bottom: 1px solid var(--border);
@@ -2987,7 +3515,7 @@ main.wrap > .measure { grid-column: full; }
 .doors-index li {
   position: relative;
   counter-increment: door;
-  border-top: 2px solid var(--rule-strong);
+  padding-top: 3px; /* the tick replaces the full-width rule (ADR-014) */
   min-width: 0;
 }
 .doors-index a {
@@ -3141,7 +3669,7 @@ main.wrap > .measure { grid-column: full; }
    the italic became a weight rather than a letter-spacing when the serif left:
    tracking a sentence is the same mistake in a quieter register. */
 .ledger-intro {
-  margin: 34px 0 14px;
+  margin: 0; /* the rhythm ladder owns the gap (ADR-014) */
   font-weight: 500;
   font-size: 0.95rem;
   color: var(--muted);
@@ -3238,7 +3766,7 @@ main.wrap > .measure { grid-column: full; }
 .stat-strip {
   list-style: none;
   padding: 0;
-  margin: 26px 0 20px;
+  margin: 0; /* the rhythm ladder owns the gap (ADR-014) */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 18px 36px;
@@ -3248,12 +3776,13 @@ main.wrap > .measure { grid-column: full; }
    bound a column in a printed results table, drawn per cell so they survive
    the collapse to one column on a phone. */
 .stat-strip li {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border-top: 2px solid var(--rule-strong);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 0 10px;
+  /* The tick replaces the full-width top rule, and whitespace closes the
+     cell: the bottom hairline retires with the top rule (ADR-014). */
+  padding: 13px 0 0;
 }
 
 /* ---- The three display figures are the one place the data voice is NOT mono
@@ -3283,12 +3812,16 @@ main.wrap > .measure { grid-column: full; }
    inconsistency. This is only about display size. */
 .stat-strip .stat-value {
   font-family: var(--font);
-  font-size: clamp(1.8rem, 4vw, 2.2rem);
+  /* The display-metric threshold (ADR-014), native law: a metric set at
+     1.5rem or larger renders in Geist at weight 500 with tabular figures;
+     below that size a metric stays in the mono data voice. The stat values
+     grow to the monograph display size under it. */
+  font-size: clamp(2.2rem, 5vw, 3rem);
   font-weight: 500;
   line-height: 1.05;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.022em;
 }
 
 /* At 390px the auto-fit lands on two columns, which leaves the third figure
@@ -3307,16 +3840,16 @@ main.wrap > .measure { grid-column: full; }
    into prose is unguarded by the published-metrics check and is exactly how
    this site once shipped two stale figures onto a résumé. */
 .stat-note {
-  margin: -8px 0 18px;
+  margin: 0; /* the ladder's .stat-strip + .stat-note rule owns the 8px */
   font-size: 0.9rem;
   color: var(--muted);
 }
 
 .stat-strip .stat-label {
   font-family: var(--font);
-  font-size: 0.66rem;
+  font-size: 0.68rem; /* the label register (ADR-014) */
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -3417,16 +3950,10 @@ main.wrap > .measure { grid-column: full; }
     text-align: right;
   }
 
-  /* Section folios on the project pages, numbered to match the ToC. */
-  .article-body h2::before {
-    position: absolute;
-    top: 22px;
-    right: calc(100% + var(--margin-gap));
-    width: var(--margin-note);
-    margin-right: 0;
-    vertical-align: baseline;
-    text-align: right;
-  }
+  /* The section folio is NOT on this list any more (ADR-014). The TITLE
+     BLOCK graft unifies the section head into one folio-plus-title
+     construction at every width, so the folio stays in flow beside the head
+     and only the kickers, tags, and ledger numerals keep the margin. */
 }
 
 /* The ToC is deliberately NOT on this list, and the reason is worth writing
@@ -3522,7 +4049,10 @@ main.wrap > .measure { grid-column: full; }
      cap-height advantage — so the phone nameplate keeps the physical size the
      budget above was measured against. */
   .hero h1 {
-    font-size: 2.06rem;
+    /* The phone masthead steps up from July's 2.06rem with the display jump
+       (ADR-014). The phone budget was re-measured; the delta is in the
+       landing PR. */
+    font-size: 2.25rem;
     margin-bottom: 8px;
   }
   .tagline {
