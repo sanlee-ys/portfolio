@@ -59,14 +59,22 @@ import SiteNav from '../components/SiteNav.astro';
     .gloss-plate marker path { fill: var(--muted); }
     /* The caption now sits INSIDE the figure wrapper, so the PL-2 ladder in
        style.css does not reach it: the ladder owns direct children of
-       main.wrap only. 14px is the value the consolidated .fig figcaption
-       grammar states, so the plate and its caption sit at one distance
-       everywhere on the site. The old bottom margin is gone; the wrapper
-       owns the air under the figure now. */
+       main.wrap only. The old bottom margin is gone; the wrapper owns the
+       air under the figure now.
+
+       max-width and the auto margins RESTATE the consolidated .fig
+       figcaption geometry, measured: without them the caption inherits the
+       wrapper's promoted wide track and runs 884px at 1280px, against a
+       544px prose measure. This caption cannot BE a <figcaption>, because a
+       figcaption outside a <figure> is invalid and a <figure> here fails the
+       figure contract. So it restates the one rule it cannot inherit, and
+       nothing else. Consolidating this selector belongs to the one hand on
+       style.css; the pull request records the ask. */
     .gloss-plate-caption {
       color: var(--muted);
       font-size: 0.92rem;
-      margin: 14px 0 0;
+      max-width: var(--content);
+      margin: 14px auto 0;
     }
   </style>
   </Fragment>
