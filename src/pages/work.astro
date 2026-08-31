@@ -8,6 +8,75 @@ import SiteNav from '../components/SiteNav.astro';
   canonical="https://sanlee.me/work.html"
   ogType="website"
 >
+  <Fragment slot="head">
+  <style is:inline>
+    /* ORIGIN: src/pages/index.astro, style island, at 6859243. Both blocks
+       below moved here with the units they style, when the eight-row decision
+       ledger and the field-note clusters moved off the homepage (landing
+       WO-E1.1). The declarations are the homepage's, unchanged.
+
+       ONE selector changed, and only the ix-s1 one: `.ledger li` became
+       `.measure .ledger li`. This page already carries two other ul.ledger
+       lists, and those rows are a link followed by a sentence rather than a
+       .led-claim / .led-to pair. Unscoped, the 48rem grid squeezes each of
+       those descriptions into a 10.5rem cell. `.measure` is the
+       containment the rule always relied on: on the homepage this block only
+       ever sat inside section.measure, so the scope states what was already
+       true rather than adding a condition. */
+
+    /* ix-s1. The decision ledger, re-laid as a strip. Eight rows carry one
+       grammar: the claim, then the page that records it in full. The strip
+       re-lays the row. It does not rewrite it. The STE conversion of the same
+       rows is a separate edit in the same commit, and the pull request keeps
+       the two ledger blocks apart.
+
+       The strip adds no status word. Three rows carry data-outcome="reversal"
+       and five do not, and the five are not five shipped decisions: one is an
+       audit finding and one is a bug found before publication. A status stamp
+       on the unmarked five would add a claim the page never made. The only
+       mark here is the reversal mark the row already carried.
+
+       The link stays inline in the claim below 48rem, and becomes its own
+       cell only above it. scripts/hit-target.cjs measures a standalone anchor
+       at 390px, and a link that is the only text of its block owes a 44px box
+       there. Eight of those boxes cost the phone reader about 0.2 screens and
+       return no reading gain, so the phone keeps the WCAG 2.5.8 inline
+       exception that this row already relies on. */
+    @media (min-width: 48rem) {
+      .measure .ledger li {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 10.5rem;
+        gap: 4px 24px;
+        align-items: start;
+      }
+      .measure .ledger li .led-to {
+        justify-self: end;
+        text-align: right;
+      }
+    }
+
+    /* ix-s2. Twelve field notes under five cluster headings. Every one of the
+       twelve titles is byte-exact. The five headings are the only new words,
+       and each one is drawn from the vocabulary the titles already use. A
+       heading is a structural label. It states no result.
+
+       The label reuses .kicker, which is the site's own label grammar, so this
+       block adds no second idiom, no new colour, and no new size. */
+    .notes-clusters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0 32px;
+      margin: 16px 0 10px;
+    }
+    .notes-clusters .notes-cluster { min-width: 0; }
+    .notes-clusters .kicker { margin: 16px 0 0; }
+    .notes-clusters .notes-list {
+      grid-template-columns: minmax(0, 1fr);
+      margin: 6px 0 0;
+    }
+  </style>
+  </Fragment>
+
   <SiteNav current="work" />
 
   <main class="wrap article-body" id="main" tabindex="-1">
@@ -40,6 +109,96 @@ import SiteNav from '../components/SiteNav.astro';
       <li><a href="projects/the-system-run.html">One Note, End to End</a> &mdash; one payload traced across the real service contracts.</li>
       <li><a href="projects/netops-lab.html">Zero-Touch Provisioning</a> &mdash; a factory-blank router configured after one power cycle.</li>
     </ul>
+
+    <!-- The eight one-row decisions, moved whole from index.astro at 6859243
+         (landing WO-E1.1). Every row, its id, its reversal mark, its sr-only
+         prefix, and its ix-s1 CSS travelled byte-exact; the CSS sits in this
+         page's head with its origin note. The intro line lost one word: it
+         read "Eight more, one row each" on the homepage, where the three full
+         decision cards above it were the thing there were eight more of. That
+         referent does not exist here, so the positional word is gone and the
+         count, the shape, and the link promise are unchanged.
+
+         section.measure is the containment this block had on the homepage. It
+         re-establishes the page grid, so the rows sit on the same left edge
+         as the prose above them, and it is what scopes the ix-s1 grid off
+         this page's other two ledger lists. -->
+    <section class="measure">
+      <h2 id="decision-log">The decision log</h2>
+      <p class="ledger-intro">Eight decisions, one row each. Each row links to the page that records it in full.</p>
+      <!-- ix-s1, the verdict strip. Each row holds the claim and then the page
+           that records it. The reversal mark and the sr-only prefix stay on the
+           three rows that already carried them, and no row gains a status word.
+           Five rows are not five shipped decisions: decision-falsegreen is an
+           audit finding and decision-truncation is a bug found before
+           publication. The CSS note in the head records why the link only
+           leaves the sentence above 48rem. -->
+      <ul class="ledger">
+        <li id="decision-contracts"><span class="led-claim">I decoupled the repos with frozen HTTP contracts. Then I audited the seam and found it <strong>broken with both repos' CI green</strong>. Each side asserted against its own copy of the shape. Two unit tests that happen to agree are not a contract test.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
+        <li id="decision-falsegreen"><span class="led-claim">I audited my own gates. Six of them reported success for work that never ran. One review lane went green in <strong>36 seconds</strong> and posted nothing. The counter I built to find that failure read a key that does not exist.</span> <span class="led-to"><a href="projects/false-green.html">False Green &rarr;</a></span></li>
+        <li id="decision-hybrid" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built hybrid lexical retrieval to rescue one specific miss. I measured it and kept the dense-only default. The measurement returned <strong>MRR identical to four decimals</strong>. The miss it was built for was not a lexical failure at all.</span> <span class="led-to"><a href="projects/kb-agent-retrieval.html">Retrieval &rarr;</a></span></li>
+        <li id="decision-truncation"><span class="led-claim">I nearly published a dramatic premium-vs-cheap model gap. The gap was <strong>my own bug</strong>. A <code>max_tokens</code> cap truncated the cheap tier before its verdict on 20% of claims. I counted each one as a disagreement.</span> <span class="led-to"><a href="projects/faithfulness-judge.html">Judge &rarr;</a></span></li>
+        <li id="decision-ceiling"><span class="led-claim">I called it a ceiling. Then I looked anyway. The misses clustered on one boundary. Two rubric clauses moved category <strong>90.7% &rarr; 94.4%</strong>, and nothing regressed. It was a prompt problem, not a ceiling.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
+        <li id="decision-prompt" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>A prompt read better to a human and measured worse. Category moved <strong>79.0% &rarr; 76.7%</strong>, and industry recall moved 0.217 &rarr; 0.100. I reversed it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
+        <li id="decision-rightsized" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built the enrichment loop on Kafka to learn it properly. Then I cut it. A single-user idempotent workload <strong>never needed a distributed log</strong>. It is now an in-process background task.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
+        <li id="decision-tooluse"><span class="led-claim">I forced output to a tool schema instead of a prose parse. The API layer rejects an invalid label. It rejected <strong>one out-of-enum response in 300</strong>, and a re-sample handled it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
+      </ul>
+    </section>
+
+    <!-- The field-note section, moved whole from index.astro at 6859243
+         (landing WO-E1.1). The twelve titles, the five cluster headings, the
+         two framing sentences, and the ix-s2 CSS travelled byte-exact. The
+         heading takes this page's own h2 grammar and gains the anchor id; its
+         text does not change. -->
+    <section class="measure">
+      <h2 id="field-notes">Field notes</h2>
+      <p>I keep these notes as I learn. They are in plain language, on the techniques behind all of this. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
+      <!-- ix-s2, the note clusters. The twelve titles are byte-exact and the
+           order is the only thing that moved. The five headings are structural
+           labels and each one is drawn from the words the titles already use.
+           A heading names a subject. It states no result and it adds no
+           assertion the notes site does not already carry. -->
+      <div class="notes-clusters">
+        <div class="notes-cluster">
+          <p class="kicker">Tool use</p>
+          <ul class="notes-list">
+            <li>Structured output via tool-use</li>
+            <li>Tool use, the general idea</li>
+            <li>The agentic tool-use loop</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">Eval</p>
+          <ul class="notes-list">
+            <li>Eval-driven development</li>
+            <li>Reading the numbers</li>
+            <li>Synthetic data and circular eval</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">RAG</p>
+          <ul class="notes-list">
+            <li>RAG: answering from your own docs</li>
+            <li>Embeddings and vector stores</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">Model routing</p>
+          <ul class="notes-list">
+            <li>Tiered model routing</li>
+          </ul>
+        </div>
+        <div class="notes-cluster">
+          <p class="kicker">Environments and checkpoints</p>
+          <ul class="notes-list">
+            <li>Secrets and env</li>
+            <li>Reproducible environments with uv</li>
+            <li>Checkpoint, resume, and retries</li>
+          </ul>
+        </div>
+      </div>
+      <p class="muted-line">This is a selection. The notes site carries the full set, and the set still grows.</p>
+    </section>
 
     <p>Looking for terminology used across the projects? <a href="glossary.html">Open the glossary &rarr;</a></p>
   </main>
