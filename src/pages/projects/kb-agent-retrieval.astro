@@ -46,19 +46,20 @@ const qP = qValue('McNemar exact p').toFixed(4);
   <style is:inline>
     /* Retrieval measured plate (portfolio ADR-004). Page-scoped: the unit is
        query → ranked chunks → objective gold path-match, not a metrics chart
-       (the tables below carry the numbers). Max-width 260 keeps viewBox units
-       1:1 with CSS px on every gate width (same measured discipline as
-       .judge-plate / .two-fail / .lab-topo). */
-    .retr-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       (the tables below carry the numbers).
+
+       THE PLATE BOX IS NOT DECLARED HERE ANY MORE (ADR-014). The gallery
+       ladder in style.css sets the display, the width, the --fig-plate cap
+       and the auto side margins for every `.fig--plate > svg`. This plate is
+       a bare plate, so the markup below wraps it in
+       `<div class="fig fig--plate">` and it takes the ladder from there. The
+       old 260px cap held one viewBox unit at one CSS pixel. The ladder hangs
+       the plate at 24rem instead, so the render scale is 1.046 at a 320px
+       viewport and 1.477 at 1280px. The microtext below is sized for the
+       320px case. See .rp-micro. */
     .retr-plate .rp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .retr-plate .rp-lane {
@@ -74,10 +75,15 @@ const qP = qValue('McNemar exact p').toFixed(4);
       font-size: 11px;
       font-weight: 500;
     }
+    /* The 9px microtext floor (CLAUDE.md, ADR-014 section 5). 8px used to
+       render at 8.00px, because the plate sat at 1:1. Under the ladder the
+       plate renders at 1.046 at a 320px viewport, so 9px renders at 9.42px
+       and the floor holds at every width. The declared unit goes up; the
+       plate does not scale under a breakpoint. */
     .retr-plate .rp-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     /* Rank rows: schematic list, not real chunk text. */
     .retr-plate .rp-rank {
@@ -123,24 +129,29 @@ const qP = qValue('McNemar exact p').toFixed(4);
       font-weight: 700;
     }
     .retr-plate marker path { fill: var(--muted); }
-    .retr-plate-caption {
+
+    /* The bare-plate caption slot. A bare plate cannot use `<figcaption>`,
+       because that element is legal only inside `<figure>` and the figure
+       gate fails a `<figure>` that declares no `data-fig`. So these two
+       captions stay paragraphs, and they take the caption grammar by hand.
+       The origin is `.fig--plate .tt-plate-caption` in public/assets/style.css
+       at 60228a8; only the class names differ. This lane cannot add a class of
+       its own to that selector list, because style.css has one integrator. */
+    .retr-plate-caption,
+    .hyb-plate-caption {
+      max-width: var(--content);
+      margin: 14px auto 0;
       color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 6px;
+      font-size: 0.95rem;
+      line-height: 1.55;
     }
 
     /* Hybrid declined plate. MRR identical; the miss it was built for
-       is still a miss. Oxide on DECLINED. */
-    .hyb-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       is still a miss. Oxide on DECLINED. The gallery ladder owns this
+       plate's box too; see the .retr-plate comment above. */
     .hyb-plate .hp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .hyb-plate .hp-lane {
@@ -156,10 +167,11 @@ const qP = qValue('McNemar exact p').toFixed(4);
       font-size: 11px;
       font-weight: 500;
     }
+    /* The 9px microtext floor; see the .rp-micro note above. */
     .hyb-plate .hp-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .hyb-plate .hp-ok {
       fill: var(--bg);
@@ -183,54 +195,15 @@ const qP = qValue('McNemar exact p').toFixed(4);
       font-size: 10px;
       font-weight: 700;
     }
-    .hyb-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 18px;
-    }
-
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
-
-       COPY. The origin is src/pages/projects/context-architecture.astro at
-       9d81caa, and the four rules below are that block verbatim. A shared
-       grammar is copied and never extracted: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges.
-
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses.
-
-       NOT COPIED, AND THE NEXT LANE NEEDS IT. autonomy-ladder.astro at 8772e5b
-       adds a `.fig figcaption a` rule, because a link inside a figcaption is
-       neither `.article-body p a` nor `.article-body li a` and falls to the
-       browser default, which measures 1.97:1 on the dark theme. No caption on
-       this page carries a link, so the rule would be dead CSS here. A lane that
-       puts the first link in a caption on this page copies that rule with it. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-    /* A caption that names an artifact carries a long file path. It breaks
-       inside the word rather than widening the page at 320px. */
-    .fig figcaption code {
-      overflow-wrap: anywhere;
-    }
+    /* The two-slot caption grammar is NOT declared on this page any more
+       (ADR-014, OC-F closed). Its one home is public/assets/style.css: the
+       `.fig`, `.fig figcaption`, `.fig-what`, `.fig-limit` and
+       `figcaption code` rules this island used to copy from
+       context-architecture.astro at 9d81caa were deleted here when the
+       integrator landed them there. The `figcaption a` rule that the deleted
+       comment asked the next lane to copy from autonomy-ladder.astro is also
+       global now, so a caption on this page may carry a link with no page CSS
+       at all. */
 
     /* One plate grammar, three new plates (ADR-004, ADR-013). Page-scoped.
 
@@ -247,15 +220,25 @@ const qP = qValue('McNemar exact p').toFixed(4);
        a dashed box, and a filled mark against an empty row.
 
        SVG text inherits from <body>, so every text class names its own font.
-       Max-width 260 keeps one viewBox unit at one CSS pixel down to 320px. The
-       plates sit inside .decision, which has no horizontal padding, so the
-       measured container is the article track and not a narrower one. */
+       The plates sit inside .decision, which has no horizontal padding, so the
+       measured container is the article track and not a narrower one.
+
+       THE 260px CAP IS RETIRED (ADR-014). The gallery ladder hangs a plate at
+       --fig-plate. style.css already applies that cap to every
+       `figure[data-fig="plate"] > svg`, which reaches kb1 and kb2 but not
+       kb3, because kb3 declares `data-fig="plot"`. The cap below is therefore
+       the ladder value and not the 1:1 value, so all three plates hang at one
+       size. kb3 takes --fig-plate and NOT --fig-plot on purpose. --fig-plot is
+       30rem for a wide artboard, and kb3 is drawn on the same 260-unit board
+       as its two neighbours. At 30rem its 10px chrome renders at 18.5px. That
+       is larger than the 16px body text, and it breaks the rank PL-10
+       protects. */
     .kb-plate {
       display: block;
       width: 100%;
-      max-width: 260px;
+      max-width: min(100%, var(--fig-plate));
       height: auto;
-      margin: 4px 0 0;
+      margin: 0 auto;
     }
     .kb-plate .kb-lane {
       fill: var(--muted);
@@ -276,10 +259,11 @@ const qP = qValue('McNemar exact p').toFixed(4);
       font-size: 10px;
       font-weight: 700;
     }
+    /* The 9px microtext floor; see the .rp-micro note above. */
     .kb-plate .kb-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
 
     /* kb1-ranks. Two ranked lists that agree on one file.
@@ -295,7 +279,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
        them (the .two-fail comment on false-green.astro records that). */
     .kb1-plate .kb1-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .kb1-plate .kb1-agree {
@@ -332,7 +316,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
        declares its own. */
     .kb2-plate .kb2-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .kb2-plate .kb2-tie {
@@ -422,7 +406,16 @@ const qP = qValue('McNemar exact p').toFixed(4);
          match against a hand-labeled gold set. It is not a recall chart. The
          tables below carry the numbers. No LLM judge runs at this layer, and
          the prose below states that. It is schematic only, and it invents no
-         query text as a real quote. ADR-010 does not apply. -->
+         query text as a real quote. ADR-010 does not apply.
+
+         THE WRAPPER IS A DIV AND NOT A FIGURE (ADR-013 gate rule R-N). A
+         `<figure>` with no `data-fig` fails the gate, and this bare plate
+         carries one caption sentence rather than the two caption slots
+         `data-fig` demands. `data-place="spine"` is the plate kind's declared
+         width: the plate keeps the content track and hangs at --fig-plate
+         inside it. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 01</span>
     <svg class="retr-plate" viewBox="0 0 260 132" role="img"
          aria-label="The unit of the retrieval eval. A query returns ranked chunks. An objective path match judges each result against a hand-labeled gold set. The verdict is hit or miss. No LLM judge runs at this layer.">
       <title>The unit of the retrieval eval. A query returns ranked chunks. An objective path match judges each result against a hand-labeled gold set. The verdict is hit or miss. No LLM judge runs at this layer.</title>
@@ -473,6 +466,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
       measure how often the right source file is in the top&nbsp;k. No LLM
       judge runs at this layer.
     </p>
+    </div>
 
     <nav class="toc" aria-labelledby="toc-heading">
       <p class="toc-heading" id="toc-heading">On this page</p>
@@ -536,6 +530,15 @@ const qP = qValue('McNemar exact p').toFixed(4);
       not.
     </p>
 
+    <!-- The Contents returns (ADR-014, PL-7 and PL-8). The ToC gate carries a
+         page at 8 phone screens or at 6 figures. This page clears the screen
+         half of that gate by a wide margin, so it carries the returns. One
+         return sits above every h2 except the first, because the first h2
+         already sits under the Contents. The target is `#toc-heading`, the id
+         this page already holds, so no new id ships. Each return costs a 44px
+         box inside the section seam, and the pull request states the measured
+         cost. -->
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="three-changes">Three changes, and an A/B test for each one</h2>
 
     <p>
@@ -551,7 +554,8 @@ const qP = qValue('McNemar exact p').toFixed(4);
          cell is dashed and has no edge out of it, because the test reads the
          discordant pairs and nothing else. ADR-010 does not apply: nothing here
          is a control. -->
-    <figure class="kb2-paired fig" data-fig="plate">
+    <figure class="kb2-paired fig" data-fig="plate" data-place="spine">
+      <span class="fig-label">Plate 02</span>
       <svg class="kb2-plate kb-plate" viewBox="0 0 260 118" role="img"
            aria-label="The paired comparison method. Both arms answer the same queries. Each query returns a win, a loss or a tie. McNemar's exact test reads only the wins and the losses. A harness-health section reports every dropped or unpairable row.">
         <title>Both arms answer the same queries. The test reads only the discordant pairs.</title>
@@ -645,8 +649,19 @@ const qP = qValue('McNemar exact p').toFixed(4);
       </p>
     </div>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="the-negative-result">The one I built and did not ship</h2>
 
+    <!-- Plate 03 is this page's REVERSAL FIGURE. The plate's whole subject is
+         the default I built and then took back, it already dual-encodes that
+         with the oxide DECLINED cell, and the identity marks a reversal object
+         with the doubled oxide tick, the oxide label and the sr-only prefix
+         (ADR-014). The decision entry below carries its own mark, as it always
+         did: two objects, two marks, one reversal. The two plates that follow
+         are NOT marked. Plate 04 diagnoses why the premise failed and Plot 05
+         reports a measurement, and neither is the reversal itself. -->
+    <div class="fig fig--plate" data-place="spine" data-outcome="reversal">
+    <span class="fig-label"><span class="sr-only">Reversed. </span>Plate 03</span>
     <svg class="hyb-plate" viewBox="0 0 260 118" role="img"
          aria-label="Hybrid retrieval against dense-only. MRR is identical to four decimals. I built hybrid to rescue one paraphrase miss, and that miss stands. Dense-only stayed the default.">
       <title>MRR identical. I built hybrid to fix one miss, and that miss stands. Declined.</title>
@@ -668,6 +683,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
       MRR identical to four decimals. I built it to rescue one miss, and that
       miss stands.
     </p>
+    </div>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>Change 3<span class="code-ref">PR #73 &middot; ADR-010</span></p>
@@ -712,8 +728,16 @@ const qP = qValue('McNemar exact p').toFixed(4);
       <!-- kb1-ranks. A PLATE. Zero digits: the two ranks this argument turns on
            are in the caption, where a gate reads them, and neither list is
            placed at its measured rank. The dashed band is the stub the query
-           asked for. ADR-010 does not apply: nothing here is a control. -->
-      <figure class="kb1-ranks fig" data-fig="plate">
+           asked for. ADR-010 does not apply: nothing here is a control.
+
+           `data-place="spine"` states the plate kind's declared width, and it
+           changes nothing here: this figure is nested inside `.decision`, so
+           the grid promotion never reaches it and it keeps the entry's own
+           measure (ADR-014, amendment A5). The attribute stays because it is
+           the kind's policy, and it becomes live if a later lane ever lifts
+           this figure out of the entry. -->
+      <figure class="kb1-ranks fig" data-fig="plate" data-place="spine">
+        <span class="fig-label">Plate 04</span>
         <svg class="kb1-plate kb-plate" viewBox="0 0 260 132" role="img"
              aria-label="Two retrievers, lexical and dense. Each one returns the same notes file at the top of its list. The project stub the query asked for sits below both lists.">
           <title>Both retrievers return the same notes file first. The project stub sits below both lists.</title>
@@ -778,6 +802,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
       </p>
     </div>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="what-the-numbers-support">What the numbers actually support</h2>
 
     <p>
@@ -802,8 +827,19 @@ const qP = qValue('McNemar exact p').toFixed(4);
          coordinate and no count. One slot is one query, so the mark's width IS
          the points one query is worth at this denominator. The second row is a
          measured zero, not an absence. ADR-010 does not apply: nothing here is
-         a control. -->
-    <figure class="kb3-quantum fig" data-fig="plot">
+         a control.
+
+         `data-place="spine"` AND NOT "sheet", against the plot kind's own
+         default (ADR-014). The default sends a plot to the sheet because a
+         plot normally carries a wide artboard. This plot does not: it is drawn
+         on the same 260-unit board as the four plates above it, and it caps at
+         --fig-plate for the reason the .kb-plate comment records. On the sheet
+         the wrapper measures 912px at 1280px while the drawing measures 384px,
+         so the figure label sits 264px away from the artwork it names and the
+         night ground paints an empty panel around it. The spine keeps the
+         label, the drawing and the caption on one measure. -->
+    <figure class="kb3-quantum fig" data-fig="plot" data-place="spine">
+      <span class="fig-label">Plot 05</span>
       <svg class="kb3-plate kb-plate" viewBox="0 0 260 104" role="img"
            data-fig-generated="true"
            aria-label={`Two rows of marks, one row for each direction of disagreement. One mark is one query out of the ${qPairs} pairs the gold set scores. Hybrid is right where dense is wrong in ${qWins}. Dense is right where hybrid is wrong in ${qLosses}. The comparison did not clear the bar to change a default.`}>
@@ -845,6 +881,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
       retrieval measurement. I report the two separately.
     </p>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="what-this-does-not-establish">What this does not establish</h2>
     <ul>
       <li><strong>This is a per-KB measurement.</strong> 260 chunks across 44
@@ -874,6 +911,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
         comparable, and the ones on this page are same-day pairs.</li>
     </ul>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="stack">Stack</h2>
     <p>
       Python, and ChromaDB with the local <code>all-MiniLM-L6-v2</code>
@@ -895,6 +933,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
       each carry their own numbers.
     </p>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       This page shows the same discipline as the
