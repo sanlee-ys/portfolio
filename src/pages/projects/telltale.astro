@@ -75,10 +75,6 @@ if (missingFrames.length) {
        declared. Both the item and the box need an explicit zero. */
     .tt-figure,
     .article-body pre.tt-frame { min-width: 0; }
-    /* The caption names a full repository path, which is one long unbreakable
-       token in a mono face. It must be allowed to break, or it reproduces the
-       same overflow one element further down. */
-    .tt-figure figcaption code { overflow-wrap: anywhere; }
 
     /* Argument plate TT-1 (portfolio ADR-004, ADR-012). Page-scoped: the three
        states a gauge can be in, and the fact that only two of them are honest.
@@ -88,19 +84,15 @@ if (missingFrames.length) {
        a paste would fail the font-coverage gate. This plate carries the
        argument instead, and it carries no number that could go stale.
        State is word plus geometry first, colour second. Oxide marks the
-       negative finding, which here is the invented reading. Max-width 260
-       keeps viewBox units 1:1 with CSS px (same discipline as .seam-plate).
-       ADR-010 N/A: nothing here is interactive. */
-    .tt-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       negative finding, which here is the invented reading.
+       ADR-010 N/A: nothing here is interactive.
+       ADR-014 moved the plate's scale and stroke ink to style.css: the figure
+       ladder caps a plate at var(--fig-plate) and centers it, and every strong
+       plate stroke reads var(--stroke-figure). At a 320px viewport the 272px
+       track renders this 260-unit viewBox at scale 1.046, so a declared 9px
+       stays at or above the 9px floor at every width. */
     .tt-plate .tt-track {
       fill: var(--bg);
-      stroke: var(--rule-strong);
       stroke-width: 1;
     }
     .tt-plate .tt-fill {
@@ -153,56 +145,12 @@ if (missingFrames.length) {
     }
     .tt-plate-caption {
       color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 18px;
     }
 
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
-
-       COPIED VERBATIM from src/pages/projects/context-architecture.astro at
-       9d81caa (PR #247), which is the origin copy. Do not edit this block
-       here; edit the origin and re-copy. It is page-scoped on purpose: a
-       concurrent session owns public/assets/style.css for the tap-target work,
-       and two writers on one shared stylesheet cannot merge. OC-F of the
-       redesign brief carries the consolidation, for after that session merges.
-
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses.
-
-       The quiet voice is a token, never opacity (ADR-009). Both slots are
-       block-level, so the limit reads as its own line and not as a tail. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    /* One page-local addition to the copied block, kept separate so the copy
-       above stays byte-identical to its origin. `min-width: 0` matters here
-       and not on the origin page: every frame figure is a grid item holding a
-       120-column `<pre>`, and a grid item's default `min-width: auto` refuses
-       to shrink below its content, so the figure would widen its own track and
-       take the page with it.
-
-       Nothing else is added. Every frame figure carries BOTH `tt-figure` and
-       `fig`, so the copied `.fig figcaption` rules already style all thirteen
-       captions on this page. A second rule restating the same values is a
-       thing that drifts. */
-    .fig { min-width: 0; }
+    /* The two-slot caption CSS this island used to copy from
+       context-architecture.astro now has ONE home in style.css (ADR-014,
+       OC-F closed), together with the figure ladder's `min-width: 0`. This
+       lane deleted the local copy per the landing order. */
 
     /* ---------------------------------------------------------------------
        `tt9-` IS THE SHARED GRAMMAR FOR THE FOUR NEW PLATES ON THIS PAGE.
@@ -224,24 +172,18 @@ if (missingFrames.length) {
            italic cut.
          - SVG text inherits from <body>, so every text class declares its own
            `font-family`.
-         - `max-width: 260px` keeps one viewBox unit at one CSS pixel down to
-           320px. Nothing here sits inside an indent, so the container is the
-           full content track. Measured 2026-08-30 at 320px: the container
-           offers 272px, the plate renders 260px, and the scale is 1.000.
-         - No text class declares under 9px. At 1:1 the declared size is the
-           rendered size, so 9px is the CLAUDE.md microtext floor.
+         - The plate's scale and its strong stroke ink live in style.css now
+           (ADR-014): the figure ladder caps a plate at var(--fig-plate) and
+           centers it, and the strong strokes read var(--stroke-figure). The
+           narrowest render is a 320px viewport, where the 272px track shows
+           this 260-unit viewBox at scale 1.046, so the floor arithmetic below
+           still holds at every width.
+         - No text class declares under 9px. At scale >= 1.0 the declared size
+           is the rendered floor, so 9px is the CLAUDE.md microtext floor.
        --------------------------------------------------------------------- */
-    .tt9-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 4px 0 0;
-    }
     .tt9-set,
     .tt9-band {
       fill: none;
-      stroke: var(--rule-strong);
       stroke-width: 1;
       stroke-dasharray: 3 3;
     }
@@ -252,7 +194,6 @@ if (missingFrames.length) {
     }
     .tt9-box-open {
       fill: none;
-      stroke: var(--rule-strong);
       stroke-width: 1;
       stroke-dasharray: 2 2;
     }
@@ -263,7 +204,6 @@ if (missingFrames.length) {
     }
     .tt9-panel {
       fill: none;
-      stroke: var(--rule-strong);
       stroke-width: 1;
     }
     .tt9-edge {
@@ -358,10 +298,9 @@ if (missingFrames.length) {
       color: var(--muted);
     }
     .tt-s2-group:first-of-type { margin-top: 4px; }
-    @media (min-width: 34rem) {
-      .tt-strip li,
-      .tt-strip-cols { grid-template-columns: 3fr 4fr; }
-    }
+    /* The two-column split above 34rem lives in style.css now (ADR-014): the
+       claim cell caps at minmax(0, 38rem) so the mechanic stays a readable
+       line on the wide track. */
     /* tt-s2 groups a single-column list. It is a strip because it re-lays
        existing text under headings, not because it has two columns. The
        two-class selector out-ranks the media query at every width, so the
@@ -392,54 +331,48 @@ if (missingFrames.length) {
     .tt-reader[data-enhanced] figure[id^="frame-"]:not([data-current]) {
       display: none;
     }
+    /* The reader's CHROME - the de-carded tab idiom, the ghost step buttons,
+       the mono status, the phone scroll row, and the rhythm - lives in
+       style.css now (ADR-014). This island keeps only what the page owns: the
+       rail's structure, the 44px control boxes, and the focus ring. */
     .tt-reader-rail {
       list-style: none;
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin: 12px 0 4px;
       padding: 0;
     }
     .tt-reader-rail li { min-width: 0; }
+    /* PL-9: at phone widths the seven labels ride ONE scrolling row.
+       style.css declares the same flip, but this island loads after it and
+       the base `flex-wrap: wrap` above would win the tie by source order.
+       The island owns the rail's structure, so it flips its own declaration.
+       The scroll box, the li flex basis, and the nowrap labels come from
+       style.css. */
+    @media (max-width: 640px) {
+      .tt-reader-rail { flex-wrap: nowrap; }
+    }
     /* A real control, not a word. 44px at every width, which is what the
-       hit-target gate measures at 390px for a standalone anchor. */
+       hit-target gate measures at phone widths for a standalone anchor. */
     .tt-reader-rail a,
     .tt-reader-step {
       display: inline-flex;
       align-items: center;
       min-height: 44px;
       padding: 0 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--panel);
-      color: var(--muted);
       font-family: var(--mono);
-      font-size: 0.84rem;
-      text-decoration: none;
-    }
-    .tt-reader-rail a[aria-current] {
-      border-color: var(--accent);
-      color: var(--text);
-      font-weight: 600;
     }
     .tt-reader-step { cursor: pointer; }
-    .tt-reader-step:disabled {
-      color: var(--muted);
-      cursor: default;
-    }
+    .tt-reader-step:disabled { cursor: default; }
     .tt-reader-controls {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 10px;
-      margin: 14px 0 4px;
     }
     .tt-reader-status {
       margin: 0;
       color: var(--muted);
-      font-size: 0.9rem;
     }
-    .tt-reader figure { margin: 18px 0 22px; }
     .tt-reader figure:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   </style>
   </Fragment>
@@ -471,6 +404,10 @@ if (missingFrames.length) {
       engineering here is the code that refuses to render.
     </p>
 
+    <!-- ADR-014: a legacy bare plate takes a div wrapper (never a figure - gate
+         law) and a hand-numbered label span (PL-3, PL-4). -->
+    <div class="fig fig--plate">
+    <span class="fig-label">Plate 01</span>
     <svg class="tt-plate" viewBox="0 0 260 96" role="img"
          aria-label="Three states a gauge can be in. Measured zero: the value reads 0 percent over a full, empty track. Absent: the value is an em dash and no track at all, because nothing measured it. Invented: the value reads 47 percent over a half-filled track, struck through. A plausible number nobody measured is the one failure this program prevents.">
       <title>Measured zero draws a full empty track. Absent draws nothing. An invented reading is the failure.</title>
@@ -500,6 +437,7 @@ if (missingFrames.length) {
       to keep them different. The third cell is the one the whole program
       exists to prevent.
     </p>
+    </div>
 
     <p>
       Two kinds of number appear below. A script recounts a plain figure from
@@ -510,7 +448,7 @@ if (missingFrames.length) {
       the build when either kind drifts from the record.
     </p>
 
-    <nav class="toc" aria-labelledby="toc-heading">
+    <nav class="toc" id="toc" aria-labelledby="toc-heading">
       <p class="toc-heading" id="toc-heading">On this page</p>
       <ol>
       <li><a href="#what-it-is">What it is</a></li>
@@ -546,6 +484,7 @@ if (missingFrames.length) {
          the `data-tt` span where a gate reads them. Nothing here is a reversal,
          so nothing here uses the warm hue. -->
     <figure class="fig" data-fig="plate">
+      <span class="fig-label">Plate 02</span>
       <svg class="tt9-plate" viewBox="0 0 260 108" role="img"
            aria-label="Vendor adapters drawn as one set. The dispatch room seats five of them. The display watches the other two and does not seat them. The drop-file relay sits outside the set, and the display marks its row self-reported.">
         <title>Five adapters are seated, two are watched, and the relay sits outside the set.</title>
@@ -612,6 +551,7 @@ if (missingFrames.length) {
       is a draft and I never submitted it.
     </p>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="absent">Zero and absent are different states</h2>
 
     <!-- tt3-layers (portfolio ADR-013). The MECHANISM only: two independent
@@ -622,6 +562,7 @@ if (missingFrames.length) {
          search, and the refusal to draw a context percentage. A plate cannot
          carry any of them at full strength. -->
     <figure class="fig" data-fig="plate">
+      <span class="fig-label">Plate 03</span>
       <svg class="tt9-plate" viewBox="0 0 260 132" role="img"
            aria-label="Two independent layers enforce presence. Per session, every optional field is a pointer, so one field can drop on its own. Per adapter, a capability declaration drops a whole column and does not fill it with dashes.">
         <title>A pointer drops one field. A declaration drops a whole column.</title>
@@ -694,6 +635,7 @@ if (missingFrames.length) {
       an absence nobody looked for. That difference is the whole product.
     </p>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="badges">The badges claimed more than I measured</h2>
 
     <div class="decision" data-outcome="reversal">
@@ -725,6 +667,7 @@ if (missingFrames.length) {
            because a wrap reads left to right and then down. The cost is height:
            the plate grows from 96 units to 152. -->
       <figure class="fig" data-fig="plate">
+        <span class="fig-label">Plate 04</span>
         <svg class="tt9-plate" viewBox="0 0 260 152" role="img"
              aria-label="Four badge classes. Enforced: a live run measured the restriction holding. Refuted: a live run measured it failing. Unverified: I looked for a result and got none. Claimed: retired, and struck through, because it read like enforced and was not.">
           <title>Three evidence classes are live, and the fourth is retired.</title>
@@ -805,6 +748,7 @@ if (missingFrames.length) {
       </p>
     </div>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="race">Five seats, one brief, and no winner</h2>
     <p>
       telltale races one brief across every seat at once. Each attempt runs in
@@ -825,6 +769,7 @@ if (missingFrames.length) {
          is the honest direction to be wrong in, and that one race is not a
          benchmark. A strip cannot carry a ruling at full strength. -->
     <figure class="fig" data-fig="strip">
+      <span class="fig-label">Strip 05</span>
       <div class="tt-strip">
         <!-- NOT `aria-hidden`. These two are column LABELS, and CLAUDE.md's
              contrast rule names exactly this case: marking something
@@ -910,6 +855,7 @@ if (missingFrames.length) {
       unexercised.
     </p>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="instrument">Twice the instrument was the bug</h2>
     <p>
       Four corrections, and two of them are the same shape. The thing that was
@@ -924,6 +870,7 @@ if (missingFrames.length) {
          reference. A plate cannot carry a citation, and a figure that drops a
          citation is worse than no figure. -->
     <figure class="fig" data-fig="plate">
+      <span class="fig-label">Plate 06</span>
       <svg class="tt9-plate" viewBox="0 0 260 118" role="img"
            aria-label="The record on disk holds the keys. The sweep sits between the record and the answer, and its pattern matched almost nothing, so it reported nothing found. A session recorded weeks earlier holds the identical key set. The verdict is instrument, not drift.">
         <title>An old session with the identical key set rules out vendor drift.</title>
@@ -1092,8 +1039,14 @@ if (missingFrames.length) {
          "optimize" this into a server-rendered single frame.
 
          THE ORDER IS AN ARGUMENT, AND IT LIVES IN `READER_ORDER` ABOVE. -->
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="see-it">See it: seven recorded frames</h2>
     <section class="tt-reader">
+      <!-- ADR-014: the reader takes ONE figure number, of kind Frame, on its
+           head. The live "3 / 7" status the script renders indexes the seven
+           states inside it. One number per individual frame was considered and
+           declined: it renumbers the whole page for no reader gain. -->
+      <span class="fig-label">Frame 07</span>
       <p>
         Seven recorded states of the instrument. Each one is a byte-exact,
         contiguous line range of one committed golden file, and each caption
@@ -1266,6 +1219,7 @@ if (missingFrames.length) {
       </p>
     </section>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="refusals">What it refuses to render</h2>
     <p>
       I considered each of these, I argued it, and I declined it. Each refusal
@@ -1293,6 +1247,7 @@ if (missingFrames.length) {
       <a href="#frame-gate">See the gate bar &rarr;</a>
     </p>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="capacity">The gate that measured the capacity</h2>
     <p>
       I pointed the same habit that gates a model choice on this site at the
@@ -1305,6 +1260,7 @@ if (missingFrames.length) {
       <a href="product-and-program.html#capacity-gate">The capacity gate &rarr;</a>
     </p>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="limits">What this does not establish</h2>
 
     <!-- tt-s2 (portfolio ADR-013). GROUPING IS THE ONLY LEGAL TREATMENT OF A
@@ -1314,6 +1270,9 @@ if (missingFrames.length) {
          nothing is ranked. This section grows, and that is the correct
          outcome: ADR-004 and ADR-007 forbid a shorter concession list. -->
     <figure class="fig" data-fig="strip">
+      <!-- Strip 08, not 07: the reader above holds Frame 07 (ADR-014), so
+           every figure after it renumbers by one. Hand-authored digits, PL-4. -->
+      <span class="fig-label">Strip 08</span>
       <div class="tt-strip tt-s2">
         <p class="tt-s2-group">Release and platform</p>
         <ul>
@@ -1358,6 +1317,7 @@ if (missingFrames.length) {
       </figcaption>
     </figure>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="stack">Stack</h2>
     <p>
       Go, one static binary, no runtime dependency. The program binds no network
@@ -1448,6 +1408,7 @@ if (missingFrames.length) {
       that record.
     </p>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       The rest of this record is a system I built with agents. This is the
