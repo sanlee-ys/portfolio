@@ -184,32 +184,54 @@ import SiteNav from '../../components/SiteNav.astro';
        which are page-scoped above -- and that borrowing is the point: the
        reader learns the colour code from this diagram and carries it into the
        score chart further down. */
-    .split-map {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 4px 0 10px;
-    }
+    /* The plate's geometry -- display, width, height, the width cap, and the
+       centring margins -- comes from the figure ladder in assets/style.css
+       (ADR-014) now that the map sits in a .fig.fig--plate wrapper. The old
+       local 260px cap and its "renders 1:1 at every width" note are DELETED
+       rather than out-cascaded: the ladder hangs a plate at --fig-plate, so
+       the map renders about 1.05x at 320px and 1.48x at 1280px, and a comment
+       claiming a measured 1.000 beside a live 1.48 is a comment that lies.
+       Re-measured after the move: the smallest text on this plate renders
+       12.6px at 320px, against the 9px microtext floor. */
+
     /* Set boxes take the series colour; what they feed stays neutral, so the
-       eye tracks the three sets rather than the six shapes. */
+       eye tracks the three sets rather than the six shapes.
+
+       Both kinds of box are filled with --bg, which the figure ladder scopes
+       to the lifted dark figure ground. A box filled with --panel punched a
+       hole DARKER than the ground it sat on at night (--panel #1e1a15 against
+       the ground's #322a1e), which is the exact defect that scoping trick
+       exists to prevent. The neutral outline reads --stroke-figure, the figure
+       layer's own stroke rank, because the alpha-ink --border it used to read
+       is a page hairline and it disappears on the night ground. The rank
+       inside the plate still holds: a 2px series set, then a 1px ink box, then
+       a muted edge. */
     .split-map .sm-set { fill: var(--bg); stroke-width: 2; }
     .split-map .sm-a { stroke: var(--series-a); }
     .split-map .sm-b { stroke: var(--series-b); }
     .split-map .sm-c { stroke: var(--series-c); }
-    .split-map .sm-box { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; }
+    .split-map .sm-box { fill: var(--bg); stroke: var(--stroke-figure); stroke-width: 1; }
     .split-map .sm-id { fill: var(--text); font-size: 16px; font-weight: 700; }
     .split-map .sm-role { fill: var(--text); font-size: 12.5px; }
-    /* max-width caps the SVG at 260px, which is under the content column even
-       at a 320px viewport (272px inside the gutters) -- so it renders 1:1 at
-       every width the gate tests and these viewBox units ARE CSS pixels.
-       Measured, not assumed: scale came back 1.000 at 320, 390 and 900. */
     .split-map .sm-note { fill: var(--muted); font-size: 12px; }
     .split-map .sm-edge { fill: none; stroke: var(--muted); stroke-width: 1.5; }
     .split-map .sm-edge-a { stroke: var(--series-a); }
     .split-map marker path { fill: var(--muted); }
     .split-map marker path.sm-head-a { fill: var(--series-a); }
-    .split-caption { color: var(--muted); font-size: 0.92rem; margin: 0 0 28px; }
+    /* The map's caption joins the consolidated caption grammar rather than
+       keeping a voice of its own: same measure, same note voice, same place
+       under the artwork. It stays a <p> and does not become a <figcaption>,
+       because the wrapper is a <div> -- a bare plate never becomes a <figure>
+       (gate law, ADR-013 rule R-N) and a <figcaption> outside a <figure> is
+       invalid markup. So the grammar's tokens are set on the class instead. */
+    .split-caption {
+      max-width: var(--content);
+      margin: 14px auto 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
 
     .chart-legend {
       display: flex;
@@ -235,6 +257,13 @@ import SiteNav from '../../components/SiteNav.astro';
     #score-chart .series-dot.b { fill: var(--series-b); }
     #score-chart .series-dot.c { fill: var(--series-c); }
     #score-chart .gridline { stroke: var(--border); stroke-width: 1; }
+    /* 10px here is 10 RENDERED pixels at every width, and that is the whole
+       point of the change in loop-replay.js: the chart's viewBox is measured
+       at draw time, so one unit is one CSS pixel and the declared size is the
+       rendered size. Under the old fixed 640-unit viewBox this same 10px
+       rendered at 4.25px on a 320px phone -- the worst microtext on the site,
+       against a 9px floor -- and at 14.25px on a desktop. Do not put this
+       number back on a scale. */
     #score-chart .axis-label { fill: var(--muted); font-size: 10px; }
     #score-chart .cursor-line { stroke: var(--text); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.5; }
     #score-chart .hit-col { fill: transparent; cursor: pointer; }
@@ -277,6 +306,21 @@ import SiteNav from '../../components/SiteNav.astro';
       color: var(--muted);
     }
 
+    /* The rationale and the edit summary are agent-written text that JS swaps
+       in per iteration, and they carry raw identifiers: a rung-2 summary names
+       feature groups like technology_signature_keyword. An identifier longer
+       than the measure offers no break opportunity, so the paragraph widened
+       the WHOLE PAGE at 320px on three of rung 2's six iterations -- measured
+       at +28px, +164px and +43px.
+       No gate sees this, and that is the interesting half. mobile-qa.cjs
+       measures scrollWidth once at load and never clicks, so a panel that only
+       overflows after a scrub is invisible to it. The overflow was on the page
+       before this pass; it is fixed here because the pass is what looked.
+       `anywhere` rather than `break-word` because it also feeds min-content
+       sizing, which is what a grid item resolves against. The site already
+       uses this idiom on `figcaption code`. */
+    #iter-rationale, #iter-summary { overflow-wrap: anywhere; }
+
     .iter-detail h3 { margin: 22px 0 8px; font-size: 1rem; }
     .iter-baseline-note {
       color: var(--muted);
@@ -311,31 +355,12 @@ import SiteNav from '../../components/SiteNav.astro';
     }
     .honest-callout strong { color: var(--series-c); }
 
-    /* ----- The figure contract's two caption slots (ADR-013) -----
-       ORIGIN: src/pages/projects/context-architecture.astro, at commit
-       9d81caa (pull request #247). That page holds the origin block and it
-       merged first. This page branched before the origin merged, so the
-       declarations below are a page-local variant of the origin grammar and
-       not a byte copy. The third paragraph records why the tokens differ.
-
-       Page-scoped rather than assets/style.css because a concurrent session
-       owns that file for the tap-target work, and two writers on one
-       generated surface cannot be merged. OC-F consolidates the copies after
-       that session merges.
-
-       The tokens are .split-caption's, deliberately: this page already draws
-       a caption in --muted at 0.92rem directly above, and a second caption
-       grammar on one page would read as a second kind of claim. --muted is
-       also a real colour token rather than a faded one -- opacity never dims
-       text on this site (ADR-009), and contrast-check.cjs reads a figcaption
-       because it is HTML and not SVG text. */
-    .fig { margin: 0; }
-    .fig figcaption { color: var(--muted); font-size: 0.92rem; margin: 4px 0 28px; }
-    /* Both slots are blocks so the limit reads as its own line rather than as
-       a tail the eye can run past. The gate requires both to be non-empty;
-       this is what makes the limit legible as well as required. */
-    .fig .fig-what, .fig .fig-limit { display: block; }
-    .fig .fig-limit { margin-top: 6px; }
+    /* The caption grammar that used to sit here -- a page-local copy of the
+       two-slot block, carried with an origin comment while OC-F was open --
+       is DELETED. assets/style.css is its one home now (ADR-014), so the copy
+       would only be a second place for it to drift. The consolidated rule
+       renders the same two slots in the note voice, with the .ex-caption
+       hairline on the limit. */
 
     /* lr1-pipeline. The prefix is lr1- on every class and on the marker id,
        so nothing collides with the split map's sm-/split-arrow set above. A
@@ -349,18 +374,16 @@ import SiteNav from '../../components/SiteNav.astro';
        relationship the figure does not have. So the plate reads in the same
        ink as the body, and every state it draws is a word, not a hue.
 
-       max-width caps the SVG at 260px, which is under the content column even
-       at a 320px viewport, so these viewBox units are CSS pixels 1:1 -- the
-       same basis the split map above records. SVG text inherits font-family
-       from <body> rather than from the page, so each text class declares it. */
-    .lr1-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 4px 0 10px;
-    }
-    .lr1-plate .lr1-box { fill: var(--panel); stroke: var(--border); stroke-width: 1.5; }
+       The plate's geometry comes from the figure ladder in assets/style.css
+       (ADR-014): a plate hangs at --fig-plate, so this 260-unit drawing
+       renders about 1.05x at 320px and 1.48x at 1280px. The local 260px cap
+       and its "viewBox units are CSS pixels 1:1" note are deleted, because the
+       ladder already superseded both. Measured after the move: the smallest
+       text here renders 11.5px at 320px, against the 9px microtext floor.
+       SVG text inherits font-family from <body> rather than from the page, so
+       each text class declares it. The box fill and stroke follow the split
+       map's dark pass above, and for the same two reasons. */
+    .lr1-plate .lr1-box { fill: var(--bg); stroke: var(--stroke-figure); stroke-width: 1.5; }
     .lr1-plate .lr1-name { fill: var(--text); font-family: var(--font); font-size: 13px; font-weight: 600; }
     .lr1-plate .lr1-key { fill: var(--muted); font-family: var(--font); font-size: 11.5px; }
     .lr1-plate .lr1-step { fill: var(--text); font-family: var(--font); font-size: 12px; }
@@ -399,6 +422,8 @@ import SiteNav from '../../components/SiteNav.astro';
          previously three sentences of topology the reader had to assemble. The
          set colours match the chart's series colours below, so the code is
          learned here and carried down the page. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 01</span>
     <svg class="split-map" viewBox="0 0 260 184" role="img"
          aria-label="Set A feeds the agent's prompt rewrite and is re-scored each iteration, a closed loop. Set B is scored and stops the run. Set C is scored and reported only. Neither B nor C feeds back into the prompt.">
       <defs>
@@ -445,6 +470,7 @@ import SiteNav from '../../components/SiteNav.astro';
       <strong>C</strong> &mdash; real gold text &mdash; never enters the
       agent&rsquo;s context at all.
     </p>
+    </div>
 
     <div class="run-tabs" id="run-tabs" aria-label="Choose a recorded run">
       <button type="button" aria-pressed="true">Rung 1 &middot; prompt loop</button>
@@ -477,7 +503,17 @@ import SiteNav from '../../components/SiteNav.astro';
       <span><i class="swatch b"></i>B &middot; held-back (stops the loop)</span>
       <span><i class="swatch c"></i>C &middot; gold held-out (the honest number)</span>
     </div>
-    <svg id="score-chart" class="diagram" viewBox="0 0 640 280" role="img" aria-label="Line chart of category macro-F1 for splits A, B, and C across iterations"></svg>
+    <!-- The chart takes the sheet: a plot has an intrinsic width, and this one
+         carries three series and a shaded band. It is a <div> wrapper and not
+         a <figure>, per the same gate law the two plates follow, and it keeps
+         the prose above it as its caption rather than gaining a new one: a
+         two-slot caption here would be a new claim, and this pass moves no
+         claims. The viewBox below is a starting value only; loop-replay.js
+         measures the track and rewrites it so the chart draws at 1:1. -->
+    <div class="fig" data-place="sheet">
+      <span class="fig-label">Plot 02</span>
+      <svg id="score-chart" class="diagram" viewBox="0 0 640 280" role="img" aria-label="Line chart of category macro-F1 for splits A, B, and C across iterations"></svg>
+    </div>
 
     <h2>Iteration replay</h2>
     <div class="iter-nav">
@@ -560,7 +596,8 @@ import SiteNav from '../../components/SiteNav.astro';
          is edited). The rung numbers and the two diff shapes are in .fig-what,
          because a hand-drawn figure carries no digit (ADR-013) and because a
          caption is read by contrast-check.cjs while SVG text is not. -->
-    <figure class="fig" data-fig="plate">
+    <figure class="fig" data-fig="plate" data-place="spine">
+      <span class="fig-label">Plate 03</span>
       <svg class="lr1-plate" viewBox="0 0 260 132" role="img"
            aria-label="Two run logs enter in different dialects. One tags its records with type. The other tags with record. Both reach one normalizer at parse time, and then the viewer. Neither log is edited.">
         <defs>
