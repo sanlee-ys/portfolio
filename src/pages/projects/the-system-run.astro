@@ -12,18 +12,21 @@ import SiteNav from '../../components/SiteNav.astro';
   <style is:inline>
     /* One-note run plate (portfolio ADR-004). Page-scoped companion to the
        system diagram: a single note through notes-api, classifier, writeback,
-       and kb-agent. Max-width 260 keeps viewBox units 1:1 with CSS px on every
-       gate width (same measured discipline as .jtbd-strip / .lab-topo). */
+       and kb-agent.
+
+       The figure ladder in style.css now owns the scale, the ground, and the
+       centring (ADR-014). The plate sits in a .fig .fig--plate wrapper, so
+       `.fig--plate > svg` caps it at --fig-plate and centres it. This island
+       DELETES its own width, max-width, and height declarations. It does not
+       out-cascade them: a dead declaration reads as a live constraint to the
+       next writer. Only the block margins stay page-scoped. */
     .run-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
+      margin-top: 0;
+      margin-bottom: 0;
     }
     .run-plate .rn-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .run-plate .rn-title {
@@ -32,10 +35,13 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 10px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). The
+       plate renders at scale 1.046 in a 320px viewport, so a declared 9px
+       renders at 9.42px and clears the floor. */
     .run-plate .rn-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .run-plate .rn-edge {
       fill: none;
@@ -64,45 +70,29 @@ import SiteNav from '../../components/SiteNav.astro';
     }
     .run-plate marker path { fill: var(--muted); }
     .run-plate marker path.rn-head-drop { fill: var(--accent-warm); }
+    /* The bare plate's caption. It moves to the consolidated grammar
+       (ADR-014). It states what the plate argues, so it takes the what-voice.
+       The values below are the ones `:is(.fig, figure[data-fig]) .fig-what`
+       gives the caption further down this page. The class stays page-scoped,
+       because style.css names the two-slot figure caption and not this one
+       paragraph. */
     .run-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 6px;
-    }
-
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
-
-       COPY. ORIGIN: src/pages/projects/context-architecture.astro, at commit
-       9d81caa (pull request #247). The declarations below are that page's
-       block, verbatim. It is copied and not extracted because a concurrent
-       session owns public/assets/style.css for the tap-target work, and two
-       writers on one shared stylesheet cannot merge. OC-F of the redesign
-       brief carries the consolidation, for after that session merges.
-
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses.
-
-       The quiet voice is a token, never opacity (ADR-009). Both slots are
-       block-level, so the limit reads as its own line and not as a tail. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
+      max-width: var(--content);
+      margin: 14px auto 0;
+      font-size: 0.95rem;
+      font-weight: 500;
       line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
       color: var(--text-secondary);
     }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
+
+    /* This lane DELETED the two-slot caption block that used to sit here. The
+       block was a copy of context-architecture.astro's rules at commit 9d81caa
+       (pull request #247). That page took the copy because a concurrent
+       session then held public/assets/style.css. The session merged, and
+       ADR-014 gave the caption grammar one home. Three rules in style.css
+       replace the copy: `.fig figcaption`,
+       `:is(.fig, figure[data-fig]) .fig-what`, and
+       `:is(.fig, figure[data-fig]) .fig-limit`. */
 
     /* tsr1-hygiene (ADR-013). The prefix carries a digit, because a marker id
        is global to the document and a duplicate id repaints the wrong arrow
@@ -118,20 +108,19 @@ import SiteNav from '../../components/SiteNav.astro';
        it reads NOT BUILT. contrast-check.cjs exempts SVG text and no gate
        reads a plate, so the word half is the half that always survives.
 
-       At max-width 260 the viewBox units are CSS px 1:1 down to 320px. The
-       plate sits inside .example-run, which sets padding 0 and list-style
-       none, so a list item is the full content track: 272px on a 320px phone.
-       The plate renders at 260 and adds no indent of its own. */
+       The figure ladder in style.css owns the scale and the centring
+       (ADR-014): `figure[data-fig="plate"] > svg` caps the plate at
+       --fig-plate and centres it. This island DELETES its width, max-width,
+       and height declarations, for the same reason as .run-plate's. The plate
+       sits inside .example-run, which sets padding 0 and list-style none, so a
+       list item is the full content track: 272px on a 320px phone. */
     .tsr1-hygiene {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 14px 0 0;
+      margin-top: 14px;
+      margin-bottom: 0;
     }
     .tsr1-hygiene .tsr1-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .tsr1-hygiene .tsr1-title,
@@ -141,10 +130,13 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 10px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). This
+       plate renders at scale 1.046 in a 320px viewport, so a declared 9px
+       renders at 9.42px and clears the floor. */
     .tsr1-hygiene .tsr1-micro {
       fill: var(--text-secondary);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .tsr1-hygiene .tsr1-kicker {
       fill: var(--muted);
@@ -196,56 +188,67 @@ import SiteNav from '../../components/SiteNav.astro';
     <!-- Run companion to the-system diagram: one note through the four seams.
          region is the load-bearing asymmetry (dashed oxide drop off classifier).
          The ordered list below still carries the five steps and the real
-         payloads. ADR-010 is not applicable. There are no interactive nodes. -->
-    <svg class="run-plate" viewBox="0 0 260 118" role="img"
-         aria-label="One note end to end. notes-api creates the note. The classifier returns three labels. writeback keeps two as tags and drops region unmapped. kb-agent can then search by tag.">
-      <title>One note end to end. notes-api creates the note. The classifier returns three labels. writeback keeps two as tags and drops region unmapped. kb-agent can then search by tag.</title>
-      <defs>
-        <marker id="rn-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-        <marker id="rn-arrow-drop" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-          <path class="rn-head-drop" d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
+         payloads. ADR-010 is not applicable. There are no interactive nodes.
 
-      <!-- Four stage boxes L→R. rx matches --radius-sm (2px). -->
-      <rect class="rn-box" x="2" y="8" width="56" height="40" rx="2" />
-      <text class="rn-title" x="30" y="26" text-anchor="middle">notes-api</text>
-      <text class="rn-micro" x="30" y="38" text-anchor="middle">POST</text>
+         The wrapper is a div with .fig .fig--plate, and it is deliberately not
+         a figure element. A figure element in the content region must carry
+         data-fig and both caption slots, and this plate's caption is one
+         what-statement. The div joins the figure ladder and the lifted night
+         ground, and it claims no contract that it does not meet (ADR-013,
+         ADR-014). data-place="spine" pins the plate to the content track,
+         which is the per-kind default for a plate. -->
+    <div class="fig fig--plate" data-place="spine">
+      <span class="fig-label">Plate 01</span>
+      <svg class="run-plate" viewBox="0 0 260 118" role="img"
+           aria-label="One note end to end. notes-api creates the note. The classifier returns three labels. writeback keeps two as tags and drops region unmapped. kb-agent can then search by tag.">
+        <title>One note end to end. notes-api creates the note. The classifier returns three labels. writeback keeps two as tags and drops region unmapped. kb-agent can then search by tag.</title>
+        <defs>
+          <marker id="rn-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+          <marker id="rn-arrow-drop" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path class="rn-head-drop" d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
 
-      <rect class="rn-box" x="68" y="8" width="56" height="40" rx="2" />
-      <text class="rn-title" x="96" y="26" text-anchor="middle">classifier</text>
-      <text class="rn-micro" x="96" y="38" text-anchor="middle">3 fields</text>
+        <!-- Four stage boxes L→R. rx matches --radius-sm (2px). -->
+        <rect class="rn-box" x="2" y="8" width="56" height="40" rx="2" />
+        <text class="rn-title" x="30" y="26" text-anchor="middle">notes-api</text>
+        <text class="rn-micro" x="30" y="38" text-anchor="middle">POST</text>
 
-      <rect class="rn-box" x="134" y="8" width="56" height="40" rx="2" />
-      <text class="rn-title" x="162" y="26" text-anchor="middle">writeback</text>
-      <text class="rn-micro" x="162" y="38" text-anchor="middle">2 tags</text>
+        <rect class="rn-box" x="68" y="8" width="56" height="40" rx="2" />
+        <text class="rn-title" x="96" y="26" text-anchor="middle">classifier</text>
+        <text class="rn-micro" x="96" y="38" text-anchor="middle">3 fields</text>
 
-      <rect class="rn-box" x="200" y="8" width="56" height="40" rx="2" />
-      <text class="rn-title" x="228" y="26" text-anchor="middle">kb-agent</text>
-      <text class="rn-micro" x="228" y="38" text-anchor="middle">search</text>
+        <rect class="rn-box" x="134" y="8" width="56" height="40" rx="2" />
+        <text class="rn-title" x="162" y="26" text-anchor="middle">writeback</text>
+        <text class="rn-micro" x="162" y="38" text-anchor="middle">2 tags</text>
 
-      <!-- Three L→R muted edges — open pipeline through the run. -->
-      <path class="rn-edge" d="M 58 28 L 66 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
-      <path class="rn-edge" d="M 124 28 L 132 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
-      <path class="rn-edge" d="M 190 28 L 198 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
+        <rect class="rn-box" x="200" y="8" width="56" height="40" rx="2" />
+        <text class="rn-title" x="228" y="26" text-anchor="middle">kb-agent</text>
+        <text class="rn-micro" x="228" y="38" text-anchor="middle">search</text>
 
-      <!-- Dropped region: branches down from classifier, never reaches writeback.
-           Dashed oxide + label dual-encode the unmapped field. -->
-      <path class="rn-drop" d="M 96 50 L 96 72" marker-end="url(#rn-arrow-drop)" aria-hidden="true" />
-      <rect class="rn-drop-box" x="58" y="76" width="76" height="22" rx="2" />
-      <text class="rn-drop-text" x="96" y="91" text-anchor="middle">region dropped</text>
+        <!-- Three L→R muted edges — open pipeline through the run. -->
+        <path class="rn-edge" d="M 58 28 L 66 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
+        <path class="rn-edge" d="M 124 28 L 132 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
+        <path class="rn-edge" d="M 190 28 L 198 28" marker-end="url(#rn-arrow)" aria-hidden="true" />
 
-      <text class="rn-micro" x="162" y="70" text-anchor="middle">cat + domain only</text>
-      <text class="rn-micro" x="130" y="112" text-anchor="middle">same note, real schemas</text>
-    </svg>
-    <p class="run-plate-caption">
-      Create, classify, write two tags, search. The dashed branch is the field
-      the consumer never mapped. Step&nbsp;3 below names it.
-    </p>
+        <!-- Dropped region: branches down from classifier, never reaches writeback.
+             Dashed oxide + label dual-encode the unmapped field. -->
+        <path class="rn-drop" d="M 96 50 L 96 72" marker-end="url(#rn-arrow-drop)" aria-hidden="true" />
+        <rect class="rn-drop-box" x="58" y="76" width="76" height="22" rx="2" />
+        <text class="rn-drop-text" x="96" y="91" text-anchor="middle">region dropped</text>
+
+        <text class="rn-micro" x="162" y="70" text-anchor="middle">cat + domain only</text>
+        <text class="rn-micro" x="130" y="112" text-anchor="middle">same note, real schemas</text>
+      </svg>
+      <p class="run-plate-caption">
+        Create, classify, write two tags, search. The dashed branch is the field
+        the consumer never mapped. Step&nbsp;3 below names it.
+      </p>
+    </div>
 
     <ol class="example-run">
       <li>
@@ -311,8 +314,15 @@ import SiteNav from '../../components/SiteNav.astro';
              plate does not repeat it. The seam that let the drift through is
              shown on the-system.html, and .fig-limit links there rather than
              showing it a second time in a second grammar. Zero digits here.
-             Every count stays in the notes above. -->
-        <figure class="fig" data-fig="plate">
+             Every count stays in the notes above.
+
+             data-place="spine" here is DECLARATIVE and it paints nothing. The
+             rules that read data-place are direct-child selectors, and this
+             figure sits inside a list item. The attribute states the per-kind
+             width policy for a plate, so a later move of this figure to the
+             article grid keeps the policy it already carries. -->
+        <figure class="fig" data-fig="plate" data-place="spine">
+          <span class="fig-label">Plate 02</span>
           <svg class="tsr1-hygiene" viewBox="0 0 260 96" role="img"
                aria-label="Two paths. The consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. A check that fails the build is not built here.">
             <title>Two paths. The consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. A check that fails the build is not built here.</title>
