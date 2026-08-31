@@ -12,21 +12,24 @@ import Term from '../../components/Term.astro';
 >
   <Fragment slot="head">
   <style is:inline>
-    /* Contract-seam plate (portfolio ADR-004). Page-scoped: both sides
-       report GREEN against their own copy of the shape, and the wire
+    /* Contract-seam plate (portfolio ADR-004, ADR-014). Page-scoped: both
+       sides report GREEN against their own copy of the shape, and the wire
        between them is broken. Not a second system diagram (the interactive
-       map below already is that). Max-width 260 keeps viewBox units 1:1
-       with CSS px (same discipline as .two-fail / .judge-plate). */
-    .seam-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       map below already is that).
+
+       The plate now hangs on the MONOGRAPH figure ladder. Its wrapper is
+       <div class="fig fig--plate">, never a <figure>: a bare plate carries no
+       two-slot caption, and a <figure> without data-fig fails the figure gate.
+       So style.css owns the geometry (`.fig--plate > svg`, capped at
+       --fig-plate) and this block owns only the drawing. The old max-width of
+       260px is DELETED with that move, so the 1:1 discipline no longer holds
+       and the plate owes a measurement: at a 320px viewport the spine track
+       measures 272px over a 260-unit viewBox, which renders at scale 1.046.
+       Every text class below therefore renders at or above its declared size,
+       and the 9px microtext floor (CLAUDE.md) is met with margin. */
     .seam-plate .sp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .seam-plate .sp-lane {
@@ -42,10 +45,12 @@ import Term from '../../components/Term.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* No text node carries this class today. It is held at the 9px floor so a
+       later editor who reaches for it starts above the line, not under it. */
     .seam-plate .sp-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .seam-plate .sp-edge {
       fill: none;
@@ -84,42 +89,17 @@ import Term from '../../components/Term.astro';
     }
     .seam-plate marker path { fill: var(--muted); }
     .seam-plate marker path.sp-head-bad { fill: var(--accent-warm); }
+    /* The caption grammar itself now lives in style.css (ADR-014, OC-F
+       closed), so the copy this page carried from context-architecture is
+       DELETED with its origin comment. The plate's caption takes .fig-what and
+       reads the consolidated note voice from there.
+
+       What stays here is geometry, and only because a <div> cannot hold a
+       <figcaption>: the consolidated `.fig figcaption` rule that centres a
+       caption on the prose measure cannot match a bare plate's paragraph. */
     .seam-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 18px;
-    }
-
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
-
-       COPIED VERBATIM from src/pages/projects/context-architecture.astro at
-       commit 9d81caa, which is the origin page for this block. Copied and not
-       extracted: a concurrent session owns public/assets/style.css for the
-       tap-target work, and two writers on one shared stylesheet cannot merge.
-       OC-F of the redesign brief carries the consolidation, for after that
-       session merges. Change this block only by re-copying from the origin.
-
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses. The quiet voice is a token, never opacity
-       (ADR-009). */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
+      max-width: var(--content);
+      margin: 14px auto 0;
     }
 
     /* ts1-sequence, the seam drawn as a sequence (ADR-004, ADR-013).
@@ -132,6 +112,17 @@ import Term from '../../components/Term.astro';
        phone gives 272px. This plate sits inside a .decision card, and
        .decision carries `padding: 22px 0 30px`. The card adds no horizontal
        padding, so the plate measures the same 272px and renders at 260.
+
+       This figure takes NO data-place attribute, and that is the A5 rule of
+       ADR-014: a figure nested in a .decision keeps the entry's own measure
+       and is never promoted. The width mechanism selects direct children of
+       main.wrap, so an attribute here would state a width policy that nothing
+       applies. The wrapper's own inline padding drops at 640px and below
+       (PL-6, the pocket edition), which is what holds the 272px track above.
+
+       The plate scale is therefore 1.000 at every width, so a declared unit is
+       a rendered pixel and the 9px microtext floor is a code review rather
+       than a measurement (CLAUDE.md, "Why 320px matters").
 
        The prefix is ts1- and the marker id carries the digit. A marker id is
        global to the document, this page already ships `sp-arrow` and `arrow`,
@@ -157,7 +148,7 @@ import Term from '../../components/Term.astro';
     }
     .ts1-plate .ts1-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     /* The stub exists and nobody touched it. Dashed, not absent. */
@@ -180,10 +171,15 @@ import Term from '../../components/Term.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* 8px broke the microtext floor. The plate renders at scale 1.000, so
+       these four labels painted 8.00px at a 320px viewport and the floor is
+       9px. The units go up and the plate keeps its geometry: the widest label
+       grows from 144.2 to about 162 units inside a 260-unit box, and the
+       tightest one ends about 5 units short of its box edge. */
     .ts1-plate .ts1-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .ts1-plate .ts1-edge {
       fill: none;
@@ -223,55 +219,70 @@ import Term from '../../components/Term.astro';
 
     <!-- Argument: each side's test is green against its own copy of the
          shape; the wire between them is broken. Word + geometry first
-         (GREEN / GREEN / BROKEN), oxide only on the seam. ADR-010 N/A. -->
-    <svg class="seam-plate" viewBox="0 0 260 148" role="img"
-         aria-label="Contract seam: the provider tests its own fixture and reports GREEN. The consumer tests its own stub and reports GREEN. The wire between them is BROKEN, because each side asserted against its own copy of the shape.">
-      <title>Both sides report GREEN against their own copy of the shape. The wire between them is BROKEN.</title>
-      <defs>
-        <marker id="sp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-        <marker id="sp-arrow-bad" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-          <path class="sp-head-bad" d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
+         (GREEN / GREEN / BROKEN), oxide only on the seam. ADR-010 N/A.
 
-      <text class="sp-lane" x="4" y="12">PROVIDER</text>
-      <rect class="sp-box" x="4" y="18" width="110" height="36" rx="2" />
-      <text class="sp-title" x="59" y="40" text-anchor="middle">own fixture</text>
-      <rect class="sp-ok" x="4" y="60" width="110" height="22" rx="2" />
-      <text class="sp-ok-text" x="59" y="75" text-anchor="middle">GREEN</text>
+         Plate 01 of three (ADR-014). The wrapper is a <div class="fig
+         fig--plate">, never a <figure>: this plate carries a one-slot caption
+         and the figure gate fails a <figure> that declares no data-fig. The
+         label is a real span with hand-authored digits (PL-3, PL-4), in flow
+         above the artwork at every width, so selection and Ctrl+F reach it and
+         both text gates read it. data-place="spine" is the per-kind width
+         policy: a plate sits on the content track. -->
+    <div class="fig fig--plate" data-place="spine">
+      <span class="fig-label">Plate 01</span>
+      <svg class="seam-plate" viewBox="0 0 260 148" role="img"
+           aria-label="Contract seam: the provider tests its own fixture and reports GREEN. The consumer tests its own stub and reports GREEN. The wire between them is BROKEN, because each side asserted against its own copy of the shape.">
+        <title>Both sides report GREEN against their own copy of the shape. The wire between them is BROKEN.</title>
+        <defs>
+          <marker id="sp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+          <marker id="sp-arrow-bad" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path class="sp-head-bad" d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
 
-      <text class="sp-lane" x="146" y="12">CONSUMER</text>
-      <rect class="sp-box" x="146" y="18" width="110" height="36" rx="2" />
-      <text class="sp-title" x="201" y="40" text-anchor="middle">own stub</text>
-      <rect class="sp-ok" x="146" y="60" width="110" height="22" rx="2" />
-      <text class="sp-ok-text" x="201" y="75" text-anchor="middle">GREEN</text>
+        <text class="sp-lane" x="4" y="12">PROVIDER</text>
+        <rect class="sp-box" x="4" y="18" width="110" height="36" rx="2" />
+        <text class="sp-title" x="59" y="40" text-anchor="middle">own fixture</text>
+        <rect class="sp-ok" x="4" y="60" width="110" height="22" rx="2" />
+        <text class="sp-ok-text" x="59" y="75" text-anchor="middle">GREEN</text>
 
-      <path class="sp-edge" d="M 59 82 L 59 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
-      <path class="sp-edge" d="M 201 82 L 201 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
-      <path class="sp-edge-break" d="M 59 96 L 118 96" aria-hidden="true" />
-      <path class="sp-edge-break" d="M 142 96 L 201 96" marker-end="url(#sp-arrow-bad)" aria-hidden="true" />
+        <text class="sp-lane" x="146" y="12">CONSUMER</text>
+        <rect class="sp-box" x="146" y="18" width="110" height="36" rx="2" />
+        <text class="sp-title" x="201" y="40" text-anchor="middle">own stub</text>
+        <rect class="sp-ok" x="146" y="60" width="110" height="22" rx="2" />
+        <text class="sp-ok-text" x="201" y="75" text-anchor="middle">GREEN</text>
 
-      <text class="sp-lane" x="4" y="116">THE WIRE</text>
-      <rect class="sp-bad" x="4" y="122" width="252" height="22" rx="2" />
-      <text class="sp-bad-text" x="130" y="137" text-anchor="middle">BROKEN</text>
-    </svg>
-    <p class="seam-plate-caption">
-      Two unit tests that happen to agree are not a contract test. Each side
-      was green. The seam was not.
-    </p>
+        <path class="sp-edge" d="M 59 82 L 59 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
+        <path class="sp-edge" d="M 201 82 L 201 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
+        <path class="sp-edge-break" d="M 59 96 L 118 96" aria-hidden="true" />
+        <path class="sp-edge-break" d="M 142 96 L 201 96" marker-end="url(#sp-arrow-bad)" aria-hidden="true" />
+
+        <text class="sp-lane" x="4" y="116">THE WIRE</text>
+        <rect class="sp-bad" x="4" y="122" width="252" height="22" rx="2" />
+        <text class="sp-bad-text" x="130" y="137" text-anchor="middle">BROKEN</text>
+      </svg>
+      <p class="seam-plate-caption fig-what">
+        Two unit tests that happen to agree are not a contract test. Each side
+        was green. The seam was not.
+      </p>
+    </div>
 
     <nav class="toc" aria-labelledby="toc-heading">
       <p class="toc-heading" id="toc-heading">On this page</p>
       <ol>
+      <!-- The figure run behind a section row is plain text, never an anchor,
+           so a phone pays no 44px box per figure (ADR-014). Plate 01 opens the
+           page above this list and belongs to no section, so no row claims
+           it. -->
       <li><a href="#what-it-grew-into">The four repos</a></li>
-      <li><a href="#the-map">The map</a></li>
+      <li><a href="#the-map">The map</a><span class="toc-figs">Map 02</span></li>
       <li><a href="#how-it-flows">How it flows</a></li>
       <li><a href="#the-problem">The problem</a></li>
-      <li><a href="#the-decisions">The decisions</a></li>
+      <li><a href="#the-decisions">The decisions</a><span class="toc-figs">Map 03</span></li>
       <li><a href="#the-outcome">The outcome</a></li>
       <li><a href="#where-it-goes-next">Where it goes next</a></li>
       </ol>
@@ -294,9 +305,20 @@ import Term from '../../components/Term.astro';
     </ul>
     <p class="ex-caption">All four repos are public. The ADRs and contract tests below live in those repos.</p>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="the-map">The map</h2>
     <p>Click a box to see what each part does. The list below carries the same flow.</p>
-    <figure class="diagram-wrap">
+    <!-- Map 02 of three (ADR-014). data-place="sheet" states the per-kind
+         width policy for a map. The promotion list already carries a bare
+         <figure>, so the attribute changes no pixel here; it is written
+         because the width of this figure is now a declared policy and not an
+         accident of which selector happened to match.
+
+         The label sits before the <svg> and not inside it: no digit enters an
+         SVG text node (ADR-013), and diagram.js addresses its two groups by
+         id, so a sibling span ahead of them moves nothing. -->
+    <figure class="diagram-wrap" data-place="sheet">
+      <span class="fig-label">Map 02</span>
       <svg class="diagram" id="system-diagram" viewBox="0 0 800 430" role="group" aria-label="Interactive map of the system: notes-api, classifier, and kb-agent, connected by an async BackgroundTasks enrichment loop.">
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -309,6 +331,7 @@ import Term from '../../components/Term.astro';
       <figcaption class="diagram-detail" id="diagram-detail" aria-live="polite" aria-atomic="true">Click a box above to see what each part does.</figcaption>
     </figure>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="how-it-flows">How it flows</h2>
     <ol class="flow">
       <li><code>POST /notes</code> creates a note in <strong>notes-api</strong>. The endpoint enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately. The task runs after notes-api sends the response.</li>
@@ -328,12 +351,14 @@ import Term from '../../components/Term.astro';
       still drops. <a class="card-link" href="the-system-run.html">Watch one note go through it, with the real schemas <span class="arrow">&rarr;</span></a>
     </p>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="the-problem">The problem</h2>
     <p>
       The four repos should act as one system and stay independently deployable.
       That lives in the contracts between them, not in shared code.
     </p>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="the-decisions">The decisions</h2>
 
     <div class="decision" id="decision-contracts">
@@ -367,6 +392,7 @@ import Term from '../../components/Term.astro';
            No digit (ADR-013). The third field, the July 2026 audit, and the
            green CI stay in the prose above. -->
       <figure class="ts1-fig fig" data-fig="map">
+        <span class="fig-label">Map 03</span>
         <svg class="ts1-plate" viewBox="0 0 260 118" role="img"
              aria-label="The classifier adds a field. The same commit updates the provider's own fixture. The consumer stub stays untouched. Neither side can see the other.">
           <title>The provider adds a field and updates its own fixture. The consumer stub stays untouched.</title>
@@ -467,6 +493,7 @@ import Term from '../../components/Term.astro';
         not write down.</p>
     </div>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="the-outcome">The outcome</h2>
     <ul>
       <li><strong>Create a note, and the system classifies and tags it automatically.</strong> The work runs asynchronously, with no coupling between note creation and classifier availability.</li>
@@ -475,6 +502,7 @@ import Term from '../../components/Term.astro';
       <li><strong>A skill map (SYS-007) spells out what the system exercises</strong>: evals, context engineering, <Term id="agent">agents</Term>, and observability. It also names where I am weak, which is security on the agent's tool seam.</li>
     </ul>
 
+    <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="where-it-goes-next">Where it goes next</h2>
     <p>
       The roadmap is an autonomy ladder: the same classifier, more
