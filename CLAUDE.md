@@ -155,10 +155,10 @@ Before committing any layout / style / markup change:
      within the viewport. A table scrolls inside its **own** box (`display:
      block; overflow-x: auto`), it never widens the page.
    - Nav and footer link rows **wrap**, never clip.
-   - Tap targets ≥ 44px. (`hit-target.cjs` enforces this at 390px for SVG
-     controls and for standalone anchors — a link that is the only text of its
-     block. A link inside a sentence keeps the WCAG 2.5.8 inline exception;
-     for everything else it is still on you.)
+   - Tap targets ≥ 44px. (`hit-target.cjs` enforces this at 320/360/390/430px
+     for SVG controls and for standalone anchors — a link that is the only
+     text of its block. A link inside a sentence keeps the WCAG 2.5.8 inline
+     exception; for everything else it is still on you.)
    - If you change colors, check **both** light and dark themes.
 
 3. **Actually look at it.** For anything visual, screenshot the affected page at
@@ -201,9 +201,9 @@ npm run build && SITE_ROOT=dist node scripts/hit-target.cjs
 ```
 
 - It hit-tests every element that **claims to be a control** — `role="button"`,
-  `role="link"`, or focusable — at 1280 and 390px, and fails if the centre is
-  dead, if under 60% of the box is a target, or if the box is under 44px at
-  phone width.
+  `role="link"`, or focusable — at 1280 and at 320/360/390/430px, and fails if
+  the centre is dead, if under 60% of the box is a target, or if the box is
+  under 44px at phone width.
 - **`cursor: pointer` is deliberately not part of that test.** The cursor
   inherits, so decorative shapes inside a real control report it; keying on it
   failed four correct pages, including `#score-chart`, whose `.series-dot`
@@ -212,11 +212,12 @@ npm run build && SITE_ROOT=dist node scripts/hit-target.cjs
   because an SVG clips at its viewport and un-claimable area is not a defect.
 - **Finding zero interactive SVG elements is a failure, not a clean run** — the
   figures are script-drawn, so "none found" most likely means a renderer broke.
-- It also measures every **standalone anchor** at 390px against the same 44px
-  floor. Standalone = the link is the only text of its block container (the
-  homepage card links shipped at 15px tall this way). A link inside a sentence
-  is exempt — WCAG 2.5.8's inline exception, adopted deliberately in the ToC
-  block in `style.css`. Finding zero anchors site-wide is a failure too.
+- It also measures every **standalone anchor** at 320/360/390/430px against
+  the same 44px floor. Standalone = the link is the only text of its block
+  container (the homepage card links shipped at 15px tall this way). A link
+  inside a sentence is exempt — WCAG 2.5.8's inline exception, adopted
+  deliberately in the ToC block in `style.css`. Finding zero anchors site-wide
+  is a failure too.
 
 ## The figure contract: a hand-drawn figure carries no digit
 
@@ -402,6 +403,9 @@ which drops the effective width to ~375px or less. Test **down to 320px**, not
 just 430 — a layout that only works at 430 will still clip for a real user.
 
 ### The microtext floor: no SVG text renders under 9px at 320px
+
+*Recorded in [`decisions/ADR-014`](decisions/ADR-014-the-monograph-identity.md),
+section 5. This section is canonical for what to **do**.*
 
 **No `<text>` node inside an `<svg>` may render under 9px at a 320px
 viewport.** The floor binds the RENDERED size, not the declared one. A plate

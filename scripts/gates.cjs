@@ -144,8 +144,9 @@ function runSiteGate(label, script) {
  * above the line need no `dist/`, no browser and no network, and finish in
  * seconds; the eleven below either walk the built site or launch a browser —
  * contrast-check renders every page in both themes, mobile-qa renders 64
- * page-widths, hit-target hit-tests every control at two widths. A missing ADR
- * section should redden in two seconds, not after a full render pass.
+ * page-widths, hit-target hit-tests every control at 1280 and at
+ * 320/360/390/430px. A missing ADR section should redden in two seconds, not
+ * after a full render pass.
  *
  * The hit-target SUITE sits at the bottom with the browser work rather than up
  * with the other `node --test` suites: it spawns the gate, which launches
