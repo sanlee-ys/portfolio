@@ -29,17 +29,15 @@ import SiteNav from '../components/SiteNav.astro';
   <style is:inline>
     /* Method plate (portfolio ADR-004). Page-scoped: the three-part way
        the work is run. Not a second system diagram (that sits below).
-       Max-width 260, viewBox 1:1, same grammar as .jtbd-strip. */
-    .method-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       The plate's size, centring, ground, and box stroke moved to
+       style.css with the MONOGRAPH figure ladder (ADR-014, landing WO-I1).
+       The .fig--plate wrapper and the consolidated .method-plate rule own
+       the geometry there, and .mp-box reads --stroke-figure there. This
+       island keeps only the ink style.css does not carry. The microtext
+       sits at 9px, the ADR-014 floor. No SVG text renders under 9px at a
+       320px viewport, and this plate never renders under 1:1. */
     .method-plate .mp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
       stroke-width: 1;
     }
     .method-plate .mp-title {
@@ -51,7 +49,7 @@ import SiteNav from '../components/SiteNav.astro';
     .method-plate .mp-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .method-plate .mp-edge {
       fill: none;
@@ -59,11 +57,6 @@ import SiteNav from '../components/SiteNav.astro';
       stroke-width: 1.5;
     }
     .method-plate marker path { fill: var(--muted); }
-    .method-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0;
-    }
 
     /* Flagship block (promoted above the router). Same rule-and-air rhythm as
        .orientation so the two read as siblings: a promoted entry, then the
@@ -220,7 +213,12 @@ import SiteNav from '../components/SiteNav.astro';
       <p class="diagram-more standalone"><a class="card-link" href="projects/classifier-baseline.html#try-it">Run the classifier demo <span class="arrow">&rarr;</span></a></p>
 
       <!-- How the work is run. Open pipeline, no oxide: this is the method,
-           not a reversal. ADR-010 N/A. -->
+           not a reversal. ADR-010 N/A. A legacy bare plate takes a div
+           wrapper, never a figure (gate law), and a hand-numbered label
+           span (ADR-014, PL-3/PL-4). The caption slots stay empty; the
+           landing program records the owner-copy ask. -->
+      <div class="fig fig--plate">
+      <span class="fig-label">Plate 01</span>
       <svg class="method-plate" viewBox="0 0 260 72" role="img"
            aria-label="How the work is run: set the direction, freeze the contracts between the parts, then gate every change on evidence.">
         <title>Direction, then contracts, then an evidence gate.</title>
@@ -243,11 +241,13 @@ import SiteNav from '../components/SiteNav.astro';
         <text class="mp-micro" x="220" y="38" text-anchor="middle">gate the merge</text>
         <text class="mp-micro" x="130" y="64" text-anchor="middle">eval gates the merge</text>
       </svg>
+      </div>
     </section>
 
     <h2 class="section-title">The system</h2>
     <p class="section-sub">I wired three services into one loop: an API, an LLM classifier, and a RAG agent.</p>
     <figure class="diagram-wrap">
+      <span class="fig-label">Map 02</span>
       <p class="flow-line" aria-label="System data flow, in order">
         Notes API <span class="flow-arrow" aria-hidden="true">&rarr;</span>
         BackgroundTask <span class="flow-arrow" aria-hidden="true">&rarr;</span>
