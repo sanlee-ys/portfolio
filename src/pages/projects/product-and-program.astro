@@ -129,17 +129,13 @@ import SiteNav from '../../components/SiteNav.astro';
        figcaption, .fig-what, and .fig-limit one home in style.css. This lane
        deletes the copy rather than keep it in step by hand.
 
-       Three single-slot captions stay page-scoped, below. They caption bare
-       plates inside a div.fig wrapper and not inside a figure element. They
-       hold no .fig-limit, and no gate reads them. Each one carries the class
-       fig-what, which puts it in the consolidated note voice. The rule below
-       sets the box only, because style.css owns the voice. */
-    .jtbd-strip-caption,
-    .nnl-plate-caption,
-    .gp-plate-caption {
-      max-width: var(--content);
-      margin: 14px auto 0;
-    }
+       Three single-slot captions sit on this page. They caption bare plates
+       inside a div.fig wrapper and not inside a figure element. They hold no
+       .fig-limit, and no gate reads them. Each one carries the class fig-what,
+       which puts it in the consolidated note voice — and style.css now gives
+       it the consolidated BOX as well, through `.fig--plate > p`. The
+       page-scoped rule that set that box is deleted with the rest: the class
+       names stay on the markup as hooks, and nothing here declares. */
 
     /* pp1: the axis board. A STRIP, so it re-lays text and draws nothing.
        Two lists sit under this section today, and the reader has to join a

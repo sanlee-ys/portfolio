@@ -223,10 +223,10 @@ import SiteNav from '../../components/SiteNav.astro';
        under the artwork. It stays a <p> and does not become a <figcaption>,
        because the wrapper is a <div> -- a bare plate never becomes a <figure>
        (gate law, ADR-013 rule R-N) and a <figcaption> outside a <figure> is
-       invalid markup. So the grammar's tokens are set on the class instead. */
+       invalid markup. The measure and the centring now come from `.fig--plate > p` in
+       style.css, which reaches a bare plate's caption as the paragraph it is;
+       only the voice tokens are set on the class. */
     .split-caption {
-      max-width: var(--content);
-      margin: 14px auto 0;
       font-size: 0.95rem;
       font-weight: 500;
       line-height: 1.55;

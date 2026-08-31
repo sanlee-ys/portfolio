@@ -137,16 +137,14 @@ import SiteNav from '../../components/SiteNav.astro';
        is deleted. The shared grammar gives .fig-what its note voice through a
        descendant selector, and it gives the caption BOX its measure through
        `.fig figcaption`. A bare plate wraps in a <div class="fig fig--plate">
-       and therefore holds no <figcaption>, so this rule declares that box for
-       the two plates that need it.
+       and therefore holds no <figcaption> — so style.css declares that box for
+       a bare plate separately, through `.fig--plate > p`. The rule that used
+       to declare it here, for the two plates on this page, is deleted with the
+       rest of the copy.
 
        A bare plate never becomes a <figure>. Gate rule R-C makes a declared
        figure owe a two-slot caption, and a limit sentence written to answer a
        gate is a claim that nobody measured. */
-    .fig--plate > .fig-what {
-      max-width: var(--content);
-      margin: 14px auto 0;
-    }
 
     /* fg-s1. The three attempts, re-laid as a strip. Each row keeps the words
        the paragraph already used: the break, then what CI reported. The strip

@@ -62,19 +62,21 @@ import SiteNav from '../components/SiteNav.astro';
        main.wrap only. The old bottom margin is gone; the wrapper owns the
        air under the figure now.
 
-       max-width and the auto margins RESTATE the consolidated .fig
-       figcaption geometry, measured: without them the caption inherits the
-       wrapper's promoted wide track and runs 884px at 1280px, against a
-       544px prose measure. This caption cannot BE a <figcaption>, because a
-       figcaption outside a <figure> is invalid and a <figure> here fails the
-       figure contract. So it restates the one rule it cannot inherit, and
-       nothing else. Consolidating this selector belongs to the one hand on
-       style.css; the pull request records the ask. */
+       THE GEOMETRY IS NO LONGER RESTATED HERE. style.css carries
+       `.fig--plate > p`, which gives every bare-plate caption the prose
+       measure and the centring; that is the ask PR #286 left for the one hand
+       on that file, now taken. Without it this caption inherits the wrapper's
+       promoted wide track and runs 884px at 1280px against a 544px prose
+       measure. This caption still cannot BE a <figcaption> — one outside a
+       <figure> is invalid, and a <figure> here fails the figure contract —
+       which is exactly why the shared selector reaches for the <p>.
+
+       What stays local is the voice. The chrome pages caption in `--muted` at
+       0.92rem; the project pages use the note voice. One shared selector
+       cannot decide that without changing what a page renders. */
     .gloss-plate-caption {
       color: var(--muted);
       font-size: 0.92rem;
-      max-width: var(--content);
-      margin: 14px auto 0;
     }
   </style>
   </Fragment>

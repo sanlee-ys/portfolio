@@ -80,14 +80,14 @@ import SiteNav from '../../components/SiteNav.astro';
     }
     /* The plate's own caption. It is a <p> and not a <figcaption>. A bare
        plate wraps in <div class="fig fig--plate"> and never in <figure>,
-       because the figure gate reads a <figure> as a two-slot figure. So this
-       rule restates the consolidated caption metrics rather than inheriting
-       them. The origin is the block headed "The caption grammar, one home" in
-       public/assets/style.css (ADR-014). It carries the note voice, because
-       this line argues rather than concedes. */
+       because the figure gate reads a <figure> as a two-slot figure. So the shared
+       selector reaches for the <p> instead: `.fig--plate > p` in
+       public/assets/style.css now carries the measure and the centring for
+       every bare-plate caption, and the geometry that stood here retired into
+       it (ADR-014, the ask from PR #286). What stays is the note voice,
+       because this line argues rather than concedes — and voice is
+       page-owned. */
     .rung-plate-caption {
-      max-width: var(--content);
-      margin: 14px auto 0;
       font-size: 0.95rem;
       font-weight: 500;
       line-height: 1.55;
