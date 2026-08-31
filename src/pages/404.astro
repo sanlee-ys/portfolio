@@ -9,17 +9,34 @@ import SiteNav from '../components/SiteNav.astro';
   <Fragment slot="head">
   <style is:inline>
     /* Missing-page plate (portfolio ADR-004). Asked path, empty record.
-       Dashed box + oxide NOT LOGGED. Max-width 260, viewBox 1:1. */
-    .miss-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       Dashed box + oxide NOT LOGGED. viewBox 1:1.
+
+       The plate now sits in the MONOGRAPH figure ladder (ADR-014). The
+       wrapper is the .fig fig--plate div, so style.css owns the width cap
+       (--fig-plate), the night ground, the pocket edition, and the owned
+       margin. The four declarations that stated those here are DELETED
+       rather than out-cascaded, per the ladder's own rule. What stays is
+       page-scoped: the stroke, the fill, and the type inside this one
+       drawing.
+
+       This plate carries NO figure label, and that is a recorded call, not
+       an oversight. A number indexes a figure so a reader can cite it, and
+       this page is a joke page behind robots="noindex" that nobody cites.
+       The floor duty is separate and it still binds: see .ms-micro below. */
+    /* The box stroke reads --stroke-figure, not --rule-strong (ADR-014,
+       amendment A2). The two tokens are the same hex in light. In dark the
+       figure token is #b0a591 against the global rule's #6b6252, so the
+       night retune reaches the plate and leaves every rule outside the
+       figure layer at its July value. I0 moved the two prototype pages'
+       plates and left each remaining page's plate to that page's lane.
+       fill: var(--bg) is deliberate and unchanged: --bg is scoped to
+       --fig-ground inside a dark figure, so the knockout tracks the lifted
+       ground instead of punching a darker hole in it. The dashed .ms-hollow
+       and the .ms-edge arrows keep --muted: they are the quiet rank, and
+       PL-10 pins the RANK ink > strong > quiet, not the hex. */
     .miss-plate .ms-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .miss-plate .ms-hollow {
@@ -41,10 +58,15 @@ import SiteNav from '../components/SiteNav.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). The
+       plate holds a 260-unit viewBox and renders at scale 1.046 in a 320px
+       viewport, so a declared 9px renders at 9.42px. The rule says raise the
+       declared unit and never scale the plate. The label "no entry" is
+       byte-exact and it measures 43.4 units at 9px inside a 128-unit box. */
     .miss-plate .ms-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .miss-plate .ms-edge {
       fill: none;
@@ -63,10 +85,16 @@ import SiteNav from '../components/SiteNav.astro';
       font-weight: 700;
     }
     .miss-plate marker path { fill: var(--muted); }
+    /* The caption now sits INSIDE the figure wrapper, so the PL-2 ladder in
+       style.css does not reach it: the ladder owns direct children of
+       main.wrap only. 14px is the value the consolidated .fig figcaption
+       grammar states, so the plate and its caption sit at one distance
+       everywhere on the site. The old bottom margin is gone; the wrapper
+       owns the air under the figure now. */
     .miss-plate-caption {
       color: var(--muted);
       font-size: 0.92rem;
-      margin: 0 0 18px;
+      margin: 14px 0 0;
     }
     /* The way-back rows are stacked link rows, so each link grows into its
        own 44px band below 900px — inline-block, the pitch-grows mechanism
@@ -90,6 +118,11 @@ import SiteNav from '../components/SiteNav.astro';
       This path is not on the site. The link is stale, or the path never
       existed.
     </p>
+    <!-- The wrapper is a div and never a <figure>: figure-contract.cjs fails
+         a <figure> that carries no data-fig, and a data-fig figure owes two
+         caption slots this one-slot caption does not have. No fig-label
+         here; the head of this style island records why. -->
+    <div class="fig fig--plate">
     <svg class="miss-plate" viewBox="0 0 260 118" role="img"
          aria-label="The path you asked for is not in the record. No decision was logged for it.">
       <title>Asked path, empty record. Not logged.</title>
@@ -112,6 +145,7 @@ import SiteNav from '../components/SiteNav.astro';
     <p class="miss-plate-caption">
       A stale link, or a path that never existed.
     </p>
+    </div>
     <p>Here is the way back:</p>
     <ul class="way-back">
       <li><a href="/index.html">The front page</a></li>
