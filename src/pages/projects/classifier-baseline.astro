@@ -13,18 +13,27 @@ import SiteNav from '../../components/SiteNav.astro';
   <style is:inline>
     /* Baseline vs LLM fork (portfolio ADR-004). Page-scoped: why an LLM at
        all is the decision, not the bake-off percentages (the table below
-       carries those). Max-width 260 keeps viewBox units 1:1 with CSS px on
-       every gate width (same measured discipline as .two-fail / .judge-plate). */
-    .bake-fork {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       carries those).
+
+       THE PLATE NOW TAKES THE GALLERY LADDER WIDTH (ADR-014). The old
+       `max-width: 260px` rule here held viewBox units at 1:1 with CSS px at
+       every width. The MONOGRAPH figure ladder supersedes that rule. The
+       markup wraps the plate in `<div class="fig fig--plate"
+       data-place="spine">`, and assets/style.css gives it `--fig-plate`
+       (24rem). That stylesheet now sets the plate's `width`, `max-width`,
+       `height`, `display`, and centring margins, and the rhythm ladder sets
+       the air around it. This island re-states none of them.
+
+       A BROKEN 1:1 SCALE OWES A MEASUREMENT. CLAUDE.md states that rule. I
+       measured the plate on 2026-08-31 with the pinned Playwright. It renders
+       272.0px at a 320px viewport, which is scale 1.046. It renders 312.0px
+       at 360, 342.0px at 390, and 382.0px at 430. It caps at 384.0px, scale
+       1.477, once the content track reaches 24rem. 320px is therefore the
+       worst case for the microtext floor, and .bf-micro below meets the floor
+       there. */
     .bake-fork .bf-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .bake-fork .bf-lane {
@@ -40,10 +49,20 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* The microtext floor (CLAUDE.md, ADR-014 section 5): no SVG text node
+       renders under 9px at a 320px viewport. This rule declared 8px. That
+       rendered 8.00px on the old 1:1 plate, and 8.37px on the ladder. The
+       declared unit steps up to 9px. The plate does not grow under a phone
+       breakpoint. A plate that grows only under a phone breakpoint renders
+       its text smaller again above that breakpoint, which reverses the floor.
+       At a 320px viewport the five .bf-micro nodes now render 9.42px each.
+       They still clear their boxes. The widest node is "same rows both arms ·
+       paired McNemar", and it measures 194.6 units inside the 260-unit
+       viewBox. */
     .bake-fork .bf-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .bake-fork .bf-edge {
       fill: none;
@@ -63,57 +82,39 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 10px;
       font-weight: 700;
     }
+    /* The stroke rank inside this plate holds ink > strong > quiet (PL-10).
+       .bf-gold keeps --text, the ink rank. .bf-box takes --stroke-figure, the
+       strong rank, so the dark retune reaches every box. The edges and their
+       arrow markers keep --muted, the quiet rank. In the dark theme the
+       figure ground scopes --muted up one rank, so the edges keep their step
+       above the lifted ground. */
     .bake-fork marker path { fill: var(--muted); }
-    .bake-fork-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 6px;
-    }
 
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
+    /* CAPTION CSS: THIS PAGE DELETED ITS LOCAL COPY (ADR-014, OC-F closed).
+       assets/style.css now holds the two-slot grammar (.fig, .fig figcaption,
+       .fig-what, .fig-limit), the global `figcaption code { overflow-wrap:
+       anywhere }` rule, and the `figcaption a` rule. The copy that stood here
+       came from src/pages/projects/context-architecture.astro at 9d81caa. An
+       earlier session copied that block rather than extract it, because a
+       concurrent session held the shared stylesheet. That session merged, so
+       this lane deletes the copy.
 
-       COPY. The origin is src/pages/projects/context-architecture.astro at
-       9d81caa, and the four rules below are that block verbatim. A shared
-       grammar is copied and never extracted: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges.
+       Two reasons the local copy recorded still bind, so this comment keeps
+       them. First, a caption on this page names an artifact file, and a name
+       is one unbreakable token. Without the overflow-wrap rule the caption
+       widens the page at 320px. Second, lane N measured a link inside a
+       figcaption at 1.97:1 in the dark theme, on the browser default.
+       assets/style.css now ships both rules for every page, so a caption here
+       may hold a link. No caption here holds one, because the paragraph above
+       the strip already links the two records it rests on. */
 
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    /* NOT part of the copy above. It is the rule
-       defense-news-classifier.astro added at f131d30, and lane I repeated on
-       faithfulness-judge.astro at bd00680: a caption here names an artifact
-       file, and a file name is one unbreakable token. Without this rule the
-       caption widens the page at 320px and the mobile gate reddens.
-
-       No caption on this page holds a link, and that is deliberate. Lane N
-       measured a link inside a figcaption painting the browser default at
-       1.97:1 on the dark theme, because the house link rules are scoped to
-       `.article-body p a` and `li a`. The two records this strip rests on are
-       already linked from the paragraph above it. An editor who adds a link to
-       a caption here adds a `.fig figcaption a` rule first. */
-    .fig figcaption code { overflow-wrap: anywhere; }
+    /* The plate's caption. It holds one slot and not two. A bare plate takes
+       a <div class="fig fig--plate"> wrapper and never a <figure> (gate law),
+       so the two-slot rule R-C does not reach it. The consolidated .fig-what
+       rule gives the note voice, the colour, and the size. Only the margin is
+       local: the rhythm ladder reaches direct grid children, and this
+       paragraph sits inside the wrapper. */
+    .fig--plate > .fig-what { margin: 14px 0 0; }
 
     /* cb-s1. The two label collapses, re-laid as a strip (ADR-013).
 
@@ -133,10 +134,15 @@ import SiteNav from '../../components/SiteNav.astro';
 
        Rows below 48rem, two columns above it. The house grammar is al-s1 on
        autonomy-ladder.astro: the claim, then the thing it resolves to. The
-       strip sits inside a .decision card, whose padding is `22px 0 30px`, so
-       the content track is the full 34rem and no indent narrows it. Nothing
-       here is a link, so scripts/hit-target.cjs has no standalone anchor to
-       measure. */
+       strip sits inside a .decision card, whose padding is `22px 0 30px`. The
+       figure ladder (ADR-014) adds 14px of inline padding to every figure
+       above 640px, and drops it at phone widths (PL-6). So the strip sits 14px
+       in on a desktop card, and it runs the full track on a phone. The wide
+       promotion never reaches this card: a figure inside .decision keeps the
+       entry's own measure (A5). `data-place="spine"` here therefore states
+       the per-kind width policy for a strip, and it changes no width today.
+       Nothing here is a link, so scripts/hit-target.cjs has no standalone
+       anchor to measure. */
     .cb-miss-strip {
       list-style: none;
       padding: 0;
@@ -187,7 +193,10 @@ import SiteNav from '../../components/SiteNav.astro';
        ever dimmed with opacity (ADR-009): quieter text takes a quieter TOKEN,
        and opacity is reserved for the bar tracks, which carry no text. */
 
-    .bdemo { margin: 26px 0 8px; }
+    /* This lane DELETED the demo's own top and bottom margins. It did not
+       out-cascade them (ADR-014, PL-2). #baseline-demo is a direct child of
+       main.wrap, so the rhythm ladder owns its seam, and every gap on this
+       page is exactly one stated value. */
 
     .bdemo-kicker {
       font-family: var(--mono);
@@ -421,54 +430,63 @@ import SiteNav from '../../components/SiteNav.astro';
     <!-- Decision fork: same text, two arms, one human gold set. Percentages
          stay in the table below (ADR-004 Decision 5 floor — the figure carries
          topology, prose keeps the numbers). No oxide: this is a bake-off, not
-         a reversal claim. ADR-010 N/A — no interactive nodes. -->
-    <svg class="bake-fork" viewBox="0 0 260 148" role="img"
-         aria-label="Decision fork for the classifier bake-off. One defense-news snippet goes to a classical TF-IDF logistic-regression baseline and to the LLM. Both face the same 54-row human gold set.">
-      <title>Decision fork for the classifier bake-off. One defense-news snippet goes to a classical TF-IDF logistic-regression baseline and to the LLM. Both face the same 54-row human gold set.</title>
-      <defs>
-        <marker id="bf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
+         a reversal claim. ADR-010 N/A — no interactive nodes.
 
-      <!-- Shared input on the left. -->
-      <text class="bf-lane" x="4" y="12">INPUT</text>
-      <rect class="bf-box" x="4" y="48" width="70" height="40" rx="2" />
-      <text class="bf-title" x="39" y="68" text-anchor="middle">snippet</text>
-      <text class="bf-micro" x="39" y="80" text-anchor="middle">one row</text>
+         PLATE 01 (ADR-014). The bare plate takes a <div class="fig
+         fig--plate"> wrapper and never a <figure>. A <figure> with no
+         data-fig fails rule R-N. A <figure> with data-fig needs two caption
+         slots, and this caption holds one. data-place="spine" states the
+         per-kind width policy for a plate. -->
+    <div class="fig fig--plate" data-place="spine">
+      <span class="fig-label">Plate 01</span>
+      <svg class="bake-fork" viewBox="0 0 260 148" role="img"
+           aria-label="Decision fork for the classifier bake-off. One defense-news snippet goes to a classical TF-IDF logistic-regression baseline and to the LLM. Both face the same 54-row human gold set.">
+        <title>Decision fork for the classifier bake-off. One defense-news snippet goes to a classical TF-IDF logistic-regression baseline and to the LLM. Both face the same 54-row human gold set.</title>
+        <defs>
+          <marker id="bf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
 
-      <!-- Split: classical above, LLM below — both face the same gold. -->
-      <path class="bf-edge" d="M 74 68 L 90 68 L 90 40 L 106 40"
-            marker-end="url(#bf-arrow)" aria-hidden="true" />
-      <path class="bf-edge" d="M 90 68 L 90 96 L 106 96"
-            marker-end="url(#bf-arrow)" aria-hidden="true" />
+        <!-- Shared input on the left. -->
+        <text class="bf-lane" x="4" y="12">INPUT</text>
+        <rect class="bf-box" x="4" y="48" width="70" height="40" rx="2" />
+        <text class="bf-title" x="39" y="68" text-anchor="middle">snippet</text>
+        <text class="bf-micro" x="39" y="80" text-anchor="middle">one row</text>
 
-      <text class="bf-lane" x="110" y="12">ARMS</text>
-      <rect class="bf-box" x="110" y="22" width="78" height="36" rx="2" />
-      <text class="bf-title" x="149" y="38" text-anchor="middle">TF-IDF + LR</text>
-      <text class="bf-micro" x="149" y="50" text-anchor="middle">classical</text>
+        <!-- Split: classical above, LLM below — both face the same gold. -->
+        <path class="bf-edge" d="M 74 68 L 90 68 L 90 40 L 106 40"
+              marker-end="url(#bf-arrow)" aria-hidden="true" />
+        <path class="bf-edge" d="M 90 68 L 90 96 L 106 96"
+              marker-end="url(#bf-arrow)" aria-hidden="true" />
 
-      <rect class="bf-box" x="110" y="78" width="78" height="36" rx="2" />
-      <text class="bf-title" x="149" y="94" text-anchor="middle">LLM</text>
-      <text class="bf-micro" x="149" y="106" text-anchor="middle">forced tool</text>
+        <text class="bf-lane" x="110" y="12">ARMS</text>
+        <rect class="bf-box" x="110" y="22" width="78" height="36" rx="2" />
+        <text class="bf-title" x="149" y="38" text-anchor="middle">TF-IDF + LR</text>
+        <text class="bf-micro" x="149" y="50" text-anchor="middle">classical</text>
 
-      <!-- Merge into shared gold. -->
-      <path class="bf-edge" d="M 188 40 L 204 40 L 204 68 L 218 68"
-            marker-end="url(#bf-arrow)" aria-hidden="true" />
-      <path class="bf-edge" d="M 188 96 L 204 96 L 204 68" aria-hidden="true" />
+        <rect class="bf-box" x="110" y="78" width="78" height="36" rx="2" />
+        <text class="bf-title" x="149" y="94" text-anchor="middle">LLM</text>
+        <text class="bf-micro" x="149" y="106" text-anchor="middle">forced tool</text>
 
-      <text class="bf-lane" x="200" y="12">GOLD</text>
-      <rect class="bf-gold" x="222" y="48" width="34" height="40" rx="2" />
-      <text class="bf-gold-text" x="239" y="68" text-anchor="middle">n=54</text>
-      <text class="bf-micro" x="239" y="80" text-anchor="middle">human</text>
+        <!-- Merge into shared gold. -->
+        <path class="bf-edge" d="M 188 40 L 204 40 L 204 68 L 218 68"
+              marker-end="url(#bf-arrow)" aria-hidden="true" />
+        <path class="bf-edge" d="M 188 96 L 204 96 L 204 68" aria-hidden="true" />
 
-      <text class="bf-micro" x="130" y="140" text-anchor="middle">same rows both arms &middot; paired McNemar</text>
-    </svg>
-    <p class="bake-fork-caption">
-      One snippet, two arms, one human gold set. The table below is the score;
-      the fork is why the comparison is fair.
-    </p>
+        <text class="bf-lane" x="200" y="12">GOLD</text>
+        <rect class="bf-gold" x="222" y="48" width="34" height="40" rx="2" />
+        <text class="bf-gold-text" x="239" y="68" text-anchor="middle">n=54</text>
+        <text class="bf-micro" x="239" y="80" text-anchor="middle">human</text>
+
+        <text class="bf-micro" x="130" y="140" text-anchor="middle">same rows both arms &middot; paired McNemar</text>
+      </svg>
+      <p class="fig-what">
+        One snippet, two arms, one human gold set. The table below is the score;
+        the fork is why the comparison is fair.
+      </p>
+    </div>
 
     <table class="metrics" id="bakeoff">
       <thead>
@@ -503,8 +521,12 @@ import SiteNav from '../../components/SiteNav.astro';
            reader reads them. That is the carrier difference from .bake-fork
            above, whose comment records the opposite rule for a plate. The two
            sentences under the strip are the argument, and they stay as
-           prose. -->
-      <figure class="fig cb-s1" data-fig="strip">
+           prose.
+
+           STRIP 02 (ADR-014). This is the second figure in reading order,
+           and a strip takes the spine. -->
+      <figure class="fig cb-s1" data-fig="strip" data-place="spine">
+        <span class="fig-label">Strip 02</span>
         <ul class="cb-miss-strip" aria-label="Two labels the baseline collapsed, and the class each one collapsed into">
           <li>
             <span class="cb-miss-from">five of six <code>policy</code> stories</span>
@@ -580,8 +602,21 @@ import SiteNav from '../../components/SiteNav.astro';
             region labels to train on, so there is nothing to show here.</p>
         </section>
 
+        <!-- STRIP 03 (ADR-014). The recorded strip is the page's third
+             figure of the record. It reads committed artifact values out of
+             gold.csv and gold_predictions_v3.csv. The live panel beside it
+             carries no label, and that is deliberate. The live panel is not a
+             figure of the record. It is the output of a computation the
+             reader just ran, and the five-kind vocabulary numbers the
+             record's figures. The demo states that split itself: "Recorded,
+             not run" against "live in this tab".
+
+             The label sits OUTSIDE #bdemo-reference. renderReference() in
+             public/projects/baseline-demo.js clears that box on every render.
+             It would remove a label inside the box on the first chip. -->
         <section class="bdemo-panel" aria-labelledby="bdemo-ref-h">
           <h3 class="bdemo-h" id="bdemo-ref-h">Recorded, not run</h3>
+          <span class="fig-label">Strip 03</span>
           <div id="bdemo-reference"></div>
         </section>
       </div>

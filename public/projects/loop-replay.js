@@ -295,9 +295,54 @@
   // 7. Score chart (SVG, hand-built)
   // ---------------------------------------------------------------------
 
-  // Layout constants for the 640x280 viewBox declared in the HTML. Padding
-  // leaves room for axis labels on the left/bottom.
-  var CHART = { w: 640, h: 280, padL: 42, padR: 16, padT: 16, padB: 30 };
+  // Layout constants. The chart draws at 1:1 -- one viewBox unit is one CSS
+  // pixel -- so the viewBox is measured at render time rather than fixed.
+  //
+  // WHY, and it is the microtext floor (CLAUDE.md, ADR-014 section 5). The
+  // chart had a fixed 640-unit viewBox inside a track that runs from 272px on
+  // a 320px phone to 910px on the desktop. That is a render scale of 0.425 to
+  // 1.425, so the declared 10px axis label rendered at 4.25px on a phone and
+  // at 14.25px on a desktop. 4.25px was the worst microtext on the site.
+  //
+  // A bigger declared size cannot fix a 3.35x scale range: the size that
+  // clears 9px at 0.425 renders over 31px at 1.425. The scale IS the defect,
+  // so the fix is to delete the scale. At 1:1 a declared 10px is a rendered
+  // 10px at every width, which turns the floor into a code review instead of
+  // a measurement -- the same discipline the 260-unit plates already keep.
+  //
+  // The rendered BOX does not move: the height keeps the shipped 640:280
+  // ratio, so the chart occupies exactly the pixels it occupied before. Only
+  // the unit basis changes.
+  //
+  // The paddings are real pixels now, not units that shrink with the scale,
+  // so they are re-cut for the text they actually have to clear: padL holds a
+  // right-anchored "0.00" at 10px, padB holds one line of the same. They are
+  // also the tap-target budget -- a hit column is (width - padL - padR) / (n-1)
+  // wide, and the six-iteration run must keep 44px at 320px. Measured after
+  // the cut: 45.6px. Do not widen these without re-measuring that number.
+  var CHART = { w: 640, h: 280, padL: 34, padR: 10, padT: 16, padB: 30 };
+  var CHART_RATIO = 280 / 640;
+
+  // The SVG viewport is the content box: box-sizing is border-box site-wide
+  // and .diagram carries a 1px rule, so the borders come off the measurement.
+  function measureChart() {
+    var rect = svg.getBoundingClientRect();
+    var cs = window.getComputedStyle(svg);
+    var w = rect.width -
+      (parseFloat(cs.borderLeftWidth) || 0) -
+      (parseFloat(cs.borderRightWidth) || 0);
+    return Math.round(w);
+  }
+
+  function sizeChart() {
+    var w = measureChart();
+    // A hidden or unlaid-out chart measures zero. Keep the last good basis
+    // rather than dividing by it.
+    if (!(w > 1)) return;
+    CHART.w = w;
+    CHART.h = Math.round(w * CHART_RATIO);
+    svg.setAttribute("viewBox", "0 0 " + CHART.w + " " + CHART.h);
+  }
 
   function chartX(i) {
     var n = iterations.length - 1 || 1;
@@ -319,6 +364,7 @@
   function renderChart() {
     svg.textContent = "";
     if (!iterations.length) return;
+    sizeChart();
 
     // ---- Gridlines + Y axis labels (0, 0.25, 0.5, 0.75, 1.0) ----
     [0, 0.25, 0.5, 0.75, 1.0].forEach(function (v) {
@@ -522,6 +568,20 @@
       });
     });
   }
+
+  // The chart's unit basis is a measurement now, so a width change invalidates
+  // it. Re-draw on a real width change only (a rotation, a zoom step, a window
+  // drag), never on a height-only resize. The redraw rebuilds the same chart
+  // from the same records and keeps the selected iteration, so nothing the
+  // reader chose is lost. It moves no viewport (ADR-010).
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      var w = measureChart();
+      if (w > 1 && w !== CHART.w) renderChart();
+    }, 120);
+  });
 
   loadRun(0);
 })();

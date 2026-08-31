@@ -88,6 +88,56 @@ test('markers on a second page are still found', () => {
   assert.strictEqual(figuresIn(html).length, 1);
 });
 
+// --- markup a browser never renders ------------------------------------------
+
+/*
+ * The comment-parsing chokepoint, ported from scripts/figure-contract.cjs
+ * (`contentRegion`/`stripNonMarkup`, commit 864c356). The defect class it
+ * closes, measured 2026-08-30 against this checker before the port: the four
+ * marker patterns run over raw HTML, so a commented-out `data-tt` span parses
+ * as a live figure and a `[data-tt="..."]` selector in a style island counts
+ * as an unparsed raw marker. Both name markup no reader will ever see, and the
+ * cheapest way to green either false failure is to delete the comment or the
+ * selector.
+ */
+
+test('a commented-out figure marker is not a live figure', () => {
+  const html =
+    '<!-- retired draft: <span data-tt="goldens.total">999</span> -->' +
+    '<span data-tt="goldens.total">132</span>';
+  const { problems, checked } = verify({ pages: page(html), evidence: goodEvidence() });
+  assert.deepStrictEqual(problems, []);
+  assert.strictEqual(checked, 1);
+});
+
+test('a commented-out frame is not a live frame', () => {
+  const html =
+    '<!-- <pre class="tt-frame" data-tt-frame="council">OLD  LINES</pre> -->' +
+    '<pre class="tt-frame" data-tt-frame="council">SEAT  CTX\na     12</pre>';
+  const { problems, checked } = verify({ pages: page(html), evidence: goodEvidence() });
+  assert.deepStrictEqual(problems, []);
+  assert.strictEqual(checked, 1);
+});
+
+test('a data-tt selector inside a style island is not an unparsed marker', () => {
+  const html =
+    '<style>[data-tt="goldens.total"] { font-variant-numeric: tabular-nums; }</style>' +
+    '<span data-tt="goldens.total">132</span>';
+  const { problems } = verify({ pages: page(html), evidence: goodEvidence() });
+  assert.deepStrictEqual(problems, []);
+});
+
+test('a comment holding a > still hides the markup after it', () => {
+  // Every plate on this site is preceded by a rationale comment, and those
+  // comments hold `>` characters. A comment ends at `-->`, not at the first `>`.
+  const html =
+    '<!-- the arrow a -> b is drawn, not typed: <span data-tt="goldens.total">7</span> -->' +
+    '<span data-tt="goldens.total">132</span>';
+  const { problems, checked } = verify({ pages: page(html), evidence: goodEvidence() });
+  assert.deepStrictEqual(problems, []);
+  assert.strictEqual(checked, 1);
+});
+
 // --- failure mode 1: an unknown key -----------------------------------------
 
 test('an unknown data-tt key fails', () => {

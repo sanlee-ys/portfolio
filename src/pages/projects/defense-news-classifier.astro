@@ -31,19 +31,16 @@ const pwCommit = dncPower.sha.slice(0, 7);
     /* Eval-rebuild plate (portfolio ADR-004). Page-scoped: the argument of
        this page is that the number fell when the gold got real, and that
        the lower figure is the trustworthy one. Not a metrics chart — the
-       table below already carries every column. Max-width 260 keeps viewBox
-       units 1:1 with CSS px on every gate width (same measured discipline
-       as .judge-plate / .two-fail / .lab-topo). */
-    .eval-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       table below already carries every column.
+
+       The width policy moved to the figure ladder in style.css (ADR-014).
+       A `.fig.fig--plate` wraps the plate, and the plate hangs at
+       --fig-plate. This lane deletes the old 260px cap. It does not
+       out-cascade it. The plate now renders above 1:1, so the DECLARED
+       units below hold the microtext floor. The render scale does not. */
     .eval-plate .ep-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .eval-plate .ep-lane {
@@ -65,10 +62,12 @@ const pwCommit = dncPower.sha.slice(0, 7);
       font-size: 16px;
       font-weight: 500;
     }
+    /* 9px, not 8px, for the microtext floor (CLAUDE.md, ADR-014 section 5).
+       I measured 8.00px rendered at 320px before this change. */
     .eval-plate .ep-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .eval-plate .ep-edge {
       fill: none;
@@ -103,24 +102,13 @@ const pwCommit = dncPower.sha.slice(0, 7);
       font-weight: 700;
     }
     .eval-plate marker path { fill: var(--muted); }
-    .eval-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 18px;
-    }
 
     /* Actor-is-not-theater plate. The region misses clustered here:
-       a US actor inferred as americas. Oxide on the bad inference. */
-    .theater-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       a US actor inferred as americas. Oxide on the bad inference. The
+       figure ladder sets the width policy, the same as .eval-plate above. */
     .theater-plate .th-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .theater-plate .th-lane {
@@ -136,11 +124,19 @@ const pwCommit = dncPower.sha.slice(0, 7);
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px for the microtext floor. I measured 8.00px at 320px before. */
     .theater-plate .th-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
+    /* The one micro line that sits ON the oxide wash, not on the figure
+       ground. The lifted dark figure ground (ADR-014) raised the composited
+       wash, and --muted on it measured 3.51:1 at night. The metadata ink
+       measures 4.89:1 there, so the annotation reads at the same apparent
+       weight as its twin on the plain ground. No opacity, no new hue: a
+       quieter thing gets a quieter token, never a faded one (ADR-009). */
+    .theater-plate .th-micro-wash { fill: var(--text-secondary); }
     .theater-plate .th-edge {
       fill: none;
       stroke: var(--accent-warm);
@@ -170,43 +166,26 @@ const pwCommit = dncPower.sha.slice(0, 7);
       font-weight: 700;
     }
     .theater-plate marker path { fill: var(--accent-warm); }
+
+    /* The two-slot caption grammar left this island. style.css is its ONE
+       home now (ADR-014). This lane deletes the copy that stood here, and
+       its origin comment with it. It does not out-cascade them. The global
+       home also carries the `figcaption code { overflow-wrap: anywhere }`
+       rule that this page first needed for the artifact path in the
+       dnc1-power caption.
+
+       These two rules stay page-scoped because the consolidated home names
+       no bare-plate caption class but telltale's. The VALUES are the
+       consolidated grammar's, so both plates read in one voice with every
+       two-slot caption on the site. */
+    .eval-plate-caption,
     .theater-plate-caption {
+      max-width: var(--content);
+      margin: 14px auto 0;
       color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 18px;
-    }
-
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
-
-       COPY. The origin is src/pages/projects/context-architecture.astro at
-       9d81caa, and the four rules below are that block verbatim. A shared
-       grammar is copied and never extracted: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       line-height: 1.55;
-      margin: 8px 0 0;
     }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    /* Added here, and not part of the copied block. This page is the first
-       whose caption names an artifact PATH, and a path is one unbreakable
-       token that is wider than the content track at 320px. Without this rule
-       the caption widens the page and the mobile gate reddens. */
-    .fig figcaption code { overflow-wrap: anywhere; }
 
     /* dnc1-power. A PLOT: every x below is interpolated from
        src/data/figures.json, which scripts/build-plots.cjs computed from a
@@ -223,12 +202,18 @@ const pwCommit = dncPower.sha.slice(0, 7);
     .dnc1-plot {
       display: block;
       width: 100%;
-      max-width: 260px;
+      /* A PLOT takes the plot rung of the figure ladder (ADR-014), which is
+         why this rule survives the consolidation: style.css caps plates and
+         leaves plots to the page. */
+      max-width: min(100%, var(--fig-plot));
       height: auto;
-      margin: 4px 0 0;
+      margin: 0 auto;
     }
     .dnc1-plot .dnc1-bar { stroke: var(--text); stroke-width: 1.5; }
-    .dnc1-plot .dnc1-track { stroke: var(--border); stroke-width: 1; }
+    /* The axis track is the figure layer's STRONG rank, under the bar's ink
+       (PL-10). It read --border, which is alpha ink now and too faint for a
+       drawn axis at night. */
+    .dnc1-plot .dnc1-track { stroke: var(--stroke-figure); stroke-width: 1; }
     .dnc1-plot .dnc1-lane {
       fill: var(--muted);
       font-family: var(--font);
@@ -236,10 +221,11 @@ const pwCommit = dncPower.sha.slice(0, 7);
       font-weight: 600;
       letter-spacing: 0.06em;
     }
+    /* 9px for the microtext floor. I measured 8.00px at 320px before. */
     .dnc1-plot .dnc1-note {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     /* Oxide is the site's mark for a decision that was taken back, the same
        encoding as .ep-drop above and .rung[data-state="retired"] on the
@@ -269,21 +255,18 @@ const pwCommit = dncPower.sha.slice(0, 7);
     }
 
     /* dnc2-inversion. Hand-drawn, so it carries no digit (ADR-013): the
-       counts sit in .fig-what and in the prose below. What it draws is the
+       counts sit in .fig-what and in the prose below. What it shows is the
        DIRECTION of a miss, which is the one thing the prose can only state.
        Monochrome on purpose. Oxide on this site means a decision that was
        taken back, and a mislabeled row is not one. The two directions are
        dual-encoded by their own words and by the mirrored word order. */
-    .dnc2-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 4px 0 0;
-    }
+    /* The figure ladder in style.css (ADR-014) sets the width, the height,
+       and the centring: a `figure[data-fig="plate"] > svg` hangs at
+       --fig-plate. This lane deletes the old 260px cap. It does not
+       out-cascade it. */
     .dnc2-plate .dnc2-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .dnc2-plate .dnc2-row {
@@ -304,10 +287,11 @@ const pwCommit = dncPower.sha.slice(0, 7);
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px per the microtext floor. Measured at 320px before: 8.37px. */
     .dnc2-plate .dnc2-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .dnc2-plate .dnc2-edge {
       fill: none;
@@ -407,37 +391,40 @@ const pwCommit = dncPower.sha.slice(0, 7);
          (FLATTERING against TRUSTWORTHY, ink against oxide). The numbers come
          second. This is not a colour-only chart, and it is not a second
          metrics table. ADR-010 does not apply. -->
-    <svg class="eval-plate" viewBox="0 0 260 132" role="img"
-         aria-label="The eval rebuild: v1 graded the model on 300 self-generated snippets and reported 97.3 percent domain accuracy. v2 replaced that with 54 hand-labeled real snippets and domain fell to 88.9 percent. The lower number is the trustworthy one.">
-      <title>The eval rebuild: v1 self-graded 97.3 percent domain; v2 hand-labeled 88.9 percent. The drop is the trustworthy reading.</title>
-      <defs>
-        <marker id="ep-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
+    <div class="fig fig--plate" data-place="spine">
+      <span class="fig-label">Plate 01</span>
+      <svg class="eval-plate" viewBox="0 0 260 132" role="img"
+           aria-label="The eval rebuild: v1 graded the model on 300 self-generated snippets and reported 97.3 percent domain accuracy. v2 replaced that with 54 hand-labeled real snippets and domain fell to 88.9 percent. The lower number is the trustworthy one.">
+        <title>The eval rebuild: v1 self-graded 97.3 percent domain; v2 hand-labeled 88.9 percent. The drop is the trustworthy reading.</title>
+        <defs>
+          <marker id="ep-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
 
-      <text class="ep-lane" x="4" y="12">V1 SYNTHETIC</text>
-      <rect class="ep-box" x="4" y="18" width="110" height="48" rx="2" />
-      <text class="ep-figure" x="59" y="40" text-anchor="middle">97.3%</text>
-      <text class="ep-micro" x="59" y="56" text-anchor="middle">domain, self-graded</text>
+        <text class="ep-lane" x="4" y="12">V1 SYNTHETIC</text>
+        <rect class="ep-box" x="4" y="18" width="110" height="48" rx="2" />
+        <text class="ep-figure" x="59" y="40" text-anchor="middle">97.3%</text>
+        <text class="ep-micro" x="59" y="56" text-anchor="middle">domain, self-graded</text>
 
-      <path class="ep-edge" d="M 116 42 L 140 42" marker-end="url(#ep-arrow)" aria-hidden="true" />
+        <path class="ep-edge" d="M 116 42 L 140 42" marker-end="url(#ep-arrow)" aria-hidden="true" />
 
-      <text class="ep-lane" x="146" y="12">V2 REAL</text>
-      <rect class="ep-box" x="146" y="18" width="110" height="48" rx="2" />
-      <text class="ep-figure" x="201" y="40" text-anchor="middle">88.9%</text>
-      <text class="ep-micro" x="201" y="56" text-anchor="middle">domain, 54 gold</text>
+        <text class="ep-lane" x="146" y="12">V2 REAL</text>
+        <rect class="ep-box" x="146" y="18" width="110" height="48" rx="2" />
+        <text class="ep-figure" x="201" y="40" text-anchor="middle">88.9%</text>
+        <text class="ep-micro" x="201" y="56" text-anchor="middle">domain, 54 gold</text>
 
-      <text class="ep-lane" x="4" y="88">READING</text>
-      <rect class="ep-ok" x="4" y="94" width="110" height="28" rx="2" />
-      <text class="ep-ok-text" x="59" y="112" text-anchor="middle">FLATTERING</text>
-      <rect class="ep-drop" x="146" y="94" width="110" height="28" rx="2" />
-      <text class="ep-drop-text" x="201" y="112" text-anchor="middle">TRUSTWORTHY</text>
-    </svg>
-    <p class="eval-plate-caption">
-      The number fell when the gold got real. Same model, harder test.
-    </p>
+        <text class="ep-lane" x="4" y="88">READING</text>
+        <rect class="ep-ok" x="4" y="94" width="110" height="28" rx="2" />
+        <text class="ep-ok-text" x="59" y="112" text-anchor="middle">FLATTERING</text>
+        <rect class="ep-drop" x="146" y="94" width="110" height="28" rx="2" />
+        <text class="ep-drop-text" x="201" y="112" text-anchor="middle">TRUSTWORTHY</text>
+      </svg>
+      <p class="eval-plate-caption">
+        The number fell when the gold got real. Same model, harder test.
+      </p>
+    </div>
 
     <nav class="toc" aria-labelledby="toc-heading">
       <p class="toc-heading" id="toc-heading">On this page</p>
@@ -496,6 +483,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
     </div>
 
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="what-the-eval-caught">What the eval found</h2>
 
     <div class="decision" data-outcome="reversal">
@@ -535,6 +523,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
     </div>
 
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="why-an-llm-at-all">Why an LLM at all</h2>
     <p>
       Does this task need an LLM? I built the boring baseline: TF-IDF into
@@ -561,6 +550,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
       <a class="card-link" href="classifier-baseline.html#try-it">Run the losing baseline <span class="arrow">&rarr;</span></a>
     </p>
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="two-ways-of-not-fooling-myself">Scale and routing</h2>
     <p>
       Fifty-four hand-labeled snippets is a small set. The 95% interval on that
@@ -586,6 +576,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
            This plot is a frozen v2.1.0-era measurement, and no lane
            re-baselines it against that headline.) The SVG geometry is generated
            from evals/scale_eval.txt. Nobody hand-placed it. -->
+      <span class="fig-label">Plot 02</span>
       <svg class="ci-plot" viewBox="0 0 232 196" role="img"
            aria-label="Confidence-interval comparison. For category accuracy, the n=54 human-graded interval spans 84.9 to 98.1 percent; the n=300 judge-graded interval spans 89.9 to 95.6, about half as wide. For domain accuracy, n=54 spans 82.5 to 97.1 and n=300 spans 86.5 to 93.2. Scaling the eval roughly halves each interval.">
         <line class="ci-grid" x1="16.0" y1="24" x2="16.0" y2="150" />
@@ -656,33 +647,37 @@ const pwCommit = dncPower.sha.slice(0, 7);
     </div>
 
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="the-third-axis">The third axis</h2>
 
-    <svg class="theater-plate" viewBox="0 0 260 118" role="img"
-         aria-label="Region misses clustered on one rule: a US actor is not a US theater. The model saw a US command or contractor and inferred americas. The gold label was global. Actor is not a place.">
-      <title>US actor inferred as americas. Gold was global. Actor is not a place.</title>
-      <defs>
-        <marker id="th-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
-      <text class="th-lane" x="4" y="12">ACTOR</text>
-      <rect class="th-box" x="4" y="18" width="100" height="40" rx="2" />
-      <text class="th-title" x="54" y="36" text-anchor="middle">US command</text>
-      <text class="th-micro" x="54" y="50" text-anchor="middle">named in text</text>
-      <path class="th-edge" d="M 104 38 L 124 38" marker-end="url(#th-arrow)" aria-hidden="true" />
-      <text class="th-lane" x="128" y="12">INFERRED</text>
-      <rect class="th-bad" x="128" y="18" width="128" height="40" rx="2" />
-      <text class="th-bad-text" x="192" y="36" text-anchor="middle">americas</text>
-      <text class="th-micro" x="192" y="50" text-anchor="middle">no place stated</text>
-      <rect class="th-ok" x="4" y="70" width="252" height="26" rx="2" />
-      <text class="th-ok-text" x="130" y="87" text-anchor="middle">GOLD: global   actor is not a place</text>
-    </svg>
-    <p class="theater-plate-caption">
-      All seven first-pass misses were this shape. Naming a US command
-      identifies the actor, not a theater.
-    </p>
+    <div class="fig fig--plate" data-place="spine">
+      <span class="fig-label">Plate 03</span>
+      <svg class="theater-plate" viewBox="0 0 260 118" role="img"
+           aria-label="Region misses clustered on one rule: a US actor is not a US theater. The model saw a US command or contractor and inferred americas. The gold label was global. Actor is not a place.">
+        <title>US actor inferred as americas. Gold was global. Actor is not a place.</title>
+        <defs>
+          <marker id="th-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+        <text class="th-lane" x="4" y="12">ACTOR</text>
+        <rect class="th-box" x="4" y="18" width="100" height="40" rx="2" />
+        <text class="th-title" x="54" y="36" text-anchor="middle">US command</text>
+        <text class="th-micro" x="54" y="50" text-anchor="middle">named in text</text>
+        <path class="th-edge" d="M 104 38 L 124 38" marker-end="url(#th-arrow)" aria-hidden="true" />
+        <text class="th-lane" x="128" y="12">INFERRED</text>
+        <rect class="th-bad" x="128" y="18" width="128" height="40" rx="2" />
+        <text class="th-bad-text" x="192" y="36" text-anchor="middle">americas</text>
+        <text class="th-micro th-micro-wash" x="192" y="50" text-anchor="middle">no place stated</text>
+        <rect class="th-ok" x="4" y="70" width="252" height="26" rx="2" />
+        <text class="th-ok-text" x="130" y="87" text-anchor="middle">GOLD: global   actor is not a place</text>
+      </svg>
+      <p class="theater-plate-caption">
+        All seven first-pass misses were this shape. Naming a US command
+        identifies the actor, not a theater.
+      </p>
+    </div>
 
     <p>
       v3 added <code>region</code>, and it breaks the output contract on purpose.
@@ -720,7 +715,8 @@ const pwCommit = dncPower.sha.slice(0, 7);
          so the VERDICT WORD carries the outcome. Both p-values sit in
          .fig-what beside the artifact that produced them. Zero digits in the
          SVG. ADR-010 does not apply: nothing here is a control. -->
-    <figure class="dnc1-power fig" data-fig="plot">
+    <figure class="dnc1-power fig" data-fig="plot" data-place="sheet">
+      <span class="fig-label">Plot 04</span>
       <svg class="dnc1-plot" viewBox="0 0 260 132" role="img"
            data-fig-generated="true"
            aria-label="A p-value axis, with less evidence on the left and more on the right. One pre-registered bar stands at p equals 0.05. The first run sits just short of that bar at p equals 0.0522, and I reverted it. The re-run sits far past the same bar at p equals 0.0002, and it shipped.">
@@ -757,11 +753,12 @@ const pwCommit = dncPower.sha.slice(0, 7);
     </figure>
 
     <!-- dnc2-inversion. Hand-drawn, so no digit: the counts sit in .fig-what
-         and in the prose. It draws the DIRECTION of a miss, which is the one
+         and in the prose. It shows the DIRECTION of a miss, which is the one
          thing the prose can only state. The mirrored word order is the
          inversion. Monochrome, because oxide on this site marks a decision
          that was taken back and a mislabeled row is not one. -->
-    <figure class="dnc2-inversion fig" data-fig="plate">
+    <figure class="dnc2-inversion fig" data-fig="plate" data-place="spine">
+      <span class="fig-label">Plate 05</span>
       <svg class="dnc2-plate" viewBox="0 0 260 118" role="img"
            aria-label="Before the fix, every region miss ran one way: the gold label was global and the model called a named region. Now the misses run in two directions. One is still gold global called americas. Two are the converse, gold americas called global.">
         <title>The miss direction inverted. One old-cluster miss is left, and two run the other way.</title>
@@ -794,7 +791,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
           the clause over-called <code>americas</code> rows to
           <code>global</code>. The three come from
           <code>evals/gold_confusion_v3.md</code> at v3.2.1 ({pwCommit}).</span>
-        <span class="fig-limit">The plate draws the direction of a miss and not
+        <span class="fig-limit">The plate shows the direction of a miss and not
           the count. It does not show the rows the clause left correct.</span>
       </figcaption>
     </figure>
@@ -811,6 +808,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
     </p>
 
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="the-decisions">The decisions</h2>
 
     <div class="decision">
@@ -864,6 +862,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
     </div>
 
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="autonomy-ladder">Autonomy ladder</h2>
     <p>
       This classifier is also the portfolio&rsquo;s autonomy ladder. Each level
@@ -878,7 +877,8 @@ const pwCommit = dncPower.sha.slice(0, 7);
          strip keeps its text inside contrast-check.cjs, which exempts SVG text.
          The .rung-plate itself is NOT redrawn here; that figure belongs to the
          ladder page and this strip carries verdicts, not the climb. -->
-    <figure class="dncs1-rungs fig" data-fig="strip">
+    <figure class="dncs1-rungs fig" data-fig="strip" data-place="spine">
+      <span class="fig-label">Strip 06</span>
       <ol class="dncs1-rows" aria-label="The four rungs and their verdicts">
         <li class="dncs1-row" data-state="shipped">
           <span class="dncs1-id">L1</span>
@@ -927,6 +927,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
       <a class="card-link" href="loop-replay.html">Replay the two autonomous runs <span class="arrow">&rarr;</span></a>
     </p>
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="stack">Stack</h2>
     <p>
       The stack is Python and the Anthropic SDK, with Sonnet 5 for
@@ -942,6 +943,7 @@ const pwCommit = dncPower.sha.slice(0, 7);
       the experiments I measured and cut.
     </p>
 
+    <div class="toc-return"><a href="#toc-heading">Contents</a></div>
     <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       The gold set is 54 rows. An eval gates the merge. That method declined
