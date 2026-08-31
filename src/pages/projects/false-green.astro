@@ -21,10 +21,14 @@ import SiteNav from '../../components/SiteNav.astro';
       height: auto;
       margin: 8px 0 10px;
     }
-    /* Neutral step boxes — fill ground so they sit in the page, not on a card. */
+    /* Neutral step boxes. The fill reads --bg so the box sits in the page and
+       not on a card. Inside a .fig wrapper the figure ground scopes --bg, so
+       the same fill tracks the lifted night ground (ADR-014). The stroke reads
+       --stroke-figure, which is the figure layer's strong rank, so the night
+       retune reaches this plate and nothing outside it (A2, PL-10). */
     .two-fail .tf-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     /* Shared empty middle: hollow + dashed. Same geometry on both lanes so the
@@ -97,11 +101,6 @@ import SiteNav from '../../components/SiteNav.astro';
     .two-fail marker path { fill: var(--muted); }
     .two-fail marker path.tf-head-fail { fill: var(--accent-warm); }
     .two-fail marker path.tf-head-pass { fill: var(--text); }
-    .two-fail-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 22px;
-    }
 
     /* Six-pass plate: the count, not the mechanism (two-fail is that).
        Six identical PASS marks. Oxide + word: they passed. ADR-010 N/A. */
@@ -130,36 +129,23 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 10px;
       font-weight: 700;
     }
-    .six-pass-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 22px;
-    }
 
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
+    /* The caption box for the two BARE plates on this page.
 
-       COPIED VERBATIM from src/pages/projects/context-architecture.astro at
-       commit 9d81caa, which is the origin page for this block. Do not edit one
-       copy alone. It is page-scoped on purpose: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
+       The two-slot caption grammar moved to public/assets/style.css with the
+       MONOGRAPH identity (ADR-014, OC-F closed), so the page-scoped copy of it
+       is deleted. The shared grammar gives .fig-what its note voice through a
+       descendant selector, and it gives the caption BOX its measure through
+       `.fig figcaption`. A bare plate wraps in a <div class="fig fig--plate">
+       and therefore holds no <figcaption>, so this rule declares that box for
+       the two plates that need it.
+
+       A bare plate never becomes a <figure>. Gate rule R-C makes a declared
+       figure owe a two-slot caption, and a limit sentence written to answer a
+       gate is a claim that nobody measured. */
+    .fig--plate > .fig-what {
+      max-width: var(--content);
+      margin: 14px auto 0;
     }
 
     /* fg-s1. The three attempts, re-laid as a strip. Each row keeps the words
@@ -237,9 +223,13 @@ import SiteNav from '../../components/SiteNav.astro';
       font-weight: 600;
       letter-spacing: 0.06em;
     }
+    /* The object box and the two read boxes carry the figure layer's strong
+       rank (A2, PL-10), so the dark retune reaches them. The fill reads --bg,
+       which the figure ground scopes, so each box tracks the lifted night
+       ground instead of punching a darker hole in it. */
     .fg1-plate .fg1-obj {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .fg1-plate .fg1-obj-label {
@@ -260,7 +250,7 @@ import SiteNav from '../../components/SiteNav.astro';
     }
     .fg1-plate .fg1-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .fg1-plate .fg1-box-miss {
@@ -298,28 +288,69 @@ import SiteNav from '../../components/SiteNav.astro';
     <h1>False Green</h1>
     <p class="subtitle">I built six checks and wired them into CI. Later I found that each one reported success for work that never ran. Each one exited green.</p>
 
-    <svg class="six-pass" viewBox="0 0 260 100" role="img"
-         aria-label="Six checks. Each one reported PASS for work that never ran.">
-      <title>Six PASS marks. The shared fact is that they passed.</title>
-      <text class="sx-lane" x="4" y="12">SIX CHECKS</text>
-      <rect class="sx-ok" x="4" y="22" width="80" height="28" rx="2" />
-      <text class="sx-ok-text" x="44" y="40" text-anchor="middle">PASS</text>
-      <rect class="sx-ok" x="90" y="22" width="80" height="28" rx="2" />
-      <text class="sx-ok-text" x="130" y="40" text-anchor="middle">PASS</text>
-      <rect class="sx-ok" x="176" y="22" width="80" height="28" rx="2" />
-      <text class="sx-ok-text" x="216" y="40" text-anchor="middle">PASS</text>
-      <rect class="sx-ok" x="4" y="58" width="80" height="28" rx="2" />
-      <text class="sx-ok-text" x="44" y="76" text-anchor="middle">PASS</text>
-      <rect class="sx-ok" x="90" y="58" width="80" height="28" rx="2" />
-      <text class="sx-ok-text" x="130" y="76" text-anchor="middle">PASS</text>
-      <rect class="sx-ok" x="176" y="58" width="80" height="28" rx="2" />
-      <text class="sx-ok-text" x="216" y="76" text-anchor="middle">PASS</text>
-    </svg>
-    <p class="six-pass-caption">
-      Six greens. Each check reported PASS for work that never ran.
-    </p>
+    <!-- Plate 01. A bare plate takes a <div class="fig fig--plate"> wrapper and
+         never a <figure> (ADR-014). Gate rule R-C makes a declared <figure> owe
+         a two-slot caption, and this plate's caption states what it shows and
+         nothing more. data-place="spine" is the per-kind default for a plate:
+         it pins the plate to the content track. -->
+    <div class="fig fig--plate" data-place="spine">
+      <span class="fig-label">Plate 01</span>
+      <svg class="six-pass" viewBox="0 0 260 100" role="img"
+           aria-label="Six checks. Each one reported PASS for work that never ran.">
+        <title>Six PASS marks. The shared fact is that they passed.</title>
+        <text class="sx-lane" x="4" y="12">SIX CHECKS</text>
+        <rect class="sx-ok" x="4" y="22" width="80" height="28" rx="2" />
+        <text class="sx-ok-text" x="44" y="40" text-anchor="middle">PASS</text>
+        <rect class="sx-ok" x="90" y="22" width="80" height="28" rx="2" />
+        <text class="sx-ok-text" x="130" y="40" text-anchor="middle">PASS</text>
+        <rect class="sx-ok" x="176" y="22" width="80" height="28" rx="2" />
+        <text class="sx-ok-text" x="216" y="40" text-anchor="middle">PASS</text>
+        <rect class="sx-ok" x="4" y="58" width="80" height="28" rx="2" />
+        <text class="sx-ok-text" x="44" y="76" text-anchor="middle">PASS</text>
+        <rect class="sx-ok" x="90" y="58" width="80" height="28" rx="2" />
+        <text class="sx-ok-text" x="130" y="76" text-anchor="middle">PASS</text>
+        <rect class="sx-ok" x="176" y="58" width="80" height="28" rx="2" />
+        <text class="sx-ok-text" x="216" y="76" text-anchor="middle">PASS</text>
+      </svg>
+      <p class="fig-what">
+        Six greens. Each check reported PASS for work that never ran.
+      </p>
+    </div>
 
-    <h2>Two ways to fail</h2>
+    <!-- The long-page nav device (ADR-014). The re-based ToC gate carries this
+         page on the SCREEN arm, not the figure arm. The gate opens at 8 phone
+         screens or 6 figures. The page holds four figures, so the figure arm
+         stays shut. It ran 9.08 phone screens at 393px before this device
+         landed, so the screen arm decides. The page was already over the gate
+         on main; this lane is the first to apply it here.
+
+         The device is typographic and it runs no JavaScript. The Contents rows
+         index the six sections. The nav carries id="toc" because the Contents
+         returns below target it (PL-8: a #toc link ships only on a page that
+         holds the id, and link-check.cjs does not read same-page fragments).
+
+         This page ships NO .toc-figs comma-run, and the reason is measured.
+         The graft sets the run `white-space: nowrap` beside the section link,
+         which suits a short section title. This page's titles run to 51
+         characters and they wrap at 320px, so the run lands beside the FIRST
+         line of a wrapping title and reads as part of that title. It also
+         ends at 296px in a track that ends at 296px, which is a fit with no
+         slack. The figure numbers already ride each figure in flow, which is
+         where the reader meets them. Plate 01 sits above this nav and inside
+         no section, so no row would index it in any case. -->
+    <nav class="toc" id="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#two-ways-to-fail">Two ways to fail</a></li>
+      <li><a href="#measured-the-wrong-thing">The check that measured the wrong thing</a></li>
+      <li><a href="#could-not-see">The check that could not see what it was looking for</a></li>
+      <li><a href="#what-each-one-measured">What each one was actually measuring</a></li>
+      <li><a href="#the-check-watching-the-check">The check watching the check</a></li>
+      <li><a href="#the-question">The question</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="two-ways-to-fail">Two ways to fail</h2>
 
     <p>
       The first agentic review lane I put into CI broke three times before it
@@ -334,8 +365,13 @@ import SiteNav from '../../components/SiteNav.astro';
          Everything the row grammar cannot hold stays in the paragraph below:
          the cost, the refused posts, the recorded denial count, and the ruling
          that a tool denial is not a job failure. The dollar figure never enters
-         the figure (redesign brief 1.12, OC-D). -->
-    <figure class="fg-s1 fig" data-fig="strip">
+         the figure (redesign brief 1.12, OC-D).
+
+         Strip 02 in the page's figure order. data-place="spine" is the
+         per-kind default for a strip: it pins the strip to the content track,
+         beside the prose that carries what the rows cannot hold. -->
+    <figure class="fg-s1 fig" data-fig="strip" data-place="spine">
+      <span class="fig-label">Strip 02</span>
       <ul class="fg-s1-rows">
         <li>
           <span class="fgs-break">A missing OIDC permission</span>
@@ -371,65 +407,76 @@ import SiteNav from '../../components/SiteNav.astro';
     <!-- Argument: same empty middle, opposite report. The state is a word plus
          a geometry first (FAIL/PASS, a broken or an intact edge). Oxide and ink
          come second. This is not a colour-only reading, and the figure invents
-         no CI green. -->
-    <svg class="two-fail" viewBox="0 0 260 188" role="img"
-         aria-label="Two parallel CI outcomes when no work ran. Top: a deterministic tool exits non-zero and reports FAIL. Bottom: an agentic or hand-written gate exits zero and reports PASS. The mark is the same whether the work was denied, crashed, or never attempted.">
-      <defs>
-        <marker id="tf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-        <marker id="tf-arrow-fail" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto">
-          <path class="tf-head-fail" d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-        <marker id="tf-arrow-pass" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="6" markerHeight="6" orient="auto">
-          <path class="tf-head-pass" d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
+         no CI green.
 
-      <!-- Top lane: deterministic tool. A loud FAIL when nothing ran. -->
-      <text class="tf-lane" x="6" y="14">DETERMINISTIC TOOL</text>
-      <rect class="tf-box" x="6" y="24" width="64" height="36" rx="2" />
-      <text class="tf-step" x="38" y="46" text-anchor="middle">run tool</text>
-      <path class="tf-edge" d="M 70 42 L 84 42" marker-end="url(#tf-arrow)" />
-      <rect class="tf-hollow" x="88" y="24" width="74" height="36" rx="2" />
-      <text class="tf-hollow-label" x="125" y="46" text-anchor="middle">nothing ran</text>
-      <!-- Broken final edge: the gap is the loud break into FAIL. -->
-      <path class="tf-edge-break" d="M 162 42 L 170 42" />
-      <path class="tf-edge-break" d="M 180 42 L 188 42" marker-end="url(#tf-arrow-fail)" />
-      <!-- ASCII exit code + word badge only: ≠ / ✕ / ✓ are not in Geist, and
-           FAIL/PASS + broken edge already dual-encode outcome (font-coverage). -->
-      <text class="tf-micro" x="175" y="72" text-anchor="middle">exit != 0</text>
-      <rect class="tf-fail" x="192" y="24" width="62" height="36" rx="2" />
-      <text class="tf-fail-text" x="223" y="46" text-anchor="middle">FAIL</text>
+         Plate 03 in the page's figure order. It is a bare plate, so it takes a
+         <div class="fig fig--plate"> wrapper and never a <figure> (ADR-014).
+         The svg keeps class="two-fail": figure-contract-baseline.json names
+         this plate by that class, and a renamed class is an exemption that
+         nobody granted. Its two text values stay byte-exact for the same
+         reason. -->
+    <div class="fig fig--plate" data-place="spine">
+      <span class="fig-label">Plate 03</span>
+      <svg class="two-fail" viewBox="0 0 260 188" role="img"
+           aria-label="Two parallel CI outcomes when no work ran. Top: a deterministic tool exits non-zero and reports FAIL. Bottom: an agentic or hand-written gate exits zero and reports PASS. The mark is the same whether the work was denied, crashed, or never attempted.">
+        <defs>
+          <marker id="tf-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+          <marker id="tf-arrow-fail" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path class="tf-head-fail" d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+          <marker id="tf-arrow-pass" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path class="tf-head-pass" d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
 
-      <!-- Bottom lane: agentic or hand gate. A quiet PASS on the same empty middle. -->
-      <text class="tf-lane" x="6" y="104">AGENTIC / HAND GATE</text>
-      <rect class="tf-box" x="6" y="114" width="64" height="36" rx="2" />
-      <text class="tf-step" x="38" y="136" text-anchor="middle">run check</text>
-      <path class="tf-edge" d="M 70 132 L 84 132" marker-end="url(#tf-arrow)" />
-      <rect class="tf-hollow" x="88" y="114" width="74" height="36" rx="2" />
-      <text class="tf-hollow-label" x="125" y="136" text-anchor="middle">nothing ran</text>
-      <!-- Intact final edge: quiet false success. -->
-      <path class="tf-edge tf-edge-pass" d="M 162 132 L 188 132" marker-end="url(#tf-arrow-pass)" />
-      <text class="tf-micro" x="175" y="162" text-anchor="middle">exit 0</text>
-      <rect class="tf-pass" x="192" y="114" width="62" height="36" rx="2" />
-      <text class="tf-pass-text" x="223" y="136" text-anchor="middle">PASS</text>
-    </svg>
-    <p class="two-fail-caption">
-      Same empty middle, opposite report. A deterministic tool fails when it
-      does nothing. An agentic or hand-written gate can still report PASS,
-      whether the work happened, was denied, crashed, or was never attempted.
-    </p>
+        <!-- Top lane: deterministic tool. A loud FAIL when nothing ran. -->
+        <text class="tf-lane" x="6" y="14">DETERMINISTIC TOOL</text>
+        <rect class="tf-box" x="6" y="24" width="64" height="36" rx="2" />
+        <text class="tf-step" x="38" y="46" text-anchor="middle">run tool</text>
+        <path class="tf-edge" d="M 70 42 L 84 42" marker-end="url(#tf-arrow)" />
+        <rect class="tf-hollow" x="88" y="24" width="74" height="36" rx="2" />
+        <text class="tf-hollow-label" x="125" y="46" text-anchor="middle">nothing ran</text>
+        <!-- Broken final edge: the gap is the loud break into FAIL. -->
+        <path class="tf-edge-break" d="M 162 42 L 170 42" />
+        <path class="tf-edge-break" d="M 180 42 L 188 42" marker-end="url(#tf-arrow-fail)" />
+        <!-- ASCII exit code + word badge only: ≠ / ✕ / ✓ are not in Geist, and
+             FAIL/PASS + broken edge already dual-encode outcome (font-coverage). -->
+        <text class="tf-micro" x="175" y="72" text-anchor="middle">exit != 0</text>
+        <rect class="tf-fail" x="192" y="24" width="62" height="36" rx="2" />
+        <text class="tf-fail-text" x="223" y="46" text-anchor="middle">FAIL</text>
+
+        <!-- Bottom lane: agentic or hand gate. A quiet PASS on the same empty middle. -->
+        <text class="tf-lane" x="6" y="104">AGENTIC / HAND GATE</text>
+        <rect class="tf-box" x="6" y="114" width="64" height="36" rx="2" />
+        <text class="tf-step" x="38" y="136" text-anchor="middle">run check</text>
+        <path class="tf-edge" d="M 70 132 L 84 132" marker-end="url(#tf-arrow)" />
+        <rect class="tf-hollow" x="88" y="114" width="74" height="36" rx="2" />
+        <text class="tf-hollow-label" x="125" y="136" text-anchor="middle">nothing ran</text>
+        <!-- Intact final edge: quiet false success. -->
+        <path class="tf-edge tf-edge-pass" d="M 162 132 L 188 132" marker-end="url(#tf-arrow-pass)" />
+        <text class="tf-micro" x="175" y="162" text-anchor="middle">exit 0</text>
+        <rect class="tf-pass" x="192" y="114" width="62" height="36" rx="2" />
+        <text class="tf-pass-text" x="223" y="136" text-anchor="middle">PASS</text>
+      </svg>
+      <p class="fig-what">
+        Same empty middle, opposite report. A deterministic tool fails when it
+        does nothing. An agentic or hand-written gate can still report PASS,
+        whether the work happened, was denied, crashed, or was never attempted.
+      </p>
+    </div>
 
     <p>
       I wrote that down as a lesson about agents. The same shape already sat in
       gates that I wrote by hand. It took another four months to find them.
     </p>
 
-    <h2>The check that measured the wrong thing</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="measured-the-wrong-thing">The check that measured the wrong thing</h2>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>The gate that tested an invisible page</p>
@@ -470,7 +517,8 @@ import SiteNav from '../../components/SiteNav.astro';
       evidence.
     </p>
 
-    <h2>The check that could not see what it was looking for</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="could-not-see">The check that could not see what it was looking for</h2>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>Every deep link, unchecked</p>
@@ -508,7 +556,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </p>
     </div>
 
-    <h2>What each one was actually measuring</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-each-one-measured">What each one was actually measuring</h2>
 
     <table class="metrics">
       <thead>
@@ -552,7 +601,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </tbody>
     </table>
 
-    <h2>The check watching the check</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="the-check-watching-the-check">The check watching the check</h2>
 
     <div class="decision" data-outcome="reversal">
       <p class="tag"><span class="sr-only">Reversed. </span>The instrument that read an absent field</p>
@@ -569,8 +619,15 @@ import SiteNav from '../../components/SiteNav.astro';
            zero. Zero digits in the plate: the run figures stay in the prose
            below, where a reader can check them against the run summary. Both
            key names are exact, because a near-miss identifier is a wrong
-           identifier and the whole defect is one character run of them. -->
-      <figure class="fg1-fig fig" data-fig="plate">
+           identifier and the whole defect is one character run of them.
+
+           Plate 04 in the page's figure order. data-place="spine" states the
+           per-kind width policy for a plate. It changes nothing here: this
+           figure is nested inside a .decision card, so the wide-promotion list
+           never reaches it and the card's own measure holds (A5). The
+           attribute records the policy where the next reader looks for it. -->
+      <figure class="fg1-fig fig" data-fig="plate" data-place="spine">
+        <span class="fig-label">Plate 04</span>
         <svg class="fg1-plate" viewBox="0 0 260 118" role="img"
              aria-label="One result message and two key reads. The key permission_denials holds an array. The key permission_denials_count is not in the message, so the read returned zero.">
           <title>Two key reads against one result message. One returns an array, one returns zero.</title>
@@ -641,7 +698,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </p>
     </div>
 
-    <h2>The question</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="the-question">The question</h2>
 
     <p>
       Each defect is one line. A passing check and a check that cannot fail look
