@@ -55,73 +55,49 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
 >
   <Fragment slot="head">
   <style is:inline>
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
+    /* THE CAPTION GRAMMAR IS GONE FROM THIS PAGE (ADR-014, MONOGRAPH).
 
-       COPY. The origin is src/pages/projects/context-architecture.astro at
-       9d81caa, and the four rules below are that block verbatim. A shared
-       grammar is copied and never extracted: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
+       The two-slot caption block that stood here was a verbatim copy of
+       src/pages/projects/context-architecture.astro at 9d81caa, kept as a copy
+       because a concurrent session owned public/assets/style.css and two
+       writers on one shared stylesheet cannot merge. That session merged and
+       the integrator gave the grammar one home, so the copy and its origin
+       comment are DELETED rather than out-cascaded. style.css now owns
+       `.fig figcaption`, `.fig-what`, `.fig-limit`, the global `figcaption a`
+       rule, and `figcaption code { overflow-wrap: anywhere }`, which is the
+       rule this page needed for the artifact path in the fj2 caption.
+
+       One page-local rule survives that deletion, and only because style.css
+       names the telltale caption class rather than these two: a bare plate on
+       this page carries a single-paragraph caption, not a two-slot figcaption,
+       so the paragraph is given the same measure and the same offset the
+       figcaption block gives a caption. style.css owns the voice. */
+    .fig--plate > .fig-what {
+      max-width: var(--content);
+      margin: 14px auto 0;
     }
 
-    /* Added here, and not part of the copied block. It is the rule
-       defense-news-classifier.astro added at f131d30, for the same reason: a
-       caption on this page names an artifact path, and a path is one
-       unbreakable token that is wider than the content track at 320px. Without
-       this rule the caption widens the page and the mobile gate reddens.
+    /* Two plates and one plot, one grammar (ADR-013). Page-scoped.
 
-       No caption on this page holds a link, and that is deliberate. Lane N
-       measured a link inside a figcaption painting the browser default at
-       1.97:1 on the dark theme, because the house link rules are scoped to
-       `.article-body p a` and `li a`. This page names the artifact inside a
-       `code` element and links the repository from the Stack section instead.
-       An editor who adds a link to a caption here adds a `.fig figcaption a`
-       rule first. */
-    .fig figcaption code { overflow-wrap: anywhere; }
-
-    /* Two new plates, one grammar (ADR-013). Page-scoped.
-
-       max-width 260 keeps one viewBox unit at one CSS pixel down to 320px. The
-       container is .wrap, whose gutter is 24px each side, so a 320px phone
-       gives a plate 272px and the plate renders at 260. Both plates sit at the
-       top level of .article-body, so 272px is the real measurement.
+       WIDTH IS NO LONGER SET HERE. The figure ladder in style.css (ADR-014)
+       carries display, width, height, the cap, and the centring for every
+       plate through `figure[data-fig="plate"] > svg` and `.fig--plate > svg`,
+       so the layout declarations this block used to hold are deleted. The
+       ladder names --fig-plot but wires no plot selector, because no plot had
+       landed when it shipped, so fj2 pins its own rung below.
 
        The shared parts carry an `fj-` prefix and the per-plate parts carry
-       `fj1-` and `fj2-`. Neither plate needs a marker or a gradient, so this
+       `fj1-` and `fj2-`. Neither figure needs a marker or a gradient, so this
        block adds no id to the document and cannot repaint another plate's
        arrow head.
 
-       Both plates are monochrome. Oxide (--accent-warm) on this site marks a
+       Both are monochrome. Oxide (--accent-warm) on this site marks a
        decision that was taken back, and the .judge-plate comment below records
-       that reading for this page. Nothing on these two plates was taken back,
-       so every state is a word plus a shape: a solid cell against a dashed
-       cell on fj1, and a solid mark against a hollow mark on fj2.
+       that reading for this page. Nothing here was taken back, so every state
+       is a word plus a shape: a solid cell against a dashed cell on fj1, and a
+       solid mark against a hollow mark on fj2.
 
        SVG text inherits from <body>, so every text class names its own font. */
-    .fj-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 4px 0 0;
-    }
     .fj-plate .fj-lane {
       fill: var(--muted);
       font-family: var(--font);
@@ -141,10 +117,15 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       font-size: 10px;
       font-weight: 700;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). No
+       SVG text may render under 9px at a 320px viewport. The declared unit is
+       raised at 1:1 rather than the plate scaled under a breakpoint, because a
+       plate that grows only on a phone renders its text smaller again above
+       that breakpoint. Measured on this page: 8.37px before, 9.42px after. */
     .fj-plate .fj-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
 
     /* fj1-nested. One outer set, two cells inside it.
@@ -159,7 +140,10 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
        one. */
     .fj1-plate .fj1-outer {
       fill: none;
-      stroke: var(--rule-strong);
+      /* The figure layer's stroke rank (ADR-014 A2): --stroke-figure carries
+         every strong plate stroke, so the night retune reaches this plate and
+         no rule outside the figure layer moves. Light is unchanged. */
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .fj1-plate .fj1-crisp {
@@ -179,8 +163,9 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
        Three pages on this site run a paired comparison, and none of them showed
        the discordant pairs. This block is written here first. A later lane
        copies the rules below and the <figure> markup on the page, verbatim, and
-       names this page and its commit in the copy's comment. A shared grammar is
-       copied and never extracted, for the reason the caption block above gives.
+       names this page and its commit in the copy's comment. This grammar stays
+       a copy: it is one study's drawing, not a site-wide component, and
+       style.css owns only what every page shares.
 
        WHAT A COPYING LANE CHANGES, AND NOTHING ELSE.
          1. The `fj2-` prefix becomes that page's own prefix.
@@ -199,7 +184,28 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
 
        WHY THE TWO ROWS SHARE A LEFT EDGE. The reader compares two lengths, not
        two positions. The fill and the row label dual-encode the direction, so
-       the plate needs no second hue. */
+       the plate needs no second hue.
+
+       THE PLOT'S RUNG ON THE FIGURE LADDER. `data-place="sheet"` puts this
+       figure on the wide track, which is the per-kind default for a plot
+       (ADR-014). The ARTWORK cap is the plate rung and NOT --fig-plot, and
+       that is a measured call rather than the default. The ladder's rungs are
+       rendered widths, and each one was chosen against the artboard its kind
+       usually draws on. This plot draws on a 260-unit artboard, the same one
+       every plate on this page draws on. Measured at 1280px: --fig-plot
+       renders it at 480px, so its 10-unit lane labels paint at 18.46px, and
+       the body text beside them paints at 18.40px. A chrome label the size of
+       the prose is not a chrome label. --fig-plate renders the same artboard
+       at 384px and its lane labels at 14.77px, which is the scale the other
+       three figures hold. */
+    .fj2-plate {
+      display: block;
+      width: 100%;
+      max-width: min(100%, var(--fig-plate));
+      height: auto;
+      margin-left: auto;
+      margin-right: auto;
+    }
     .fj2-plate .fj2-rule {
       stroke: var(--border);
       stroke-width: 1;
@@ -216,18 +222,15 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
 
     /* Claim-vs-source plate (portfolio ADR-004). Page-scoped: the unit of the
        study, not a metrics chart (the κ table already carries the numbers).
-       Max-width 260 keeps viewBox units 1:1 with CSS px on every gate width
-       (same measured discipline as .two-fail / .jtbd-strip / .lab-topo). */
-    .judge-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       The plate sits in a `.fig .fig--plate` wrapper now, so the figure ladder
+       in style.css owns its width, its height, and its centring (ADR-014), and
+       the 260px cap this block used to carry is deleted rather than
+       out-cascaded. The wrapper also scopes --bg to the lifted dark figure
+       ground, so every knockout rect below tracks that ground. */
     .judge-plate .jp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      /* The figure layer's stroke rank (ADR-014 A2). Light is unchanged. */
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .judge-plate .jp-lane {
@@ -243,10 +246,12 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5).
+       Measured on this page: 8.00px before, 9.42px after. */
     .judge-plate .jp-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     /* Schematic passage marks — not a real quote, not UI chrome. */
     .judge-plate .jp-glyph {
@@ -287,24 +292,15 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       font-weight: 700;
     }
     .judge-plate marker path { fill: var(--muted); }
-    .judge-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 6px;
-    }
 
     /* Truncation plate: the false gap. Cheap tier cut before the verdict
-       word; scoring counted each empty as a miss. Oxide on the false gap. */
-    .trunc-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       word; scoring counted each empty as a miss. Oxide on the false gap.
+       Width, height, and centring come from the figure ladder in style.css
+       through the `.fig .fig--plate` wrapper (ADR-014), as on .judge-plate. */
     .trunc-plate .tp-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      /* The figure layer's stroke rank (ADR-014 A2). Light is unchanged. */
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     .trunc-plate .tp-hollow {
@@ -326,10 +322,12 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5).
+       Measured on this page: 8.00px before, 9.42px after. */
     .trunc-plate .tp-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .trunc-plate .tp-edge {
       fill: none;
@@ -355,11 +353,6 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
     }
     .trunc-plate marker path { fill: var(--muted); }
     .trunc-plate marker path.tp-head-bad { fill: var(--accent-warm); }
-    .trunc-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 18px;
-    }
   </style>
   </Fragment>
 
@@ -385,7 +378,15 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
          table below already carries the numbers. The drawing is schematic
          only. It invents no sample text as a real quote, and it shows no fake
          screenshot. ADR-010 does not apply, because nothing here is an
-         interactive node. -->
+         interactive node.
+
+         Plate 01 of four, and the wrapper is a `div`, never a `<figure>`: a
+         `<figure>` without `data-fig` fails gate rule R-N, and with it the
+         gate demands a two-slot caption this plate does not carry. The label
+         digits are hand-authored in a real span (PL-3, PL-4), and the caption
+         is one paragraph in the note voice, not the two-slot grammar. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 01</span>
     <svg class="judge-plate" viewBox="0 0 260 132" role="img"
          aria-label="The unit of the faithfulness study. A cited source passage leads to one claim sentence. A person reads the claim against that source. The binary verdict is supported or unsupported.">
       <title>The unit of the faithfulness study. A person reads one claim against its cited source, and the binary verdict is supported or unsupported.</title>
@@ -424,10 +425,11 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       <rect class="jp-bad" x="134" y="106" width="122" height="22" rx="2" />
       <text class="jp-bad-text" x="195" y="121" text-anchor="middle">UNSUPPORTED</text>
     </svg>
-    <p class="judge-plate-caption">
+    <p class="fig-what">
       One claim, one cited source, one binary label. The table below measures
       how often the model judge matches the human gold on that unit.
     </p>
+    </div>
 
     <h2>The result</h2>
     <table class="metrics">
@@ -466,7 +468,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
          inside the hedged cell, and the fabrication cell is identical for both
          tiers. The two cells are NOT to scale, and .fig-limit says so, because
          a cell sized by a count would publish that count as a width. -->
-    <figure class="fj1-nested fig" data-fig="plate">
+    <figure class="fj1-nested fig" data-fig="plate" data-place="spine">
+      <span class="fig-label">Plate 02</span>
       <svg class="fj1-plate fj-plate" viewBox="0 0 260 132" role="img"
            aria-label="The unsupported class holds two cells. One cell is fabrication, where both tiers are identical. The other cell is hedged, where the whole tier gap sits. Every recall disagreement sits in the hedged cell.">
         <title>The whole tier gap sits in the hedged cell. On fabrication the two tiers are identical.</title>
@@ -519,7 +522,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
          The verdict word carries the outcome, because two short rows cannot.
          Zero digits in the SVG. ADR-010 does not apply: nothing here is a
          control. -->
-    <figure class="fj2-discordant fig" data-fig="plot">
+    <figure class="fj2-discordant fig" data-fig="plot" data-place="sheet">
+      <span class="fig-label">Plot 03</span>
       <svg class="fj2-plate fj-plate" viewBox="0 0 260 104" role="img"
            data-fig-generated="true"
            aria-label={`Two rows of marks, one for each direction of disagreement. The top row has ${dpWins} marks, where the premium judge is right and the cheap one is wrong. The bottom row has ${dpLosses} marks, where the cheap judge is right and the premium one is wrong. This test does not separate the two tiers.`}>
@@ -560,6 +564,11 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
 
     <h2>The result I almost published instead</h2>
 
+    <!-- Plate 04 of four. The wrapper is a `div` for the same gate reason
+         Plate 01 records. The plate's digits are the false gap itself, and
+         scripts/figure-contract-baseline.json carries the exemption. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 04</span>
     <svg class="trunc-plate" viewBox="0 0 260 132" role="img"
          aria-label="A token cap cut the cheap judge before its verdict on 20 percent of claims. I counted each empty as a disagreement, and that invented a tier gap of 0.70 versus 0.43. The gap was a harness bug.">
       <title>max_tokens cut the cheap tier before the verdict. The 0.70 vs 0.43 gap was a bug.</title>
@@ -587,10 +596,11 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       <rect class="tp-bad" x="4" y="98" width="252" height="26" rx="2" />
       <text class="tp-bad-text" x="130" y="115" text-anchor="middle">FALSE GAP  0.70 vs 0.43</text>
     </svg>
-    <p class="trunc-plate-caption">
+    <p class="fig-what">
       A token cap cut the cheap tier before the verdict on 20% of the set. I
       counted each empty as a miss. The gap was my harness.
     </p>
+    </div>
 
     <div class="decision">
       <p class="tag">A truncation setting that looked like a finding</p>

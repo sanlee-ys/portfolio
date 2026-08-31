@@ -10,47 +10,28 @@ import SiteNav from '../../components/SiteNav.astro';
 >
   <Fragment slot="head">
   <style is:inline>
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
+    /* The two-slot caption CSS that this page carried is RETIRED (ADR-014).
 
-       ORIGIN COPY. This block is written here first. A later lane copies it
-       verbatim into its own page and names this page and its commit in the
-       copy's comment. It is page-scoped on purpose: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges.
+       This block was the ORIGIN COPY. Twelve other pages copied it verbatim
+       and named this page and its commit 9d81caa in their own comments.
+       ADR-014 gave the caption grammar one home in public/assets/style.css,
+       so the origin block and every copy come out. Each page deletes its own
+       copy; this page retires the origin.
 
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses.
+       The contract the block encoded is unchanged, and style.css now holds
+       it. .fig-what states what the figure argues. .fig-limit states what the
+       figure does not show. The gate fails the build on an empty .fig-limit.
+       The quiet voice is a token and never opacity (ADR-009).
 
-       The quiet voice is a token, never opacity (ADR-009). Both slots are
-       block-level, so the limit reads as its own line and not as a tail. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
-      line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
-      color: var(--text-secondary);
-    }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
+       One plate grammar, three plates (ADR-004, ADR-013). Page-scoped.
 
-    /* One plate grammar, three plates (ADR-004, ADR-013). Page-scoped.
-
-       max-width 260 keeps one viewBox unit at one CSS pixel down to 320px.
-       The container is .wrap, whose gutter is 24px each side, so a 320px
-       phone gives the plate 272px and the plate renders at 260. A .decision
-       card adds no horizontal padding, so ca2-bypass inside one measures the
-       same 272px. That is the measurement the 1:1 rule needs.
+       The plate width is no longer this page's business. The figure ladder in
+       style.css caps a plate at --fig-plate. The plate therefore renders at
+       about 1.48x on a wide screen, and at 272px in a 320px viewport. That is
+       a render scale of about 1.05, so a declared 9px renders above the 9px
+       microtext floor. The local max-width: 260px is deleted for two reasons.
+       It lost to the ladder on specificity, and it stated a scale the page no
+       longer holds.
 
        The shared parts carry a `ca-` prefix and the marker ids carry a digit
        (`ca2-arrow`, `ca3-arrow`). A marker id is global to the document and a
@@ -65,16 +46,9 @@ import SiteNav from '../../components/SiteNav.astro';
        Every state is a word plus a shape, so colour is second: no glyph on
        this site can carry a state, and Geist has no italic cut. SVG text
        inherits from <body>, so every text class names its own font. */
-    .ca-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 0;
-    }
     .ca-plate .ca-box {
       fill: var(--bg);
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     /* An outline written as a path, so a segment can be left out. The gap is
@@ -82,7 +56,7 @@ import SiteNav from '../../components/SiteNav.astro';
        to show one. */
     .ca-plate .ca-open {
       fill: none;
-      stroke: var(--rule-strong);
+      stroke: var(--stroke-figure);
       stroke-width: 1;
     }
     /* The file exists and nothing reads it. Dashed, not absent. */
@@ -105,10 +79,15 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* 9px, not 8px: the microtext floor (CLAUDE.md, ADR-014 section 5). The
+       declared unit rises and the plate keeps its 1:1-or-better render scale.
+       The floor therefore holds at every width, and not only under a
+       breakpoint. The floor costs room: a 76-wide cell in ca1-costs now holds
+       about twelve mono characters on one line rather than about fourteen. */
     .ca-plate .ca-micro {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .ca-plate .ca-cmd {
       fill: var(--accent-warm);
@@ -168,12 +147,17 @@ import SiteNav from '../../components/SiteNav.astro';
          Two deliberate changes. The arrows are gone, because the three costs
          are parallel and not a sequence, and an arrow would state an order
          the prose never claims. The cell is 44 tall rather than 40, because a
-         mechanism needs two micro lines: one line of Geist Mono at 8px holds
-         about fourteen characters inside a 76-wide cell.
+         mechanism needs two micro lines: one line of Geist Mono at 9px holds
+         about twelve characters inside a 76-wide cell.
 
          No digit (ADR-013). The counts stay in the prose and in the caption,
-         where a reader can check them. No oxide: nothing here was taken back. -->
-    <figure class="ca1-fig fig" data-fig="plate">
+         where a reader can check them. No oxide: nothing here was taken back.
+
+         Plate 01 of three, in reading order. The label is an in-flow span
+         with a hand-authored digit (PL-3, PL-4), never a CSS counter. The
+         kind is Plate and a plate sits on the spine (ADR-014). -->
+    <figure class="ca1-fig fig" data-fig="plate" data-place="spine">
+      <span class="fig-label">Plate 01</span>
       <svg class="ca1-plate ca-plate" viewBox="0 0 260 72" role="img"
            aria-label="One payload, three costs. Money: every resident token is re-sent on every turn. Attention: the model weights each fact less. Trust: a fact carries no date.">
         <title>A bigger payload is not free: money, attention, and trust.</title>
@@ -257,8 +241,13 @@ import SiteNav from '../../components/SiteNav.astro';
          netops-lab records the same rule. The unread body is dashed rather
          than absent, because the file exists: nothing read it.
 
-         No digit (ADR-013). Every state is a word plus a shape. -->
-    <figure class="ca3-fig fig" data-fig="plate">
+         No digit (ADR-013). Every state is a word plus a shape.
+
+         Plate 02 of three, in reading order. The class prefix `ca3-` records
+         the order this plate was authored in, and the label records the order
+         a reader meets it. The label is the reference; the class is not. -->
+    <figure class="ca3-fig fig" data-fig="plate" data-place="spine">
+      <span class="fig-label">Plate 02</span>
       <svg class="ca3-plate ca-plate" viewBox="0 0 260 118" role="img"
            aria-label="The index is resident and each line is a pointer. When the pointer fires, the body file loads on demand. When it never fires, the body file stays unread.">
         <title>The index is resident. The body loads on demand, and a pointer that never fires leaves it unread.</title>
@@ -495,8 +484,17 @@ import SiteNav from '../../components/SiteNav.astro';
 
            No digit (ADR-013). The test-suite counts stay in the prose below.
            The words carry every state, because Geist has no glyph for a cross
-           or a tick and this site refuses to add one. -->
-      <figure class="ca2-fig fig" data-fig="plate">
+           or a tick and this site refuses to add one.
+
+           Plate 03 of three, in reading order. This figure takes NO
+           data-outcome="reversal" of its own. The .decision card around it
+           already carries that attribute, its doubled oxide mark, and the
+           sr-only "Reversed. " prefix. A figure-level mark would state one
+           reversal twice and announce it twice. The figure sits inside a
+           .decision, so it keeps the entry's measure and is not promoted
+           (ADR-014, A5); data-place is therefore declarative here. -->
+      <figure class="ca2-fig fig" data-fig="plate" data-place="spine">
+        <span class="fig-label">Plate 03</span>
         <svg class="ca2-plate ca-plate" viewBox="0 0 260 132" role="img"
              aria-label="One guard, two branches. The commit branch scans a flag letter by letter. The add branch compares whole tokens. Two commands walked out through the gap: git stage -A and git add -Au.">
           <title>Two branches of one guard. Only one of them scans a flag letter by letter.</title>
