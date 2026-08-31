@@ -13,12 +13,13 @@ import SiteNav from '../../components/SiteNav.astro';
   <style is:inline>
     /* Wipe-to-provision topology (portfolio ADR-004). Page-scoped: the
        argument is this lab's closed loop, not a shared diagram type.
-       The box properties moved out to the figure ladder (ADR-014): all four
-       artworks on this page are 260-unit drawings, so they take ONE cap and
-       the page states one drawn scale. The old max-width 260 pinned the scale
-       at 1.000; the ladder hangs a plate at --fig-plate. Measured 2026-08-30:
-       384px at 1280 (1.477x) and 272px at 320 (1.046x). The scale never drops
-       under 1.0, so the microtext floor still reads off the declared unit. */
+       The box properties moved out to the figure ladder (ADR-014). All four
+       artworks on this page are 260-unit drawings. They therefore take ONE
+       cap, and the page states one drawn scale. The old max-width 260 pinned
+       the scale at 1.000; the ladder hangs a plate at --fig-plate. Measured
+       2026-08-30: 384px at 1280 (1.477x) and 272px at 320 (1.046x). The scale
+       never drops under 1.0, so the microtext floor still reads off the
+       declared unit. */
     .lab-topo .lt-box {
       fill: var(--bg);
       stroke: var(--stroke-figure);
@@ -85,8 +86,8 @@ import SiteNav from '../../components/SiteNav.astro';
     .lab-topo marker path.lt-head-return { fill: var(--accent); }
     /* The bare plate's what-slot. A div cannot carry a figcaption, so this
        caption stays page-scoped, exactly as .tt-plate-caption does on the
-       telltale page. Its declarations now read the consolidated caption
-       grammar (ADR-014): the what-slot argues in the note voice, at the prose
+       telltale page. Its declarations now follow the consolidated caption
+       grammar (ADR-014). The what-slot argues in the note voice, at the prose
        measure, centred under the artwork. */
     .lab-topo-caption {
       max-width: var(--content);
@@ -98,13 +99,13 @@ import SiteNav from '../../components/SiteNav.astro';
     }
 
     /* The two-slot caption CSS that used to sit here is DELETED, not
-       out-cascaded: style.css now holds the one home for the caption grammar
+       out-cascaded. style.css now holds the one home for the caption grammar
        (ADR-014, OC-F closed by lane I0). This page's local copy and its
        origin comment went with it.
 
        The artwork cap is what stays page-scoped. The ladder in style.css caps
        a plate through `.fig--plate > svg` and `figure[data-fig="plate"] >
-       svg`, and it says nothing about a map, because a map normally has an
+       svg`. It says nothing about a map, because a map normally has an
        intrinsic width worth the whole sheet. The three maps here do not: they
        are 260-unit drawings authored to the same discipline as the plate
        beside them. So they take the plate cap and this page renders ONE drawn
@@ -274,9 +275,9 @@ import SiteNav from '../../components/SiteNav.astro';
          straight list cannot draw: re-arm returns into the next wipe, and
          power is the only hand in the apparatus. No 1–5 numbering here —
          sequence stays on ol.cycle (ADR-004 Decision 5 floor).
-         A legacy bare plate takes a div wrapper (never a figure — gate law)
-         and a hand-numbered label span (PL-3, PL-4, ADR-014). The kind is
-         Map: the drawing argues about a topology, not about a state set. The
+         A legacy bare plate takes a div wrapper, never a figure. That is gate
+         law. It also takes a hand-numbered label span (PL-3, PL-4). The kind
+         is Map: the drawing argues about a topology, not about a state set. The
          caption travels inside the wrapper so the artwork, its label, and its
          what-slot are one block under the rhythm ladder. -->
     <div class="fig" data-place="sheet">
@@ -380,11 +381,12 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
 
     {/* The Contents return (ADR-014, PL-7, PL-8). The ToC gate carries this
-        page on screens, not on figures: measured 2026-08-30, 12.85 phone
-        screens at 393px against the gate's floor of 8, and four figures
-        against its floor of six. The nav.toc above holds id="toc", so every
-        target resolves on this page. The first section head takes no return:
-        it sits about one screen under the Contents it would point at. */}
+        page on screens, not on figures. Measured 2026-08-30: 12.85 phone
+        screens at 393px against the gate's floor of 8. The page holds four
+        figures against the gate's other floor of six. The nav.toc above holds
+        id="toc", so every target resolves on this page. The first section
+        head takes no return: it sits about one screen under the Contents it
+        would point at. */}
     <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="the-finding-the-barriers-were-on-the-host-not">The finding: the barriers were on the host, not the device</h2>
     <p>
