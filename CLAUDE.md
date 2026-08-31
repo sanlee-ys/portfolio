@@ -433,13 +433,21 @@ viewBox under `max-width: 260px` renders at scale 1.000 down to 320px. **Break
 that discipline and you owe a measurement**, because the scale then decides the
 answer. Measure with the same pinned Playwright the gates use.
 
-**Measured state, 2026-08-30, so a later reader can weigh this section.**
-`projects/telltale.html` meets the floor. It holds 53 plate text nodes, and
-zero of them render under 9px at 320px. The rest of the site does not. 27 class groups and 93 text nodes
-still render under the floor, and most of them sit at 8px. The worst is
-`projects/loop-replay.html` `.axis-label` at 4.25px, where a 640-unit diagram
-sits in a 272px track. **The floor binds new and edited plates now.** A
-site-wide sweep is outstanding work.
+**Measured state, 2026-08-31, so a later reader can weigh this section.** The
+**whole site meets the floor** — the sweep the previous note called outstanding
+closed with the per-page identity lanes (PRs #272 to #286). Measured over the
+built site at a 320px viewport: 400 `<svg>` `<text>` nodes across 22 pages,
+zero under 9px, and the smallest rendered size on the site is 9.00px
+(`projects/the-system.html`). The former worst case,
+`projects/loop-replay.html` `.axis-label` at 4.25px, now renders at 10px —
+lane I11 redrew that chart at 1:1 rather than scaling the plate, which is the
+remedy this section names. **The floor binds new and edited plates**, and it is
+now a floor the site is standing on rather than climbing to.
+
+Re-measure it the way this state was measured: build, then walk every
+`svg text` at 320px and compare the computed `font-size` times the plate's
+render scale (rendered CSS width over viewBox width) against 9. There is no
+gate for it on purpose — see the first bullet above.
 
 ## AI-use posture: method, not confession (voice rule)
 
