@@ -117,6 +117,110 @@ const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const SHA_RE = /^[0-9a-f]{7,40}$/;
 
 /*
+ * The index of the `>` that closes the tag opening at `start`, or -1.
+ *
+ * Quoted attribute values are skipped, so `<a title="a>b">` closes at the last
+ * `>` and not the one inside the title.
+ *
+ * A comment ends at `-->` and not at the first `>` inside it. Every plate on
+ * this site is preceded by a comment that records its design rationale, and
+ * those comments hold `>` characters. Without this branch the tail of such a
+ * comment reads as page text.
+ *
+ * Ported verbatim from `scripts/figure-contract.cjs` (commit 864c356), where
+ * #244 and #264 taught the figure gate this exact lesson. Two copies exist
+ * because the two gates are deliberately dependency-free of each other; a
+ * change to either copy owes the other a look.
+ */
+function closeOfTag(markup, start) {
+  if (markup.startsWith('<!--', start)) {
+    const end = markup.indexOf('-->', start + 4);
+    return end === -1 ? -1 : end + 2;
+  }
+  let quote = null;
+  for (let i = start + 1; i < markup.length; i += 1) {
+    const ch = markup[i];
+    if (quote !== null) {
+      if (ch === quote) quote = null;
+    } else if (ch === '"' || ch === "'") {
+      quote = ch;
+    } else if (ch === '>') {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// The elements whose content is text for a parser, never markup.
+const RAW_TEXT_ELEMENTS = new Set(['style', 'script']);
+
+/*
+ * The page with every span a browser does NOT turn into elements removed:
+ * comments, and the bodies of <style> and <script> islands. `verify` calls it
+ * once per page, so every marker pattern below reads the reduced page and no
+ * counter has to remember.
+ *
+ * WHY IT IS NEEDED. The four marker patterns above run a regex over raw HTML,
+ * so markup a comment switched off still reads as markup on the page. Measured
+ * 2026-08-30 against this checker before the port (routed from lane B3,
+ * PR #264): a commented-out `data-tt` span parses as a LIVE figure and fails
+ * the equality check against markup no reader sees, and a `[data-tt="..."]`
+ * selector in a style island counts as an unparsed raw marker. Both were
+ * latent while the telltale page carried no such markup; a page rewrite makes
+ * them live. The cheapest way to green either false failure is to delete the
+ * comment or the selector, which is the wrong fix twice.
+ *
+ * Unlike the figure gate's `contentRegion`, this chokepoint does NOT scope to
+ * <main>: a `data-tt` marker anywhere on a page is a published figure, and a
+ * <main> scope would silently unguard one that moved outside it.
+ *
+ * COMMENTS ARE DELETED, NOT BLANKED. Removing a comment node joins the text
+ * runs either side of it, which is what the reader sees: `n=<!-- note -->54`
+ * renders `n=54`. The pass runs left to right, so position decides precedence:
+ * a <style> inside a comment is comment, and a comment inside a <style> is
+ * style. Ported from `scripts/figure-contract.cjs` `stripNonMarkup`
+ * (commit 864c356); see that copy for the full derivation.
+ */
+function stripNonMarkup(region) {
+  let out = '';
+  let i = 0;
+  while (i < region.length) {
+    const lt = region.indexOf('<', i);
+    if (lt === -1) return out + region.slice(i);
+    out += region.slice(i, lt);
+
+    if (region.startsWith('<!--', lt)) {
+      const end = region.indexOf('-->', lt + 4);
+      /*
+       * An unterminated comment runs to the end of the region, as it does in a
+       * browser. Keeping the tail would be reading markup nobody can see. This
+       * is why the branch does not delegate to `closeOfTag`: the two agree on
+       * a terminated comment and disagree here.
+       */
+      if (end === -1) return out;
+      i = end + 3;
+      continue;
+    }
+
+    const gt = closeOfTag(region, lt);
+    if (gt === -1) return out + region.slice(lt); // an unclosed tag is text
+    const openTag = region.slice(lt, gt + 1);
+    out += openTag;
+    i = gt + 1;
+
+    const tag = (openTag.match(/^<([a-zA-Z][\w-]*)/) || [])[1];
+    if (!tag || openTag.endsWith('/>') || !RAW_TEXT_ELEMENTS.has(tag.toLowerCase())) continue;
+    // Raw text runs to the close tag and no `<` inside it opens anything, which
+    // is why this cannot be left to the ordinary tag walk above.
+    const close = new RegExp(`</${tag}\\s*>`, 'i').exec(region.slice(i));
+    if (!close) return out;
+    out += close[0];
+    i += close.index + close[0].length;
+  }
+  return out;
+}
+
+/*
  * Log nothing raw. Every string here comes from a file this gate read, and a
  * newline in one of them can forge a log line, which in CI is how a real
  * failure hides under a convincing fake success. Same guard as
@@ -293,8 +397,12 @@ function verify({ pages, evidence }) {
   let requiredPageMarkers = 0;
   let sawRequiredPage = false;
 
-  for (const { rel, html } of pages) {
+  for (const { rel, html: rawHtml } of pages) {
     if (rel === REQUIRED_PAGE) sawRequiredPage = true;
+
+    // The chokepoint: every counter below reads only what a browser turns into
+    // elements. See `stripNonMarkup` for the defect class this closes.
+    const html = stripNonMarkup(rawHtml);
 
     const missedFigures = unparsedFigures(html);
     if (missedFigures > 0) {
@@ -454,6 +562,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  stripNonMarkup,
   figuresIn,
   unparsedFigures,
   framesIn,
