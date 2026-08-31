@@ -12,14 +12,15 @@ import SiteNav from '../../components/SiteNav.astro';
   <style is:inline>
     /* Ladder-verdict plate (portfolio ADR-004). Page-scoped: four rungs,
        two shipped, two taken back. The ol.ladder below carries the full
-       telling; this plate is the scoreboard. Max-width 260, viewBox 1:1. */
-    .rung-plate {
-      display: block;
-      width: 100%;
-      max-width: 260px;
-      height: auto;
-      margin: 18px 0 6px;
-    }
+       telling; this plate is the scoreboard.
+
+       The sizing rule that sat here is DELETED, not out-cascaded. The
+       MONOGRAPH figure ladder owns the plate scale now (ADR-014). The plate
+       sits inside a .fig--plate wrapper, and `.fig--plate > svg` in
+       public/assets/style.css caps it at --fig-plate. The old cap was 260px
+       against a 260-unit viewBox. That cap held scale 1.000 at every width.
+       The ladder breaks that discipline on purpose, so this page owes a
+       measurement. The .rp-id note below carries it. */
     .rung-plate .rp-lane {
       fill: var(--muted);
       font-family: var(--font);
@@ -27,10 +28,17 @@ import SiteNav from '../../components/SiteNav.astro';
       font-weight: 600;
       letter-spacing: 0.06em;
     }
+    /* 9 units, not 8: the microtext floor (CLAUDE.md, ADR-014 section 5).
+       Measured with the pinned Playwright at a 320px viewport, the plate
+       renders 272px against a 260-unit viewBox, a scale of 1.046. The old 8
+       units rendered 8.00px at the old 1.000 scale. At 1.046 the same 8 units
+       give 8.37px. Both sit under the floor. 9 units render 9.42px, measured.
+       The step-up raises the declared units at the plate's own scale, which
+       is the remedy the floor names. The text content does not move. */
     .rung-plate .rp-id {
       fill: var(--muted);
       font-family: var(--mono);
-      font-size: 8px;
+      font-size: 9px;
     }
     .rung-plate .rp-title {
       fill: var(--text);
@@ -38,9 +46,19 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 11px;
       font-weight: 500;
     }
+    /* The shipped cell is a knockout box: --bg for the fill, so it reads as
+       bare ground. Inside a .fig the night theme scopes --bg to --fig-ground
+       (ADR-014, the READOUT graft). So the knockout now tracks the lifted
+       figure ground instead of punching a darker hole.
+
+       The stroke moves from --text to --stroke-figure, the figure layer's
+       strong rank (ADR-014, section 4). That holds PL-10 inside the plate:
+       the cell's own label stays ink, and the box that carries it steps down
+       one rank. The retired and declined cells below keep --accent-warm,
+       because a warm stroke is a verdict and not a frame. */
     .rung-plate .rp-ok {
       fill: var(--bg);
-      stroke: var(--text);
+      stroke: var(--stroke-figure);
       stroke-width: 1.5;
     }
     .rung-plate .rp-ok-text {
@@ -60,67 +78,32 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 10px;
       font-weight: 700;
     }
+    /* The plate's own caption. It is a <p> and not a <figcaption>. A bare
+       plate wraps in <div class="fig fig--plate"> and never in <figure>,
+       because the figure gate reads a <figure> as a two-slot figure. So this
+       rule restates the consolidated caption metrics rather than inheriting
+       them. The origin is the block headed "The caption grammar, one home" in
+       public/assets/style.css (ADR-014). It carries the note voice, because
+       this line argues rather than concedes. */
     .rung-plate-caption {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin: 0 0 18px;
-    }
-
-    /* The two-slot figure caption (ADR-013, gate rule R-C).
-
-       COPY. The origin is src/pages/projects/context-architecture.astro at
-       commit 9d81caa, and this block is copied from it verbatim. It is
-       page-scoped on purpose: a concurrent session owns
-       public/assets/style.css for the tap-target work, and two writers on one
-       shared stylesheet cannot merge. OC-F of the redesign brief carries the
-       consolidation, for after that session merges.
-
-       .fig-what states what the figure argues. .fig-limit states what the
-       figure does not show. The gate fails the build on an empty .fig-limit,
-       because a figure that ends on a win while its caveat sits somewhere else
-       is the split ADR-007 refuses.
-
-       The quiet voice is a token, never opacity (ADR-009). Both slots are
-       block-level, so the limit reads as its own line and not as a tail. */
-    .fig {
-      margin: 0 0 22px;
-    }
-    .fig figcaption {
-      font-size: 0.92rem;
+      max-width: var(--content);
+      margin: 14px auto 0;
+      font-size: 0.95rem;
+      font-weight: 500;
       line-height: 1.55;
-      margin: 8px 0 0;
-    }
-    .fig .fig-what {
-      display: block;
       color: var(--text-secondary);
     }
-    .fig .fig-limit {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-    }
 
-    /* NOT part of the copy above. Lane N adds it, and the next lane that puts
-       a link in a caption needs it too.
+    /* The two-slot caption block that sat here is DELETED. Its origin comment
+       named OC-F of the redesign brief as the consolidation, and OC-F closed.
+       public/assets/style.css now carries .fig-what, .fig-limit, and the
+       shared figcaption metrics in one home (ADR-014).
 
-       The site styles a prose link as `.article-body p a, .article-body li a`
-       in public/assets/style.css. A <figcaption> is neither, so a link inside
-       .fig-what falls to the browser default and paints #0000ee. On the dark
-       theme that measures 1.97:1, and contrast-check.cjs fails the build. The
-       gate found it; no reading would have. This restates the house link
-       declarations rather than inventing a caption link style, so a caption
-       link and a prose link stay one idiom. OC-F carries the consolidation. */
-    .fig figcaption a {
-      color: var(--accent);
-      text-decoration: underline;
-      text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
-      text-underline-offset: 3px;
-      text-decoration-thickness: 1px;
-      transition: text-decoration-color 0.15s ease;
-    }
-    .fig figcaption a:hover {
-      text-decoration-color: var(--accent);
-    }
+       The lane N caption-link rule goes with it. Its whole job was to keep a
+       caption link off the browser default #0000ee. That default measures
+       1.97:1 in the dark theme. The consolidated `figcaption a` rule carries
+       the accent colour now. I read that rule in the live stylesheet before
+       the deletion. I did not assume it. */
 
     /* al-s1. The three L2 experiments, re-laid as a strip (ADR-013).
 
@@ -194,7 +177,24 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <!-- Four rungs, and I took two back. The word and the stroke come first.
          Oxide marks only the rungs that I retired or declined. ADR-010 does
-         not apply. -->
+         not apply.
+
+         The plate sits in a <div class="fig fig--plate"> and never in a
+         <figure>. The figure gate reads a <figure> as a two-slot figure, and
+         this plate carries one caption line. data-place="spine" pins the
+         wrapper to the content track. That is the MONOGRAPH per-kind default
+         for a plate (ADR-014).
+
+         It takes Plate 01, the first number in the page's figure sequence.
+         The backward-edge plate inside the L4 rung takes no number. It sits
+         inside ol.ladder, which ADR-004 Decision 5 protects. It is rung
+         chrome, not a figure of the page.
+
+         The <svg> below keeps its own indentation. The plate is byte-exact
+         and its four rung names are baseline-frozen, so the wrapper adds a
+         level of nesting and re-indents nothing. -->
+    <div class="fig fig--plate" data-place="spine">
+    <span class="fig-label">Plate 01</span>
     <svg class="rung-plate" viewBox="0 0 260 132" role="img"
          aria-label="Autonomy ladder scoreboard. L1 single call: shipped. L2 augmented: retired. L3 autonomous loop: shipped. L4 multi-agent: declined.">
       <title>L1 shipped, L2 retired, L3 shipped, L4 declined.</title>
@@ -223,6 +223,7 @@ import SiteNav from '../../components/SiteNav.astro';
     <p class="rung-plate-caption">
       The measurements sit in the rungs below.
     </p>
+    </div>
     <!-- The ladder is a climb, not a table. It carries the same payload the
          four-row table carried: what it gains, who drives, and the state. A
          table cannot show two of those things. L2 has a climbed-then-retired
@@ -327,8 +328,17 @@ import SiteNav from '../../components/SiteNav.astro';
          the paragraph already used, and every number moves into .fig-what.
          The L2 rung above carries no explanatory note on purpose. This strip
          does not put one there either. The struck marker and the "then
-         retired" chip already carry the climb-down. -->
-    <figure class="fig al-s1" data-fig="strip">
+         retired" chip already carry the climb-down.
+
+         Strip 02 in the page's figure sequence. data-place="spine" pins it to
+         the content track, the MONOGRAPH per-kind default for a strip
+         (ADR-014).
+
+         The strip is not a reversal figure. It reports three verdicts, and
+         one of them is a retirement. The doubled oxide tick would state that
+         retirement a third time, after the plate and the L2 rung. -->
+    <figure class="fig al-s1" data-fig="strip" data-place="spine">
+      <span class="fig-label">Strip 02</span>
       <ul class="l2-strip" aria-label="Three L2 experiments and the verdict each one returned">
         <li>
           <span class="l2-way">Retrieved neighbor documents as context</span>
