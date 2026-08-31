@@ -16,15 +16,22 @@
   // also carries `anchor` (the decision-log entry it governs) and `adr` (the IDs
   // to surface in the caption), so selecting a box offers a link to the decision
   // behind it. Offers — it does not travel there for you; see `select()` below.
+  //
+  // `away` is the same entry's address once it is no longer on the page the map
+  // sits on. The eight one-row entries moved to work.html#decision-log in the
+  // landing program, which took two of these three anchors off index.html; the
+  // id lookup in `select()` would then have silently offered no link at all.
+  // `anchor` stays the same id on both pages, so this file needs no per-page
+  // branch: the lookup decides, and `away` is the fallback.
   var nodes = [
     { id: "notes-api", label: "notes-api",
-      anchor: "decision-rightsized", adr: ["SYS-005"],
+      anchor: "decision-rightsized", away: "/work.html#decision-rightsized", adr: ["SYS-005"],
       desc: "FastAPI REST service. Owns the knowledge base and serves notes. On create, it runs a FastAPI BackgroundTask that calls the classifier and writes the labels back to itself as namespaced tags (PUT /notes/{id}/tags, replace semantics)." },
     { id: "classifier", label: "classifier",
       anchor: "decision-eval", adr: ["ADR-002", "SYS-002"],
       desc: "Classifies text in-process (one Sonnet call, structured output) into a category and an operational domain. A pure provider: called by the notes-api background task and by kb-agent, it knows nothing about either." },
     { id: "kb-agent", label: "kb-agent",
-      anchor: "decision-contracts", adr: ["SYS-003", "SYS-006"],
+      anchor: "decision-contracts", away: "/work.html#decision-contracts", adr: ["SYS-003", "SYS-006"],
       desc: "RAG and tool-use agent. Reads notes to ground its answers, and can also call the classifier synchronously." },
   ];
 
@@ -283,17 +290,26 @@
         detail.textContent =
           n.label + ": " + n.desc + (n.adr ? "  ·  " + n.adr.join(", ") : "");
 
+        // Same-page first: if the entry is on this page, link to it by hash and
+        // mark it on arrival. Otherwise fall back to `away`, the full path the
+        // entry moved to. Two of these three entries left index.html for
+        // work.html#decision-log in the landing program, and the id lookup on
+        // its own would have dropped their links without a word. A node with
+        // neither an id here nor an `away` path still offers nothing.
         var target = n.anchor && document.getElementById(n.anchor);
-        if (!target) return;
+        var href = target ? "#" + n.anchor : n.away;
+        if (!href) return;
         var a = document.createElement("a");
         a.className = "card-link";
-        a.href = "#" + n.anchor;
+        a.href = href;
         a.appendChild(document.createTextNode("The decision behind it "));
         var arrow = document.createElement("span");
         arrow.className = "arrow";
         arrow.textContent = "→";
         a.appendChild(arrow);
-        a.addEventListener("click", function () { markTarget(target); });
+        // The highlighter swipe is a same-page affordance. A cross-page jump
+        // gets the browser's own hash navigation and nothing else.
+        if (target) a.addEventListener("click", function () { markTarget(target); });
         detail.appendChild(a);
       }
       g.addEventListener("click", select);

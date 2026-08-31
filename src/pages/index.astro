@@ -88,56 +88,46 @@ import SiteNav from '../components/SiteNav.astro';
     }
     .flagship-figure span { color: var(--text); font-weight: 600; }
 
-    /* ix-s1. The decision ledger, re-laid as a strip. Eight rows carry one
-       grammar: the claim, then the page that records it in full. The strip
-       re-lays the row. It does not rewrite it. The STE conversion of the same
-       rows is a separate edit in the same commit, and the pull request keeps
-       the two ledger blocks apart.
+    /* The seat line, under the lede. It states what I want next. It is not an
+       argument the record has to carry, so it sits one step quieter than the
+       lede above it and keeps the lede's own measure. Owner-approved copy
+       (landing WO-E1.4); the lede itself is byte-frozen under OC-1.
 
-       The strip adds no status word. Three rows carry data-outcome="reversal"
-       and five do not, and the five are not five shipped decisions: one is an
-       audit finding and one is a bug found before publication. A status stamp
-       on the unmarked five would add a claim the page never made. The only
-       mark here is the reversal mark the row already carried.
-
-       The link stays inline in the claim below 48rem, and becomes its own
-       cell only above it. scripts/hit-target.cjs measures a standalone anchor
-       at 390px, and a link that is the only text of its block owes a 44px box
-       there. Eight of those boxes cost the phone reader about 0.2 screens and
-       return no reading gain, so the phone keeps the WCAG 2.5.8 inline
-       exception that this row already relies on. */
-    @media (min-width: 48rem) {
-      .ledger li {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 10.5rem;
-        gap: 4px 24px;
-        align-items: start;
-      }
-      .ledger li .led-to {
-        justify-self: end;
-        text-align: right;
+       ix-s1 and ix-s2 used to sit here. Both blocks moved to work.astro with
+       the units they style: the eight-row ledger and the field-note clusters
+       (landing WO-E1.1). */
+    .looking {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.58;
+      max-width: 52ch;
+      margin: 0 0 26px;
+    }
+    @media (max-width: 640px) {
+      .looking {
+        font-size: 0.96rem;
+        line-height: 1.52;
+        margin-bottom: 12px;
       }
     }
 
-    /* ix-s2. Twelve field notes under five cluster headings. Every one of the
-       twelve titles is byte-exact. The five headings are the only new words,
-       and each one is drawn from the vocabulary the titles already use. A
-       heading is a structural label. It states no result.
-
-       The label reuses .kicker, which is the site's own label grammar, so this
-       block adds no second idiom, no new colour, and no new size. */
-    .notes-clusters {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 0 32px;
-      margin: 16px 0 10px;
+    /* Two prose links on this page sit outside .measure: the capacity-gate
+       link in the flagship, and the field-notes pointer that stands between
+       two sections. `.measure p a` in style.css never reaches either, so both
+       painted in the browser's default blue and contrast-check.cjs failed
+       them at 1.97:1 in dark. This is the same construction as `.measure p a`,
+       page-scoped until lane I0 gives the rule one home (OC-F). `.card-link`
+       is excluded because the flagship's writeup link already owns its own
+       colour and its own 44px box. */
+    .flagship p a:not(.card-link),
+    p.muted-line a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
     }
-    .notes-clusters .notes-cluster { min-width: 0; }
-    .notes-clusters .kicker { margin: 16px 0 0; }
-    .notes-clusters .notes-list {
-      grid-template-columns: minmax(0, 1fr);
-      margin: 6px 0 0;
-    }
+    .flagship p a:not(.card-link):hover,
+    p.muted-line a:hover { text-decoration-color: var(--accent); }
   </style>
   </Fragment>
 
@@ -151,6 +141,7 @@ import SiteNav from '../components/SiteNav.astro';
         gate delivery on evidence. I use AI agents to accelerate execution while
         retaining ownership of the architecture, decisions, and quality bar.
       </p>
+      <p class="looking">I want a technical program manager seat on an AI systems team that gates delivery on evidence.</p>
     </div>
   </header>
 
@@ -185,6 +176,26 @@ import SiteNav from '../components/SiteNav.astro';
       <p class="kicker">The instrument</p>
       <h2 class="section-title">telltale</h2>
       <p class="section-sub">Five coding-agent CLIs, one brief, five columns &mdash; and gauges that render nothing when nothing was measured.</p>
+      <!-- The program leads, and the instrument follows (landing WO-E1.2).
+           telltale exists because a pre-registered gate on my own build
+           capacity closed without an instrument, so this section states the
+           program first and the artifact second. Every clause below is
+           checked against a live public page: the axis count, the freeze, the
+           close, the step down, and the process finding are all on
+           product-and-program.html#capacity-gate, and telltale.html#capacity
+           carries the same summary. A vendor count and a spend claim were in
+           the drafted copy and are not here: no public page states either,
+           and the capacity section reports by evidence axis, never by lane
+           and never by name. -->
+      <p>
+        I ran an evidence gate on the build capacity behind this record. On a
+        fixed date I wrote six evidence axes and a close date. I froze every
+        change until the close. One month later the gate returned a step down,
+        and I declined a parked upgrade. Nothing ever wrote to the axes, so I
+        reconstructed the evidence from dated records. Pre-registration
+        without an instrument is half a measurement.
+        <a href="projects/product-and-program.html#capacity-gate">The capacity gate &rarr;</a>
+      </p>
       <p>
         The agents that build this record are the thing I most needed to
         measure. telltale reads what five agent CLIs leave on disk and draws
@@ -286,24 +297,13 @@ import SiteNav from '../components/SiteNav.astro';
         <p>Category accuracy actually rose, because real vocabulary separates more cleanly; domain fell because the synthetic set was trivially easy to grade. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
       </div>
 
-      <p class="ledger-intro">Eight more, one row each. Each row links to the page that records it in full.</p>
-      <!-- ix-s1, the verdict strip. Each row holds the claim and then the page
-           that records it. The reversal mark and the sr-only prefix stay on the
-           three rows that already carried them, and no row gains a status word.
-           Five rows are not five shipped decisions: decision-falsegreen is an
-           audit finding and decision-truncation is a bug found before
-           publication. The CSS note in the head records why the link only
-           leaves the sentence above 48rem. -->
-      <ul class="ledger">
-        <li id="decision-contracts"><span class="led-claim">I decoupled the repos with frozen HTTP contracts. Then I audited the seam and found it <strong>broken with both repos' CI green</strong>. Each side asserted against its own copy of the shape. Two unit tests that happen to agree are not a contract test.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
-        <li id="decision-falsegreen"><span class="led-claim">I audited my own gates. Six of them reported success for work that never ran. One review lane went green in <strong>36 seconds</strong> and posted nothing. The counter I built to find that failure read a key that does not exist.</span> <span class="led-to"><a href="projects/false-green.html">False Green &rarr;</a></span></li>
-        <li id="decision-hybrid" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built hybrid lexical retrieval to rescue one specific miss. I measured it and kept the dense-only default. The measurement returned <strong>MRR identical to four decimals</strong>. The miss it was built for was not a lexical failure at all.</span> <span class="led-to"><a href="projects/kb-agent-retrieval.html">Retrieval &rarr;</a></span></li>
-        <li id="decision-truncation"><span class="led-claim">I nearly published a dramatic premium-vs-cheap model gap. The gap was <strong>my own bug</strong>. A <code>max_tokens</code> cap truncated the cheap tier before its verdict on 20% of claims. I counted each one as a disagreement.</span> <span class="led-to"><a href="projects/faithfulness-judge.html">Judge &rarr;</a></span></li>
-        <li id="decision-ceiling"><span class="led-claim">I called it a ceiling. Then I looked anyway. The misses clustered on one boundary. Two rubric clauses moved category <strong>90.7% &rarr; 94.4%</strong>, and nothing regressed. It was a prompt problem, not a ceiling.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
-        <li id="decision-prompt" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>A prompt read better to a human and measured worse. Category moved <strong>79.0% &rarr; 76.7%</strong>, and industry recall moved 0.217 &rarr; 0.100. I reversed it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
-        <li id="decision-rightsized" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built the enrichment loop on Kafka to learn it properly. Then I cut it. A single-user idempotent workload <strong>never needed a distributed log</strong>. It is now an in-process background task.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
-        <li id="decision-tooluse"><span class="led-claim">I forced output to a tool schema instead of a prose parse. The API layer rejects an invalid label. It rejected <strong>one out-of-enum response in 300</strong>, and a re-sample handled it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
-      </ul>
+      <!-- The eight one-row entries moved to work.html#decision-log whole
+           (landing WO-E1.1). Every row, its id, its reversal mark, its
+           sr-only prefix, and the ix-s1 CSS travelled byte-exact. This line
+           is the pointer that stays behind, and it adds no claim: the count
+           and the shape are the ones the intro paragraph already stated.
+           No page links any of the eight ids, on this site or off it. -->
+      <p class="ledger-intro">Eight more decisions, one row each. <a href="work.html#decision-log">The decision log &rarr;</a></p>
     </section>
 
     <section class="measure">
@@ -319,61 +319,35 @@ import SiteNav from '../components/SiteNav.astro';
       <p>The classical baseline lost the case for an LLM. I vendored it here, and it runs in the browser on the same rows. <a href="projects/classifier-baseline.html#try-it">Run it yourself &rarr;</a></p>
     </section>
 
-    <section class="measure">
-      <h2 class="section-title">Field notes</h2>
-      <p>I keep these notes as I learn. They are in plain language, on the techniques behind all of this. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
-      <!-- ix-s2, the note clusters. The twelve titles are byte-exact and the
-           order is the only thing that moved. The five headings are structural
-           labels and each one is drawn from the words the titles already use.
-           A heading names a subject. It states no result and it adds no
-           assertion the notes site does not already carry. -->
-      <div class="notes-clusters">
-        <div class="notes-cluster">
-          <p class="kicker">Tool use</p>
-          <ul class="notes-list">
-            <li>Structured output via tool-use</li>
-            <li>Tool use, the general idea</li>
-            <li>The agentic tool-use loop</li>
-          </ul>
-        </div>
-        <div class="notes-cluster">
-          <p class="kicker">Eval</p>
-          <ul class="notes-list">
-            <li>Eval-driven development</li>
-            <li>Reading the numbers</li>
-            <li>Synthetic data and circular eval</li>
-          </ul>
-        </div>
-        <div class="notes-cluster">
-          <p class="kicker">RAG</p>
-          <ul class="notes-list">
-            <li>RAG: answering from your own docs</li>
-            <li>Embeddings and vector stores</li>
-          </ul>
-        </div>
-        <div class="notes-cluster">
-          <p class="kicker">Model routing</p>
-          <ul class="notes-list">
-            <li>Tiered model routing</li>
-          </ul>
-        </div>
-        <div class="notes-cluster">
-          <p class="kicker">Environments and checkpoints</p>
-          <ul class="notes-list">
-            <li>Secrets and env</li>
-            <li>Reproducible environments with uv</li>
-            <li>Checkpoint, resume, and retries</li>
-          </ul>
-        </div>
-      </div>
-      <p class="muted-line">This is a selection. The notes site carries the full set, and the set still grows.</p>
-    </section>
+    <!-- The field-note section moved to work.html#field-notes whole (landing
+         WO-E1.1). The twelve titles, the five cluster headings, the ix-s2
+         comment, and the ix-s2 CSS travelled byte-exact. This line is the
+         pointer that stays behind. It carries the notes-site link the section
+         already carried, and it adds no claim. -->
+    <p class="muted-line">Field notes on the techniques behind this work sit on the work index. <a href="work.html#field-notes">The field notes &rarr;</a></p>
 
     <section class="measure about" id="about">
       <h2 class="section-title">About</h2>
       <p>
         For the short version of how I came to this work and how I approach it,
         read <a href="about.html">About &rarr;</a>
+      </p>
+      <!-- What the way of working produced, stated as things a reader can go
+           and check (landing WO-E1.4). Every sentence points at a live
+           surface: the reversal legend in the proof band above, the figure
+           contract that fails a build on an empty limit slot, and the public
+           incident log the colophon already links. The career-story ceiling
+           binds here: no employer internal, no team, no seat claim, and no
+           number that no artifact produces. The capacity ruling is
+           deliberately not restated, because the flagship above already
+           carries it and one page states one claim once. -->
+      <p>
+        I run this record in the open. A measurement changed what I shipped,
+        and a reversed decision carries a doubled rule on the page that
+        recorded it. A figure caption states what the figure does not show,
+        and the build fails on an empty one. The operating layer keeps its
+        <a href="https://github.com/sanlee-ys/agent-ops">incident log in the open</a>,
+        postmortem-first.
       </p>
       <p>
         It is a solo build, so I simulate the program layer. The
