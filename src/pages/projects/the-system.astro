@@ -207,11 +207,11 @@ import Term from '../../components/Term.astro';
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
       <ul>
+        <li><strong>Result and evidence:</strong> Notes are classified and tagged automatically and the system is browsable end to end. The audit also exposed a false-green <Term id="contract">contract seam</Term>; it remains open and is documented rather than presented as solved.</li>
         <li><strong>Problem:</strong> Make four independently deployable repositories operate as one system without hiding coupling in shared code.</li>
         <li><strong>Ownership:</strong> I directed the solo build, defined the cross-repo decisions and contracts, and audited whether their controls worked.</li>
         <li><strong>Constraints:</strong> Note creation had to stay responsive when the <Term id="classification">classifier</Term> was unavailable; reprocessing had to be safe; and each repository kept its own release boundary.</li>
         <li><strong>Actions:</strong> I designed an asynchronous, <Term id="idempotency">idempotent</Term> enrichment loop, recorded system-level <Term id="adr">ADRs</Term>, added contract checks, and built a portal linking decisions to the source.</li>
-        <li><strong>Result and evidence:</strong> Notes are classified and tagged automatically and the system is browsable end to end. The audit also exposed a false-green <Term id="contract">contract seam</Term>; it remains open and is documented rather than presented as solved.</li>
       </ul>
     </div>
 
