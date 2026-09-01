@@ -203,7 +203,17 @@ const PROBE = () => {
 
     const { measured, empty } = await page.evaluate(PROBE);
     empties += empty;
-    console.log(`TALLY ${rel} ${measured.length}`);
+    const raw = await page.evaluate(() => {
+      const all = [...document.querySelectorAll('svg text')];
+      return {
+        n: all.length,
+        noOwner: all.filter(t => !t.ownerSVGElement).length,
+        blank: all.filter(t => (t.textContent || '').trim() === '').length,
+        labels: all.map(t => JSON.stringify(t.textContent || '')).join('|'),
+      };
+    });
+    console.log(`TALLY ${rel} measured=${measured.length} raw=${raw.n} noOwner=${raw.noOwner} blank=${raw.blank}`);
+    if (rel.includes('the-system-run')) console.log(`LABELS ${raw.labels}`);
 
     for (const t of measured) {
       checked++;
