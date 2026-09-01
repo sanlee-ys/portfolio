@@ -37,25 +37,37 @@
  *
  * HOW THE SCALE IS MEASURED: `getScreenCTM()`, not a viewBox ratio.
  * -----------------------------------------------------------------
- * `CLAUDE.md` describes the arithmetic as the rendered CSS width divided by the
- * viewBox width. That is correct for a static plate, and it is what a person
- * can do by hand. It has three blind spots, and the incident above walked into
- * the first one:
+ * Two separate choices sit here, and it is worth keeping them apart, because
+ * only the first one is what the incident above turned on.
  *
- *   1. a viewBox rewritten at runtime, so the attribute a reader sees in the
- *      source is not the one the browser is using;
- *   2. a `transform` on the text node or on any ancestor group, which the ratio
- *      never looks at;
- *   3. a `preserveAspectRatio` that letterboxes, where the width ratio is not
- *      the scale actually applied.
+ * The first is RENDER RATHER THAN READ. A runtime-rewritten viewBox defeats any
+ * gate that reads the source, and that is the whole of the 2026-09-01 error. It
+ * does not argue for one in-page formula over another: a width ratio computed
+ * IN THE PAGE reads the live attribute and gets the system map right.
+ *
+ * The second is the formula, and it earns its place on two narrower cases that
+ * an in-page width ratio still gets wrong, both in the direction that matters —
+ * the ratio reports a legible size for text the reader cannot read:
+ *
+ *   1. a `transform` on the text node or on any ancestor group, which a width
+ *      ratio never looks at;
+ *   2. a `preserveAspectRatio` that letterboxes. It defaults to `meet`, so the
+ *      applied scale is the SMALLER axis ratio; a plate that is wide for its
+ *      box paints smaller than its width ratio claims.
  *
  * `getScreenCTM()` returns the element's own user-space to viewport transform,
- * so it composes all three. The vertical scale is `hypot(b, d)`, the length of
+ * so it composes all of it. The vertical scale is `hypot(b, d)`, the length of
  * the transformed unit-y vector, because a font size scales along y.
  *
- * The two methods were compared over the whole built site on 2026-09-01: 410
- * text nodes on 22 pages, and they agreed on every one. The ratio method is not
- * wrong today. It is fragile against a construction the site already contains.
+ * `microtext-floor.test.cjs` pins both choices separately, and the split above
+ * is a mutation result rather than a claim: swapping this line for an in-page
+ * width ratio reddens the two blind-spot tests and leaves the runtime-rewrite
+ * tests green.
+ *
+ * The two methods were also compared over the whole built site on 2026-09-01:
+ * 410 text nodes on 22 pages, and they agreed on every one. The ratio method is
+ * not wrong on today's site. It is fragile against constructions the site
+ * already contains.
  *
  * WHY 320px ALONE
  * ---------------
