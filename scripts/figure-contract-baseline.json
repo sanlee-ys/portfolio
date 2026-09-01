@@ -33,7 +33,7 @@
       "page": "projects/faithfulness-judge.html",
       "figure": ".trunc-plate",
       "texts": ["FALSE GAP 0.70 vs 0.43"],
-      "reason": "The two figures name the false tier gap that a token cap invented. The plate draws the harness bug, so the number is the evidence for the refutation beside it. It does not survive a move into prose."
+      "reason": "The two figures name the false tier gap that a token cap invented. The plate shows the harness bug, so the number is the evidence for the refutation beside it. It does not survive a move into prose."
     },
     {
       "page": "projects/false-green.html",

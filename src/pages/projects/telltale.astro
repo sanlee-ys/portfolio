@@ -132,12 +132,15 @@ if (missingFrames.length) {
     }
     .tt-plate .tt-state-absent { fill: var(--muted); }
     .tt-plate .tt-state-bad { fill: var(--accent-warm); }
-    /* The microtext floor (CLAUDE.md, "Why 320px matters"). This plate holds
-       max-width 260px against a 260-unit viewBox. One unit is therefore one
-       CSS pixel at every width from 320px up, and a declared 9px IS a rendered
-       9px. The class shipped at 8px and rendered at 8.00px at 320px, which is
-       under the floor. The state rank above it moves 9px to 10px, so the two
-       ranks stay apart. */
+    /* The microtext floor (CLAUDE.md, "Why 320px matters"). The class shipped
+       at 8px and rendered at 8.00px at 320px, which is under the floor. The
+       state rank above it moves 9px to 10px, so the two ranks stay apart.
+       Scale note, re-measured 2026-08-31: the gallery ladder (ADR-014) now
+       caps this plate at --fig-plate, which outranks the local 260px cap, so
+       at 320px it renders 272px wide against a 260-unit viewBox: scale 1.046,
+       and a declared 9px renders at 9.42px. The floor still clears, with room.
+       Do not read "declared equals rendered" off this comment - it is no
+       longer 1:1, and a plate below 1:1 owes a measurement. */
     .tt-plate .tt-micro {
       fill: var(--muted);
       font-family: var(--mono);
@@ -221,8 +224,10 @@ if (missingFrames.length) {
     }
     /* THE MICROTEXT FLOOR, and the three ranks that sit on it.
        CLAUDE.md rules the floor: no SVG text renders under 9px at a 320px
-       viewport. These plates hold max-width 260px against a 260-unit viewBox,
-       so one unit is one CSS pixel and a declared size IS the rendered size.
+       viewport. Scale, re-measured 2026-08-31: the gallery ladder caps these
+       plates at --fig-plate, which outranks their local 260px cap, so at
+       320px each renders 272px against a 260-unit viewBox (scale 1.046). A
+       declared size is therefore NOT the rendered size; multiply by 1.046.
        Measured at 320px before the fix: head 9.00px, label 8.00px, note
        7.50px. The label and the note were both under the floor.
        The note takes the floor, the label takes the floor, and the head moves

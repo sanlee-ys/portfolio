@@ -193,7 +193,10 @@ import SiteNav from '../../components/SiteNav.astro';
 
     /* fg1-keys. One result message, two key reads (ADR-013). Page-scoped.
 
-       max-width 260 keeps one viewBox unit at one CSS pixel down to 320px. The
+       Scale, re-measured 2026-08-31: the gallery ladder (ADR-014) caps this
+       plate at --fig-plate and outranks the local 260px rule, so it renders
+       272px against a 260-unit viewBox at 320px, which is scale 1.046 and no
+       longer 1:1. The
        plate sits inside a .decision card, and that card adds no horizontal
        padding, so a 320px phone leaves it the same 272px the .wrap gutter
        leaves. That is the measurement the 1:1 rule needs.

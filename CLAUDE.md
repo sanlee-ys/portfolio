@@ -433,16 +433,23 @@ viewBox under `max-width: 260px` renders at scale 1.000 down to 320px. **Break
 that discipline and you owe a measurement**, because the scale then decides the
 answer. Measure with the same pinned Playwright the gates use.
 
-**Measured state, 2026-08-31, so a later reader can weigh this section.** The
-**whole site meets the floor** — the sweep the previous note called outstanding
-closed with the per-page identity lanes (PRs #272 to #286). Measured over the
+**Measured state, 2026-08-31, so a later reader can weigh this section.**
+**The floor is met site-wide.** Measured with the pinned Playwright over the
 built site at a 320px viewport: 400 `<svg>` `<text>` nodes across 22 pages,
-zero under 9px, and the smallest rendered size on the site is 9.00px
-(`projects/the-system.html`). The former worst case,
-`projects/loop-replay.html` `.axis-label` at 4.25px, now renders at 10px —
-lane I11 redrew that chart at 1:1 rather than scaling the plate, which is the
-remedy this section names. **The floor binds new and edited plates**, and it is
-now a floor the site is standing on rather than climbing to.
+none skipped, zero under 9px, and the smallest rendered size on the site is
+9.00px (`projects/the-system.html`).
+
+That closes the sweep this section used to call outstanding. On 2026-08-30 it
+was 27 class groups and 93 text nodes under the floor, most at 8px, with
+`projects/loop-replay.html` `.axis-label` worst at 4.25px. Each page lane of
+the MONOGRAPH landing cleared its own page. The two repair shapes the ADR
+predicted are both in the record: most pages stepped the declared unit from
+8px to 9px at 1:1, and `loop-replay` needed the geometry instead, because a
+640-unit diagram in a 272px track cannot be fixed by a unit step. It is drawn
+at 1:1 now and its labels render at 10px.
+
+**The floor binds new and edited plates, and it now also binds every existing
+one** — there is no remaining debt to grandfather.
 
 Re-measure it the way this state was measured: build, then walk every
 `svg text` at 320px and compare the computed `font-size` times the plate's
