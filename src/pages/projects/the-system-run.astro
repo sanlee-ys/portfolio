@@ -73,12 +73,10 @@ import SiteNav from '../../components/SiteNav.astro';
     /* The bare plate's caption. It moves to the consolidated grammar
        (ADR-014). It states what the plate argues, so it takes the what-voice.
        The values below are the ones `:is(.fig, figure[data-fig]) .fig-what`
-       gives the caption further down this page. The class stays page-scoped,
-       because style.css names the two-slot figure caption and not this one
-       paragraph. */
+       gives the caption further down this page. The class stays page-scoped for its VOICE only. The measure and the
+       centring left it: style.css now reaches a bare plate's caption
+       paragraph directly, through `.fig--plate > p`. */
     .run-plate-caption {
-      max-width: var(--content);
-      margin: 14px auto 0;
       font-size: 0.95rem;
       font-weight: 500;
       line-height: 1.55;

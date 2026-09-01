@@ -2585,6 +2585,38 @@ figure[data-fig] figcaption,
   font-size: 0.95rem;
   line-height: 1.55;
 }
+
+/* A bare plate's caption is a <p>, and the grammar above reaches a
+   <figcaption> and one page's class. A bare plate takes a <div class="fig
+   fig--plate"> wrapper and never a <figure> (figure-contract.cjs, rule R-C),
+   so its caption cannot be a <figcaption> - and the wrapper rides the promoted
+   wide track. A caption that inherits that track lands far wider than the prose
+   it explains: measured at 1280px on glossary, colophon and 404, 884px against
+   a 544px prose column (PR #286).
+
+   Eleven pages each restated these two declarations locally to correct it. This
+   is the one home those restatements retired into, and the ask PR #286 left for
+   this file's hand.
+
+   GEOMETRY ONLY, AND THAT IS THE WHOLE DESIGN. The note voice stays page-owned,
+   because a plate caption is `--muted` at 0.92rem on the chrome pages and the
+   `--text-secondary` note voice at 0.95rem on the project pages. One selector
+   cannot decide that without changing what a page renders, so it does not try.
+   `.tt-plate-caption` stays named above because telltale's caption takes the
+   figcaption voice whole; it is the exception this rule does not absorb.
+
+   A page that needs different geometry still wins on specificity: this is
+   (0,1,1), and `classifier-baseline`'s `.fig--plate > .fig-what` is (0,2,0),
+   which is what keeps its deliberate flush-left margin.
+
+   THE CHILD COMBINATOR IS THE WHOLE GUARD. Every direct-child <p> of a
+   .fig--plate is a caption - measured across all 14 pages that carry one - so
+   the selector needs no class list to stay off prose. (Routed from #288, which
+   reached this same rule independently; this block is the merged comment.) */
+.fig--plate > p {
+  max-width: var(--content);
+  margin: 14px auto 0;
+}
 :is(.fig, figure[data-fig]) .fig-what {
   display: block;
   font-size: 0.95rem;
@@ -2620,17 +2652,6 @@ figcaption a,
 figcaption a:hover,
 .fig--plate > p a:hover { text-decoration-color: var(--accent); }
 figcaption code { overflow-wrap: anywhere; }
-
-/* A bare plate cannot host a <figcaption>: a <figcaption> outside a <figure>
-   is invalid, and a <figure> here fails figure-contract.cjs. So its caption is
-   a <p>, and the consolidated rule above cannot reach it. Thirteen pages each
-   restated the same two geometry properties locally. This is that home. Every
-   direct-child <p> of a .fig--plate is a caption (measured across all 14
-   pages that carry one), so the child combinator is the whole guard. */
-.fig--plate > p {
-  max-width: var(--content);
-  margin: 14px auto 0;
-}
 
 /* The figure stroke (A2): every strong plate stroke inside the figure layer
    reads --stroke-figure, so the night retune reaches the plates and nothing

@@ -434,9 +434,10 @@ that discipline and you owe a measurement**, because the scale then decides the
 answer. Measure with the same pinned Playwright the gates use.
 
 **Measured state, 2026-08-31, so a later reader can weigh this section.**
-**The floor is met site-wide. Zero SVG text nodes render under 9px at a 320px
-viewport, on all 21 pages.** Measured with the pinned Playwright over the
-built site.
+**The floor is met site-wide.** Measured with the pinned Playwright over the
+built site at a 320px viewport: 400 `<svg>` `<text>` nodes across 22 pages,
+none skipped, zero under 9px, and the smallest rendered size on the site is
+9.00px (`projects/the-system.html`).
 
 That closes the sweep this section used to call outstanding. On 2026-08-30 it
 was 27 class groups and 93 text nodes under the floor, most at 8px, with
@@ -449,6 +450,11 @@ at 1:1 now and its labels render at 10px.
 
 **The floor binds new and edited plates, and it now also binds every existing
 one** — there is no remaining debt to grandfather.
+
+Re-measure it the way this state was measured: build, then walk every
+`svg text` at 320px and compare the computed `font-size` times the plate's
+render scale (rendered CSS width over viewBox width) against 9. There is no
+gate for it on purpose — see the first bullet above.
 
 ## AI-use posture: method, not confession (voice rule)
 

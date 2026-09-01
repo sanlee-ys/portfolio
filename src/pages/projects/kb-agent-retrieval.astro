@@ -133,14 +133,14 @@ const qP = qValue('McNemar exact p').toFixed(4);
     /* The bare-plate caption slot. A bare plate cannot use `<figcaption>`,
        because that element is legal only inside `<figure>` and the figure
        gate fails a `<figure>` that declares no `data-fig`. So these two
-       captions stay paragraphs, and they take the caption grammar by hand.
-       The origin is `.fig--plate .tt-plate-caption` in public/assets/style.css
-       at 60228a8; only the class names differ. This lane cannot add a class of
-       its own to that selector list, because style.css has one integrator. */
+       captions stay paragraphs — and the shared sheet now reaches them AS
+       paragraphs: `.fig--plate > p` in public/assets/style.css carries the
+       measure and the centring for every bare plate, which retired the copy
+       that stood here. The integrator took that hand, rather than this lane
+       adding its own class names to a selector list it does not own. The
+       voice below stays page-scoped and unchanged. */
     .retr-plate-caption,
     .hyb-plate-caption {
-      max-width: var(--content);
-      margin: 14px auto 0;
       color: var(--muted);
       font-size: 0.95rem;
       line-height: 1.55;
