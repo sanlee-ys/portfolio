@@ -529,7 +529,7 @@ import SiteNav from '../../components/SiteNav.astro';
         <tr><td>Classifier accuracy ceiling (residual label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model. I measured it at +0 rows for ~1.97&times; cost. Refine the rubric instead. A confusion breakdown found the misses clustered on one boundary, and two clauses lifted category 90.7% &rarr; 94.4%</td></tr>
         <tr><td>Breadth creep (verticals without depth)</td><td>Medium</td><td>Deep on one vehicle; other verticals are an explicit non-goal</td></tr>
         <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep the artifacts thin and current, and tie them to real delivery only</td></tr>
-        <tr><td>Silent contract drift (separate repos)</td><td colspan="2">This is the one risk that happened. The <a href="#risk-drift">callout below</a> carries the severity, what happened, the open status, and the fix</td></tr>
+        <tr><td>Silent contract drift (separate repos)</td><td colspan="2">This is the one risk that happened. The <a href="#risk-drift">callout below</a> carries the severity, what happened, how I closed it, and what the fix still does not cover</td></tr>
         <tr><td>Simulated program (no real cross-team coordination)</td><td>Low (honesty)</td><td>I state it plainly. The reasoning and the artifacts are real. The org is not</td></tr>
       </tbody>
     </table>
@@ -555,20 +555,24 @@ import SiteNav from '../../components/SiteNav.astro';
         </li>
         <li class="pp3-row">
           <p class="pp3-label">What happened</p>
-          <p class="pp3-value">The wire contracts are frozen, but the enforcement was never real. Each repo&rsquo;s tests assert against its own copy of the shape. The classifier added a field, and the coordinated consumer update never happened. Both builds stayed green.</p>
+          <p class="pp3-value">The wire contracts were frozen, but the enforcement was never real. Each repo&rsquo;s tests asserted against its own copy of the shape. The classifier added a field, and the coordinated consumer update never happened. Both builds stayed green.</p>
         </li>
         <li class="pp3-row">
           <p class="pp3-label">Status</p>
-          <p class="pp3-value">Open.</p>
+          <p class="pp3-value">Closed on 2026-07-18, under SYS-018.</p>
         </li>
         <li class="pp3-row">
           <p class="pp3-label">The fix</p>
-          <p class="pp3-value">One shared artifact both sides check against.</p>
+          <p class="pp3-value">One shared artifact both sides check against. Each provider generates a schema from its live response model and commits it. Every consumer fetches that schema in its own CI and fails on divergence.</p>
+        </li>
+        <li class="pp3-row">
+          <p class="pp3-label">What it still misses</p>
+          <p class="pp3-value">A consumer that cannot fetch the schema warns and exits 0, so a real provider outage reads as a pass. I took that trade so a GitHub outage cannot redden an unrelated build.</p>
         </li>
       </ul>
       <figcaption>
-        <span class="fig-what">Six risks sit in the register, and one of them happened. This callout carries that one at full weight: frozen contracts that no shared artifact enforced.</span>
-        <span class="fig-limit">The callout does not show the other five risks, and it does not close this one. The fix is stated. It is not built.</span>
+        <span class="fig-what">Six risks sit in the register, and one of them happened. This callout carries that one at full weight: frozen contracts that no shared artifact enforced, and the artifact that now enforces them.</span>
+        <span class="fig-limit">The callout does not show the other five risks. It states the fix and the date, and it does not show the CI steps that run it. Those sit on <a href="the-system.html#decision-contracts">The System</a>.</span>
       </figcaption>
     </figure>
 
