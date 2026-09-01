@@ -399,18 +399,18 @@ import Term from '../../components/Term.astro';
       <li><code>POST /notes</code> creates a note in <strong>notes-api</strong>. The endpoint enqueues a FastAPI <code>BackgroundTask</code> to classify and tag it. The <code>201</code> returns immediately. The task runs after notes-api sends the response.</li>
       <li>The <strong>background task</strong> POSTs the note text to the classifier's <code>/classify</code> endpoint.</li>
       <li>The <strong>classifier</strong> classifies the text into a category, an operational domain, and a region. It returns them. One Sonnet call does the work, and tool-use forces the structured output.</li>
-      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/&#123;id&#125;/tags</code>, replace semantics). It preserves the user's own tags. It currently maps the first two. The region field is newer than this consumer. An unset <code>CLASSIFIER_URL</code> makes the whole step a no-op.</li>
+      <li>The task writes the labels back as namespaced tags (<code>PUT /notes/&#123;id&#125;/tags</code>, replace semantics). It preserves the user's own tags. It maps all three fields. It mapped only the first two until 2026-07-18, because the region field was newer than this consumer. An unset <code>CLASSIFIER_URL</code> makes the whole step a no-op.</li>
       <li>The <strong>kb-agent</strong> reads notes (<code>GET /notes</code>) to ground its RAG answers, and can also call the classifier synchronously.</li>
     </ol>
 
 
-    <!-- No figure for step 4. the-system-run.astro already draws that drop as
-         .run-plate, and one claim gets one drawing. So this page points at the
-         drawing instead of redrawing it, and the pointer keeps the polarity of
-         the step it points at: the field is dropped, not mapped. -->
+    <!-- No figure for step 4. the-system-run.astro already draws the writeback
+         as .run-plate, and one claim gets one drawing. So this page points at
+         the drawing instead of redrawing it, and the pointer keeps the polarity
+         of the step it points at: the field was dropped, and it is mapped now. -->
     <p class="diagram-more">
       That is the loop in words. The run page draws the field this consumer
-      still drops. <a class="card-link" href="the-system-run.html">Watch one note go through it, with the real schemas <span class="arrow">&rarr;</span></a>
+      dropped, and the check that closed the gap. <a class="card-link" href="the-system-run.html">Watch one note go through it, with the real schemas <span class="arrow">&rarr;</span></a>
     </p>
 
     <p class="toc-return"><a href="#toc-heading">Contents</a></p>
