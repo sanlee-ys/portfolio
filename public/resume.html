@@ -265,9 +265,13 @@
     }
     .pdf-link, .pdf-link:hover { text-decoration: none; }
 
-    /* 2px of ink closes the masthead, the same mark that opens every section
-       below it and closes the document at the foot. */
-    header.masthead { border-bottom: 2px solid var(--rule-strong); padding-bottom: 20px; margin-bottom: 30px; }
+    /* The masthead carries no rule of its own, and that is the site's own
+       construction rather than an omission: on a project page `.article-body
+       h1` is closed by the FIRST h2's 2px rule, not by a border under the
+       title. Giving the masthead a rule here put two 2px rules 30px apart with
+       dead paper between them, which reads as a mistake. One rule, owned by
+       the section under it. */
+    header.masthead { margin-bottom: 26px; }
     header.masthead h1 {
       font-size: clamp(2.3rem, 6vw, 2.9rem);
       font-weight: var(--display-weight);
@@ -279,7 +283,11 @@
        is the note voice: weight 500, ink one step back. It was set in the
        accent, which put the loudest colour on the page directly under the
        largest type and left nothing for the links to mean. */
-    .role-line { color: var(--text-secondary); font-weight: 500; letter-spacing: 0; margin: 0 0 12px; }
+    .role-line {
+      color: var(--text-secondary); font-weight: 500;
+      font-size: 1.1rem; line-height: 1.4; letter-spacing: 0;
+      margin: 0 0 12px;
+    }
     .contact { color: var(--muted); font-size: 0.94rem; }
     .contact a { color: var(--muted); }
     .contact a:hover { color: var(--accent); }
@@ -366,8 +374,9 @@
       .top-actions { display: none; }
       .wrap { padding: 0; max-width: 100%; }
       body { font-size: 10pt; line-height: 1.4; }
-      header.masthead { padding-bottom: 12px; margin-bottom: 16px; }
+      header.masthead { margin-bottom: 14px; }
       header.masthead h1 { font-size: 2rem; }
+      .role-line { font-size: 1.05rem; margin-bottom: 8px; }
       section { margin-top: 12px; padding-top: 8px; }
       h2.sec { margin-bottom: 6px; }
       .entry { margin-bottom: 8px; }
