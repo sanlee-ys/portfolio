@@ -313,7 +313,9 @@ import SiteNav from '../../components/SiteNav.astro';
       <text class="lt-hand-label" x="196" y="30" text-anchor="end">By hand</text>
 
       <!-- Two boxes only — schematic hosts, not photoreal hardware. rx matches
-           --radius-sm (2px); at max-width 260 viewBox units are CSS px 1:1. -->
+           --radius-sm (2px). Scale, re-measured 2026-08-31: the gallery ladder
+           caps this plate at --fig-plate, so at 320px it renders 272px against
+           a 260-unit viewBox (scale 1.046), not 1:1. -->
       <rect class="lt-box" x="6" y="40" width="100" height="48" rx="2" />
       <text class="lt-id" x="56" y="60" text-anchor="middle">Pi</text>
       <text class="lt-role" x="56" y="76" text-anchor="middle">Netinstall</text>

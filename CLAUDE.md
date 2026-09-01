@@ -433,13 +433,22 @@ viewBox under `max-width: 260px` renders at scale 1.000 down to 320px. **Break
 that discipline and you owe a measurement**, because the scale then decides the
 answer. Measure with the same pinned Playwright the gates use.
 
-**Measured state, 2026-08-30, so a later reader can weigh this section.**
-`projects/telltale.html` meets the floor. It holds 53 plate text nodes, and
-zero of them render under 9px at 320px. The rest of the site does not. 27 class groups and 93 text nodes
-still render under the floor, and most of them sit at 8px. The worst is
-`projects/loop-replay.html` `.axis-label` at 4.25px, where a 640-unit diagram
-sits in a 272px track. **The floor binds new and edited plates now.** A
-site-wide sweep is outstanding work.
+**Measured state, 2026-08-31, so a later reader can weigh this section.**
+**The floor is met site-wide. Zero SVG text nodes render under 9px at a 320px
+viewport, on all 21 pages.** Measured with the pinned Playwright over the
+built site.
+
+That closes the sweep this section used to call outstanding. On 2026-08-30 it
+was 27 class groups and 93 text nodes under the floor, most at 8px, with
+`projects/loop-replay.html` `.axis-label` worst at 4.25px. Each page lane of
+the MONOGRAPH landing cleared its own page. The two repair shapes the ADR
+predicted are both in the record: most pages stepped the declared unit from
+8px to 9px at 1:1, and `loop-replay` needed the geometry instead, because a
+640-unit diagram in a 272px track cannot be fixed by a unit step. It is drawn
+at 1:1 now and its labels render at 10px.
+
+**The floor binds new and edited plates, and it now also binds every existing
+one** — there is no remaining debt to grandfather.
 
 ## AI-use posture: method, not confession (voice rule)
 

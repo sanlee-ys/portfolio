@@ -50,12 +50,9 @@ const pwCommit = dncPower.sha.slice(0, 7);
       font-weight: 600;
       letter-spacing: 0.06em;
     }
-    .eval-plate .ep-title {
-      fill: var(--text);
-      font-family: var(--font);
-      font-size: 11px;
-      font-weight: 500;
-    }
+    /* .ep-title was declared here and no text node ever carried it. Deleted
+       2026-08-31: the rule matched zero elements, so its removal cannot move
+       a pixel on .eval-plate, which is a frozen historical measurement. */
     .eval-plate .ep-figure {
       fill: var(--text);
       font-family: var(--font);
@@ -202,10 +199,17 @@ const pwCommit = dncPower.sha.slice(0, 7);
     .dnc1-plot {
       display: block;
       width: 100%;
-      /* A PLOT takes the plot rung of the figure ladder (ADR-014), which is
-         why this rule survives the consolidation: style.css caps plates and
-         leaves plots to the page. */
-      max-width: min(100%, var(--fig-plot));
+      /* This plot takes --fig-plate, not the retired --fig-plot, and the
+         reason is this plot's own artboard. The plot rung was 30rem, and it
+         assumed a wide artboard. This plot is drawn on the same 260-unit
+         board as the plates above it, so 30rem rendered it at 1.85x and put
+         its 10px lane labels at 18.46px against 18.40px body text: a chrome
+         label the size of prose, which inverts the rank PL-10 protects.
+         Four other lanes measured the same result on their own plots and
+         took --fig-plate. This one now agrees with them, so every plot on
+         the site hangs at one size. Measured at 1280px: 384px, scale 1.477,
+         lane labels 14.77px under 18.40px prose. */
+      max-width: min(100%, var(--fig-plate));
       height: auto;
       margin: 0 auto;
     }
