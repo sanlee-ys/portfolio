@@ -82,14 +82,16 @@ import SiteNav from '../../components/SiteNav.astro';
        head where no gate sees it. The rn- prefix above is the only other
        prefix on this page.
 
-       Two hues only. --accent marks the guard that nobody built, which is the
-       surprise this page reports. --accent-warm means a reversal on this site,
-       and an absent guard is not a reversal, so it does not appear here.
+       Two hues only. --accent marks the guard, which is what this page now
+       reports. --accent-warm means a reversal on this site, and a guard that
+       landed as planned is not a reversal, so it does not appear here.
 
        Every state is dual-encoded by a word and a shape. The path that runs is
-       a solid box and it reads "nothing breaks". The guard is a dashed box and
-       it reads NOT BUILT. contrast-check.cjs exempts SVG text and no gate
-       reads a plate, so the word half is the half that always survives.
+       a solid box and it reads "nothing breaks". The guard is a solid box too,
+       and the word BUILT carries its state. Colour marks salience here, and it
+       never carries a state on its own. contrast-check.cjs exempts SVG text
+       and no gate reads a plate, so the word half is the half that always
+       survives.
 
        The figure ladder in style.css owns the scale and the centring
        (ADR-014): `figure[data-fig="plate"] > svg` caps the plate at
@@ -107,7 +109,7 @@ import SiteNav from '../../components/SiteNav.astro';
       stroke-width: 1;
     }
     .tsr1-hygiene .tsr1-title,
-    .tsr1-hygiene .tsr1-gap-title {
+    .tsr1-hygiene .tsr1-guard-title {
       fill: var(--text);
       font-family: var(--font);
       font-size: 10px;
@@ -134,16 +136,17 @@ import SiteNav from '../../components/SiteNav.astro';
       stroke: var(--muted);
       stroke-width: 1.5;
     }
-    /* The guard that is not built: a dashed accent outline with no fill, and
-       the word NOT BUILT beside it. The dash is the shape half and the word is
-       the word half, the same encoding .nl1-doors uses for a path that stops. */
-    .tsr1-hygiene .tsr1-gap {
+    /* The guard that IS built: a solid accent outline, and the word BUILT
+       beside it. The word is what carries the state; the accent stroke only
+       marks the row this page reports. It is unfilled and carries no role,
+       tabindex or handler, so the fill: none rule in CLAUDE.md does not bind
+       it. */
+    .tsr1-hygiene .tsr1-guard {
       fill: none;
       stroke: var(--accent);
       stroke-width: 1.5;
-      stroke-dasharray: 3 2.5;
     }
-    .tsr1-hygiene .tsr1-gap-mark {
+    .tsr1-hygiene .tsr1-guard-mark {
       fill: var(--accent);
       font-family: var(--font);
       font-size: 9px;
@@ -298,9 +301,12 @@ import SiteNav from '../../components/SiteNav.astro';
           <a href="the-system.html#decision-contracts">The full decision
           &rarr;</a></p>
 
-        <!-- tsr1-hygiene (ADR-013). The page's own point, and nothing showed it
-             until now: this consumer tolerates an unknown field, and tolerance
-             is not a guard. .run-plate above already shows the drop, so this
+        <!-- tsr1-hygiene (ADR-013). The page's own point: this consumer
+             tolerates an unknown field, tolerance is not a guard, so somebody
+             built the guard. Row two used to read NOT BUILT, which contradicted
+             the note directly above it once SYS-018 landed. It now reads BUILT
+             and names the one case the check does not catch.
+             .run-plate above already shows the drop, so this
              plate does not repeat it. The seam that let the drift through is
              shown on the-system.html, and .fig-limit links there rather than
              showing it a second time in a second grammar. Zero digits here.
@@ -313,9 +319,9 @@ import SiteNav from '../../components/SiteNav.astro';
              article grid keeps the policy it already carries. -->
         <figure class="fig" data-fig="plate" data-place="spine">
           <span class="fig-label">Plate 02</span>
-          <svg class="tsr1-hygiene" viewBox="0 0 260 96" role="img"
-               aria-label="Two paths. The consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. A check that fails the build is not built here.">
-            <title>Two paths. The consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. A check that fails the build is not built here.</title>
+          <svg class="tsr1-hygiene" viewBox="0 0 260 104" role="img"
+               aria-label="Two rows. In the first, the consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. In the second, a check now fails the build when the two shapes drift apart. It does not fail on a fetch failure.">
+            <title>Two rows. In the first, the consumer reads the fields it knows by name, so a new field costs it nothing and nothing breaks. That is hygiene. In the second, a check now fails the build when the two shapes drift apart. It does not fail on a fetch failure.</title>
             <defs>
               <marker id="tsr1-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                       markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
@@ -342,23 +348,28 @@ import SiteNav from '../../components/SiteNav.astro';
             <path class="tsr1-edge" d="M 70 29 L 84 29" marker-end="url(#tsr1-arrow)" aria-hidden="true" />
             <path class="tsr1-edge" d="M 159 29 L 173 29" marker-end="url(#tsr1-arrow)" aria-hidden="true" />
 
-            <!-- The guard that nobody built. The dash and the words NOT BUILT
-                 carry the state together, so colour never carries it alone. -->
+            <!-- The guard that SYS-018 built. The word BUILT carries the state,
+                 so colour never carries it alone. The second line names the one
+                 case the check does not catch, so the row does not overstate
+                 when a reader takes it on its own. -->
             <text class="tsr1-kicker" x="2" y="59">A guard</text>
 
-            <rect class="tsr1-gap" x="2" y="64" width="256" height="30" rx="2" />
-            <text class="tsr1-gap-title" x="12" y="83">a check that fails the build</text>
-            <text class="tsr1-gap-mark" x="248" y="83" text-anchor="end">Not built</text>
+            <rect class="tsr1-guard" x="2" y="64" width="256" height="34" rx="2" />
+            <text class="tsr1-guard-title" x="12" y="78">a check that fails the build</text>
+            <text class="tsr1-guard-mark" x="248" y="78" text-anchor="end">Built</text>
+            <text class="tsr1-micro" x="12" y="90">it fails on drift, not on a fetch failure</text>
           </svg>
           <figcaption>
             <span class="fig-what">Tolerance of an unknown field is consumer
               hygiene, not a guard. The writeback reads the fields it knows by
-              name, so a new field costs it nothing. No shared check fails the
-              build when the two shapes drift apart.</span>
-            <span class="fig-limit">It does not show why no build went red. Each
-              repository asserts against its own copy of the shape, and
-              <a href="the-system.html">The System</a> shows that seam. The
-              notes above keep the reasoning and the record link.</span>
+              name, so a new field costs it nothing. A shared check now fails
+              the build when the two shapes drift apart. A fetch failure still
+              exits 0, so a provider outage reads as a pass.</span>
+            <span class="fig-limit">It does not show the seam that let the drift
+              through. Each repository asserted against its own copy of the
+              shape, and <a href="the-system.html">The System</a> shows that
+              seam. The notes above keep the reasoning and the record
+              link.</span>
           </figcaption>
         </figure>
 
@@ -375,16 +386,21 @@ import SiteNav from '../../components/SiteNav.astro';
       <li>
         <p class="ex-step">The note is now enriched</p>
         <p class="ex-note">A <code>GET</code> returns the labels in its flat
-          <code>tags</code> list. There is no <code>status</code> field anywhere.
-          The word "enriched" simply means the presence of <code>category:</code>,
-          <code>domain:</code>, and <code>region:</code> tags. That keeps the schema small and the state
-          honest.</p>
+          <code>tags</code> list, and it returns <code>enrichment_status</code>
+          beside them. The status starts at <code>pending</code>. The background
+          task sets it to <code>done</code> after a writeback, and to
+          <code>failed</code> after a classifier error. It stays
+          <code>pending</code> when <code>CLASSIFIER_URL</code> is unset, so a
+          local run never reads as a failure. The tags show the labels, and the
+          status shows whether the task that wrote them finished.</p>
         <pre><code>GET /notes/1
 &#123;
   "id": 1,
   "title": "USS Ronald Reagan first ordnance drop",
   "content": "F/A-18E Hornets ... Operation Iraqi Freedom.",
   "tags": ["category:operations", "domain:air", "region:middle-east"],
+  "enrichment_status": "done",
+  "published_at": null,
   "created_at": "...",
   "updated_at": "..."
 &#125;</code></pre>
