@@ -97,10 +97,8 @@ import Term from '../../components/Term.astro';
        What stays here is geometry, and only because a <div> cannot hold a
        <figcaption>: the consolidated `.fig figcaption` rule that centres a
        caption on the prose measure cannot match a bare plate's paragraph. */
-    .seam-plate-caption {
-      max-width: var(--content);
-      margin: 14px auto 0;
-    }
+    /* The bare-plate caption geometry moved to style.css (`.fig--plate > p`),
+       so the two properties this page restated are deleted. */
 
     /* ts1-sequence, the seam drawn as a sequence (ADR-004, ADR-013).
        Page-scoped. A MAP, not a second verdict plate: .seam-plate above

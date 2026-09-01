@@ -321,10 +321,22 @@
   --space-block: 28px;
   --space-tight: 12px;
   /* The gallery ladder for figures. A 260-unit plate hangs at 24rem
-     (~1.48x); a dense plate steps down to 20rem; a plot takes 30rem. */
+     (~1.48x); a dense plate steps down to 20rem.
+
+     --fig-plot IS RETIRED, and the retirement is the recorded answer to a
+     fork five lanes hit independently (I3, I5, I7, I11, and the classifier
+     lane). The token shipped at 30rem and never gained a consumer: only
+     `figure[data-fig="plate"] > svg` and `.fig--plate > svg` read the ladder,
+     so a `data-fig="plot"` figure always fell through to its page island.
+     Every lane that tried the token measured the same failure. The site's
+     plots are drawn on the same 260-unit board as its plates, so 30rem
+     renders a 10px chrome label at 18.5px against 16px body text. A chrome
+     label larger than prose inverts the rank PL-10 protects. The token is
+     deleted rather than wired, because wiring it would re-render three
+     shipped pages against five independent measurements that rejected it.
+     A plot takes --fig-plate. */
   --fig-plate: 24rem;
   --fig-plate-compact: 20rem;
-  --fig-plot: 30rem;
   /* Landing scope for the diff idiom: a deleted line takes the reversal
      hue. The bar test passes literally - a deleted line was cut. */
   --diff-del: var(--accent-warm);
@@ -2006,12 +2018,32 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
   .toc li {
     display: flex;
     align-items: baseline;
+    /* The comma-run drops to its own line under a wrapped title (see below),
+       and it can only drop if the row is allowed to wrap. */
+    flex-wrap: wrap;
     margin: 0;
   }
   .toc li::before { flex: 0 0 1.5em; }
+  /* flex-basis 0, not auto. With the row allowed to wrap (above), an `auto`
+     basis lets a long section title demand its full content width, so the
+     anchor wrapped to its own line and left the counter numeral stranded on
+     the line before it. A zero basis makes the anchor take what is left
+     beside the numeral and wrap its text inside its own box instead. */
   .article-body .toc a {
-    flex: 1 1 auto;
+    flex: 1 1 0;
+    min-width: 0;
     padding: 11px 0;
+  }
+  /* The run is a flex item here, so `align-items: baseline` pinned it to the
+     FIRST line of the title. On a page whose section titles wrap - netops-lab
+     runs to 57 characters and wrapped to four lines at 320px - the run then
+     sat beside line one with the other three lines running under it, and it
+     read as part of the title rather than as the section's figure list.
+     Measured before this fix: all four runs ended at x=296 in a 296px track.
+     It takes its own line and keeps the title's left edge. */
+  .toc-figs {
+    flex: 1 0 100%;
+    margin-left: 1.5em;
   }
 }
 
@@ -2454,12 +2486,14 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
    figures. Every direct-child figure wrapper rides the wide track (see the
    promotion list) and its artwork centres. Plates hang at --fig-plate
    (~1.48x of a 260-unit viewBox); dense plates step to --fig-plate-compact;
-   plots take --fig-plot; frames, maps, and strips take the wide track.
+   plots take --fig-plate too (--fig-plot is retired: see the token block);
+   frames, maps, and strips take the wide track.
    Figures nested inside .decision keep the entry's measure (A5).
    This is also the ONE home for the caption grammar the thirteen page
-   islands carry as copies (OC-F closed). Each page lane deletes its local
-   copy in that page's own PR; until then the island copy wins ties by
-   source order, which is the same rendered result.
+   islands used to carry as copies (OC-F closed). Every page lane has now
+   deleted its local copy, and the integrator confirmed zero remaining
+   declarations in the page islands on 2026-08-31. What the pages still
+   carry is a deletion record naming the origin copy, and that record stays.
    =========================================================================== */
 figure[data-fig],
 .fig,
@@ -2568,13 +2602,35 @@ figure[data-fig] figcaption,
   padding: 2px 0 2px 12px;
   margin-top: 10px;
 }
-figcaption a {
+/* A caption link is a prose link. The thirteen page islands each restated the
+   house declarations rather than invent a caption link style, and the
+   consolidation dropped two of them: the soft underline (the color-mix) and
+   the transition that firms it up on hover. A caption link then painted a
+   solid underline with no hover response, which is a different idiom from
+   every other link on the site. Restored here, and stated once. */
+figcaption a,
+.fig--plate > p a {
   color: var(--accent);
   text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
 }
+figcaption a:hover,
+.fig--plate > p a:hover { text-decoration-color: var(--accent); }
 figcaption code { overflow-wrap: anywhere; }
+
+/* A bare plate cannot host a <figcaption>: a <figcaption> outside a <figure>
+   is invalid, and a <figure> here fails figure-contract.cjs. So its caption is
+   a <p>, and the consolidated rule above cannot reach it. Thirteen pages each
+   restated the same two geometry properties locally. This is that home. Every
+   direct-child <p> of a .fig--plate is a caption (measured across all 14
+   pages that carry one), so the child combinator is the whole guard. */
+.fig--plate > p {
+  max-width: var(--content);
+  margin: 14px auto 0;
+}
 
 /* The figure stroke (A2): every strong plate stroke inside the figure layer
    reads --stroke-figure, so the night retune reaches the plates and nothing
@@ -3578,6 +3634,31 @@ figcaption code { overflow-wrap: anywhere; }
   transition: text-decoration-color 0.15s ease;
 }
 .orientation-routes a:hover { text-decoration-color: var(--accent); }
+
+/* The same scoping gap, two more places, and this is the last of OC-F.
+   `.measure p a` carries the prose-link idiom for the reading column, so a
+   prose link that sits OUTSIDE .measure inherits nothing and paints in the
+   browser's default deep blue - measured at 1.97:1 in dark, which the
+   contrast gate fails. Three constructions sit outside: the capacity-gate
+   link in the homepage flagship, the field-notes pointer that stands between
+   two homepage sections, and the glossary pointer that closes work.html.
+   The homepage carried this rule in its own island, page-scoped, waiting for
+   an integrator; this is that home, and the island copy is deleted.
+   `.card-link` is excluded because the flagship's writeup link owns its own
+   colour and its own 44px box. */
+.flagship p a:not(.card-link),
+p.muted-line a,
+main > p a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+.flagship p a:not(.card-link):hover,
+p.muted-line a:hover,
+main > p a:hover { text-decoration-color: var(--accent); }
 
 /* Decision log: flip the hierarchy so the human kicker leads and the ledger
    ID (SYS-004, ADR-002, EVAL...) rides behind it as quiet metadata. */

@@ -104,23 +104,14 @@ import SiteNav from '../components/SiteNav.astro';
       }
     }
 
-    /* Two prose links on this page sit outside .measure: the capacity-gate
-       link in the flagship, and the field-notes pointer that stands between
-       two sections. `.measure p a` in style.css never reaches either, so both
-       painted in the browser's default blue and contrast-check.cjs failed
-       them at 1.97:1 in dark. This is the same construction as `.measure p a`,
-       page-scoped until lane I0 gives the rule one home (OC-F). `.card-link`
-       is excluded because the flagship's writeup link already owns its own
-       colour and its own 44px box. */
-    .flagship p a:not(.card-link),
-    p.muted-line a {
-      color: var(--accent);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
-    }
-    .flagship p a:not(.card-link):hover,
-    p.muted-line a:hover { text-decoration-color: var(--accent); }
+    /* THE OUT-OF-MEASURE PROSE-LINK RULE LEFT THIS PAGE (OC-F closed).
+       Two prose links here sit outside .measure: the capacity-gate link in
+       the flagship, and the field-notes pointer between two sections.
+       `.measure p a` reaches neither, so both painted in the browser's
+       default blue and contrast-check.cjs failed them at 1.97:1 in dark.
+       This island carried the fix page-scoped while it waited for an
+       integrator. style.css now states it once, for this page and for
+       work.html's glossary pointer, which is the same construction. */
   </style>
   </Fragment>
 

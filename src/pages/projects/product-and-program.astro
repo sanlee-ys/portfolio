@@ -135,11 +135,8 @@ import SiteNav from '../../components/SiteNav.astro';
        fig-what, which puts it in the consolidated note voice. The rule below
        sets the box only, because style.css owns the voice. */
     .jtbd-strip-caption,
-    .nnl-plate-caption,
-    .gp-plate-caption {
-      max-width: var(--content);
-      margin: 14px auto 0;
-    }
+    /* The bare-plate caption geometry moved to style.css (`.fig--plate > p`),
+       so the two properties this page restated are deleted. */
 
     /* pp1: the axis board. A STRIP, so it re-lays text and draws nothing.
        Two lists sit under this section today, and the reader has to join a
@@ -337,8 +334,10 @@ import SiteNav from '../../components/SiteNav.astro';
         </marker>
       </defs>
 
-      <!-- Four stage boxes. rx matches --radius-sm (2px). At max-width 260 one
-           viewBox unit is one CSS pixel. Queryable KB runs on two lines, so the
+      <!-- Four stage boxes. rx matches --radius-sm (2px). Scale, re-measured
+           2026-08-31: the gallery ladder caps this strip at --fig-plate, so at
+           320px it renders 272px against a 260-unit viewBox (scale 1.046), not
+           1:1. Queryable KB runs on two lines, so the
            short labels fit with no horizontal overflow at 320. -->
       <rect class="jtbd-box" x="2" y="6" width="56" height="40" rx="2" />
       <!-- Stacked feed marks. They draw the raw multi-source stream into

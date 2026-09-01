@@ -72,10 +72,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
        this page carries a single-paragraph caption, not a two-slot figcaption,
        so the paragraph is given the same measure and the same offset the
        figcaption block gives a caption. style.css owns the voice. */
-    .fig--plate > .fig-what {
-      max-width: var(--content);
-      margin: 14px auto 0;
-    }
+    /* The bare-plate caption geometry moved to style.css (`.fig--plate > p`),
+       so the two properties this page restated are deleted. */
 
     /* Two plates and one plot, one grammar (ADR-013). Page-scoped.
 
