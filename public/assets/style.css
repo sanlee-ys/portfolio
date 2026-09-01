@@ -1296,7 +1296,11 @@ em, i, cite {
   font-family: var(--font);
   color: var(--text);
   text-decoration: none;
-  font-size: 0.72rem;
+  /* 0.75rem, up from 0.72rem on 2026-09-01. An independent review read the
+     nav at the quiet end of the scale, and the nav is the one control every
+     reader uses. 12px is the step that answers it. See the packing note in
+     the 640px block for why the phone no longer steps this down. */
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.13em;
@@ -1887,11 +1891,15 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
   padding: 72px 0 96px;
 }
 
+/* The return path. Every non-primary page carries one (see the navigation
+   contract in CLAUDE.md), so it is a control, not a label — and it is set in
+   tracked caps, which is the hardest case to read small. 0.75rem from
+   2026-09-01, up from 0.68rem, for the reason recorded at `.doors a`. */
 .article-body .back {
   font-family: var(--font);
   color: var(--muted);
   text-decoration: none;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -2834,7 +2842,9 @@ figcaption code { overflow-wrap: anywhere; }
   min-height: 44px;
   min-width: 44px;
   font-family: var(--font);
-  font-size: 0.68rem;
+  /* 0.75rem from 2026-09-01. Same job and same reason as `.article-body
+     .back`: this is a return control, not a label. */
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3246,9 +3256,12 @@ figcaption code { overflow-wrap: anywhere; }
 .rung[data-state="retired"] .rung-state { color: var(--accent-warm); border-color: var(--accent-warm); }
 .rung-gain { margin: 6px 0 0; font-size: 0.95rem; }
 .rung-driver { margin: 4px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
+/* 0.68rem from 2026-09-01, up from 0.64rem. This was the only chrome label on
+   the site set BELOW the ADR-014 label register, so the step puts it back on
+   the register rather than off it. The register itself does not move. */
 .rung-driver .lbl {
   font-family: var(--font);
-  font-size: 0.64rem;
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -4223,10 +4236,16 @@ main > p a:hover { text-decoration-color: var(--accent); }
      screen. That is honest rather than fixable: 320px of viewport is 300px of
      container, and packing that first row into it would need a ~14% smaller
      setting — 9px letterspaced caps, which is a worse answer than a row. */
-  .doors a {
-    font-size: 0.665rem;
-    letter-spacing: 0.09em;
-  }
+
+  /* RETIRED 2026-09-01, because the seven items became four. ADR-007 moved
+     project depth out of the primary nav, so the row this packing existed to
+     save is Work, About, Résumé, Contact. Re-measured on the built site with
+     the pinned Playwright at 320, 360, 390, 430 and 560px: one row, 243.6px
+     of ink in a 300px container. The packing had no target left, and it cost
+     the phone the smallest type on the site — a rendered 10.64px against the
+     11.52px the same link got on a desktop, which is backwards. The nav now
+     holds one setting at every width. Restore this block only with a fresh
+     ink measurement, and only if the nav grows again. */
 }
 
 /* ---- Thumbable nav, phone and tablet ------------------------------------
