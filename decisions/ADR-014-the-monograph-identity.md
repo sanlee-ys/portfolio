@@ -126,6 +126,27 @@ binds new and edited plates now; 93 nodes across the remaining pages sit under
 it, and each per-page identity lane brings its page to the floor in that
 page's PR.
 
+**Amended 2026-09-01. Two claims above are now closed, and one was wrong.**
+
+- **The debt is paid.** The 93 nodes are gone. Each page lane cleared its own
+  page, and the sweep closed on 2026-08-31. The floor binds every plate on the
+  site, and no lane grandfathers one.
+- **"No gate can hold it" was wrong.** The premise is a fact about
+  `contrast-check.cjs`, which exempts SVG text. It is not a fact about gates. A
+  rendered font size is laid-out geometry, and `hit-target.cjs` and
+  `contrast-check.cjs` already measure laid-out geometry.
+  `scripts/microtext-floor.cjs` holds the floor from 2026-09-01, and the QA
+  check count moved from 20 to 22 with it and its adversarial suite.
+- **The floor stays a rule as well.** A gate reports on what a writer already
+  wrote. The rule is what the writer follows first, and the two repair shapes
+  above are still the remedy.
+
+The gate reads the plate's scale from `getScreenCTM()` rather than from a
+viewBox ratio. A ratio invites a source read, and `diagram.js` rewrites the
+system map's viewBox at phone widths. A source read of that plate on
+2026-09-01 reported 4.08px where the reader gets 12.98px, and it proposed
+repairs to a correct figure.
+
 ### 6. Integration calls this record makes
 
 - **The caption grammar has one home in `style.css`** (OC-F closed). Thirteen
