@@ -12,10 +12,17 @@ import Term from '../../components/Term.astro';
 >
   <Fragment slot="head">
   <style is:inline>
-    /* Contract-seam plate (portfolio ADR-004, ADR-014). Page-scoped: both
-       sides report GREEN against their own copy of the shape, and the wire
-       between them is broken. Not a second system diagram (the interactive
-       map below already is that).
+    /* Contract-seam plate (portfolio ADR-004, ADR-014). Page-scoped. The plate
+       draws two eras, because the page tells one arc. THEN: both sides report
+       GREEN against their own copy of the shape, and the wire between them is
+       BROKEN. NOW: the provider publishes one generated schema, every consumer
+       asserts against it, and the wire is GUARDED. Not a second system diagram
+       (the interactive map below already is that).
+
+       The defect half is KEPT, not replaced. SYS-018 closed the seam on
+       2026-07-18, and a plate that drew only the closed state would delete the
+       finding that produced it. R-D still binds: no <text> node here carries a
+       digit, so the dates and the ADR numbers stay in the prose.
 
        The plate now hangs on the MONOGRAPH figure ladder. Its wrapper is
        <div class="fig fig--plate">, never a <figure>: a bare plate carries no
@@ -39,14 +46,24 @@ import Term from '../../components/Term.astro';
       font-weight: 600;
       letter-spacing: 0.06em;
     }
+    /* The era band. Two states sit on one plate, so each needs a header that
+       outranks a lane label. Ink, not muted, and no digit (R-D). */
+    .seam-plate .sp-era {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
     .seam-plate .sp-title {
       fill: var(--text);
       font-family: var(--font);
       font-size: 11px;
       font-weight: 500;
     }
-    /* No text node carries this class today. It is held at the 9px floor so a
-       later editor who reaches for it starts above the line, not under it. */
+    /* Declared at the 9px floor. The plate renders at scale 1.046 at a 320px
+       viewport (see the measurement above), so 9px declared is 9.41px
+       rendered, which clears the floor. */
     .seam-plate .sp-micro {
       fill: var(--muted);
       font-family: var(--mono);
@@ -86,6 +103,28 @@ import Term from '../../components/Term.astro';
       font-family: var(--font);
       font-size: 10px;
       font-weight: 700;
+    }
+    /* GUARDED: ink inverted — the state after the fix. The word carries the
+       verdict, so the plate never reads by colour alone. No oxide here:
+       --accent-warm marks a decision that I took back, and a closed defect is
+       not that. */
+    .seam-plate .sp-fix {
+      fill: var(--text);
+      stroke: var(--text);
+      stroke-width: 1.5;
+    }
+    .seam-plate .sp-fix-text {
+      fill: var(--bg);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    /* The join. One solid ink line under both lanes states the shared
+       artifact, against the dashed oxide break in the era above. */
+    .seam-plate .sp-edge-join {
+      fill: none;
+      stroke: var(--text);
+      stroke-width: 1.5;
     }
     .seam-plate marker path { fill: var(--muted); }
     .seam-plate marker path.sp-head-bad { fill: var(--accent-warm); }
@@ -207,7 +246,7 @@ import Term from '../../components/Term.astro';
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
       <ul>
-        <li><strong>Result and evidence:</strong> Notes are classified and tagged automatically and the system is browsable end to end. The audit also exposed a false-green <Term id="contract">contract seam</Term>; it remains open and is documented rather than presented as solved.</li>
+        <li><strong>Result and evidence:</strong> Notes are classified and tagged automatically and the system is browsable end to end. The audit also exposed a false-green <Term id="contract">contract seam</Term>. I closed it under SYS-018 on 2026-07-18: each provider publishes one generated schema, and every consumer asserts against that schema in its own CI.</li>
         <li><strong>Problem:</strong> Make four independently deployable repositories operate as one system without hiding coupling in shared code.</li>
         <li><strong>Ownership:</strong> I directed the solo build, defined the cross-repo decisions and contracts, and audited whether their controls worked.</li>
         <li><strong>Constraints:</strong> Note creation had to stay responsive when the <Term id="classification">classifier</Term> was unavailable; reprocessing had to be safe; and each repository kept its own release boundary.</li>
@@ -215,9 +254,11 @@ import Term from '../../components/Term.astro';
       </ul>
     </div>
 
-    <!-- Argument: each side's test is green against its own copy of the
-         shape; the wire between them is broken. Word + geometry first
-         (GREEN / GREEN / BROKEN), oxide only on the seam. ADR-010 N/A.
+    <!-- Argument: each side's test was green against its own copy of the
+         shape, and the wire between them was broken. One published schema
+         now carries the shape, and both sides assert against it. Word +
+         geometry first (GREEN / GREEN / BROKEN, then PUBLISHES / ASSERTS /
+         GUARDED), oxide only on the old seam. ADR-010 N/A.
 
          Plate 01 of three (ADR-014). The wrapper is a <div class="fig
          fig--plate">, never a <figure>: this plate carries a one-slot caption
@@ -228,9 +269,9 @@ import Term from '../../components/Term.astro';
          policy: a plate sits on the content track. -->
     <div class="fig fig--plate" data-place="spine">
       <span class="fig-label">Plate 01</span>
-      <svg class="seam-plate" viewBox="0 0 260 148" role="img"
-           aria-label="Contract seam: the provider tests its own fixture and reports GREEN. The consumer tests its own stub and reports GREEN. The wire between them is BROKEN, because each side asserted against its own copy of the shape.">
-        <title>Both sides report GREEN against their own copy of the shape. The wire between them is BROKEN.</title>
+      <svg class="seam-plate" viewBox="0 0 260 308" role="img"
+           aria-label="The contract seam, then and now. THEN: the provider tested its own fixture and reported GREEN, the consumer tested its own stub and reported GREEN, and the wire between them was BROKEN, because each side asserted against its own copy of the shape. NOW: the provider publishes one generated schema, every consumer asserts against that schema in its own CI, and the wire is GUARDED.">
+        <title>THEN: both sides reported GREEN against their own copy of the shape, and the wire was BROKEN. NOW: one published schema, and the wire is GUARDED.</title>
         <defs>
           <marker id="sp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
                   markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
@@ -242,30 +283,53 @@ import Term from '../../components/Term.astro';
           </marker>
         </defs>
 
-        <text class="sp-lane" x="4" y="12">PROVIDER</text>
-        <rect class="sp-box" x="4" y="18" width="110" height="36" rx="2" />
-        <text class="sp-title" x="59" y="40" text-anchor="middle">own fixture</text>
-        <rect class="sp-ok" x="4" y="60" width="110" height="22" rx="2" />
-        <text class="sp-ok-text" x="59" y="75" text-anchor="middle">GREEN</text>
+        <text class="sp-era" x="4" y="10">THEN</text>
 
-        <text class="sp-lane" x="146" y="12">CONSUMER</text>
-        <rect class="sp-box" x="146" y="18" width="110" height="36" rx="2" />
-        <text class="sp-title" x="201" y="40" text-anchor="middle">own stub</text>
-        <rect class="sp-ok" x="146" y="60" width="110" height="22" rx="2" />
-        <text class="sp-ok-text" x="201" y="75" text-anchor="middle">GREEN</text>
+        <text class="sp-lane" x="4" y="28">PROVIDER</text>
+        <rect class="sp-box" x="4" y="34" width="110" height="34" rx="2" />
+        <text class="sp-title" x="59" y="55" text-anchor="middle">own fixture</text>
+        <rect class="sp-ok" x="4" y="74" width="110" height="22" rx="2" />
+        <text class="sp-ok-text" x="59" y="89" text-anchor="middle">GREEN</text>
 
-        <path class="sp-edge" d="M 59 82 L 59 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
-        <path class="sp-edge" d="M 201 82 L 201 96" marker-end="url(#sp-arrow)" aria-hidden="true" />
-        <path class="sp-edge-break" d="M 59 96 L 118 96" aria-hidden="true" />
-        <path class="sp-edge-break" d="M 142 96 L 201 96" marker-end="url(#sp-arrow-bad)" aria-hidden="true" />
+        <text class="sp-lane" x="146" y="28">CONSUMER</text>
+        <rect class="sp-box" x="146" y="34" width="110" height="34" rx="2" />
+        <text class="sp-title" x="201" y="55" text-anchor="middle">own stub</text>
+        <rect class="sp-ok" x="146" y="74" width="110" height="22" rx="2" />
+        <text class="sp-ok-text" x="201" y="89" text-anchor="middle">GREEN</text>
 
-        <text class="sp-lane" x="4" y="116">THE WIRE</text>
-        <rect class="sp-bad" x="4" y="122" width="252" height="22" rx="2" />
-        <text class="sp-bad-text" x="130" y="137" text-anchor="middle">BROKEN</text>
+        <path class="sp-edge" d="M 59 96 L 59 110" marker-end="url(#sp-arrow)" aria-hidden="true" />
+        <path class="sp-edge" d="M 201 96 L 201 110" marker-end="url(#sp-arrow)" aria-hidden="true" />
+        <path class="sp-edge-break" d="M 59 110 L 118 110" aria-hidden="true" />
+        <path class="sp-edge-break" d="M 142 110 L 201 110" marker-end="url(#sp-arrow-bad)" aria-hidden="true" />
+
+        <text class="sp-lane" x="4" y="130">THE WIRE</text>
+        <rect class="sp-bad" x="4" y="136" width="252" height="22" rx="2" />
+        <text class="sp-bad-text" x="130" y="151" text-anchor="middle">BROKEN</text>
+
+        <text class="sp-era" x="4" y="188">NOW</text>
+
+        <text class="sp-lane" x="4" y="206">PROVIDER</text>
+        <rect class="sp-box" x="4" y="212" width="110" height="38" rx="2" />
+        <text class="sp-title" x="59" y="231" text-anchor="middle">publishes</text>
+        <text class="sp-micro" x="59" y="244" text-anchor="middle">generated schema</text>
+
+        <text class="sp-lane" x="146" y="206">CONSUMER</text>
+        <rect class="sp-box" x="146" y="212" width="110" height="38" rx="2" />
+        <text class="sp-title" x="201" y="231" text-anchor="middle">asserts</text>
+        <text class="sp-micro" x="201" y="244" text-anchor="middle">compares fields</text>
+
+        <path class="sp-edge" d="M 59 250 L 59 264" marker-end="url(#sp-arrow)" aria-hidden="true" />
+        <path class="sp-edge" d="M 201 250 L 201 264" marker-end="url(#sp-arrow)" aria-hidden="true" />
+        <path class="sp-edge-join" d="M 59 264 L 201 264" aria-hidden="true" />
+
+        <text class="sp-lane" x="4" y="276">ONE SHARED ARTIFACT</text>
+        <rect class="sp-fix" x="4" y="282" width="252" height="22" rx="2" />
+        <text class="sp-fix-text" x="130" y="297" text-anchor="middle">GUARDED</text>
       </svg>
       <p class="seam-plate-caption fig-what">
         Two unit tests that happen to agree are not a contract test. Each side
-        was green. The seam was not.
+        was green. The seam was not. One published schema now holds the shape,
+        and a consumer that drifts from it fails its own build.
       </p>
     </div>
 
@@ -360,13 +424,14 @@ import Term from '../../components/Term.astro';
     <h2 id="the-decisions">The decisions</h2>
 
     <div class="decision" id="decision-contracts">
-      <p class="tag">Decision &middot; SYS-004 / SYS-006</p>
+      <p class="tag">Decision &middot; SYS-004 / SYS-006 / SYS-018</p>
       <h3>Decouple with contracts, not shared code</h3>
       <p>The repos talk over frozen HTTP contracts with explicit
-        versioning rules. Each side carries tests that pin the shape.</p>
+        versioning rules. The provider on each seam publishes the shape as a
+        committed schema, and every consumer asserts against that one file.</p>
       <p class="tradeoff"><strong>Why:</strong> a renamed field breaks the
         consumer silently at runtime.
-        <strong>Tradeoff:</strong> freeze the wire shape and write the tests, so
+        <strong>Tradeoff:</strong> freeze the wire shape and publish it, so
         drift fails a build instead of production.</p>
       <p class="tradeoff">I audited my own decision log in July 2026 and found
         this seam broken. The classifier shipped a third field. The frozen
@@ -427,9 +492,9 @@ import Term from '../../components/Term.astro';
           own fixture in the same commit. Nobody updated the consumer stub.
           Each copy of the shape then moved on its own, and neither side could
           see the other.</span>
-          <span class="fig-limit">The map does not show the fix. A real
-          contract test needs one shared artifact, and that argument stays in
-          the prose below. The map holds no verdict either: the CI on both
+          <span class="fig-limit">The map does not show the fix. One shared
+          artifact replaced the two copies, and that mechanism stays in the
+          prose below. The map holds no verdict either: the CI on both
           repositories stayed green, and that sentence stays above it.</span>
         </figcaption>
       </figure>
@@ -439,7 +504,40 @@ import Term from '../../components/Term.astro';
         other's build. I amended
         <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-004-classify-http-contract.md">SYS-004</a>
         in the open, and I struck the falsified consequences through rather
-        than delete them.
+        than delete them.</p>
+
+      <p class="tradeoff"><strong>Then I built it.</strong>
+        <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-018-provider-owned-contract-artifacts.md">SYS-018</a>
+        replaced the claim with a mechanism, and it landed on 2026-07-18. The
+        classifier generates
+        <code>contracts/classify-response.schema.json</code> from its live
+        response model and its label constants. It is never hand-edited, so it
+        cannot describe a shape the service does not return. The CI step
+        <em>Contract artifact is current (SYS-004)</em> fails on a stale file.
+        Both consumers,
+        <a href="https://github.com/sanlee-ys/kb-agent">kb-agent</a> and
+        <a href="https://github.com/sanlee-ys/notes-api">notes-api</a>, fetch
+        that published file in their own CI and fail on divergence. notes-api
+        publishes the second seam the same way, and kb-agent asserts against
+        it in the step <em>Notes read contract matches the provider
+        (SYS-006)</em>.</p>
+
+      <p class="tradeoff"><strong>The two contracts are deliberately different
+        shapes.</strong> The <code>/classify</code> schema is closed
+        (<code>additionalProperties: false</code>). That is what turns an added
+        field into a detectable break rather than a silent one, and its absence
+        is what let the third field through. The <code>GET /notes</code> schema
+        is open, because kb-agent reads a subset of the note and an added
+        provider field must not redden its build. There, the failure worth
+        catching is a field kb-agent reads that disappears upstream. That one
+        is quiet: the consumer parses with <code>.get()</code>, so it keeps
+        answering with empty titles instead of raising an error.</p>
+
+      <p class="tradeoff"><strong>What is still not guarded.</strong> A
+        consumer that cannot fetch the published schema prints a loud warning
+        and exits 0. A GitHub outage must not redden an unrelated build, and
+        the price is that a genuine provider outage reads as a pass. The check
+        scripts record that trade in their own docstrings rather than hide it.
         <a href="false-green.html">False Green</a> collects six more checks that
         reported confidence they never earned.
         <a href="context-architecture.html">Context Architecture</a> is the same
@@ -495,7 +593,7 @@ import Term from '../../components/Term.astro';
     <h2 id="the-outcome">The outcome</h2>
     <ul>
       <li><strong>Create a note, and the system classifies and tags it automatically.</strong> The work runs asynchronously, with no coupling between note creation and classifier availability.</li>
-      <li><strong>The four repos stay independently deployable.</strong> A red build still does <em>not</em> find cross-repo drift. I thought it did. An audit proved otherwise. One shared contract artifact that both sides assert against closes that gap.</li>
+      <li><strong>The four repos stay independently deployable.</strong> I claimed a red build found cross-repo drift. It did not. An audit proved that, and SYS-018 closed it. Each provider now publishes one schema generated from its live response model, and every consumer compares its own field set against that schema in CI. One limit stays: a consumer that cannot fetch the schema prints a warning and exits 0, so a real provider outage reads as a pass.</li>
       <li><strong>The whole system is browsable in one portal</strong>, with links straight to the real code.</li>
       <li><strong>A skill map (SYS-007) spells out what the system exercises</strong>: evals, context engineering, <Term id="agent">agents</Term>, and observability. It also names where I am weak, which is security on the agent's tool seam.</li>
     </ul>

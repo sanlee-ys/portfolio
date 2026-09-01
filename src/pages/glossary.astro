@@ -216,11 +216,14 @@ import SiteNav from '../components/SiteNav.astro';
         <p>The boundary where one service depends on another through a
           stable request/response shape. The point is to make integration
           explicit instead of relying on hidden assumptions.</p>
-        <p class="tradeoff"><strong>Here:</strong> I froze three of these
-          (SYS-004, SYS-005, SYS-006) and wrote tests on both sides of each.
-          I described that as &ldquo;contract tests in CI&rdquo; and said a
-          renamed field would fail the build. An audit of my own decision log
-          in July 2026 showed that was wrong.</p>
+        <p class="tradeoff"><strong>Here:</strong> I froze two of these across
+          repositories (SYS-004 for <code>POST /classify</code>, SYS-006 for
+          <code>GET /notes</code>) and wrote tests on both sides of each.
+          SYS-005 is the asynchronous writeback loop over the same
+          <code>/classify</code> call, so SYS-004 guards its only cross-repo
+          hop. I described all of that as &ldquo;contract tests in CI&rdquo;
+          and said a renamed field would fail the build. An audit of my own
+          decision log in July 2026 showed that was wrong.</p>
         <p class="tradeoff"><strong>What was actually true:</strong> each side
           asserted against its <em>own</em> copy of the shape. When the
           classifier added a third field, the provider&rsquo;s test fixture was
@@ -229,7 +232,18 @@ import SiteNav from '../components/SiteNav.astro';
           through a breaking change. Two unit tests that happen to agree
           aren&rsquo;t a contract test &mdash; a real one needs a single shared
           artifact both sides check against, so changing one copy fails the
-          other&rsquo;s build. <a href="projects/the-system.html#decision-contracts">Full decision &rarr;</a></p>
+          other&rsquo;s build.</p>
+        <p class="tradeoff"><strong>What I did about it:</strong> SYS-018
+          landed on 2026-07-18. Each provider now generates one schema from its
+          live response model and commits it, so the file cannot describe a
+          shape the service does not return. Every consumer fetches that file
+          in its own CI and fails on divergence. The
+          <code>/classify</code> schema is closed, which makes an added field a
+          detectable break. The <code>GET /notes</code> schema stays open,
+          because the consumer reads a subset and an added field must not
+          redden its build. One gap stays open on purpose: a consumer that
+          cannot fetch the schema warns and exits 0, so a real provider outage
+          reads as a pass. <a href="projects/the-system.html#decision-contracts">Full decision &rarr;</a></p>
       </div>
 
       <div class="decision" id="term-eval" data-term="eval evaluation eval harness eval-driven development testing">

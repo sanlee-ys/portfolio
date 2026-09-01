@@ -299,12 +299,21 @@ import SiteNav from '../../components/SiteNav.astro';
           what the writeback actually writes.</p>
         <p class="ex-note">The frozen contract for this seam requires a provider
           change and a coordinated consumer update together. The classifier
-          shipped <code>region</code>, and that update did not happen. No build
-          went red, because each repo's &ldquo;contract test&rdquo; asserts
-          against its own copy of the shape rather than a shared one. Nothing
-          broke here, and nothing would have noticed if it had. The
+          shipped <code>region</code>, and that update did not land with it. No
+          build went red, because each repo's &ldquo;contract test&rdquo;
+          asserted against its own copy of the shape rather than a shared one.
+          Nothing broke here, and nothing would have noticed if it had. The
           <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-004-classify-http-contract.md">SYS-004 amendment</a>
           records it.</p>
+        <p class="ex-note"><strong>That gap is closed.</strong>
+          <a href="https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-018-provider-owned-contract-artifacts.md">SYS-018</a>
+          landed on 2026-07-18. The classifier now publishes
+          <code>contracts/classify-response.schema.json</code>, generated from
+          its live response model, and this consumer fetches that file in CI
+          and fails when its own field set diverges. A fetch failure still
+          warns and exits 0, so a provider outage reads as a pass.
+          <a href="the-system.html#decision-contracts">The full decision
+          &rarr;</a></p>
 
         <!-- tsr1-hygiene (ADR-013). The page's own point, and nothing showed it
              until now: this consumer tolerates an unknown field, and tolerance
