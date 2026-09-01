@@ -203,6 +203,7 @@ const PROBE = () => {
 
     const { measured, empty } = await page.evaluate(PROBE);
     empties += empty;
+    console.log(`TALLY ${rel} ${measured.length}`);
 
     for (const t of measured) {
       checked++;
