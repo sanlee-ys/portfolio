@@ -371,11 +371,11 @@ const pwCommit = dncPower.sha.slice(0, 7);
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
       <ul>
+        <li><strong>Result and evidence:</strong> The shipped single-call classifier scores 94.4% category, 98.1% domain, and 94.4% region accuracy on the current gold. The gate declined three more complex approaches, and the simpler path stayed.</li>
         <li><strong>Problem:</strong> Classify public defense news across category, operational domain, and region. A convincing demo is not proof of quality.</li>
         <li><strong>Ownership:</strong> I built the <Term id="classification">classifier</Term> and the eval harness. I labeled the <Term id="gold-set">gold set</Term>, defined the merge gate, and made the ship-or-cut decisions.</li>
         <li><strong>Constraints:</strong> The initial 300-row synthetic set graded model-written examples. The replacement human-labeled set had only 54 rows. Small apparent gains could therefore be noise.</li>
         <li><strong>Actions:</strong> I replaced the synthetic eval with real text and I tested a classical <Term id="baseline">baseline</Term>. I scaled a corroborating run to 300 examples. I measured retrieval, premium routing, and multi-agent review against held-out evidence.</li>
-        <li><strong>Result and evidence:</strong> The shipped single-call classifier scores 94.4% category, 98.1% domain, and 94.4% region accuracy on the current gold. The gate declined three more complex approaches, and the simpler path stayed.</li>
       </ul>
     </div>
 
