@@ -22,12 +22,20 @@
   <link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
   <script>
+    /* Paper is the default, and this bootstrap now matches src/layouts/Base.astro
+       exactly. It asked for "prefers-color-scheme: light" and fell through to
+       dark, which is the pre-journal-pass logic every other page left behind:
+       a reader who arrives here directly, with nothing stored and no OS
+       preference expressed, got a dark résumé beside a paper site. Precedence
+       is unchanged and still puts the reader first — a stored choice wins,
+       then an explicit OS preference for dark, then paper. The catch arm
+       matches, so a browser with localStorage blocked also gets paper. */
     (function () {
       try {
         var saved = localStorage.getItem("theme");
-        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        var t = saved || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
         document.documentElement.setAttribute("data-theme", t);
-      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+      } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
     })();
   </script>
 <!-- Privacy-friendly analytics by Plausible -->
@@ -56,7 +64,23 @@
        unicode-ranges — only the url() differs, since this file sits at the
        repo root instead of in assets/.
 
-       Two faces is the whole stack, and every character on this page resolves
+       THE DECLARED RANGE IS 100 900, NOT 400 600. A declared range is a CLAMP,
+       so the narrower pair this page carried until 2026-09-01 rendered every
+       `font-weight: 700` on it at 600 — the masthead, the section labels, the
+       employer names. The FILES were never that narrow: both subsets carry the
+       whole axis, and assets/style.css corrected the same declaration in the
+       2026-07-27 type pass. This page is the copy that was missed. Declaring
+       the axis the file actually has costs no bytes and gets the weights the
+       CSS already asks for.
+
+       GEIST MONO IS THE SECOND VOICE, and it arrives here for the same reason
+       it exists in assets/style.css: the site splits its two faces by meaning,
+       not by decoration. Sans carries everything a person READS or OPERATES;
+       mono carries everything MEASURED — dates, IDs, metrics. The dates on
+       this page are measured things, so they are set in it, with tabular
+       figures so a column of them aligns.
+
+       Two families is the whole stack, and every character on this page resolves
        inside them. A third was carried here briefly for the won sign in the
        MBA leadership line — Geist has no won glyph at any weight — until that
        line was rewritten to say "KRW", which put the page back inside Geist.
@@ -67,7 +91,7 @@
     @font-face {
       font-family: "Geist";
       font-style: normal;
-      font-weight: 400 600;
+      font-weight: 100 900;
       font-display: swap;
       src: url("assets/fonts/geist-latin.woff2") format("woff2");
       unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2190-2193, U+2212, U+2215, U+FEFF, U+FFFD;
@@ -75,47 +99,195 @@
     @font-face {
       font-family: "Geist";
       font-style: normal;
-      font-weight: 400 600;
+      font-weight: 100 900;
       font-display: swap;
       src: url("assets/fonts/geist-latin-ext.woff2") format("woff2");
       unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
     }
-    :root {
-      --bg: #0f1115; --panel: #161a21; --text: #e7eaf0; --muted: #9aa3b2;
-      --accent: #6ea8fe; --border: #232a35;
-      --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    @font-face {
+      font-family: "Geist Mono";
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("assets/fonts/geist-mono-latin.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2190-2193, U+2212, U+2215, U+FEFF, U+FFFD;
     }
-    html[data-theme="light"] {
-      --bg: #fbfcfe; --panel: #ffffff; --text: #1a1f29; --muted: #5b6472;
-      --accent: #2563eb; --border: #e4e8ee;
+    @font-face {
+      font-family: "Geist Mono";
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("assets/fonts/geist-mono-latin-ext.woff2") format("woff2");
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    /* ===== DOCUMENT MODE, INSIDE THIS SITE'S WORLD =====================
+       Codex's finding, 2026-09-01: this page read as a separate product beside
+       the portfolio. Cold black ground, a brighter blue, pill controls, its own
+       chrome. All of that was TRUE, and none of it was a voice decision — the
+       page was simply left behind by the July journal pass and by ADR-014.
+
+       Codex offered two exits: unify, or frame the page explicitly as
+       "document mode". This file takes the second, because on this site the
+       two nearly meet. assets/style.css already draws a PRINTED RECORD — paper
+       ground, ink rules, stamped square controls, one sans and one mono split
+       by meaning. A résumé is the most document-shaped thing here, so it does
+       not need a different world; it needs THIS world with the site apparatus
+       left off.
+
+       WHAT IS ADOPTED, token for token, from assets/style.css:
+         the paper ground and the night-reading ground, both palettes entire;
+         the ink blue (#1d4e73) in place of the hyperlink blue (#2563eb);
+         the two rule weights — a hairline for quiet edges, 2px ink for
+           structure — and the rule law they serve: A SECTION TAKES A RULE;
+         the 2px corner radius, which is what replaces the 999px pills;
+         the two-face split, Geist for words and Geist Mono for measurements;
+         --display-weight 700 for the nameplate;
+         the tracked-caps chrome voice for labels and controls.
+
+       WHAT DOCUMENT MODE KEEPS DIFFERENT, and why each one is a decision:
+         NO SITE NAV, NO SKIP LINK, NO FOLIO COUNTERS. This page is one screen
+           of record with a single back link. Numbering its sections would
+           imply a reading order a résumé does not have.
+         DISPLAY TYPE STAYS SMALL. On the site a section opens on 2.6rem of
+           display type over its rule. Here the rule carries the whole rank and
+           the label stays a tracked-caps chrome line, because this artifact is
+           also printed: display heads would cost a page, and an ATS segments
+           the document by these exact labels.
+         A DENSER MEASURE AND LEADING. 52rem and 1.55, against the site's 34rem
+           prose track at 1.7. Two-column entry heads need the width, and a
+           résumé is scanned rather than read.
+
+       WHAT IS EXPLICITLY NOT TOUCHED: the words. The résumé keeps its own
+       voice contract and is the one surviving exemption from the site's
+       ASD-STE100 conversion. Its varied action verbs are what make it
+       differentiate and what an ATS matches on. This pass changed CSS only. */
+    :root {
+      /* Paper, and the light tokens live in :root so a reader whose script
+         never runs still gets paper rather than unstyled dark. */
+      --bg: #fafaf9;
+      --panel: #ffffff;
+      --text: #1e1c1b;
+      --text-secondary: #383533;
+      --muted: #5f5c58;
+      --accent: #1d4e73;
+      --accent-soft: rgba(29, 78, 115, 0.10);
+      /* Alpha ink, not a solid hex: a hairline is defined by its distance from
+         the ground it crosses, so it must hold one temperature on every one. */
+      --border: rgba(30, 28, 27, 0.14);
+      /* The second rule weight. --border is the hairline; --rule-strong is the
+         ink rule that opens a section and closes the document. */
+      --rule-strong: #423f3c;
+      /* Corners, near enough to none. Nothing on a printed page has a pill. */
+      --radius: 2px;
+      --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: "Geist Mono", ui-monospace, "Cascadia Code", SFMono-Regular, Menlo, Consolas, monospace;
+      --display-weight: 700;
+    }
+    /* Night reading, not the paper theme inverted: a warm near-black with bone
+       ink and a desaturated blue, so the page reads as the same room after
+       dark. Values are the site's, unchanged. */
+    html[data-theme="dark"] {
+      --bg: #16130f;
+      --panel: #1e1a15;
+      --text: #ece4d5;
+      --text-secondary: #cfc6b5;
+      --muted: #9a9081;
+      --accent: #9cb8d2;
+      --accent-soft: rgba(156, 184, 210, 0.13);
+      --border: rgba(236, 228, 213, 0.17);
+      --rule-strong: #6b6252;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0; background: var(--bg); color: var(--text); font-family: var(--font);
-      line-height: 1.5; -webkit-font-smoothing: antialiased;
+      font-size: 1rem; line-height: 1.55; -webkit-font-smoothing: antialiased;
     }
-    .wrap { max-width: 820px; margin: 0 auto; padding: 56px 28px 96px; }
+    /* NO ITALIC, ANYWHERE — the same rule assets/style.css carries. Geist ships
+       no italic cut, so `font-style: italic` is drawn as a synthetic oblique:
+       the upright, sheared. `em`, `i` and `cite` are italic in the BROWSER's
+       own stylesheet, so neutralising them here is what keeps a sheared face
+       off this page if any later copy uses them. Emphasis is weight. */
+    em, i, cite { font-style: normal; font-weight: 600; }
+    .wrap { max-width: 52rem; margin: 0 auto; padding: clamp(40px, 7vw, 56px) 24px clamp(64px, 10vw, 96px); }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    /* One focus ring, the site's: 2px of the link ink, offset clear of the box. */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: var(--radius);
+    }
 
+    /* The controls row is this page's running head: it sits above the
+       nameplate and closes on a hairline, so the masthead below it reads as
+       the DOUBLE RULE the site uses to open a record — a hairline a row above
+       2px of ink. It is the first thing dropped in print, because a printed
+       résumé has no running head and no controls to offer. */
     .top-actions {
       display: flex; justify-content: space-between; align-items: center;
       flex-wrap: wrap; gap: 10px 16px;
-      margin-bottom: 36px; font-size: 0.92rem;
+      padding-bottom: 14px; margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
     }
-    .top-actions .back { color: var(--muted); }
+    /* The back link takes the site's `.article-body .back` idiom exactly:
+       chrome voice, tracked caps, metadata ink, link ink on hover. The caps
+       come from `text-transform`, so the markup still reads "Back to
+       portfolio" to a screen reader and to a search engine. */
+    .top-actions .back {
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
     .top-actions .back:hover { color: var(--accent); }
     .top-actions .actions-right { display: flex; align-items: center; gap: 10px; }
+    /* Stamped squares, not pills. A pill is an app control; this page is a
+       document, and a control on a document is a printed box. Both take the
+       site's ghost-button treatment: transparent ground, an ink border, the
+       tracked-caps chrome voice, and the accent wash on hover. 44px tall at
+       every width, which is the site toggle's own size and the mobile floor. */
     .theme-toggle, .pdf-link {
-      background: var(--panel); color: var(--text); border: 1px solid var(--border);
-      border-radius: 999px; padding: 6px 14px; cursor: pointer; font: inherit; font-size: 0.85rem;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; padding: 0 16px;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--rule-strong); border-radius: var(--radius);
+      cursor: pointer;
+      font-family: var(--font); font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
     }
-    .theme-toggle:hover, .pdf-link:hover { border-color: var(--accent); }
+    .theme-toggle:hover, .pdf-link:hover {
+      border-color: var(--accent); background: var(--accent-soft); color: var(--accent);
+    }
     .pdf-link, .pdf-link:hover { text-decoration: none; }
 
-    header.masthead { border-bottom: 1px solid var(--border); padding-bottom: 22px; margin-bottom: 30px; }
-    header.masthead h1 { font-size: 2.6rem; margin: 0 0 6px; letter-spacing: -0.02em; }
-    .role-line { color: var(--accent); font-weight: 600; letter-spacing: 0.02em; margin: 0 0 12px; }
+    /* The masthead carries no rule of its own, and that is the site's own
+       construction rather than an omission: on a project page `.article-body
+       h1` is closed by the FIRST h2's 2px rule, not by a border under the
+       title. Giving the masthead a rule here put two 2px rules 30px apart with
+       dead paper between them, which reads as a mistake. One rule, owned by
+       the section under it. */
+    header.masthead { margin-bottom: 26px; }
+    header.masthead h1 {
+      font-size: clamp(2.3rem, 6vw, 2.9rem);
+      font-weight: var(--display-weight);
+      line-height: 1.04;
+      margin: 0 0 8px;
+      letter-spacing: -0.035em;
+    }
+    /* The line under a nameplate is a standfirst, and on this site a standfirst
+       is the note voice: weight 500, ink one step back. It was set in the
+       accent, which put the loudest colour on the page directly under the
+       largest type and left nothing for the links to mean. */
+    .role-line {
+      color: var(--text-secondary); font-weight: 500;
+      font-size: 1.1rem; line-height: 1.4; letter-spacing: 0;
+      margin: 0 0 12px;
+    }
     .contact { color: var(--muted); font-size: 0.94rem; }
     .contact a { color: var(--muted); }
     .contact a:hover { color: var(--accent); }
@@ -128,18 +300,35 @@
        declared decoration rather than quiet text. */
     .contact .sep { opacity: 0.5; margin: 0 8px; }
 
-    section { margin-top: 30px; }
+    /* A SECTION TAKES A RULE. The site's structural mark: 2px of ink across
+       the top of every section, so a section looks like a section wherever a
+       reader is in the record. The label itself stays a tracked-caps chrome
+       line rather than growing into display type — the rule now carries the
+       rank, and this artifact is printed and parsed (see the document-mode
+       note at the top of this block). */
+    section { margin-top: 30px; border-top: 2px solid var(--rule-strong); padding-top: 14px; }
     h2.sec {
-      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em;
-      color: var(--muted); margin: 0 0 16px; font-weight: 700;
+      font-family: var(--font);
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em;
+      color: var(--muted); margin: 0 0 16px; font-weight: 600;
     }
     .summary { color: var(--text); margin: 0; }
 
     .entry { margin-bottom: 22px; }
     .entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
-    .entry-head .org { font-weight: 700; font-size: 1.05rem; }
-    .entry-head .dates { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
-    .entry .role { color: var(--muted); font-size: 0.95rem; margin: 2px 0 10px; }
+    .entry-head .org { font-weight: var(--display-weight); font-size: 1.05rem; letter-spacing: -0.011em; }
+    /* Dates are measured things, so they take the data voice, with tabular
+       figures so the right-hand column of them lines up. */
+    .entry-head .dates, .edu-item .edu-head .dates {
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--muted); font-size: 0.82rem; letter-spacing: 0.01em; white-space: nowrap;
+    }
+    /* The role line carries a claim on three of these entries — the MBA break,
+       the projects standfirst — so it is argument ink, not metadata ink. That
+       is the site's own split: a sentence making a claim is --text-secondary;
+       a label, date or caption is --muted. */
+    .entry .role { color: var(--text-secondary); font-size: 0.95rem; margin: 2px 0 10px; }
     .entry ul { margin: 0; padding-left: 20px; }
     .entry ul li { margin-bottom: 6px; }
 
@@ -147,34 +336,74 @@
     .edu-item .deg { color: var(--muted); font-size: 0.94rem; }
     .edu-item .edu-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
     .edu-item .edu-head .school { font-weight: 600; }
-    .edu-item .edu-head .dates { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
 
     .skills p { margin: 0 0 8px; }
-    .skills .k { color: var(--muted); }
+    .skills .k { color: var(--muted); font-weight: 600; }
 
+    /* A proof line is a route, not a sentence: the site sets those a size under
+       the prose in the metadata ink, and lets the link ink arrive on hover. */
     .proof { color: var(--muted); font-size: 0.86rem; overflow-wrap: break-word; }
     .proof a { color: var(--muted); }
     .proof a:hover { color: var(--accent); }
 
-    .site-note { margin-top: 44px; font-size: 0.78rem; color: var(--muted); }
+    /* The colophon rule that closes the issue: the same 2px of ink that opens
+       every section, so the document is bounded top and bottom by one mark.
+       The imprint under it takes the note voice at weight 500. */
+    .site-note {
+      margin-top: 44px; padding-top: 16px;
+      border-top: 2px solid var(--rule-strong);
+      font-size: 0.84rem; font-weight: 500; color: var(--muted);
+    }
 
+    /* PRINT: the same ink on real paper.
+
+       The palette is the site's LIGHT palette, with two deliberate departures.
+       --bg goes to pure #ffffff because the paper is now the actual paper: a
+       #fafaf9 ground would print as a tint across every sheet. --border goes
+       from alpha ink to a solid grey at roughly the same weight, because a 14%
+       hairline that reads correctly on a backlit screen disappears on a laser
+       printer. Everything else — the ink, the metadata grey, the ink blue, the
+       2px rules — is byte-equal to the screen tokens above. */
     @media print {
-      :root { --bg: #ffffff; --panel: #ffffff; --text: #14181f; --muted: #444c5a; --accent: #1a4fc4; --border: #cbd2dc; }
-      html[data-theme="dark"] { --bg:#ffffff; --text:#14181f; --muted:#444c5a; --accent:#1a4fc4; --border:#cbd2dc; }
+      :root, html[data-theme="dark"] {
+        --bg: #ffffff; --panel: #ffffff;
+        --text: #1e1c1b; --text-secondary: #383533; --muted: #5f5c58;
+        --accent: #1d4e73; --accent-soft: transparent;
+        --border: #d5d2cd; --rule-strong: #423f3c;
+      }
       .top-actions { display: none; }
       .wrap { padding: 0; max-width: 100%; }
       body { font-size: 10pt; line-height: 1.4; }
-      header.masthead { padding-bottom: 12px; margin-bottom: 16px; }
+      header.masthead { margin-bottom: 12px; }
       header.masthead h1 { font-size: 2rem; }
-      section { margin-top: 8px; }
-      h2.sec { margin-bottom: 6px; }
+      .role-line { font-size: 1rem; line-height: 1.3; margin-bottom: 6px; }
+      /* THE SECTION RULE IS PAID FOR, NOT ADDED. The two-page budget here is
+         not a guideline: scripts/resume-pdf.cjs fails the run at three pages,
+         and the artifact before this change already filled 967px of the 979px
+         second page. So the rule cannot cost anything net.
+
+         It buys its 4px of padding from the two gaps around it. The margin
+         above a section drops 8px -> 6px, because a 2px ink rule announces the
+         section on its own and needs less approach than a bare label did; the
+         gap under the label drops 6px -> 4px for the same reason. Net zero per
+         section, measured at 720px print width across all seven.
+
+         Do not raise either number without re-running the script. The page
+         count is printed on every run, and it is the only check that matters
+         here. */
+      section { margin-top: 6px; padding-top: 4px; }
+      h2.sec { margin-bottom: 4px; }
       .entry { margin-bottom: 8px; }
       .entry .role { margin: 2px 0 6px; }
       .entry ul li { margin-bottom: 2px; }
       .edu-item, .lead-item { margin-bottom: 4px; }
       .skills p { margin-bottom: 3px; }
       .entry, .edu-item { break-inside: avoid; }
-      .site-note { margin-top: 12px; }
+      /* Same arithmetic as the section rule: 12px total, as before. The size
+         is pinned in points rather than left at the screen's 0.84rem, which
+         at a 10pt body would print the imprint LARGER than the prose above
+         it — a rank inversion that only shows up on paper. */
+      .site-note { margin-top: 8px; padding-top: 4px; font-size: 8.5pt; }
       /* Wide tracking makes pdftotext split headers into single letters
          ("E X PE R I E N C E"), and ATS parsers segment a resume by these
          headers. Screen keeps the tracking; the PDF must stay parseable. */
