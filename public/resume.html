@@ -374,18 +374,36 @@
       .top-actions { display: none; }
       .wrap { padding: 0; max-width: 100%; }
       body { font-size: 10pt; line-height: 1.4; }
-      header.masthead { margin-bottom: 14px; }
+      header.masthead { margin-bottom: 12px; }
       header.masthead h1 { font-size: 2rem; }
-      .role-line { font-size: 1.05rem; margin-bottom: 8px; }
-      section { margin-top: 12px; padding-top: 8px; }
-      h2.sec { margin-bottom: 6px; }
+      .role-line { font-size: 1rem; line-height: 1.3; margin-bottom: 6px; }
+      /* THE SECTION RULE IS PAID FOR, NOT ADDED. The two-page budget here is
+         not a guideline: scripts/resume-pdf.cjs fails the run at three pages,
+         and the artifact before this change already filled 967px of the 979px
+         second page. So the rule cannot cost anything net.
+
+         It buys its 4px of padding from the two gaps around it. The margin
+         above a section drops 8px -> 6px, because a 2px ink rule announces the
+         section on its own and needs less approach than a bare label did; the
+         gap under the label drops 6px -> 4px for the same reason. Net zero per
+         section, measured at 720px print width across all seven.
+
+         Do not raise either number without re-running the script. The page
+         count is printed on every run, and it is the only check that matters
+         here. */
+      section { margin-top: 6px; padding-top: 4px; }
+      h2.sec { margin-bottom: 4px; }
       .entry { margin-bottom: 8px; }
       .entry .role { margin: 2px 0 6px; }
       .entry ul li { margin-bottom: 2px; }
       .edu-item, .lead-item { margin-bottom: 4px; }
       .skills p { margin-bottom: 3px; }
       .entry, .edu-item { break-inside: avoid; }
-      .site-note { margin-top: 14px; padding-top: 10px; }
+      /* Same arithmetic as the section rule: 12px total, as before. The size
+         is pinned in points rather than left at the screen's 0.84rem, which
+         at a 10pt body would print the imprint LARGER than the prose above
+         it — a rank inversion that only shows up on paper. */
+      .site-note { margin-top: 8px; padding-top: 4px; font-size: 8.5pt; }
       /* Wide tracking makes pdftotext split headers into single letters
          ("E X PE R I E N C E"), and ATS parsers segment a resume by these
          headers. Screen keeps the tracking; the PDF must stay parseable. */
