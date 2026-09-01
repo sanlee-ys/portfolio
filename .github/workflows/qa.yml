@@ -222,3 +222,32 @@ jobs:
       # after the Playwright step, because it spawns the gate.
       - name: Hit-target gate (adversarial suite)
         run: node --test scripts/hit-target.test.cjs
+
+      # No SVG text may render under 9px at 320px (CLAUDE.md, "The microtext
+      # floor"; ADR-014 section 5). This was a rule with no gate until
+      # 2026-09-01, on the recorded ground that no gate could check it — a fact
+      # about contrast-check, which skips SVG text, and not about gates.
+      #
+      # It measures the plate scale with getScreenCTM() rather than a viewBox
+      # ratio, so a transform above the text node and a letterboxing
+      # preserveAspectRatio both count. It renders rather than reading source,
+      # which is the half that matters most: diagram.js rewrites the system
+      # map's viewBox at phone widths, so the attribute in the markup is not the
+      # one the browser uses. A source-reading measurement of that plate
+      # reported 4.08px where the reader gets 12.98px, and proposed repairs to a
+      # correct figure.
+      - name: Microtext floor (no SVG text under 9px at 320px)
+        run: node scripts/microtext-floor.cjs
+        env:
+          SITE_ROOT: dist
+
+      # The gate's own adversarial suite. It drives each way the gate must fail
+      # — a short label, a legible declared size under a sub-1 scale, a
+      # runtime-shrunk plate, a transform, a letterboxed plate, a build with no
+      # SVG text, an empty walk — and each way it must not, including an empty
+      # text node and a plate sitting exactly on the floor. It also records a
+      # mutation result: swapping the CTM for an in-page width ratio reddens the
+      # two blind-spot tests and leaves the runtime-rewrite tests green, so the
+      # suite states which choice each test actually proves.
+      - name: Microtext floor gate (adversarial suite)
+        run: node --test scripts/microtext-floor.test.cjs

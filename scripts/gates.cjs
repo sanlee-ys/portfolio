@@ -142,16 +142,17 @@ function runSiteGate(label, script) {
 /*
  * Ordered cheapest-first, which is also build-independent-first. The nine checks
  * above the line need no `dist/`, no browser and no network, and finish in
- * seconds; the eleven below either walk the built site or launch a browser —
+ * seconds; the thirteen below either walk the built site or launch a browser —
  * contrast-check renders every page in both themes, mobile-qa renders 64
  * page-widths, hit-target hit-tests every control at 1280 and at
- * 320/360/390/430px. A missing ADR section should redden in two seconds, not
- * after a full render pass.
+ * 320/360/390/430px, microtext-floor measures every SVG text node at 320px. A
+ * missing ADR section should redden in two seconds, not after a full render
+ * pass.
  *
- * The hit-target SUITE sits at the bottom with the browser work rather than up
- * with the other `node --test` suites: it spawns the gate, which launches
- * Chromium, so it is not one of the cheap build-independent checks even though
- * it never reads `dist/`.
+ * The hit-target and microtext-floor SUITES sit at the bottom with the browser
+ * work rather than up with the other `node --test` suites: each spawns its
+ * gate, which launches Chromium, so neither is one of the cheap
+ * build-independent checks even though neither reads `dist/`.
  */
 const CHECKS = [
   {
@@ -259,9 +260,26 @@ const CHECKS = [
     run: () => runSiteGate('hit-target', 'scripts/hit-target.cjs'),
   },
   {
+    // The microtext floor was a rule with no gate until 2026-09-01, on the
+    // recorded ground that no gate could check it. That ground was a fact about
+    // contrast-check, which skips SVG text, and not about gates. A rendered
+    // font size is laid-out geometry, and two gates above already measure that.
+    label: 'microtext floor (no SVG text under 9px at 320px, rendered)',
+    needsSite: true,
+    run: () => runSiteGate('microtext-floor', 'scripts/microtext-floor.cjs'),
+  },
+  {
     label: 'hit-target gate (adversarial suite)',
     needsSite: false,
     run: () => runNodeTest('hit-target suite', ['scripts/hit-target.test.cjs']),
+  },
+  {
+    // Down here with the browser work, and not up with the cheap nine, for the
+    // reason the hit-target suite is: it spawns the gate, which launches
+    // Chromium. `needsSite` is false because it builds its own fixtures.
+    label: 'microtext floor gate (adversarial suite)',
+    needsSite: false,
+    run: () => runNodeTest('microtext-floor suite', ['scripts/microtext-floor.test.cjs']),
   },
 ];
 
