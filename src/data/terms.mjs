@@ -39,7 +39,7 @@ export const terms = {
   contract: {
     label: 'Contract seam',
     short:
-      'The boundary where one service depends on another through a stable request/response shape. A real contract test needs a single shared artifact both sides check against.',
+      'The boundary where one service depends on another through a stable request/response shape. A real contract test needs a single shared artifact both sides check against. Mine did not have one until an audit proved it.',
   },
   eval: {
     label: 'Eval / eval harness',
