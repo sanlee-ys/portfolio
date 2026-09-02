@@ -97,7 +97,9 @@ at 320px, and no gate fails on it.
 ## Consequences
 
 - The homepage skip link lands on the flagship block rather than on the router.
-  The target is still work content, so the link keeps its meaning.
+  The target is still work content, so the link keeps its meaning. Amended
+  2026-09-02: the skip link now lands on the proof band, above the flagship,
+  so a keyboard or screen-reader user does not miss the band.
 - The two halves ship as two changes. The page, the capacity-gate section, the
   generator, both checks and this record land first; the homepage block lands
   after, because it links to a page that must exist before the link gate runs.
