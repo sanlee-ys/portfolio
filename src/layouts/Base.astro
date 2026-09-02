@@ -24,9 +24,10 @@ const {
   ogImage = '/assets/og-cover.png',
   social = canonical != null,
   // Where the skip link lands. Every page's <main> carries `id="main"` except
-  // the homepage, whose <main> has been `id="work"` since before this existed
-  // and is deep-linked as `index.html#work` from the glossary — renaming it
-  // would 404 those anchors, so the homepage overrides the target instead.
+  // the homepage. Its <main> has been `id="work"` since before this existed
+  // and the glossary deep-links it as `index.html#work`, so that id stays.
+  // The homepage overrides the target with `#proof`, the proof band above
+  // <main>, so a keyboard or screen-reader user who skips does not miss it.
   skipTo = '#main',
 } = Astro.props;
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${ogImage}`;

@@ -8,7 +8,7 @@ import SiteNav from '../components/SiteNav.astro';
   canonical="https://sanlee.me/"
   ogType="website"
   ogDescription="Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery."
-  skipTo="#work"
+  skipTo="#proof"
 >
   <Fragment slot="head">
   <script is:inline type="application/ld+json">
@@ -138,7 +138,7 @@ import SiteNav from '../components/SiteNav.astro';
   <SiteNav />
 
 
-  <div class="wrap proof-band">
+  <div class="wrap proof-band" id="proof" tabindex="-1">
     <p class="log-intro band-intro">Calls that shipped, and calls that were reversed.</p>
     <ul class="proof" aria-label="What the record shows">
       <li data-outcome="reversal"><a href="#decision-grounding"><span class="sr-only">Reversed. </span><span class="proof-claim">Added retrieval grounding, cut it</span> <strong>fixed 0, broke 4</strong></a></li>
