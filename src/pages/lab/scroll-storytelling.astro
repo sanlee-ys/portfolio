@@ -17,7 +17,7 @@ import SiteNav from '../../components/SiteNav.astro';
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 40px;
-      max-width: var(--maxw);
+      max-width: calc(var(--content) + var(--gutter) * 2);
       margin: 0 auto;
       padding: 0 24px 30vh;
     }
@@ -56,7 +56,7 @@ import SiteNav from '../../components/SiteNav.astro';
 
     /* 2) SCROLL-SCRUBBED REVEALS: each block animates as it ENTERS the viewport,
        scrubbed by scroll position (animation-timeline: view()), no JS. */
-    .scrub-section { max-width: var(--maxw); margin: 0 auto; padding: 20vh 24px; }
+    .scrub-section { max-width: calc(var(--content) + var(--gutter) * 2); margin: 0 auto; padding: 20vh 24px; }
     .scrub-item {
       padding: 30px;
       margin-bottom: 18px;
