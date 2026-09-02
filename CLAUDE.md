@@ -31,14 +31,14 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all twenty checks:
+runs all twenty-two checks:
 
 ```
 npm run qa
 ```
 
 **The runner prints the count, so do not take the number above on trust.** It
-opens with `gates: running 20 checks.` and closes with `OK - all 20 of 20 QA
+opens with `gates: running 22 checks.` and closes with `OK - all 22 of 22 QA
 checks ran and passed.` The loop exits at the first non-zero, so the closing
 line is the proof that every check ran. **An unrun gate is not a pass.**
 
@@ -50,14 +50,15 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Nine of the twenty need no build, no browser and no network — eight
+Nine of the twenty-two need no build, no browser and no network — eight
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The eleven that walk the built site or launch a browser run after,
-slowest last. (`hit-target.test.cjs` is a `node --test` suite but is **not**
-one of the cheap nine: it spawns the gate, which launches Chromium, so it sits
-at the bottom with the browser work.)
+seconds. The thirteen that walk the built site or launch a browser run after,
+slowest last. (`hit-target.test.cjs` and `microtext-floor.test.cjs` are
+`node --test` suites but are **not** among the cheap nine: each spawns its
+gate, which launches Chromium, so both sit at the bottom with the browser
+work.)
 
-`npm run gates` runs the same twenty against an existing `dist/` without
+`npm run gates` runs the same twenty-two against an existing `dist/` without
 rebuilding, and the build-independent nine still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
@@ -415,10 +416,13 @@ width.
 
 Three decisions this rule records, and the reason for each:
 
-- **The floor is a rule because no gate can be one.** `contrast-check.cjs`
-  skips every node inside an `<svg>`, so a plate nobody can read passes all
-  twenty checks. On plate text the writer is the only control, and a rule is
-  what a writer can follow.
+- **The floor is a rule AND a gate, since 2026-09-01.** This bullet used to
+  read "a rule because no gate can be one", and the reason it gave was that
+  `contrast-check.cjs` skips every node inside an `<svg>`. That is a fact about
+  the contrast gate. It is not a fact about gates. A rendered font size is
+  laid-out geometry, and this repo already measures laid-out geometry twice.
+  `scripts/microtext-floor.cjs` measures it. The rule still binds the writer,
+  because a rule is what a writer follows before a gate runs.
 - **Raise the declared units. Do not scale the plate.** A plate that grows only
   under a phone breakpoint renders its text smaller again above that
   breakpoint, which is the opposite of a floor. At 1:1 a declared 9px is a
@@ -433,11 +437,39 @@ viewBox under `max-width: 260px` renders at scale 1.000 down to 320px. **Break
 that discipline and you owe a measurement**, because the scale then decides the
 answer. Measure with the same pinned Playwright the gates use.
 
-**Measured state, 2026-08-31, so a later reader can weigh this section.**
-**The floor is met site-wide.** Measured with the pinned Playwright over the
-built site at a 320px viewport: 400 `<svg>` `<text>` nodes across 22 pages,
-none skipped, zero under 9px, and the smallest rendered size on the site is
-9.00px (`projects/the-system.html`).
+**Measured state, 2026-09-01, so a later reader can weigh this section.**
+**The floor is met site-wide**, and the gate now holds it. Measured with the
+pinned Playwright over the built site at a 320px viewport: 410 `<svg>` `<text>`
+nodes across 22 pages, none skipped, zero under 9px, and the smallest rendered
+size on the site is 9.00px (`projects/the-system.html`).
+
+```
+npm run build && SITE_ROOT=dist node scripts/microtext-floor.cjs
+```
+
+This re-verifies the 2026-08-31 sweep, which reported the same result over 400
+nodes. **The result stood. The recorded METHOD is the part that needed the
+correction**, and the difference is the reason the gate exists.
+
+That method was "the rendered CSS width over the viewBox width". It is correct
+for a static plate, and a person can do it by hand. It has two costs. It reads
+a viewBox, so it invites a source read, and this site has one plate whose
+viewBox is not what the source says. It also ignores a `transform` above the
+text node and a letterboxing `preserveAspectRatio`, which both shrink text that
+the ratio calls legible.
+
+**A source read of the system map produced a false failure on 2026-09-01.** It
+reported the map's labels at 4.08px and 5.10px and proposed repairs to a
+correct figure. `diagram.js` rewrites that plate's viewBox from `0 0 800 430`
+to `0 45 440 470` at phone widths, and it solves each label's declared unit
+against the measured scale. The measurement took the viewBox and the font sizes
+from the source, so it divided 272 by 800 for a scale of 0.34, and multiplied it
+by the desktop constants 12 and 15. Both halves were stale in the same
+direction. The reader gets 12.98px and 15.02px.
+
+**So measure a rendered page, never a source file.** The gate uses
+`getScreenCTM()`, which composes the live viewBox, every ancestor transform, and
+`preserveAspectRatio` in one step.
 
 That closes the sweep this section used to call outstanding. On 2026-08-30 it
 was 27 class groups and 93 text nodes under the floor, most at 8px, with
@@ -451,10 +483,12 @@ at 1:1 now and its labels render at 10px.
 **The floor binds new and edited plates, and it now also binds every existing
 one** — there is no remaining debt to grandfather.
 
-Re-measure it the way this state was measured: build, then walk every
-`svg text` at 320px and compare the computed `font-size` times the plate's
-render scale (rendered CSS width over viewBox width) against 9. There is no
-gate for it on purpose — see the first bullet above.
+**The gate measures at 320px alone, and that is sufficient.** A plate is
+`width: 100%` over a fixed viewBox, so its scale grows with the viewport. A
+plate under a `max-width` cap holds one scale above the cap. The rendered size
+therefore never falls as the viewport widens, so the narrowest viewport is the
+worst case. Measured on 2026-09-01: the site minimum is 9.00px at 320, 360, 390
+and 430 alike.
 
 ## AI-use posture: method, not confession (voice rule)
 
