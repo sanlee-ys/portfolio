@@ -113,6 +113,9 @@ const main = async () => {
     format: 'Letter',
     printBackground: true,
     margin: { top: '0.4in', bottom: '0.4in', left: '0.5in', right: '0.5in' },
+    // Tagged PDF: Chromium writes the structure tree, so a screen reader gets the
+    // heading and list semantics and a reading order. Untagged, it gets bare text.
+    tagged: true,
   });
   await browser.close();
 
