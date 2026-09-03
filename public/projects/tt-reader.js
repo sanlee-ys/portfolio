@@ -11,7 +11,7 @@
  * measured by nothing. The site's known silent failure is a `.tt-frame` that
  * loses on CSS specificity, wraps, shears every column, and turns the mobile
  * gate GREEN, because a wrapped frame cannot overflow. Shipping every frame
- * un-enhanced is what puts all seven inside the overflow gate's single
+ * un-enhanced is what puts all six inside the overflow gate's single
  * measurement. A later change that server-renders one frame reopens that hole in
  * silence, so it is a decision and not an optimisation.
  *
@@ -21,8 +21,8 @@
  * `preventScroll`. Focus follows a navigation the reader asked for, which is the
  * case ADR-010 keeps.
  *
- * WHY `replaceState` AND NOT `pushState`. Stepping through seven frames would
- * otherwise bury the page under seven history entries, and Back would walk them
+ * WHY `replaceState` AND NOT `pushState`. Stepping through six frames would
+ * otherwise bury the page under six history entries, and Back would walk them
  * one at a time instead of leaving the page.
  *
  * WHY THE BUTTONS ARE BUILT HERE. A previous and a next control are useless with
@@ -143,8 +143,8 @@
     status.textContent = 'Frame ' + (index + 1) + ' of ' + figures.length
       + ': ' + label(index) + '.';
 
-    // No history entry: stepping seven frames would otherwise bury the page
-    // under seven of them and Back would walk them one at a time.
+    // No history entry: stepping six frames would otherwise bury the page
+    // under six of them and Back would walk them one at a time.
     if (o.writeHash && window.history && window.history.replaceState) {
       window.history.replaceState(null, '', '#' + keys[index]);
     }
@@ -223,7 +223,7 @@
   // rule that hides every figure without `data-current`. Setting it before the
   // first selection means a throw inside that selection leaves the rule armed
   // with nothing marked current, and the reader renders empty. Setting it after
-  // means any throw leaves all seven frames visible, which is the un-enhanced
+  // means any throw leaves all six frames visible, which is the un-enhanced
   // page and is always correct.
   section.setAttribute('data-enhanced', 'true');
 }());
