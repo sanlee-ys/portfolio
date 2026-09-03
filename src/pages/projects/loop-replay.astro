@@ -296,7 +296,9 @@ import SiteNav from '../../components/SiteNav.astro';
     /* min-width: 0 overrides the flex-item default of min-width: auto, which
        otherwise refuses to shrink a <input type="range"> below its intrinsic
        content size -- the thing that was pushing this row past 320px. */
-    .iter-nav input[type="range"] { flex: 1 1 auto; min-width: 0; accent-color: var(--accent); }
+    /* height: 44px grows the hit area to the tap-target floor; the browser
+       still draws the thin native track centred in that box. */
+    .iter-nav input[type="range"] { flex: 1 1 auto; min-width: 0; height: 44px; margin: 0; background: transparent; accent-color: var(--accent); }
     .iter-nav .iter-label {
       flex: 0 0 auto;
       min-width: 92px;
