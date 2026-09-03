@@ -58,9 +58,9 @@ import SiteNav from '../components/SiteNav.astro';
     }
     .method-plate marker path { fill: var(--muted); }
 
-    /* Flagship block (promoted above the router). Same rule-and-air rhythm as
-       .orientation so the two read as siblings: a promoted entry, then the
-       index. No accent fill and no card: the site's austerity is the
+    /* Flagship block (under the router since 2026-09-03). Same rule-and-air
+       rhythm as .orientation so the two read as siblings: the index, then the
+       flagship entry. No accent fill and no card: the site's austerity is the
        credibility signal, and a banner here would argue against the page's own
        thesis. No opacity on text (ADR-009). */
     .flagship {
@@ -156,12 +156,57 @@ import SiteNav from '../components/SiteNav.astro';
   </div>
 
   <main class="wrap" id="work" tabindex="-1">
-    <!-- Flagship, promoted above the router. Not a fifth door: the router
-         holds four views of one system, and this is the instrument that
-         measures the capacity that built them. Same rule-and-air grammar as
-         .orientation below, so it reads as a promoted entry rather than a
-         banner. Every figure here is marked data-tt and is gated by
-         scripts/check-telltale-evidence.cjs. No number is typed by hand. -->
+    <section class="orientation" aria-label="What this record demonstrates">
+      <p class="kicker">Selected work</p>
+      <p class="orientation-lede">Four views of the work: how I structured the system, measured its decisions, tested a judge, and managed the program. Deeper investigations remain linked throughout the record.</p>
+      <ul class="doors-index" aria-label="Four flagship case studies">
+        <li><a href="projects/the-system.html"><span class="door-name">The System</span><span class="door-why">Architecture, interfaces, and the integration loop</span></a></li>
+        <li><a href="projects/defense-news-classifier.html"><span class="door-name">Classifier</span><span class="door-why">Evaluation, reversals, and evidence-based tradeoffs</span></a></li>
+        <li><a href="projects/faithfulness-judge.html"><span class="door-name">Faithfulness Judge</span><span class="door-why">Can an LLM reliably catch a made-up claim?</span></a></li>
+        <li><a href="projects/product-and-program.html"><span class="door-name">Product &amp; Program</span><span class="door-why">The work read through a TPM lens</span></a></li>
+      </ul>
+      <p class="diagram-more standalone"><a class="card-link" href="projects/classifier-baseline.html#try-it">Run the classifier demo <span class="arrow">&rarr;</span></a></p>
+
+      <!-- How the work is run. Open pipeline, no oxide: this is the method,
+           not a reversal. ADR-010 N/A. A legacy bare plate takes a div
+           wrapper, never a figure (gate law), and a hand-numbered label
+           span (ADR-014, PL-3/PL-4). The caption slots stay empty; the
+           landing program records the owner-copy ask. -->
+      <div class="fig fig--plate">
+      <span class="fig-label">Plate 01</span>
+      <svg class="method-plate" viewBox="0 0 260 72" role="img"
+           aria-label="How the work is run: set the direction, freeze the contracts between the parts, then gate every change on evidence.">
+        <title>Direction, then contracts, then an evidence gate.</title>
+        <defs>
+          <marker id="mp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
+            <path d="M 0 0 L 10 5 L 0 10 z" />
+          </marker>
+        </defs>
+        <rect class="mp-box" x="2" y="6" width="76" height="40" rx="2" />
+        <text class="mp-title" x="40" y="24" text-anchor="middle">Direction</text>
+        <text class="mp-micro" x="40" y="38" text-anchor="middle">set the aim</text>
+        <path class="mp-edge" d="M 78 26 L 90 26" marker-end="url(#mp-arrow)" aria-hidden="true" />
+        <rect class="mp-box" x="92" y="6" width="76" height="40" rx="2" />
+        <text class="mp-title" x="130" y="24" text-anchor="middle">Contracts</text>
+        <text class="mp-micro" x="130" y="38" text-anchor="middle">freeze seams</text>
+        <path class="mp-edge" d="M 168 26 L 180 26" marker-end="url(#mp-arrow)" aria-hidden="true" />
+        <rect class="mp-box" x="182" y="6" width="76" height="40" rx="2" />
+        <text class="mp-title" x="220" y="24" text-anchor="middle">Evidence</text>
+        <text class="mp-micro" x="220" y="38" text-anchor="middle">gate the merge</text>
+        <text class="mp-micro" x="130" y="64" text-anchor="middle">eval gates the merge</text>
+      </svg>
+      </div>
+    </section>
+
+    <!-- Flagship. The router sits above this block since 2026-09-03, on the
+         owner's call after two external reviews (ADR-012, Consequences). Not
+         a fifth door: the router holds four views of one system, and this is
+         the instrument that measures the capacity that built them. Same
+         rule-and-air grammar as .orientation above, so it reads as a promoted
+         entry rather than a banner. Every figure here is marked data-tt and
+         is gated by scripts/check-telltale-evidence.cjs. No number is typed
+         by hand. -->
     <section class="flagship" aria-label="Flagship project">
       <p class="kicker">The instrument</p>
       <h2 class="section-title">telltale</h2>
@@ -215,49 +260,6 @@ import SiteNav from '../components/SiteNav.astro';
       </p>
       <p class="flagship-figure">v0.2.0 &middot; <span data-tt="goldens.total">132</span> golden files &middot; <span data-tt="tests.total">1780</span> test functions</p>
       <p class="diagram-more standalone"><a class="card-link" href="projects/telltale.html">Read the telltale writeup <span class="arrow">&rarr;</span></a></p>
-    </section>
-
-    <section class="orientation" aria-label="What this record demonstrates">
-      <p class="kicker">Selected work</p>
-      <p class="orientation-lede">Four views of the work: how I structured the system, measured its decisions, tested a judge, and managed the program. Deeper investigations remain linked throughout the record.</p>
-      <ul class="doors-index" aria-label="Four flagship case studies">
-        <li><a href="projects/the-system.html"><span class="door-name">The System</span><span class="door-why">Architecture, interfaces, and the integration loop</span></a></li>
-        <li><a href="projects/defense-news-classifier.html"><span class="door-name">Classifier</span><span class="door-why">Evaluation, reversals, and evidence-based tradeoffs</span></a></li>
-        <li><a href="projects/faithfulness-judge.html"><span class="door-name">Faithfulness Judge</span><span class="door-why">Can an LLM reliably catch a made-up claim?</span></a></li>
-        <li><a href="projects/product-and-program.html"><span class="door-name">Product &amp; Program</span><span class="door-why">The work read through a TPM lens</span></a></li>
-      </ul>
-      <p class="diagram-more standalone"><a class="card-link" href="projects/classifier-baseline.html#try-it">Run the classifier demo <span class="arrow">&rarr;</span></a></p>
-
-      <!-- How the work is run. Open pipeline, no oxide: this is the method,
-           not a reversal. ADR-010 N/A. A legacy bare plate takes a div
-           wrapper, never a figure (gate law), and a hand-numbered label
-           span (ADR-014, PL-3/PL-4). The caption slots stay empty; the
-           landing program records the owner-copy ask. -->
-      <div class="fig fig--plate">
-      <span class="fig-label">Plate 01</span>
-      <svg class="method-plate" viewBox="0 0 260 72" role="img"
-           aria-label="How the work is run: set the direction, freeze the contracts between the parts, then gate every change on evidence.">
-        <title>Direction, then contracts, then an evidence gate.</title>
-        <defs>
-          <marker id="mp-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                  markerWidth="6" markerHeight="6" orient="auto" aria-hidden="true">
-            <path d="M 0 0 L 10 5 L 0 10 z" />
-          </marker>
-        </defs>
-        <rect class="mp-box" x="2" y="6" width="76" height="40" rx="2" />
-        <text class="mp-title" x="40" y="24" text-anchor="middle">Direction</text>
-        <text class="mp-micro" x="40" y="38" text-anchor="middle">set the aim</text>
-        <path class="mp-edge" d="M 78 26 L 90 26" marker-end="url(#mp-arrow)" aria-hidden="true" />
-        <rect class="mp-box" x="92" y="6" width="76" height="40" rx="2" />
-        <text class="mp-title" x="130" y="24" text-anchor="middle">Contracts</text>
-        <text class="mp-micro" x="130" y="38" text-anchor="middle">freeze seams</text>
-        <path class="mp-edge" d="M 168 26 L 180 26" marker-end="url(#mp-arrow)" aria-hidden="true" />
-        <rect class="mp-box" x="182" y="6" width="76" height="40" rx="2" />
-        <text class="mp-title" x="220" y="24" text-anchor="middle">Evidence</text>
-        <text class="mp-micro" x="220" y="38" text-anchor="middle">gate the merge</text>
-        <text class="mp-micro" x="130" y="64" text-anchor="middle">eval gates the merge</text>
-      </svg>
-      </div>
     </section>
 
     <h2 class="section-title">The system</h2>
