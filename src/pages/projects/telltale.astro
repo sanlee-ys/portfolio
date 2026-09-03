@@ -23,8 +23,10 @@ import evidence from '../../data/telltale-evidence.json';
  * is a map and its key order is an accident of the puller. The reading order is
  * an argument: a reading, then a marked stale reading, then an absence, then
  * the record's reach, then the gate that spends a quota, then the refusal, and
- * last the phone-native twin. `scripts/pull-telltale-evidence.cjs` owns which
- * frames exist. This page owns the order they are read in.
+ * last the phone-native twin. The reading renders above the lead, before the
+ * ToC, so a phone reader meets it first. The reader section holds the other
+ * six. `scripts/pull-telltale-evidence.cjs` owns which frames exist. This
+ * page owns the order they are read in.
  */
 const src = evidence.source;
 const READER_ORDER = ['usage', 'stale', 'absent', 'record', 'gate', 'floor', 'composer'];
@@ -347,7 +349,7 @@ if (missingFrames.length) {
       padding: 0;
     }
     .tt-reader-rail li { min-width: 0; }
-    /* PL-9: at phone widths the seven labels ride ONE scrolling row.
+    /* PL-9: at phone widths the six labels ride ONE scrolling row.
        style.css declares the same flip, but this island loads after it and
        the base `flex-wrap: wrap` above would win the tie by source order.
        The island owns the rail's structure, so it flips its own declaration.
@@ -400,6 +402,33 @@ if (missingFrames.length) {
       </ul>
     </div>
 
+    <!-- The first recorded frame sits here, before the lead, so a phone
+         reader sees the instrument before the argument. The reader section
+         under #see-it holds the other six. The frame text is interpolated
+         from src/data/telltale-evidence.json, so it carries no typed digit.
+         `.article-body pre.tt-frame` is page-scoped, so the frame keeps its
+         column alignment here. -->
+    <figure class="tt-figure fig" data-fig="frame" id="frame-usage" tabindex="-1">
+      <span class="fig-label">Frame 01</span>
+      <pre class="tt-frame" data-tt-frame="usage" tabindex="0">{evidence.frames.usage.lines.join('\n')}</pre>
+      <figcaption>
+        <span class="fig-what">
+          Two vendors expose a quota, so the display renders it against its
+          limit. The third exposes none that reaches disk, so its row states
+          the reason in words and renders no gauge. The header states the
+          distinction the whole view is built on. Lines 3 to 14 of
+          <code>internal/hud/testdata/golden/usage-ascii.txt</code> at
+          <code>{src.sha}</code>, in the ASCII render profile, copied byte for
+          byte from the test suite&rsquo;s own output.
+        </span>
+        <span class="fig-limit">
+          The fixture is synthesized, and the repository holds no real session
+          content. The rows below line 14 are not reproduced. The frame is 119
+          columns and scrolls sideways on a narrow screen.
+        </span>
+      </figcaption>
+    </figure>
+
     <p class="lead">
       telltale is a Go terminal program. It reads what five coding-agent CLIs
       leave on disk. It renders one row per seat: context, spend, quota,
@@ -412,7 +441,7 @@ if (missingFrames.length) {
     <!-- ADR-014: a legacy bare plate takes a div wrapper (never a figure - gate
          law) and a hand-numbered label span (PL-3, PL-4). -->
     <div class="fig fig--plate">
-    <span class="fig-label">Plate 01</span>
+    <span class="fig-label">Plate 02</span>
     <svg class="tt-plate" viewBox="0 0 260 96" role="img"
          aria-label="Three states a gauge can be in. Measured zero: the value reads 0 percent over a full, empty track. Absent: the value is an em dash and no track at all, because nothing measured it. Invented: the value reads 47 percent over a half-filled track, struck through. A plausible number nobody measured is the one failure this program prevents.">
       <title>Measured zero draws a full empty track. Absent draws nothing. An invented reading is the failure.</title>
@@ -461,7 +490,7 @@ if (missingFrames.length) {
       <li><a href="#badges">The badges claimed more than I measured</a></li>
       <li><a href="#race">Five seats, one brief, and no winner</a></li>
       <li><a href="#instrument">Twice the instrument was the bug</a></li>
-      <li><a href="#see-it">See it: seven recorded frames</a></li>
+      <li><a href="#see-it">See it: the recorded frames</a></li>
       <li><a href="#refusals">What it refuses to render</a></li>
       <li><a href="#capacity">The gate that measured the capacity</a></li>
       <li><a href="#limits">What this does not establish</a></li>
@@ -489,7 +518,7 @@ if (missingFrames.length) {
          the `data-tt` span where a gate reads them. Nothing here is a reversal,
          so nothing here uses the warm hue. -->
     <figure class="fig" data-fig="plate">
-      <span class="fig-label">Plate 02</span>
+      <span class="fig-label">Plate 03</span>
       <svg class="tt9-plate" viewBox="0 0 260 108" role="img"
            aria-label="Vendor adapters drawn as one set. The dispatch room seats five of them. The display watches the other two and does not seat them. The drop-file relay sits outside the set, and the display marks its row self-reported.">
         <title>Five adapters are seated, two are watched, and the relay sits outside the set.</title>
@@ -567,7 +596,7 @@ if (missingFrames.length) {
          search, and the refusal to draw a context percentage. A plate cannot
          carry any of them at full strength. -->
     <figure class="fig" data-fig="plate">
-      <span class="fig-label">Plate 03</span>
+      <span class="fig-label">Plate 04</span>
       <svg class="tt9-plate" viewBox="0 0 260 132" role="img"
            aria-label="Two independent layers enforce presence. Per session, every optional field is a pointer, so one field can drop on its own. Per adapter, a capability declaration drops a whole column and does not fill it with dashes.">
         <title>A pointer drops one field. A declaration drops a whole column.</title>
@@ -672,7 +701,7 @@ if (missingFrames.length) {
            because a wrap reads left to right and then down. The cost is height:
            the plate grows from 96 units to 152. -->
       <figure class="fig" data-fig="plate">
-        <span class="fig-label">Plate 04</span>
+        <span class="fig-label">Plate 05</span>
         <svg class="tt9-plate" viewBox="0 0 260 152" role="img"
              aria-label="Four badge classes. Enforced: a live run measured the restriction holding. Refuted: a live run measured it failing. Unverified: I looked for a result and got none. Claimed: retired, and struck through, because it read like enforced and was not.">
           <title>Three evidence classes are live, and the fourth is retired.</title>
@@ -774,7 +803,7 @@ if (missingFrames.length) {
          is the honest direction to be wrong in, and that one race is not a
          benchmark. A strip cannot carry a ruling at full strength. -->
     <figure class="fig" data-fig="strip">
-      <span class="fig-label">Strip 05</span>
+      <span class="fig-label">Strip 06</span>
       <div class="tt-strip">
         <!-- NOT `aria-hidden`. These two are column LABELS, and CLAUDE.md's
              contrast rule names exactly this case: marking something
@@ -875,7 +904,7 @@ if (missingFrames.length) {
          reference. A plate cannot carry a citation, and a figure that drops a
          citation is worse than no figure. -->
     <figure class="fig" data-fig="plate">
-      <span class="fig-label">Plate 06</span>
+      <span class="fig-label">Plate 07</span>
       <svg class="tt9-plate" viewBox="0 0 260 118" role="img"
            aria-label="The record on disk holds the keys. The sweep sits between the record and the answer, and its pattern matched almost nothing, so it reported nothing found. A session recorded weeks earlier holds the identical key set. The verdict is instrument, not drift.">
         <title>An old session with the identical key set rules out vendor drift.</title>
@@ -1045,23 +1074,24 @@ if (missingFrames.length) {
 
          THE ORDER IS AN ARGUMENT, AND IT LIVES IN `READER_ORDER` ABOVE. -->
     <p class="toc-return"><a href="#toc">Contents</a></p>
-    <h2 id="see-it">See it: seven recorded frames</h2>
+    <h2 id="see-it">See it: the recorded frames</h2>
     <section class="tt-reader">
       <!-- ADR-014: the reader takes ONE figure number, of kind Frame, on its
-           head. The live "3 / 7" status the script renders indexes the seven
+           head. The live "3 / 6" status the script renders indexes the six
            states inside it. One number per individual frame was considered and
-           declined: it renumbers the whole page for no reader gain. -->
-      <span class="fig-label">Frame 07</span>
+           declined: it renumbers the whole page for no reader gain. The first
+           frame, a reading, is Frame 01 above the lead. -->
+      <span class="fig-label">Frame 08</span>
       <p>
-        Seven recorded states of the instrument. Each one is a byte-exact,
+        Six more recorded states of the instrument follow the reading at the
+        top of this page. Each one is a byte-exact,
         contiguous line range of one committed golden file, and each caption
         names the file, the range, and the commit. A golden file is what the
         upstream test suite asserts against, so a drifted frame turns that build
         red. This is a state stepper and not a time stepper.
       </p>
 
-      <ol class="tt-reader-rail" aria-label="The seven recorded frames">
-        <li><a href="#frame-usage">a reading</a></li>
+      <ol class="tt-reader-rail" aria-label="The six recorded frames">
         <li><a href="#frame-stale">a stale reading</a></li>
         <li><a href="#frame-absent">an absence</a></li>
         <li><a href="#frame-record">the record</a></li>
@@ -1071,28 +1101,8 @@ if (missingFrames.length) {
       </ol>
 
       <noscript>
-        <p>The stepper needs JavaScript. All seven frames are below, in order, each with its full caption.</p>
+        <p>The stepper needs JavaScript. All six frames are below, in order, each with its full caption.</p>
       </noscript>
-
-      <figure class="tt-figure fig" data-fig="frame" id="frame-usage" tabindex="-1">
-        <pre class="tt-frame" data-tt-frame="usage" tabindex="0">{evidence.frames.usage.lines.join('\n')}</pre>
-        <figcaption>
-          <span class="fig-what">
-            Two vendors expose a quota, so the display renders it against its
-            limit. The third exposes none that reaches disk, so its row states
-            the reason in words and renders no gauge. The header states the
-            distinction the whole view is built on. Lines 3 to 14 of
-            <code>internal/hud/testdata/golden/usage-ascii.txt</code> at
-            <code>{src.sha}</code>, in the ASCII render profile, copied byte for
-            byte from the test suite&rsquo;s own output.
-          </span>
-          <span class="fig-limit">
-            The fixture is synthesized, and the repository holds no real session
-            content. The rows below line 14 are not reproduced. The frame is 119
-            columns and scrolls sideways on a narrow screen.
-          </span>
-        </figcaption>
-      </figure>
 
       <figure class="tt-figure fig" data-fig="frame" id="frame-stale" tabindex="-1">
         <pre class="tt-frame" data-tt-frame="stale" tabindex="0">{evidence.frames.stale.lines.join('\n')}</pre>
@@ -1275,9 +1285,10 @@ if (missingFrames.length) {
          nothing is ranked. This section grows, and that is the correct
          outcome: ADR-004 and ADR-007 forbid a shorter concession list. -->
     <figure class="fig" data-fig="strip">
-      <!-- Strip 08, not 07: the reader above holds Frame 07 (ADR-014), so
-           every figure after it renumbers by one. Hand-authored digits, PL-4. -->
-      <span class="fig-label">Strip 08</span>
+      <!-- Strip 09, not 08: Frame 01 sits above the lead and the reader
+           above holds Frame 08 (ADR-014), so every figure after each one
+           renumbers by one. Hand-authored digits, PL-4. -->
+      <span class="fig-label">Strip 09</span>
       <div class="tt-strip tt-s2">
         <p class="tt-s2-group">Release and platform</p>
         <ul>
