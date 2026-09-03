@@ -190,9 +190,11 @@ import SiteNav from '../components/SiteNav.astro';
           often and how distinctively they contain your query terms, no
           model required.</p>
         <p class="tradeoff"><strong>Here:</strong> I tested it as a
-          lightweight grounding layer for the classifier. The measured lift
-          (+1.9% category accuracy, a net of one call in 54, and +0.0% on
-          domain) didn't justify the added complexity, so it didn't ship.
+          lightweight grounding layer for the classifier. A same-prompt rerun
+          removed the lift. Across 162 grounded classifications, grounding
+          fixed a domain call zero times and broke four. I retired it. The
+          first measurement (+1.9% category, +0.0% domain) scored a new-prompt
+          arm against an old-prompt baseline, and it is superseded.
           <a href="projects/defense-news-classifier.html#decision-grounding">Full decision &rarr;</a></p>
       </div>
 
