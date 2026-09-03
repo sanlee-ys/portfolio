@@ -80,7 +80,7 @@ at 320px, and no gate fails on it.
 
 ## Downstream surfaces
 
-- `src/pages/index.astro` — carries the flagship block above the router.
+- `src/pages/index.astro` — carries the flagship block. Since 2026-09-03 the block sits below the router (see Consequences).
 - `src/pages/work.astro` — carries the fifth flagship entry.
 - `src/pages/projects/telltale.astro` — the project page.
 - `src/pages/projects/product-and-program.astro` — the capacity-gate section.
