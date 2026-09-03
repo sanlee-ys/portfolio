@@ -124,6 +124,10 @@ at 320px, and no gate fails on it.
 - Every `cited` figure depends on a document in another repository. If that
   document moves, the generator fails rather than writing a citation that no
   longer resolves.
+- Amended 2026-09-03: the router now sits above the flagship block, on the
+  owner's call after two external reviews found that the old order buried the
+  proof for a 90-second reader. The flagship stays whole and stays on the
+  homepage. Decision 1 above still holds: no door is added.
 
 ## Alternatives Considered
 
