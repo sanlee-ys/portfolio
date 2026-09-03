@@ -26,7 +26,7 @@
   var nodes = [
     { id: "notes-api", label: "notes-api",
       anchor: "decision-rightsized", away: "/work.html#decision-rightsized", adr: ["SYS-005"],
-      desc: "FastAPI REST service. Owns the knowledge base and serves notes. On create, it runs a FastAPI BackgroundTask that calls the classifier and writes the labels back to itself as namespaced tags (PUT /notes/{id}/tags, replace semantics)." },
+      desc: "FastAPI REST service. Owns the knowledge base and serves notes. On create, it runs a FastAPI BackgroundTask that calls the classifier and writes the labels back through the ORM in-process as namespaced tags with replace semantics; PUT /notes/{id}/tags is the external equivalent." },
     { id: "classifier", label: "classifier",
       anchor: "decision-eval", adr: ["ADR-002", "SYS-002"],
       desc: "Classifies text in-process (one Sonnet call, structured output) into a category and an operational domain. A pure provider: called by the notes-api background task and by kb-agent, it knows nothing about either." },
