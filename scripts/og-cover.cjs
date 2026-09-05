@@ -14,10 +14,12 @@
  * a blue keyline, and three rounded pills reading "eval-driven development /
  * contract-first integration / AI product judgment". Every part of that had
  * stopped being true. The ground and the accent were from a theme the site no
- * longer has, and "AI product judgment" is precisely the label-y
- * self-description the colophon's own voice rule warns against — the one
- * surface where the site described itself instead of showing an artifact was
- * the surface every link preview renders.
+ * longer has, and "AI product judgment" was the label-y self-description that
+ * the AI-use posture argues against (the current choice is in CLAUDE.md;
+ * reasoning at the time in ADR-002, Informational since 2026-09-04). The
+ * colophon itself states no voice rule (checked 2026-09-04). The one surface
+ * where the site described itself instead of showing an artifact was the
+ * surface every link preview renders.
  *
  * A binary with no source drifts silently, because nobody diffs a PNG. So the
  * card is generated: change the identity, run this, and the preview follows.

@@ -24,10 +24,11 @@
  * a fresh build: 30 SVG <text> nodes carry a digit, across 9 pages. The
  * doctrine is right and the site does not obey it yet. A gate with no baseline
  * therefore reddens 9 pages on the day it lands, and the cheapest way to green
- * is to delete the figures. ADR-004 and ADR-007 forbid that: a gate that forces
- * a deletion is a substance deletion with a build failure in front of it. So
- * the baseline records what already ships, with a reason for each entry, and
- * the gate binds NEW work only.
+ * is to delete the figures. This gate's own rule is that it never forces a
+ * deletion (reasoning in ADR-004 and ADR-007, Informational since 2026-09-04):
+ * a gate that forces a deletion is a substance deletion with a build failure
+ * in front of it. So the baseline records what already ships, with a reason
+ * for each entry, and the gate binds NEW work only.
  *
  * WHY IT WALKS dist/ AND NOT src/. The rule is about what a reader sees. In
  * `netops-lab.astro` the plate reads `wipe &#8594; cfg`. The digits belong to

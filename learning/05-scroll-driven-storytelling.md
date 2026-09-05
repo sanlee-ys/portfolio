@@ -96,4 +96,7 @@ both demos are wrapped in `@supports (animation-timeline: ...)`:
 
 - `index.html` + `assets/style.css` — the `.scroll-progress` bar
 - `lab/scroll-storytelling.html` — sticky panel + `view()` scrubbed reveals (self-contained)
-- `colophon.html` — links the demo from the learning log
+- `colophon.html` — linked the demo from the learning log until PR #223 (2026-08-17).
+  No site page links the demo since then. It stays at its URL, is noindex since
+  2026-09-04 (PR #315), and `scripts/navigation-check.cjs` exempts it from the
+  reachability check.

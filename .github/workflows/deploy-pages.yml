@@ -41,8 +41,9 @@ jobs:
       # Since ADR-006 the site is built rather than served from the repo tree.
       # Only `dist/` is uploaded now, so `decisions/`, `learning/`, `handoff/`
       # and the READMEs stop being published — checked before the migration, and
-      # nothing on the site links to them (the colophon's learning-note links
-      # point at github.com, not at sanlee.me paths).
+      # nothing on the site links to them (verified 2026-09-04: no page links
+      # `learning/`, and the Work page's learning link goes to the external
+      # learning-notes site).
       - name: Install and build
         run: |
           npm ci
