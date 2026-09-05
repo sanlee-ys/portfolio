@@ -1,11 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
+// 2026-09-04: the page stays at its URL for inbound links. It is noindex because it left the professional path. ADR-004 left the disposition open; this closes it.
 ---
 <Base
   title="Scroll-driven storytelling · San Lee"
   description="A sticky panel and scroll-scrubbed reveals, built with CSS only. No JavaScript."
   canonical="https://sanlee.me/lab/scroll-storytelling.html"
+  robots="noindex"
   ogType="article"
 >
   <Fragment slot="head">

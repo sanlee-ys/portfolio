@@ -38,10 +38,12 @@ import { execFileSync } from 'node:child_process';
 // breaks a URL.
 //   - `404.html` is `noindex`; listing it asks a crawler to index the page that
 //     exists to say there is nothing here.
+//   - `lab/scroll-storytelling.html` is `noindex` since 2026-09-04. It left the
+//     professional path and stays at its URL for inbound links (ADR-004).
 // `projects/netops-lab.html` was delisted when it left the site nav. ADR-011
 // puts it back on the sitemap as the second public artifact. It still stays
 // out of the nav: advertised, not a primary door.
-const EXCLUDE = new Set(['404.html']);
+const EXCLUDE = new Set(['404.html', 'lab/scroll-storytelling.html']);
 
 const escapeXml = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
