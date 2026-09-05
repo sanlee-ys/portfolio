@@ -183,7 +183,7 @@ is deleted, the Tier badges and "Back to the lab" links are gone, and the Lab do
 removed from the homepage nav, the footer, and `404.html`. The gallery keeps its
 inbound link from About (reworded "the lab" → "the gallery"); the storytelling demo is
 now reached from the learning log. This is the "retirement is about the *section* and
-its framing, not the artifacts" line applied literally.
+its framing, not the artifacts" line applied literally. Closed 2026-09-04 (PR #315): the page stays at its URL for inbound links, carries robots noindex, and is out of the sitemap.
 
 **3. The learning log moved to `colophon.html`.** It lived on `lab/index.html`, which
 is deleted. The colophon already owns the how-this-was-built story, so the seven
@@ -327,4 +327,4 @@ stable public URLs, but neither fact revives a Lab section.
 In particular, `lab/scroll-storytelling.html` is an archived learning artifact,
 not a category of professional work. It does not belong in the Work index or the
 primary navigation. Interactive work still earns portfolio placement only where
-it strengthens a current project's argument, as Decision 3 says.
+it strengthens a current project's argument, as Decision 3 says. Closed 2026-09-04 (PR #315): the page stays at its URL for inbound links, carries robots noindex, and is out of the sitemap.

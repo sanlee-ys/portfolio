@@ -9,7 +9,7 @@
       "page": "projects/autonomy-ladder.html",
       "figure": ".rung-plate",
       "texts": ["L1", "L2", "L3", "L4"],
-      "reason": "L1 to L4 are rung names, not counts. A rung name is an identifier. The page's own comment keeps the step sequence in `ol.ladder`, which ADR-004 Decision 5 protects."
+      "reason": "L1 to L4 are rung names, not counts. A rung name is an identifier. The page's own comment keeps the step sequence in `ol.ladder`, on the owner's current call (ADR-004 Decision 5, Informational since 2026-09-04)."
     },
     {
       "page": "projects/classifier-baseline.html",
@@ -79,7 +79,7 @@
     {
       "page": "lab/gallery.html",
       "figure": ".lb-figure",
-      "reason": "The lightbox frame on an archived learning artifact. ADR-004, as amended 2026-08-20, rules the lab pages archived. No lane restyles, promotes, or retires them."
+      "reason": "The lightbox frame on an archived learning artifact. The lab pages are archived on the owner's current call (ADR-004 as amended 2026-08-20, Informational since 2026-09-04). A lane that restyles, promotes, or retires them adds a dated line."
     },
     {
       "page": "projects/the-system.html",

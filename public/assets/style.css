@@ -1277,7 +1277,11 @@ em, i, cite {
    rather than chosen: seven links is ~664px of set text, so a 544px container
    wraps the row onto two centred lines at every desktop size. It is chrome,
    not prose — it has no measure to protect — and --wide keeps it sharing an
-   edge with the tables and the diagram instead of inventing a third one. */
+   edge with the tables and the diagram instead of inventing a third one.
+   Re-measured 2026-09-01 with four items: 243.6px of ink at phone widths, one
+   row at 320 to 560px (the RETIRED block in the phone media query records the
+   measurement). The wide track stays so the nav shares an edge with the
+   tables and the diagram (noted 2026-09-04). */
 .doors .wrap,
 .footer .wrap { max-width: calc(var(--wide) + var(--gutter) * 2); }
 .doors .wrap {
@@ -1516,12 +1520,13 @@ main.wrap .section-title::before {
 main.wrap > .measure { grid-column: full; }
 
 /* ---- PL-1: the reader grid fix (ADR-014) --------------------------------
-   The wide promotion below is a DIRECT-CHILD selector, and all seven telltale
+   The wide promotion below is a DIRECT-CHILD selector, and the six reader
    frames sit inside <section class="tt-reader">, so the promotion never
-   reached them. The section is promoted to the full track and re-establishes
-   the page grid inside itself - the same construction main.wrap > .measure
-   uses above. Figures inside .decision are not promoted; they keep the
-   entry's own measure (A5). */
+   reached them (Frame 01 sits above the lead, outside the section, since
+   2026-09-03, #310; seven sat inside before). The section is promoted to the
+   full track and re-establishes the page grid inside itself - the same
+   construction main.wrap > .measure uses above. Figures inside .decision are
+   not promoted; they keep the entry's own measure (A5). */
 main.wrap > .tt-reader { grid-column: full; }
 .tt-reader {
   display: grid;
@@ -1936,8 +1941,10 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
 /* "On this page" — an in-page map for the long writeups. Measured: the
    classifier is 3,194 words, 14.5 minutes, 10.1 screens at 900px tall. A ToC
    does not remove one word of that; what it does is convert linear scrolling
-   into targeted reading, which is the actual complaint. Only pages over ~1,500
-   words carry one — below that the ToC costs more screen than it saves.
+   into targeted reading, which is the actual complaint. A page carries a ToC
+   at 8 phone screens or 6 figures (ADR-014, PL-7; the page comments in
+   kb-agent-retrieval.astro record the gate). The ~1,500-word rule was the
+   2026-07 threshold (updated 2026-09-04).
 
    Sits AFTER the lead paragraph, not before it: the reader gets the hook, then
    the map. A ToC above the first sentence asks someone to choose a section
@@ -2744,10 +2751,10 @@ figcaption code { overflow-wrap: anywhere; }
    Same frames, same anchors, same script, same aria-current. The tabs drop
    the July card chrome and take the doors' active idiom: a plain label, and
    the current one carries a 2px ink underline plus weight. One control-edge
-   token, --rule-strong, at 3:1 or better in both themes (PL-5). All seven
-   labels stay (PL-9); at phone widths they ride one scrolling row. The
-   telltale island still carries the July chrome and wins ties until lane I2
-   deletes it; this block is the system's home.
+   token, --rule-strong, at 3:1 or better in both themes (PL-5). All six
+   labels stay (PL-9; seven until 2026-09-03, #310); at phone widths they ride
+   one scrolling row. The telltale island still carries the July chrome and
+   wins ties until lane I2 deletes it; this block is the system's home.
    =========================================================================== */
 .tt-reader-rail {
   gap: 0 10px;
@@ -3504,7 +3511,12 @@ figcaption code { overflow-wrap: anywhere; }
    decision-contracts and decision-rightsized — are one-line ledger footnotes,
    not .decision blocks, so the highlight the jump existed to deliver matched
    nothing on two nodes out of three. It fired into an empty selector, below the
-   fold, on a page where nobody could see it not happening. */
+   fold, on a page where nobody could see it not happening.
+
+   2026-09-04: those two rows moved to work.html#decision-log in #269
+   (2026-08-30). work.html loads no diagram.js, and only diagram.js adds the
+   `target` class, so on main only .decision.target fires, on #decision-eval.
+   The .ledger li selector stays for a code session to judge. */
 .decision,
 .ledger li { transition: background-color 0.3s ease, box-shadow 0.3s ease; }
 .decision.target,
@@ -3804,8 +3816,10 @@ main > p a:hover { text-decoration-color: var(--accent); }
 
 /* ---------------------------------------------------------------------------
    Decision ledger + stat strip (ADR-007)
-   The homepage used to carry nine full decision cards. Three stay as cards;
-   the rest are one-line ledger rows. Deliberately a stacked <ul>, never a
+   The homepage used to carry nine full decision cards. Three stay as cards.
+   The one-line ledger rows live on work.html#decision-log since 2026-08-30
+   (landing WO-E1.1, #269); the stat strip stays on the homepage (noted
+   2026-09-04). Deliberately a stacked <ul>, never a
    <table>: a table of one-line summaries is the shape most likely to overflow
    at 320px, and ADR-001 makes that a contract, not a preference.
 --------------------------------------------------------------------------- */
@@ -3822,8 +3836,9 @@ main > p a:hover { text-decoration-color: var(--accent); }
   color: var(--muted);
 }
 
-/* ---- The six, as footnotes ----------------------------------------------
-   Three decisions get a full entry; the other six get one sentence each. That
+/* ---- The eight, as footnotes --------------------------------------------
+   Eight decisions get one sentence each on work.html#decision-log (moved off
+   the homepage 2026-08-30; counted 2026-09-04). That
    is exactly the relationship a footnote has to a body paragraph, so they are
    drawn as footnotes: numbered, hairline-ruled, set a size down, and — at
    desktop — the numeral hangs out in the margin on the same line as every
@@ -4011,7 +4026,8 @@ main > p a:hover { text-decoration-color: var(--accent); }
    What moves out there, and the rule for deciding:
 
      .decision .kicker   the homepage entry's status label + its code-ref
-     .ledger li::before  footnote numbers for the six one-line entries
+     .ledger li::before  footnote numbers for the eight one-line entries
+                         (on work.html since 2026-08-30)
      .article-body h2    section folios, numbered to match the ToC
      .toc-heading        the "On this page" label beside its own list
      .orientation .kicker
@@ -4084,9 +4100,10 @@ main > p a:hover { text-decoration-color: var(--accent); }
     text-align: right;
   }
 
-  /* The six one-line entries become numbered footnotes: the hanging indent
-     they carry on a phone straightens out and the numeral moves to the
-     margin, where a footnote number belongs. */
+  /* The eight one-line entries (on work.html since 2026-08-30) become
+     numbered footnotes: the hanging indent they carry on a phone straightens
+     out and the numeral moves to the margin, where a footnote number
+     belongs. */
   .ledger li {
     padding-left: 0;
   }

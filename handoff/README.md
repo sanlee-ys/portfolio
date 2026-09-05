@@ -4,7 +4,7 @@ Working drafts staged for pickup by a session with broader repo access than
 whatever session wrote them.
 
 This portfolio repo is often the only one in scope for a given Claude Code
-session (see the GitHub-access scoping note in `CLAUDE.md`/session config).
+session (stated directly since 2026-09-04; `CLAUDE.md` carries no scoping note).
 When work belongs in a *different* repo in the system (`kb-agent`,
 `notes-api`, `defense-news-classifier`, `learning-notes`) but gets drafted
 here anyway, it's parked in this folder rather than an ephemeral scratchpad,

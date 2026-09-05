@@ -83,14 +83,17 @@ import SiteNav from '../components/SiteNav.astro';
 
     /* The seat line, under the lede. It states what I want next. It is not an
        argument the record has to carry, so it sits one step quieter than the
-       lede above it and keeps the lede's own measure. Owner-approved copy
-       (landing WO-E1.4); the lede itself is byte-frozen under OC-1.
+       lede above it and keeps the lede's own measure. The lede and the seat
+       line are the owner's current copy (landing WO-E1.4; the lede is OC-1,
+       #269, 2026-08-30). No gate freezes either one (2026-09-04). The owner
+       edits them, and a session that changes either adds a dated line here.
 
        The seat line lost its trailing clause on 2026-09-01. It read "...on an
        AI systems team that gates delivery on evidence", and the lede three
        lines above already ends on "gate delivery on evidence". One claim
-       states itself once. The lede keeps the claim because OC-1 freezes it,
-       so the seat line is the copy that gave the duplicate up.
+       states itself once. The lede kept the claim because it is the owner's
+       approved copy (OC-1), so the seat line is the copy that gave the
+       duplicate up.
 
        ix-s1 and ix-s2 used to sit here. Both blocks moved to work.astro with
        the units they style: the eight-row ledger and the field-note clusters
@@ -320,7 +323,9 @@ import SiteNav from '../components/SiteNav.astro';
            sr-only prefix, and the ix-s1 CSS travelled byte-exact. This line
            is the pointer that stays behind, and it adds no claim: the count
            and the shape are the ones the intro paragraph already stated.
-           No page links any of the eight ids, on this site or off it. -->
+           No inbound link targeted the eight ids at their homepage address.
+           diagram.js offers two of them at work.html through `away`
+           (decision-rightsized and decision-contracts, #269). 2026-09-04. -->
       <p class="ledger-intro">Eight more decisions, one row each. <a href="work.html#decision-log">The decision log &rarr;</a></p>
     </section>
 
@@ -359,9 +364,11 @@ import SiteNav from '../components/SiteNav.astro';
            and check (landing WO-E1.4). Every sentence points at a live
            surface: the reversal legend in the proof band above, the figure
            contract that fails a build on an empty limit slot, and the public
-           incident log the colophon already links. The career-story ceiling
-           binds here: no employer internal, no team, no seat claim, and no
-           number that no artifact produces. The capacity ruling is
+           incident log the colophon already links. Current choice
+           (2026-09-04, owner-editable; ADR-011 is Informational): this
+           section names no employer internal, no team, and no seat. One
+           clause is a gate and stays: no number that no artifact produces
+           (scripts/check-published-metrics.cjs). The capacity ruling is
            deliberately not restated, because the flagship above already
            carries it and one page states one claim once. -->
       <p>

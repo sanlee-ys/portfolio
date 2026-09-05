@@ -55,12 +55,13 @@ phantom broken links if `dist/` and `public/` are both present.
 ## QA
 
 CI (GitHub Actions, `.github/workflows/qa.yml`) and the local runner
-(`scripts/gates.cjs` / `npm run gates`) run the **same sixteen checks**. The
-seven that need no build, browser, or network run first; the nine that walk the
-built site or launch Chromium run after. `scripts/gates.cjs` must stay a
+(`scripts/gates.cjs` / `npm run gates`) run the **same twenty-two checks**. The
+nine that need no build, browser, or network run first; the thirteen that walk
+the built site or launch Chromium run after (counted 2026-09-04 in
+`scripts/gates.cjs`). `scripts/gates.cjs` must stay a
 faithful mirror of the workflow — add a step there, add it here.
 
-**Build-independent (cheap):**
+**Build-independent (cheap; list synced 2026-09-04):**
 
 - **`node --test scripts/private-repo-check.test.cjs
   scripts/private-name-precommit.test.cjs`** — adversarial suites for the
@@ -80,10 +81,14 @@ faithful mirror of the workflow — add a step there, add it here.
 - **`node --test scripts/navigation-check.test.cjs`** — adversarial fixtures
   for the navigation contract: complete Work discovery and contextual return
   links, with explicit exemptions for archived standalone pages.
+- **`node --test scripts/check-telltale-evidence.test.cjs`** is the adversarial
+  suite for the telltale evidence gate.
+- **`node --test scripts/figure-contract.test.cjs`** is the adversarial suite
+  for the figure contract.
 - **`scripts/lint_decisions.py`** — every ADR in `decisions/` carries a
   `## Downstream surfaces` section. Stdlib Python 3, no venv.
 
-**Against the built site (`SITE_ROOT=dist`):**
+**Against the built site (`SITE_ROOT=dist`; list synced 2026-09-04):**
 
 - **`scripts/link-check.cjs`** — no broken internal links.
 - **`scripts/navigation-check.cjs`** — every current professional-work page is
@@ -95,6 +100,10 @@ faithful mirror of the workflow — add a step there, add it here.
 - **`scripts/check-published-metrics.cjs`** — every figure marked up as a
   published metric still matches the classifier's generated artifact. A
   mismatch fails; an upstream fetch failure warns and passes.
+- **`scripts/check-telltale-evidence.cjs`** checks that every marked figure and
+  frame on the telltale page matches `src/data/telltale-evidence.json`.
+- **`scripts/figure-contract.cjs`** fails a digit in a hand-drawn plate and
+  requires both caption slots on every figure.
 - **`scripts/private-repo-check.cjs`** — every `sanlee-ys/<repo>` reference on
   every published page resolves to a repo that is actually **public**, checked
   live against the GitHub API. Fails closed if the list can't be fetched.
@@ -104,8 +113,12 @@ faithful mirror of the workflow — add a step there, add it here.
   horizontal overflow. Mobile is a contract here, not an afterthought.
 - **`scripts/hit-target.cjs`** — every element that claims to be a control is
   clickable across its box (catches SVG `fill: none` hit-target bugs).
+- **`scripts/microtext-floor.cjs`** fails any SVG text that renders under 9px
+  at a 320px viewport.
 - **`node --test scripts/hit-target.test.cjs`** — adversarial suite for the
   hit-target gate (spawns Chromium, so it sits with the browser work).
+- **`node --test scripts/microtext-floor.test.cjs`** is the adversarial suite
+  for the microtext floor gate (spawns Chromium, so it sits here too).
 
 The browser gates need a Chromium matching the pinned Playwright. On a fresh
 clone and after any Playwright bump — from the repo root, on any OS:
@@ -153,6 +166,7 @@ Grouped the way the site is organized — each link is a full writeup under
 Traffic is measured with [Plausible](https://plausible.io) — privacy-friendly,
 no cookie banner, script tag on every page. Dashboard: `sanlee.me` in the
 Plausible account tied to this repo. Beyond pageviews, `public/assets/events.js`
-sends three custom events — diagram node clicks, decision-card expands, and
-résumé clicks — so the site has real usage data about what readers actually
-engage with.
+sends two live custom events, diagram node clicks and résumé clicks, so the site
+has real usage data about what readers actually engage with. A third listener,
+decision-card expands, has had no DOM target since the homepage cards lost
+their `<details>` in #152 (2026-07-26; noted 2026-09-04).

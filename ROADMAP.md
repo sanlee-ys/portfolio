@@ -28,18 +28,24 @@ down carries the full reasoning for each item.
 - [x] **Favicon.** *(Shipped: accent monogram, 16/32 PNG + apple-touch.)*
 - [x] **Résumé link + contact.** Both shipped — `mailto:hi@sanlee.me` in the
       hero icons and footer, and a grounded neutral-master `resume.html`
-      (self-contained page, print-to-PDF) linked from the hero and footer.
+      (self-contained page; `scripts/resume-pdf.cjs` builds the tagged
+      `resume.pdf`, PR #304, 2026-09-03) linked from the hero and footer.
+      *2026-09-04: both links now sit in the primary nav and the footer; the
+      hero links left in b77fd11 (2026-08-19).*
 - [x] **Resolve the orphaned `learning/` dir.** *Kept, not deleted — it's a
       real front-end learning log, not filler. Wired into the Lab page as a
       "Learning log" section linking the six lessons on GitHub.*
+      *2026-09-04: the site links no `learning/` lesson; the directory stays in
+      the repo as a record.*
 
 ### Next — valuable, but needs a small decision or more build
 
 - [x] **Custom `404.html`.** *Shipped — on-brand "not in the record" page.*
 - [x] **`sitemap.xml` + `robots.txt`.** *Shipped.*
-- [x] **Career-story depth.** *Closed 2026-08-17 as a ceiling, not a memoir
-      (`ADR-011`). About holds a three-sentence tell. The résumé keeps the
-      facts. No further public biography.*
+- [x] **Career-story depth.** *Closed 2026-08-17 (`ADR-011`, Informational
+      since 2026-09-04). About holds a three-sentence tell and the résumé keeps
+      the facts. The owner's current call sets the public depth; a session that
+      changes it adds a dated line.*
 - [x] **Voice pass** (soften the relentlessness). *Done 2026-08-18 — see "The
       voice is relentless" under Positioning for what the pass changed.*
 
@@ -49,7 +55,8 @@ down carries the full reasoning for each item.
       strategic question. Note: frame it as a separate proof of method, *not* a
       new vertical — "other verticals" is an explicit non-goal on the system
       roadmap, and the two shouldn't read as a contradiction.
-- [ ] **Live GitHub repo cards** (already planned in README; needs the API script).
+- [ ] **Live GitHub repo cards** (the README no longer lists the plan as of
+      2026-09-04; this roadmap is the record; needs the API script).
 - [ ] **System deploy / OpenTelemetry** — on the system's own "Later"; each
       would spawn a new decision-log entry here.
 
@@ -73,7 +80,9 @@ down carries the full reasoning for each item.
 - [x] **Metrics table showed a rejected variant unlabeled** — "v2 grounded"
       column now says *(not shipped)*.
 - [x] **Dogfood the analytics** — custom events (diagram clicks, decision-card
-      expands, résumé clicks) via `assets/events.js`.
+      expands, résumé clicks) via `assets/events.js`. *(2026-09-04: the
+      decision-card expand listener has had no DOM target since #152,
+      2026-07-26; two of the three events are live.)*
 - [ ] **Security on the agent's tool seam** — the gap SYS-007 itself names.
       Prompt-injection hardening of kb-agent + a writeup (threat model, attacks
       tried, what held). Strongest candidate for the "second artifact" slot.
@@ -117,20 +126,22 @@ These have no tradeoffs worth debating. None were previously planned.
 - [x] **Orphaned `learning/` directory** — six `.md` files nothing linked to.
       On inspection it's a genuine front-end learning log (distinct from the
       external `learning-notes`, which is AI techniques), so it was *kept and
-      surfaced*, not deleted: the Lab page now has a "Learning log" section
-      linking each lesson on GitHub (which renders the Markdown; `.nojekyll`
-      means the repo serves `.md` as raw text).
+      surfaced*, not deleted: the Lab page linked each lesson on GitHub at the
+      time (which renders the Markdown; `.nojekyll` means the repo serves `.md`
+      as raw text). No page links them as of 2026-09-04.
 
 ### Positioning — needs a decision from San, not just execution
 
 - [x] **Career story has one sentence behind it.** *Decided 2026-08-17
-      (`ADR-011`): keep it short. About now holds the locked three-sentence
-      tell. Do not grow it. Longer stories stay private.*
-- [ ] **No résumé link and no contact path** beyond social icons. For a
-      job-relevant site, an easy "email me / résumé" is a cheap, obvious add.
+      (`ADR-011`, Informational since 2026-09-04): keep it short. About holds a
+      three-sentence tell. The owner's current call sets its length; a session
+      that changes it adds a dated line. Longer stories stay private.*
+- [x] **No résumé link and no contact path.** *Shipped: `mailto:hi@sanlee.me`
+      and `resume.html` are linked from the primary nav and the footer (see the
+      Site Now entry above). Closed 2026-09-04.*
 - [x] **The voice is relentless.** *Done 2026-08-18: site-copy pass cut the
-      stacked aphorisms. Tables and decision facts stay. Locked About tell
-      unchanged (ADR-011).*
+      stacked aphorisms. Tables and decision facts stay. The 2026-08-17 About
+      tell was unchanged by this pass (ADR-011, Informational since 2026-09-04).*
 
 ### Breadth — the strategic gap
 
@@ -151,7 +162,7 @@ These have no tradeoffs worth debating. None were previously planned.
       the sandbox stopped being fed, and its framing was discounting the site's
       strongest artifact. `loop-replay.html` was promoted to `projects/`; the
       gallery and scroll-storytelling pages stay at their URLs; the learning log
-      moved to the colophon.*
+      left the site, and no page links it as of 2026-09-04.*
 - [ ] **Defense-news system roadmap** — lives on `projects/product-and-program.html`
       as Now/Next/Later. That's product content for the *system*, not the site,
       but the "Later" items (containerize/deploy, OpenTelemetry) would each

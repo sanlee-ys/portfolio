@@ -1,7 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
-// 2026-09-04: the page stays at its URL for inbound links. It is noindex because it left the professional path. ADR-004 left the disposition open; this closes it.
+// 2026-09-04, owner's current call: the page keeps its URL for inbound links
+// (GitHub Pages has no redirects). It is noindex and sits in the sitemap
+// EXCLUDE set (scripts/sitemap-integration.mjs) because the owner files it as
+// an archived learning artifact. ADR-004 is Informational. Its 2026-07-23
+// record listed this page as indexed; this line supersedes that record. A
+// session that re-indexes the page removes the EXCLUDE entry in the same
+// change.
 ---
 <Base
   title="Scroll-driven storytelling · San Lee"

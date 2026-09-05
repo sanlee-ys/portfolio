@@ -2,6 +2,15 @@
 // Three signals — diagram node clicks, decision-card expands, résumé clicks —
 // sent as Plausible custom events. Everything is a no-op if analytics is
 // blocked or absent; the site never depends on this file.
+//
+// 2026-09-04: two of the three signals have a DOM target on main. index.html
+// is the only page that loads this file. The decision-card listener binds
+// `.decision > details`. No page has carried a <details> since #152
+// (2026-07-26), so that block registers zero listeners. The résumé listener
+// labels every non-footer click "hero". The hero has carried no résumé link
+// since b77fd11 (2026-08-19). On main that branch labels the primary-nav item
+// (src/components/SiteNav.astro). The value stays so the Plausible series
+// stays continuous. A removal or a rename is a code change for another session.
 
 (function () {
   function track(name, props) {

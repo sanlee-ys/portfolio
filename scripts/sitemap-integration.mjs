@@ -40,9 +40,13 @@ import { execFileSync } from 'node:child_process';
 //     exists to say there is nothing here.
 //   - `lab/scroll-storytelling.html` is `noindex` since 2026-09-04. It left the
 //     professional path and stays at its URL for inbound links (ADR-004).
-// `projects/netops-lab.html` was delisted when it left the site nav. ADR-011
-// puts it back on the sitemap as the second public artifact. It still stays
-// out of the nav: advertised, not a primary door.
+// `projects/netops-lab.html` left the primary nav and the sitemap in #199
+// (2026-08-02). PR #225 (2026-08-17) put it back on the sitemap as the second
+// public artifact; ADR-011 in that PR records the career tell, not this
+// listing. On main it stays out of the primary nav (`nav.doors`), and the
+// homepage About section and work.html link it. That placement is the owner's
+// current call (2026-09-04; ADR-011 is Informational and never mentions this
+// page). A session that adds it to the nav or delists it updates this line.
 const EXCLUDE = new Set(['404.html', 'lab/scroll-storytelling.html']);
 
 const escapeXml = (s) =>

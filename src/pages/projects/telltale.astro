@@ -1278,12 +1278,14 @@ if (missingFrames.length) {
     <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="limits">What this does not establish</h2>
 
-    <!-- tt-s2 (portfolio ADR-013). GROUPING IS THE ONLY LEGAL TREATMENT OF A
-         NEGATIVE-RESULT LIST. Every one of the fourteen lines below keeps its
-         exact text, byte for byte, and the four group names are the only new
-         words on this list. Nothing is merged, nothing is shortened, and
-         nothing is ranked. This section grows, and that is the correct
-         outcome: ADR-004 and ADR-007 forbid a shorter concession list. -->
+    <!-- tt-s2 (portfolio ADR-013). Grouping is the treatment the owner chose
+         for this negative-result list (current call, 2026-09-04). Every one
+         of the fourteen lines below keeps its exact text, byte for byte, and
+         the four group names are the only new words on this list. Nothing is
+         merged, nothing is shortened, and nothing is ranked. ADR-004 and
+         ADR-007 are Informational since 2026-09-04 and set no floor, so a
+         later call may merge or rank the list; the session that does adds a
+         dated line here. -->
     <figure class="fig" data-fig="strip">
       <!-- Strip 09, not 08: Frame 01 sits above the lead and the reader
            above holds Frame 08 (ADR-014), so every figure after each one
@@ -1400,13 +1402,14 @@ if (missingFrames.length) {
       instruction.
     </p>
     <!-- THE DISCLOSURE, AND WHY IT IS SHORT (portfolio CLAUDE.md, AI-use
-         posture). The colophon is the authoritative home for the full posture
-         statement. This page keeps one sentence that names Claude plainly, it
-         keeps its own proof, and it links to the colophon for the rest. The
-         case-study summary at the top of this page already states this
-         project's own direction claim in its own words. Do not restate the
-         site-wide posture sentence here. Two homes for one claim is how one
-         of them goes stale. -->
+         posture). The colophon holds the full posture statement by the
+         owner's current call (2026-09-04); ADR-002 is Informational. This
+         page keeps one sentence that names Claude plainly, it keeps its own
+         proof, and it links to the colophon for the rest. The case-study
+         summary at the top of this page already states this project's own
+         direction claim in its own words. A session that restates the
+         site-wide posture sentence here adds a dated line. The single-home
+         reason is maintenance: two homes for one claim let one go stale. -->
     <p class="tradeoff">
       <strong>How it was built:</strong> Claude does most of the typing. The
       proof is the suite and the goldens, and a test entry point that panics
