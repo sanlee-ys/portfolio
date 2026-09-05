@@ -92,12 +92,19 @@
           : "");
     });
 
-    // Normalize the summary: rung 2's trailer has no final_iteration,
-    // delta_macro_f1, or overfitting gap -- derive them from the records so
-    // the honesty callout works identically for both dialects.
+    // Normalize the summary: rung 1's trailer has no iteration COUNT, and
+    // rung 2's has no delta_macro_f1 or overfitting gap -- derive each from
+    // the records so the tiles and the honesty callout read the same for both
+    // dialects.
+    //
+    // COUNT, never the last index. Rung 2's own trailer states `iterations: 6`
+    // over records 0..5, so the last record's index is one less than the count
+    // the log publishes. This normalizer used to fill `final_iteration`, an
+    // INDEX, and the "Iterations run" tile printed it -- so the tile said 5 for
+    // a run its own log calls 6. Nothing else reads `final_iteration`.
     if (summary && iterations.length) {
-      if (summary.final_iteration == null) {
-        summary.final_iteration = iterations[iterations.length - 1].iteration;
+      if (summary.iterations == null) {
+        summary.iterations = iterations.length;
       }
       if (summary.total_tokens_spent == null && summary.tokens_spent != null) {
         summary.total_tokens_spent = summary.tokens_spent;
@@ -259,12 +266,23 @@
     var calloutEl = document.getElementById("honest-callout");
     if (!statsEl || !summary || !iterations.length) return;
 
-    var best = iterations[bestIteration];
+    // The three score tiles all read ONE iteration: summary.best_iteration,
+    // the iteration the loop stopped on. That is the loop's CHOICE under its
+    // done-signal, and it is not the maximum of a series. On both shipped runs
+    // it is not the maximum: rung 1 peaks on C at iteration 1 (89.3%) and this
+    // strip reports iteration 2 (86.3%); rung 2 peaks on A at iteration 3 and
+    // this strip reports iteration 2. So each label names its split and each
+    // sub names the iteration. A "Best C" label claimed a superlative the
+    // number does not hold.
+    var chosen = iterations[bestIteration];
+    var atIter = "iteration " + bestIteration;
     var tiles = "";
-    tiles += statTile("stat-a", "Best A (training)", fmtScore(best.scores.A.macro_f1), "iteration " + bestIteration);
-    tiles += statTile("stat-b", "Best B (held-back)", fmtScore(best.scores.B.macro_f1), "stop signal");
-    tiles += statTile("stat-c", "Best C (gold held-out)", fmtScore(best.scores.C.macro_f1), "the honest number");
-    tiles += statTile("", "Iterations run", String(summary.final_iteration), "done: " + summary.done_signal);
+    tiles += statTile("stat-a", "A (training)", fmtScore(chosen.scores.A.macro_f1), atIter);
+    tiles += statTile("stat-b", "B (held-back)", fmtScore(chosen.scores.B.macro_f1), atIter + ", stop signal");
+    tiles += statTile("stat-c", "C (gold held-out)", fmtScore(chosen.scores.C.macro_f1), atIter + ", the honest number");
+    // The COUNT of iteration records, not the last record's index. See the
+    // normalizer in parseRunLog.
+    tiles += statTile("", "Iterations run", String(summary.iterations), "done: " + summary.done_signal);
     statsEl.innerHTML = tiles;
 
     if (calloutEl) {

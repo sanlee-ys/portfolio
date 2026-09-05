@@ -124,8 +124,8 @@ import SiteNav from '../../components/SiteNav.astro';
 
        The colour is deliberate and stays: --series-a/b/c are keyed to the
        legend above the chart and to the split map at the top of the page, so
-       the colour on "Best C" is what tells a reader this figure is the gold
-       held-out number without re-reading the label. That is a legend, not
+       the colour on the C figure is what tells a reader this figure is the
+       gold held-out number without re-reading the label. That is a legend, not
        decoration, which is exactly the test the palette's restraint rule
        applies -- and why the amber banner failed it while these pass. */
     .stat-strip .stat-sub {
@@ -496,9 +496,10 @@ import SiteNav from '../../components/SiteNav.astro';
     <h2>Score progression</h2>
     <p>
       <span id="chart-metric-line">Category macro-F1 per split, per iteration.</span>
-      The shaded band is the gap between A and C. A wider band means the loop
-      improved on the set it optimizes against. It also means the loop did not
-      improve on real gold text.
+      The shaded band is the gap between A and C at each iteration. The band
+      shows a difference of levels at that iteration. The band does not show
+      how much a split improved. The overfitting gap above the chart reports
+      the change from the baseline.
     </p>
     <div class="chart-legend wide">
       <span><i class="swatch a"></i>A &middot; training (optimized on)</span>
