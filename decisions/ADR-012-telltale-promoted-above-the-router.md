@@ -1,10 +1,12 @@
 # ADR-012: Promote the instrument above the router, and gate its figures
 
-**Status:** Accepted
+**Status:** Informational since 2026-09-04; Accepted
 **Date:** 2026-08-29
 **Deciders:** San Lee
 
 ---
+
+**Informational, 2026-09-04.** This record explains why a choice was made at the time. It sets no floor. The owner's current call governs the site, and a session that finds this record in the way makes the change and adds a dated line here. Mechanism records (the gates and the traps) keep their floors; this one is editorial.
 
 ## Context
 
