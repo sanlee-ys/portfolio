@@ -1,10 +1,12 @@
 # ADR-004: Retire the lab as the vehicle; interactive work belongs wherever it argues best
 
-**Status:** Accepted; migration executed 2026-07-23 (see *Migration record*)
+**Status:** Informational since 2026-09-04; Accepted; migration executed 2026-07-23 (see *Migration record*)
 **Date:** 2026-07-19
 **Deciders:** San Lee
 
 ---
+
+**Informational, 2026-09-04.** This record explains why a choice was made at the time. It sets no floor. The owner's current call governs the site, and a session that finds this record in the way makes the change and adds a dated line here. Mechanism records (the gates and the traps) keep their floors; this one is editorial.
 
 ## Context
 

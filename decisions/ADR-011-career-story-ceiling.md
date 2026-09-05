@@ -1,10 +1,12 @@
 # ADR-011: The public career tell stays short
 
-**Status:** Accepted; amended 2026-08-20
+**Status:** Informational since 2026-09-04; Accepted; amended 2026-08-20
 **Date:** 2026-08-17
 **Deciders:** San Lee
 
 ---
+
+**Informational, 2026-09-04.** This record explains why a choice was made at the time. It sets no floor. The owner's current call governs the site, and a session that finds this record in the way makes the change and adds a dated line here. Mechanism records (the gates and the traps) keep their floors; this one is editorial.
 
 ## Context
 
