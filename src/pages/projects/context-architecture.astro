@@ -123,7 +123,30 @@ import SiteNav from '../../components/SiteNav.astro';
     <h1>Context Architecture</h1>
     <p class="subtitle">The payload my agent sessions load before they open a source file. I scored it against five published criteria. Three failed.</p>
 
-    <h2>The resident payload</h2>
+    <!-- The long-page nav device (ADR-014, PL-7 and PL-8). The ToC gate opens
+         at 8 phone screens or at 6 figures. This page runs 11.85 phone screens
+         at 393px, so the screen arm carries it. The figure arm stays shut: the
+         page holds three figures.
+
+         The nav carries id="toc" because the Contents returns below target it.
+         A #toc link ships only on a page that holds the id, and
+         link-check.cjs does not read same-page fragments.
+
+         The device is typographic and it runs no JavaScript. This page ships
+         no .toc-figs comma-run: the figure numbers already ride each figure in
+         flow. -->
+    <nav class="toc" id="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#the-resident-payload">The resident payload</a></li>
+      <li><a href="#what-was-already-there">What was already there</a></li>
+      <li><a href="#the-audit">The audit, and the three it failed</a></li>
+      <li><a href="#what-shipped">What shipped in August 2026</a></li>
+      <li><a href="#production-surveys">The same gaps in production surveys</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="the-resident-payload">The resident payload</h2>
 
     <p>
       Every session I start reads a fixed payload first. The payload holds an
@@ -202,7 +225,8 @@ import SiteNav from '../../components/SiteNav.astro';
       It also frames context as the agent&rsquo;s operating system.
     </p>
 
-    <h2>What was already there</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-was-already-there">What was already there</h2>
 
     <p>
       Four structures already existed, and all four predate those words. I
@@ -349,7 +373,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </p>
     </div>
 
-    <h2>The audit, and the three it failed</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="the-audit">The audit, and the three it failed</h2>
 
     <p>
       I scored each surface against all five criteria. Isolation and sufficiency
@@ -425,7 +450,8 @@ import SiteNav from '../../components/SiteNav.astro';
       measure it.
     </p>
 
-    <h2>What shipped in August 2026</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-shipped">What shipped in August 2026</h2>
 
     <p>Three conventions and one hook.</p>
 
@@ -556,7 +582,8 @@ import SiteNav from '../../components/SiteNav.astro';
       invented.</strong> The context is legible. It is not yet checkable.
     </p>
 
-    <h2>The same gaps in production surveys</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="production-surveys">The same gaps in production surveys</h2>
 
     <p>
       LangChain&rsquo;s <a href="https://www.langchain.com/state-of-agent-engineering">State

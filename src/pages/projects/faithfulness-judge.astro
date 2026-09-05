@@ -428,7 +428,31 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
     </p>
     </div>
 
-    <h2>The result</h2>
+    <!-- The long-page nav device (ADR-014, PL-7 and PL-8). The ToC gate opens
+         at 8 phone screens or at 6 figures. This page runs 10.37 phone screens
+         at 393px, so the screen arm carries it. The figure arm stays shut: the
+         page holds four figures.
+
+         The nav carries id="toc" because the Contents returns below target it.
+         A #toc link ships only on a page that holds the id, and
+         link-check.cjs does not read same-page fragments.
+
+         The device is typographic and it runs no JavaScript. This page ships
+         no .toc-figs comma-run. Plate 01 sits above this nav and inside no
+         section, so no row would index it. -->
+    <nav class="toc" id="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#the-result">The result</a></li>
+      <li><a href="#almost-published">The result I almost published instead</a></li>
+      <li><a href="#what-this-grades-against">What this grades against</a></li>
+      <li><a href="#what-this-does-not-establish">What this number does not establish</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#what-it-demonstrates">What it demonstrates</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="the-result">The result</h2>
     <table class="metrics">
       <thead>
         <tr><th>Judge</th><th>Binary &kappa;</th><th>Raw agreement (95% CI)</th><th>Unsupported recall</th></tr>
@@ -559,7 +583,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       tier is good enough and escalation is not evidenced.
     </p>
 
-    <h2>The result I almost published instead</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="almost-published">The result I almost published instead</h2>
 
     <!-- Plate 04 of four. The wrapper is a `div` for the same gate reason
          Plate 01 records. The plate's digits are the false gap itself, and
@@ -643,7 +668,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       carries the full decision record.
     </p>
 
-    <h2>What this grades against</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-this-grades-against">What this grades against</h2>
     <p>
       I grade the <a href="defense-news-classifier.html">classifier</a> against
       cheap, objective labels. A story is about procurement or it is not, and
@@ -666,7 +692,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       until an eval says otherwise.
     </p>
 
-    <h2>What this number does not establish</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-this-does-not-establish">What this number does not establish</h2>
     <p>
       The repo&rsquo;s front page also states these limits:
     </p>
@@ -709,7 +736,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
         anything consequential.</li>
     </ul>
 
-    <h2>Stack</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="stack">Stack</h2>
     <p>
       The stack is Python and the Anthropic SDK, with Sonnet and Opus as the two
       judges under test. It uses forced tool-use for the verdict schema. It
@@ -724,7 +752,8 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
       records the bug are checkable.
     </p>
 
-    <h2>What it demonstrates</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       The first scoring run printed a dramatic tier gap. The misjudgment log
       showed that a cap cut off the cheap tier. The published result is the one

@@ -485,7 +485,32 @@ import SiteNav from '../../components/SiteNav.astro';
       <span class="demo-badge-text" id="demo-badge-text">claude-sonnet-5, 1,524,937 tokens, stopped on the <code>threshold</code> done-signal. Numbers below are a measured result, not a demo.</span>
     </div>
 
-    <h2>Run summary</h2>
+    <!-- The long-page nav device (ADR-014, PL-7 and PL-8). The ToC gate opens
+         at 8 phone screens or at 6 figures. This page runs 16.53 phone screens
+         at 393px, the longest page on the site, so the screen arm carries it.
+         The figure arm stays shut: the page holds three figures.
+
+         The nav carries id="toc" because the Contents returns below target it.
+         A #toc link ships only on a page that holds the id, and
+         link-check.cjs does not read same-page fragments.
+
+         The device is typographic and it runs no JavaScript. It sits below the
+         run tabs and the demo badge, because both are page-level chrome and
+         neither belongs to a section. This page ships no .toc-figs comma-run:
+         the figure numbers already ride each figure in flow. -->
+    <nav class="toc" id="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#run-summary">Run summary</a></li>
+      <li><a href="#score-progression">Score progression</a></li>
+      <li><a href="#iteration-replay">Iteration replay</a></li>
+      <li><a href="#the-decisions">The decisions</a></li>
+      <li><a href="#how-this-reads-a-run-log">How this reads a run log</a></li>
+      <li><a href="#stack">Stack</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="run-summary">Run summary</h2>
     <ul class="stat-strip wide" id="summary-stats">
       <!-- filled by JS -->
     </ul>
@@ -493,7 +518,8 @@ import SiteNav from '../../components/SiteNav.astro';
       <!-- filled by JS -->
     </div>
 
-    <h2>Score progression</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="score-progression">Score progression</h2>
     <p>
       <span id="chart-metric-line">Category macro-F1 per split, per iteration.</span>
       The shaded band is the gap between A and C at each iteration. The band
@@ -518,7 +544,8 @@ import SiteNav from '../../components/SiteNav.astro';
       <svg id="score-chart" class="diagram" viewBox="0 0 640 280" role="img" aria-label="Line chart of category macro-F1 for splits A, B, and C across iterations"></svg>
     </div>
 
-    <h2>Iteration replay</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="iteration-replay">Iteration replay</h2>
     <div class="iter-nav">
       <button id="iter-prev" type="button" aria-label="Previous iteration">&lsaquo;</button>
       <input type="range" id="iter-slider" min="0" max="0" value="0" step="1" aria-label="Iteration" />
@@ -548,7 +575,8 @@ import SiteNav from '../../components/SiteNav.astro';
       <p class="ex-note" id="iter-meta"></p>
     </div>
 
-    <h2>The decisions</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="the-decisions">The decisions</h2>
 
     <div class="decision">
       <p class="tag">Decision</p>
@@ -587,7 +615,8 @@ import SiteNav from '../../components/SiteNav.astro';
         the swap.</p>
     </div>
 
-    <h2>How this reads a run log</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="how-this-reads-a-run-log">How this reads a run log</h2>
 
     <!-- lr1-pipeline. The two rungs' dialects are the only part of this
          section that is topology: two logs in, one normalizer, one viewer.
@@ -681,7 +710,8 @@ import SiteNav from '../../components/SiteNav.astro';
       If it gets a viewer, that viewer is a separate page.
     </p>
 
-    <h2>Stack</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="stack">Stack</h2>
     <p>
       The page uses vanilla HTML/CSS/JS, and it matches the rest of this site.
       It uses no chart library and no build step. The chart is a hand-built SVG,
