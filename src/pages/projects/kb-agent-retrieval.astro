@@ -488,9 +488,10 @@ const qP = qValue('McNemar exact p').toFixed(4);
       8 about projects, 5 about libraries, 10 about my plain-language notes, and
       4 adversarial. The corpus is lopsided, so an even split would misrepresent
       what retrieval actually searches. Each label is a query with the source
-      file or files that should come back. The metrics are recall at 1, 3 and 5,
-      plus <Term id="recall-mrr">MRR</Term>. I chose k=5 to match the search
-      tool&rsquo;s own default.
+      file or files that should come back. The harness records recall at 1, 3
+      and 5, plus <Term id="recall-mrr">MRR</Term>. This page prints recall@1,
+      recall@5 and MRR. I chose k=5 to match the search tool&rsquo;s own
+      default.
     </p>
 
     <p>
@@ -543,9 +544,9 @@ const qP = qValue('McNemar exact p').toFixed(4);
 
     <p>
       Every change ran through one paired comparison layer. I vendored that
-      layer from the classifier&rsquo;s <Term id="eval">eval</Term> rather than re-derived it. A
-      comparison that quietly shrinks its own denominator still prints a
-      confident number.
+      layer from the classifier&rsquo;s <Term id="eval">eval</Term>. I did not
+      re-derive it. A comparison that quietly shrinks its own denominator still
+      prints a confident number.
     </p>
 
     <!-- kb2-paired. A PLATE, and the method for all three changes below it.
@@ -601,6 +602,13 @@ const qP = qValue('McNemar exact p').toFixed(4);
       </figcaption>
     </figure>
 
+    <p>
+      Each pair scores one outcome, and each change names its own outcome.
+      Change 1 and change 3 score recall@5: was the right file in the top five.
+      Change 2 scores the model&rsquo;s first tool call instead, because it
+      changes no retrieval.
+    </p>
+
     <div class="decision">
       <p class="tag">Change 1<span class="code-ref">PR #71</span></p>
       <h3>Filter the boilerplate out of the notes ingest</h3>
@@ -613,11 +621,11 @@ const qP = qValue('McNemar exact p').toFixed(4);
         from 47 source files to 44.
       </p>
       <p class="tradeoff">
-        <strong>The result:</strong> hit@5 rose from 88.9% to 92.6%, recall@1
+        <strong>The result:</strong> recall@5 rose from 88.9% to 92.6%, recall@1
         from 0.630 to 0.741, and MRR from 0.744 to 0.807. The kind-filtered arm
-        went from 0.852 to 0.963 at recall@1. Per query that is one win, zero
-        losses, 26 ties. The claim is one recovered miss and no regressions, not
-        the percentage.
+        went from 0.852 to 0.963 at recall@1. At recall@5 the pairs are one win,
+        zero losses and 26 ties. The claim is one recovered miss and no
+        regressions, not the percentage.
       </p>
     </div>
 
@@ -636,9 +644,12 @@ const qP = qValue('McNemar exact p').toFixed(4);
       <p class="tradeoff">
         <strong>The result:</strong> the rate at which the model supplies a kind
         went from 0.370 to 0.889, and the correct-kind rate from 0.370 to 0.852.
-        15 wins, zero losses, 12 ties. This model rejects the temperature
-        parameter as deprecated, so I cannot pin the sampling. I ran each arm
-        three times and the figures are medians. The <Term id="baseline">baseline</Term>
+        This model rejects the temperature parameter as deprecated, so I cannot
+        pin the sampling. I ran each arm three times and the figures are
+        medians. On the supplied kind the pairs are 15 wins, zero losses and 12
+        ties. On the correct kind they are 14 wins, zero losses and 13 ties.
+        Each pair takes the majority of the three runs, so these counts do not
+        divide out of the medians. The <Term id="baseline">baseline</Term>
         spread was 0.333 to 0.407 and the candidate 0.889 to 0.926. Those ranges
         do not overlap, so the median of three is worth quoting.
       </p>
@@ -710,13 +721,14 @@ const qP = qValue('McNemar exact p').toFixed(4);
           <tr><th scope="col">Unfiltered</th><th scope="col">recall@1</th><th scope="col">recall@5</th><th scope="col">MRR</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Dense only</th><td>0.741</td><td>0.926</td><td>0.807</td></tr>
-          <tr><th scope="row">Hybrid</th><td>0.704</td><td>0.963</td><td>0.807</td></tr>
+          <tr><th scope="row">Dense only</th><td>0.741</td><td>0.926</td><td>0.8068</td></tr>
+          <tr><th scope="row">Hybrid</th><td>0.704</td><td>0.963</td><td>0.8068</td></tr>
         </tbody>
       </table>
       <p>
-        Hit@5 went from 92.6% to 96.3%. That is the number I would have led with,
-        and it is one query.
+        Recall@5 went from 92.6% to 96.3%. That is the number I would have led
+        with, and it is one query. The MRR column carries four decimals, because
+        the identity below is the claim that column has to support.
       </p>
       <p>
         <strong>I built hybrid to fix one thing, and it does not fix it.</strong>
@@ -842,7 +854,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
       <span class="fig-label">Plot 05</span>
       <svg class="kb3-plate kb-plate" viewBox="0 0 260 104" role="img"
            data-fig-generated="true"
-           aria-label={`Two rows of marks, one row for each direction of disagreement. One mark is one query out of the ${qPairs} pairs the gold set scores. Hybrid is right where dense is wrong in ${qWins}. Dense is right where hybrid is wrong in ${qLosses}. The comparison did not clear the bar to change a default.`}>
+           aria-label={`Two rows of marks, one row for each direction of disagreement. One mark is one query out of the ${qPairs} pairs the gold set scores. Each pair scores recall@5: the right file was in the top five, or it was not. Hybrid is right where dense is wrong in ${qWins}. Dense is right where hybrid is wrong in ${qLosses}. The comparison did not clear the bar to change a default.`}>
         <title>{`Discordant pairs: ${qWins} one way and ${qLosses} the other, out of ${qPairs}. The comparison did not clear the bar.`}</title>
 
         <text class="kb-lane" x="4" y="12">HYBRID RIGHT, DENSE WRONG</text>
@@ -861,8 +873,10 @@ const qP = qValue('McNemar exact p').toFixed(4);
       </svg>
       <figcaption>
         <span class="fig-what">One mark is one query, out of the {qPairs} pairs
-          the gold set scores. One mark is therefore {qPoints} percentage points
-          at this denominator. Hybrid is right where dense is wrong in
+          the gold set scores. Each pair scores recall@5: the right file was in
+          the top five, or it was not. One mark is therefore {qPoints}
+          percentage points at this denominator. Hybrid is right where dense is
+          wrong in
           {qWins} of them, and dense is right where hybrid is wrong in
           {qLosses}. McNemar&rsquo;s exact test on those pairs gives
           <strong>p&nbsp;=&nbsp;{qP}</strong>. Geometry from
@@ -918,7 +932,7 @@ const qP = qValue('McNemar exact p').toFixed(4);
       embedding model, so retrieval needs no API key and no network.
       <code>rank-bm25</code> runs the lexical leg. A hand-written recall@k and
       MRR harness measures both arms. I vendored the paired-comparison layer
-      from the classifier&rsquo;s eval rather than rewrote it. The repo is public:
+      from the classifier&rsquo;s eval. I did not rewrite it. The repo is public:
       <a href="https://github.com/sanlee-ys/kb-agent">github.com/sanlee-ys/kb-agent</a>.
       Everything behind every figure above is checkable. That is the
       <Term id="gold-set">gold set</Term>, both eval harnesses, the decision record for the negative
