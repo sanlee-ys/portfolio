@@ -3,21 +3,28 @@
 Repo-local decision records for the portfolio site, per the two-tier practice in
 [`system/SYS-001`](https://github.com/sanlee-ys/architecture/blob/main/decisions/SYS-001-record-architecture-decisions.md).
 
+Since 2026-09-04, this index holds two kinds of record. A mechanism record explains why a
+gate or a trap exists, and a gate enforces it, so the record sets a floor. An informational
+record explains why the owner made an editorial choice at that time, and it sets no floor.
+The owner's current call governs those choices, and a session that changes one adds a dated
+line to the record.
+
 | # | Title | Status |
 |---|-------|--------|
 | [ADR-001](ADR-001-mobile-qa-gate.md) | The mobile QA gate is a contract, enforced in CI | Accepted |
-| [ADR-002](ADR-002-ai-use-posture.md) | State the AI assist as method, not confession | Accepted |
+| [ADR-002](ADR-002-ai-use-posture.md) | State the AI assist as method, not confession | Informational (2026-09-04) |
 | [ADR-003](ADR-003-private-repo-boundary.md) | Never mention or link private repos; the bar is omission | Accepted |
-| [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Accepted |
+| [ADR-004](ADR-004-retire-the-lab-as-the-vehicle.md) | Retire the lab as the vehicle; interactive work belongs wherever it argues best | Informational (2026-09-04) |
 | [ADR-005](ADR-005-review-check-signal.md) | A red review check means the tooling broke, not that the PR is bad — **on-demand via `@claude` only** since 2026-07-26 (Amendment 7) | Accepted |
 | [ADR-006](ADR-006-hand-written-html-or-a-generator.md) | Hand-written HTML, or a static site generator? — **migrated to Astro**, executed 2026-07-26 | Accepted |
-| [ADR-007](ADR-007-split-dont-trim.md) | Split, don't trim — the two-speed reader | Accepted |
+| [ADR-007](ADR-007-split-dont-trim.md) | Split, don't trim — the two-speed reader | Informational (2026-09-04) |
 | [ADR-008](ADR-008-breakout-grid.md) | A breakout grid — two deliberate edges, not one honest column. **Reverses the "One content column" rule** | Accepted |
 | [ADR-009](ADR-009-rendered-contrast-gate.md) | Contrast is checked on the rendered pixel, not the declared token | Accepted |
 | [ADR-010](ADR-010-the-figure-offers-the-jump.md) | A figure offers the jump, it does not take it | Accepted |
-| [ADR-011](ADR-011-career-story-ceiling.md) | The public career tell stays short | Accepted |
-| [ADR-012](ADR-012-telltale-promoted-above-the-router.md) | Promote the instrument above the router, and gate its figures | Accepted |
+| [ADR-011](ADR-011-career-story-ceiling.md) | The public career tell stays short | Informational (2026-09-04) |
+| [ADR-012](ADR-012-telltale-promoted-above-the-router.md) | Promote the instrument above the router, and gate its figures | Informational (2026-09-04) |
 | [ADR-013](ADR-013-diagram-led-narrative.md) | A diagram-led narrative, and a gate under every figure | Accepted |
+| [ADR-014](ADR-014-the-monograph-identity.md) | The MONOGRAPH identity | Accepted |
 
 ## Why this tier was missing
 
