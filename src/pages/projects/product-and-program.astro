@@ -304,7 +304,33 @@ import SiteNav from '../../components/SiteNav.astro';
       work. I did that work as if a team existed.
     </p>
 
-    <h2>The problem (product framing)</h2>
+    <!-- The long-page nav device (ADR-014, PL-7 and PL-8). The ToC gate opens
+         at 8 phone screens or at 6 figures. This page runs 13.50 phone screens
+         at 393px, and it holds six figures, so both arms carry it.
+
+         The nav carries id="toc" because the Contents returns below target it.
+         A #toc link ships only on a page that holds the id, and
+         link-check.cjs does not read same-page fragments.
+
+         Each row repeats its own heading and adds no prose. The capacity-gate
+         row is long because that heading is long. The device is typographic
+         and it runs no JavaScript. This page ships no .toc-figs comma-run:
+         the figure numbers already ride each figure in flow. -->
+    <nav class="toc" id="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#the-problem">The problem (product framing)</a></li>
+      <li><a href="#who-it-is-for">Who it is for</a></li>
+      <li><a href="#success-metrics">Success metrics</a></li>
+      <li><a href="#dependencies">Dependencies</a></li>
+      <li><a href="#roadmap">Roadmap (program framing)</a></li>
+      <li><a href="#risk-register">Risk register</a></li>
+      <li><a href="#capacity-gate">I pre-registered six axes for a capacity review, then measured that nothing wrote to them.</a></li>
+      <li><a href="#what-it-demonstrates">What it demonstrates</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="the-problem">The problem (product framing)</h2>
     <p>
       Defense developments come from many sources. They arrive faster than one
       person can triage. An analyst spends a disproportionate share of the time
@@ -376,7 +402,8 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
     </div>
 
-    <h2>Who it is for</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="who-it-is-for">Who it is for</h2>
     <p>
       <strong>Primary user:</strong> a defense-news analyst. The analyst must
       stay current across programs, contracts, geopolitics, and technology, and
@@ -393,7 +420,8 @@ import SiteNav from '../../components/SiteNav.astro';
         analyzing instead of sorting.</p>
     </div>
 
-    <h2>Success metrics</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="success-metrics">Success metrics</h2>
     <p>Two kinds. They answer different questions.</p>
 
     <h3>User-outcome metrics (does it help the analyst?)</h3>
@@ -466,7 +494,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </figcaption>
     </figure>
 
-    <h2>Dependencies</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="dependencies">Dependencies</h2>
     <p>
       kb-agent calls notes-api and the classifier as tools, so both services
       must work before the agent works as one system. SYS-003 sets that
@@ -475,7 +504,8 @@ import SiteNav from '../../components/SiteNav.astro';
       map in the architecture repo</a> draws the graph.
     </p>
 
-    <h2>Roadmap (program framing)</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="roadmap">Roadmap (program framing)</h2>
     <p>I sequenced the work Now / Next / Later. I harvested the sequence from delivery.</p>
     <!-- Plate 03 of six (ADR-014). Bare plate, so the wrapper is a div.fig
          and not a figure element. -->
@@ -528,7 +558,8 @@ import SiteNav from '../../components/SiteNav.astro';
       </div>
     </div>
 
-    <h2>Risk register</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="risk-register">Risk register</h2>
     <table>
       <thead>
         <tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
@@ -585,6 +616,7 @@ import SiteNav from '../../components/SiteNav.astro';
       </figcaption>
     </figure>
 
+    <p class="toc-return"><a href="#toc">Contents</a></p>
     <h2 id="capacity-gate">I pre-registered six axes for a capacity review, then measured that nothing wrote to them.</h2>
     <p>
       This record applies an evidence gate to a model choice. I applied the same
@@ -726,7 +758,8 @@ import SiteNav from '../../components/SiteNav.astro';
     </p>
     <p class="diagram-more standalone"><a class="card-link" href="telltale.html">telltale, the instrument for the same capacity <span class="arrow">&rarr;</span></a></p>
 
-    <h2>What it demonstrates</h2>
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-it-demonstrates">What it demonstrates</h2>
     <p>
       The scale is personal. The program is simulated. The source documents
       live in the architecture repo:
