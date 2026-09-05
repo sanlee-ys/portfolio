@@ -289,6 +289,12 @@ import SiteNav from '../../components/SiteNav.astro';
     <h1>False Green</h1>
     <p class="subtitle">I built six checks and wired them into CI. Later I found that each one reported success for work that never ran. Each one exited green.</p>
 
+    <p>
+      The checks, the fixes, and the decision records are in this
+      site&rsquo;s own repository. It is public:
+      <a href="https://github.com/sanlee-ys/portfolio">github.com/sanlee-ys/portfolio</a>.
+    </p>
+
     <!-- Plate 01. A bare plate takes a <div class="fig fig--plate"> wrapper and
          never a <figure> (ADR-014). Gate rule R-C makes a declared <figure> owe
          a two-slot caption, and this plate's caption states what it shows and
@@ -398,11 +404,11 @@ import SiteNav from '../../components/SiteNav.astro';
     </figure>
 
     <p>
-      That second run spent $0.14 across seven turns. The agent read the diff,
-      formed a review, and attempted to post it six times. Every attempt was
-      refused. The agent exited zero. The run recorded
-      <code>permission_denials_count: 6</code>. A tool denial is not a job
-      failure, so the job did not fail.
+      Call that second break run A. Run A spent $0.14 across seven turns. The
+      agent read the diff, formed a review, and attempted to post it six times.
+      Every attempt was refused. The agent exited zero. The result message
+      carried the array <code>permission_denials</code> with six entries. A tool
+      denial is not a job failure, so the job did not fail.
     </p>
 
     <!-- Argument: same empty middle, opposite report. The state is a word plus
@@ -676,18 +682,24 @@ import SiteNav from '../../components/SiteNav.astro';
 
       <p>
         The log is the raw message stream. Its result message carries the array
-        <code>permission_denials</code>. A read of an absent key returns
-        undefined, and the code defaulted that to zero.
+        <code>permission_denials</code>. My counter read
+        <code>permission_denials_count</code>, which is not a key on that
+        message. The action derives that count for its own stdout summary only.
+        A read of an absent key returns undefined, and the code defaulted that
+        to zero.
       </p>
       <p>
-        On one pull request the step logged <code>denials=0</code>. It reported
-        <code>turns</code> as 8 and <code>cost</code> as 0.1447. Both figures
-        matched the run summary to the digit. The same result object, and one
-        field silently misread.
+        Run B is a later run, on this site&rsquo;s own review lane. Its classify
+        step logged <code>denials=0</code>. It reported <code>turns</code> as 8
+        and <code>cost</code> as 0.1447. Both figures matched the run summary to
+        the digit. The same result object, and one field silently misread. The
+        turn, cost, and denial figures on this page belong to two different
+        runs.
       </p>
       <p class="tradeoff">
-        <strong>The result:</strong> that review agent held four tools, and none
-        of them could open a file. The diff&rsquo;s meaning lived in the markup.
+        <strong>The result:</strong> in run B the review agent held four tools,
+        and none of them could open a file. The diff&rsquo;s meaning lived in
+        the markup.
         The agent burned five denied reads and posted nothing. The instrument I
         built to report those denials read a field that was never there. The
         two defects concealed each other.
@@ -734,7 +746,8 @@ import SiteNav from '../../components/SiteNav.astro';
       cannot read. A parity counter that returns zero and a correct parity
       counter produce identical output on a clean tree. So the fix was
       unfalsifiable until something made it fail on purpose. If I revert the
-      one-line exemption, exactly three of those tests turn red.
+      one-line exemption, exactly three of those tests turn red. The suite is
+      <a href="https://github.com/sanlee-ys/portfolio/blob/29f79c9b6ba0bf1fd9156ca2ab54fa141fcb3670/scripts/check-published-metrics.test.cjs">scripts/check-published-metrics.test.cjs</a>.
     </p>
 
   </main>
