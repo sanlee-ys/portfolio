@@ -300,8 +300,8 @@ import SiteNav from '../../components/SiteNav.astro';
 
     <p class="lead">
       This is a solo build. There is no team to coordinate, so the program
-      layer is simulated. The workstreams, the dependency map, and the risk
-      register are real work. I did that work as if a team existed.
+      layer is simulated. The dependency map and the risk register are real
+      work. I did that work as if a team existed.
     </p>
 
     <h2>The problem (product framing)</h2>
@@ -465,6 +465,15 @@ import SiteNav from '../../components/SiteNav.astro';
         <span class="fig-limit">The plate does not show what each measurement measured, or by how much it moved. The bullets above keep those figures, and the judge-reliability study keeps its own page.</span>
       </figcaption>
     </figure>
+
+    <h2>Dependencies</h2>
+    <p>
+      kb-agent calls notes-api and the classifier as tools, so both services
+      must work before the agent works as one system. SYS-003 sets that
+      tool-layer contract, and SYS-004 and SYS-006 freeze the two wire seams.
+      The <a href="https://github.com/sanlee-ys/architecture/blob/main/program/README.md#dependency-map">dependency
+      map in the architecture repo</a> draws the graph.
+    </p>
 
     <h2>Roadmap (program framing)</h2>
     <p>I sequenced the work Now / Next / Later. I harvested the sequence from delivery.</p>
