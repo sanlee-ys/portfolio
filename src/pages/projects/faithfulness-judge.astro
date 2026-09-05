@@ -363,9 +363,9 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
 
     <p class="lead">
       Another LLM grades every LLM system I build at some point. This project
-      measures the grader. It takes answers generated over public defense text
-      and breaks them into individual claims. A person labels each claim against
-      its cited source. Two model tiers then do the same job blind. The
+      measures the grader. It takes 79 answers generated over public defense
+      text and breaks them into individual claims. A person labels each claim
+      against its cited source. Two model tiers then do the same job blind. The
       deliverable is a number for how far the judge can be trusted, and where it
       cannot.
     </p>
@@ -693,6 +693,9 @@ if (dp.winsX.length !== dpWins || dp.lossesX.length !== dpLosses) {
         excluded four as non-claims. The intervals are about nine points wide.
         Any difference smaller than that is noise. That includes the tier gap in
         &kappa; and the recall gap. The recall denominator is only 48.</li>
+      <li><strong>Each answer holds several claims</strong>, so the claims are
+        not independent. These intervals are narrower than a clustered estimate.
+        I did not compute one.</li>
       <li><strong>Floor tier by design.</strong> The judge makes one pass. I
         tuned no judge prompt, built no ensemble, and added no retrieval. This
         measures the ruler as built, not the best ruler obtainable.</li>
