@@ -490,22 +490,19 @@ therefore never falls as the viewport widens, so the narrowest viewport is the
 worst case. Measured on 2026-09-01: the site minimum is 9.00px at 320, 360, 390
 and 430 alike.
 
-## AI-use posture: method, not confession (voice rule)
+## AI-use posture (current choice, 2026-09-04)
 
-Decided 2026-07-11. Copy that references the AI assist states it as directed
-work, in the colophon's framing (which is canonical): **San sets the
-direction, the contracts, and the bar; Claude does most of the typing; the
-evals and postmortems are the proof.** Two failure modes to avoid:
+Copy that references the AI assist describes it as directed work, in the
+colophon's framing: **San sets the direction, the contracts, and the bar;
+Claude does most of the typing; the evals and postmortems are the proof.**
 
-- **Apologetic** ("full disclosure", "disclaimer", "I have to admit") — the
-  assist is a competency being demonstrated, not a caveat to preempt.
-- **Label-y** ("agentic orchestration" or similar as a self-description) —
-  describe the practice; the skeptical-senior-engineer reader credits
-  artifacts, not vocabulary.
+Name Claude plainly on every surface that says who built the site.
 
-Honesty is unchanged by this rule: Claude is named plainly on every surface
-that makes a "who built this" claim. Surfaces aligned 2026-07-11: GitHub
-bio, profile README intro, this colophon (already canonical).
+Avoid the apologetic register ("full disclosure", "I have to admit") and the
+label register ("agentic orchestration" as a self-description).
+
+This is San's current choice. He edits it at will. Reasoning at the time:
+[`decisions/ADR-002`](decisions/ADR-002-ai-use-posture.md), now informational.
 
 ## Private repos: never mention, never link
 
@@ -525,35 +522,22 @@ First codified as a standing rule 2026-07-01 (adversarial round,
 `ROADMAP.md`); promoted here 2026-07-03 after the same leak recurred in a
 cross-repo write-up in the `architecture` repo.
 
-## Career-story ceiling: short, not a memoir (voice rule)
+## Career copy (current choice, 2026-09-04)
 
-*Reasoning: [`decisions/ADR-011`](decisions/ADR-011-career-story-ceiling.md).
-This section is canonical for what to write.*
-
-Public career copy stays at résumé facts plus the locked About tell. Do not
-add Army color, employer internals, or a claim that the seat was rare.
-
-Locked About tell (2026-08-17):
+Current About tell (2026-08-17):
 
 > Seven years in infra and operations at the same firm, then a product seat
 > on a collaboration platform. I was one person in a large machine. I built
 > the public system to own a full loop I did not own at work.
 
-Hard stops:
+Public career copy stays at résumé facts. The résumé is the factual spine.
 
-- Army: résumé facts only. No unit, no mission color, no implied special
-  operations.
-- Employer: title, platform, firm-wide scale, and the résumé's
-  merchant-command line. No team names, no feature list, no "I uniquely
-  did X."
-- `about.html` is the one permitted career page. Keep it short; do not add a
-  timeline, photo essay, or extra paragraphs that thicken the biography. The
-  homepage may carry only a short version of the same tell.
-- Longer stories stay in the private narrative bank. They are spoken, not
-  indexed.
+San decides how much of his path the About page carries. A session that wants
+more asks him in one sentence. It does not add color on its own.
 
-A later session that expands this "to help a hiring manager" is out of
-bounds. The résumé and the room hold the rest.
+Reasoning at the time:
+[`decisions/ADR-011`](decisions/ADR-011-career-story-ceiling.md), now
+informational.
 
 ## Reading the Claude Review check
 
