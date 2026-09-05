@@ -311,7 +311,7 @@ import SiteNav from '../components/SiteNav.astro';
         <p class="kicker">Eval rebuilt<span class="code-ref">EVAL &middot; v1 &rarr; v3</span></p>
         <h3>I rebuilt the eval on human-labeled real text</h3>
         <p>v1 graded the model on 300 snippets it generated itself. That measures consistency, not correctness. v2 replaced that with 54 hand-labeled real snippets, cross-checked by an Opus judge.</p>
-        <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% to 88.9% on real text, and that lower number is the trustworthy one.</p>
+        <p class="tradeoff"><strong>The result:</strong> domain accuracy fell from 97.3% on 300 self-generated snippets to 88.9% on 54 real snippets, and that lower number is the trustworthy one.</p>
         <p>Category accuracy actually rose, because real vocabulary separates more cleanly; domain fell because the synthetic set was trivially easy to grade. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
       </div>
 
@@ -333,7 +333,12 @@ import SiteNav from '../components/SiteNav.astro';
         <li><span class="stat-value" data-metric="region_accuracy">94.4%</span><span class="stat-label">Region</span></li>
       </ul>
       <p class="stat-note">I score category and region separately. The two figures are equal here by coincidence.</p>
-      <p>Those numbers are from the harder gold set. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
+      <!-- The version and the set size sit with the tiles, so a first read
+           carries both. `n` is a key of the artifact's gold object, so the
+           set size is a checked figure. The version is not under gold, so
+           check-published-metrics.cjs has no marker for it; it is plain
+           text and it moves by hand on a release. -->
+      <p>Classifier v3.2.1 on the <span data-metric="n">54</span>-snippet human-labeled gold set. <a href="projects/defense-news-classifier.html">Full eval &rarr;</a></p>
       <p>The classical baseline lost the case for an LLM. I vendored it here, and it runs in the browser on the same rows. <a href="projects/classifier-baseline.html#try-it">Run it yourself &rarr;</a></p>
     </section>
 
@@ -371,6 +376,16 @@ import SiteNav from '../components/SiteNav.astro';
         It is a solo build, so I simulate the program layer. The
         <a href="projects/product-and-program.html">Product &amp; Program</a>
         page states what that means.
+      </p>
+      <!-- Who built this, named. The lede says AI agents accelerate
+           execution, and the colophon names Claude. This paragraph names
+           Claude on the home page too, in the colophon's framing (CLAUDE.md,
+           AI-use posture). It sits under the solo-build line so "solo" does
+           not read as a claim that one person typed it all. -->
+      <p>
+        I set the direction and the bar. Claude does most of the typing. The
+        evals and postmortems are the proof. The
+        <a href="colophon.html">colophon</a> states the method in full.
       </p>
       <p>
         A second record sits off this system: a physical lab that makes a
