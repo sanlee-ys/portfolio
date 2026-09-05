@@ -378,13 +378,15 @@ import SiteNav from '../../components/SiteNav.astro';
       slipped on held-out gold. Rung 2 is an agent that does error-driven
       feature engineering on a trained baseline
       (<a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/decisions/archive/018-agent-driven-ml-loop.md">ADR-018</a>).
-      It scored +6.0 on the validation split it could see, and
-      <strong>&minus;8.6 on the human-labeled set it could not</strong>. The
-      loop&rsquo;s design gave the held-out set veto power, and it used it.
+      It gained 6.0 macro-F1 points on the split that selected it. It lost
+      <strong>8.6 macro-F1 points on the human-labeled gold set that no
+      decision read</strong>. The loop&rsquo;s design gave the held-out set
+      veto power, and it used it.
     </p>
     <p>
       L4&rsquo;s honesty test is the backward edge. I aimed the critic at the
-      one named, rule-checkable error cluster. That cluster is seven rows. In
+      one named, rule-checkable error cluster. That cluster is seven of the 54
+      gold rows. In
       each row the model inferred a region from the US actor, and the text
       stated no place. The critic fixed <strong>six of the seven</strong>. The
       honesty test passed.
