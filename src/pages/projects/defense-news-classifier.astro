@@ -480,7 +480,8 @@ const pwCommit = dncPower.sha.slice(0, 7);
         was tested or demoed in an operational setting. It also over-assigned
         <code>land</code>. Two targeted rubric clauses moved category from 90.7%
         to <strong>94.4%</strong> and domain from 90.7% to 92.6%.
-        <code>technology</code> recall reached 1.000, and nothing regressed.</p>
+        <code>technology</code> recall reached 1.000. Domain ended at 92.6%, one
+        row below the 94.4% column.</p>
       <p class="tradeoff"><strong>The lesson:</strong> the misses were a prompt
         problem. A stronger model did not move that boundary.</p>
     </div>
@@ -800,14 +801,15 @@ const pwCommit = dncPower.sha.slice(0, 7);
     </figure>
 
     <p>
-      The over-calls are the collateral, and I priced them before the run. Five
+      The over-calls are the collateral, and I priced them before the run. Six
       under-calls traded for two over-calls is the shape of the win.
     </p>
     <p>
       Judge-versus-human agreement on region is the measured condition that
       gated the scaled eval. It fell from a perfect <strong>100.0%</strong> to
-      <strong>96.3%</strong>. That is 2 disagreements in 54, against a CI floor
-      that budgets 3. Three disagreements would have stopped the release.
+      <strong>96.3%</strong>. That is 2 disagreements in 54, against an
+      eval-gate floor that budgets 3. Three disagreements would have stopped the
+      release.
     </p>
 
 
