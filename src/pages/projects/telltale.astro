@@ -381,6 +381,20 @@ if (missingFrames.length) {
       color: var(--muted);
     }
     .tt-reader figure:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+    /* The closing link row at the end of the page (adversarial review F2-15).
+       The shared rule `.diagram-more.standalone .card-link` gives a standalone
+       card link `padding: 15px 0`, and that padding sits on an INLINE box.
+       Vertical padding on an inline element grows the tap box and moves
+       nothing, so it is correct for the single closing link on
+       `product-and-program.astro` and wrong here: two rows stack, the two
+       padded boxes overlap, and the overlap goes to whichever row paints
+       later. `inline-block` turns the same padding into a real band, which is
+       the mechanism `style.css` records for `.selected-work`. It is
+       `inline-block` and not `inline-flex` for the reason that block also
+       records: a flex anchor does not wrap its text, and this label must wrap
+       at 320px. */
+    .tt-close .card-link { display: inline-block; }
   </style>
   </Fragment>
 
@@ -1447,6 +1461,20 @@ if (missingFrames.length) {
       product is least able to see in itself. Every sentence above resolves to a
       file you can open.
     </p>
+
+    <!-- The closing route out (adversarial review F2-15). The page used to end
+         on "Every sentence above resolves to a file you can open." and offer
+         no route to a file. The repository link sat in Stack, section ten of
+         eleven, and nothing followed the last sentence. These two links reuse
+         the project-page closing pattern from `product-and-program.astro`:
+         `.diagram-more.standalone` plus `.card-link`. The program link points
+         at `product-and-program.html`, because the capacity-gate paragraph
+         above already calls that page "the program page".
+         Each anchor is the only text of its paragraph, so `hit-target.cjs`
+         measures both against the 44px floor at 320 to 430px. The `tt-close`
+         rule in the style island is what makes that pass. -->
+    <p class="diagram-more standalone tt-close"><a class="card-link" href="https://github.com/sanlee-ys/telltale">Read the code <span class="arrow">&rarr;</span></a></p>
+    <p class="diagram-more standalone tt-close"><a class="card-link" href="product-and-program.html">The program that built it <span class="arrow">&rarr;</span></a></p>
   </main>
   <script is:inline src="../assets/theme.js"></script>
   <script is:inline src="../assets/last-updated.js"></script>
