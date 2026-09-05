@@ -5,7 +5,7 @@ import Term from '../../components/Term.astro';
 ---
 <Base
   title="AI System Architecture and Contract Testing · San Lee"
-  description="A four-service AI system talks over explicit HTTP contracts with asynchronous enrichment. An audit found a false-green integration seam."
+  description="A three-service AI system talks over explicit HTTP contracts with asynchronous enrichment. An audit found a false-green integration seam."
   canonical="https://sanlee.me/projects/the-system.html"
   ogType="article"
   ogImage="/assets/og-the-system.png"
@@ -241,7 +241,7 @@ import Term from '../../components/Term.astro';
   <main class="wrap article-body" id="main" tabindex="-1">
     <a class="back" href="../index.html">&larr; Back</a>
     <h1>The System</h1>
-    <p class="subtitle">Four public repos talk over frozen HTTP contracts. An audit found that each side's tests asserted against its own copy of the shape.</p>
+    <p class="subtitle">Three services talk over frozen HTTP contracts, in four public repos. An audit found that each side's tests asserted against its own copy of the shape.</p>
 
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
@@ -340,7 +340,7 @@ import Term from '../../components/Term.astro';
            so a phone pays no 44px box per figure (ADR-014). Plate 01 opens the
            page above this list and belongs to no section, so no row claims
            it. -->
-      <li><a href="#what-it-grew-into">The four repos</a></li>
+      <li><a href="#what-it-grew-into">The repos</a></li>
       <li><a href="#the-map">The map</a><span class="toc-figs">Map 02</span></li>
       <li><a href="#how-it-flows">How it flows</a></li>
       <li><a href="#the-problem">The problem</a></li>
@@ -358,14 +358,14 @@ import Term from '../../components/Term.astro';
       severity bar, with the failures left in.
     </p>
 
-    <h2 id="what-it-grew-into">The four repos</h2>
+    <h2 id="what-it-grew-into">The repos</h2>
     <ul class="repo-grid">
       <li><strong><a href="https://github.com/sanlee-ys/notes-api">notes-api</a></strong><span>FastAPI REST service. The knowledge base and data layer.</span></li>
       <li><strong><a href="https://github.com/sanlee-ys/defense-news-classifier">defense-news-classifier</a></strong><span>LLM classifier with a real <Term id="eval">eval harness</Term>. Labels the content.</span></li>
       <li><strong><a href="https://github.com/sanlee-ys/kb-agent">kb-agent</a></strong><span><Term id="rag">RAG</Term> and tool-use agent. The hub that reasons over the system.</span></li>
       <li><strong><a href="https://github.com/sanlee-ys/learning-notes">learning-notes</a></strong><span>Plain-language notes on the techniques behind it all.</span></li>
     </ul>
-    <p class="ex-caption">All four repos are public. The ADRs and contract tests below live in those repos.</p>
+    <p class="ex-caption">All four repos are public. Three of them are services. learning-notes is a notes site, and it holds no contract. The ADRs and contract tests below live in those repos.</p>
 
     <p class="toc-return"><a href="#toc-heading">Contents</a></p>
     <h2 id="the-map">The map</h2>
@@ -550,9 +550,11 @@ import Term from '../../components/Term.astro';
       <h3>Make the enrichment loop async and idempotent by design</h3>
       <p>A new note triggers a FastAPI <Term id="backgroundtask">BackgroundTask</Term> in notes-api. The task
         calls the classifier. It then writes the returned labels back as
-        namespaced tags (<code>category:</code> / <code>domain:</code>) with
-        replace semantics. notes-api owns the writeback, and the classifier
-        stays a pure provider.</p>
+        namespaced tags (<code>category:</code>, <code>domain:</code>,
+        <code>region:</code>) with replace semantics. notes-api owns the
+        writeback, and the classifier stays a pure provider. I first built this
+        loop on Kafka. I cut it, because one user and an idempotent workload do
+        not need a broker.</p>
       <p class="tradeoff"><strong>Why:</strong> classification inside a
         BackgroundTask keeps note creation fast, and it decouples note creation
         from classifier latency. Replace semantics make reprocessing converge,
