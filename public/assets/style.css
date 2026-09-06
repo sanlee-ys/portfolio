@@ -1173,6 +1173,14 @@ em, i, cite {
   text-decoration-color: var(--accent);
   text-decoration-thickness: 2px;
 }
+.proof-claim {
+  /* A band claim is an index entry, so a one-word last line reads as a stray
+     token rather than as the end of a label. `text-wrap: pretty` asks the
+     browser to balance the last line away. It is a hint, not a guarantee, so
+     the copy carries the fix too: each claim is short enough to hang its own
+     verb. No nowrap here — that would overflow the 272px track at 320px. */
+  text-wrap: pretty;
+}
 /* The measurement, and it gets a FLOOR to land on.
 
    It used to be an appositive inside the claim's sentence, introduced by an em
