@@ -204,6 +204,35 @@ import SiteNav from '../components/SiteNav.astro';
         <p class="tl-body">I had it read the site as a hiring manager who knows nothing about me. It got no context and no credit for effort. The verdict was blunt and correct. The homepage explained how I work before it said who I am. I <a href="https://github.com/sanlee-ys/portfolio/pull/200">re-cut the positioning the same day</a>. <span class="tl-quote">&ldquo;Assume you know nothing about me.&rdquo;</span></p>
       </li>
     </ol>
+
+    <!-- The site-decisions index. The records existed before this block and no
+         page pointed at them, so a reader found them only in the repo. The
+         owner ruled on 2026-09-06 that the index sits here, on the page where
+         the site explains itself, and that work.html carries one pointer line.
+
+         MARKUP: this reuses the shared ul.ledger from work.astro. style.css
+         owns every declaration (.ledger, .ledger li, the footnote counter, and
+         the marginalia rule above 64rem), so this page adds NO CSS. A local
+         copy would be a second definition of one grammar.
+
+         HIT TARGET: each row is a link followed by a sentence, so the anchor is
+         inline and keeps the WCAG 2.5.8 inline exception that hit-target.cjs
+         applies. A row whose only text was the link would be a standalone
+         anchor and would owe a 44px box at 320 to 430px.
+
+         Every href was verified against the ref before it shipped: each path
+         answered `gh api repos/sanlee-ys/portfolio/contents/decisions/<file>`
+         on main. -->
+    <h2 id="site-decisions">Site decisions</h2>
+    <p class="ledger-intro">The site keeps its decisions as dated records in the public repo. These six shape what a reader sees.</p>
+    <ul class="ledger">
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-003-private-repo-boundary.md">ADR-003</a> &mdash; the site links only to public repositories, and a gate checks every repository it names.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-006-hand-written-html-or-a-generator.md">ADR-006</a> &mdash; the site builds with Astro, and the migration changed no design and no content.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-007-split-dont-trim.md">ADR-007</a> &mdash; a long page splits into whole arguments, and a split never trims the substance.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-009-rendered-contrast-gate.md">ADR-009</a> &mdash; a gate renders every page and measures the composited pixel, not the declared colour.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-013-diagram-led-narrative.md">ADR-013</a> &mdash; a hand-drawn figure carries no digit, so each digit sits in prose or in a caption.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-014-the-monograph-identity.md">ADR-014</a> &mdash; the site reprints as a monograph, with gallery space for its figures and fewer strong rules.</li>
+    </ul>
   </main>
   <script is:inline src="assets/theme.js"></script>
   <script is:inline src="assets/last-updated.js"></script>
