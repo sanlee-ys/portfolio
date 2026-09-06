@@ -84,7 +84,34 @@ import SiteNav from '../components/SiteNav.astro';
     <p class="kicker">Complete index</p>
     <h1>Work</h1>
     <p class="subtitle">The complete index. Home is the short cut.</p>
-    <p>The decisions that shaped this site are on the <a href="colophon.html#site-decisions">colophon</a>.</p>
+    <!-- The three site decisions, in the ledger treatment. This block replaces
+         the one pointer line PR #336 left here. The owner ruled on 2026-09-06
+         that a pointer alone is too quiet, so Work carries three rows and the
+         colophon keeps the full index of six.
+
+         MARKUP: this is the row shape the colophon's Site decisions block uses,
+         and style.css owns every declaration (.ledger, .ledger li, .ledger li a).
+         This page adds NO CSS. The ix-s1 grid in this page's head is scoped to
+         `.measure .ledger li`, and this block sits outside section.measure, so
+         these rows take the same plain treatment as the two ledger lists below.
+
+         HIT TARGET: each row is a link followed by a sentence, so the anchor is
+         inline and keeps the WCAG 2.5.8 inline exception that hit-target.cjs
+         applies. A row whose only text was the link would be a standalone
+         anchor and would owe a 44px box at 320 to 430px.
+
+         VOICE: all three records are informational since 2026-09-04, so each
+         row states a choice the site makes. No row reads as a floor.
+
+         Every href was verified against the ref before it shipped: each path
+         answered `gh api repos/sanlee-ys/portfolio/contents/decisions/<file>`
+         on main. -->
+    <p class="ledger-intro">Three decisions shape how this site reads. The <a href="colophon.html#site-decisions">colophon</a> lists six.</p>
+    <ul class="ledger">
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-002-ai-use-posture.md">ADR-002</a> &mdash; the site states the AI assist as method: San sets the direction, the contracts, and the bar; Claude does most of the typing; the evals and postmortems are the proof.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-007-split-dont-trim.md">ADR-007</a> &mdash; a long page splits into whole arguments, and a split never trims the substance.</li>
+      <li><a href="https://github.com/sanlee-ys/portfolio/blob/main/decisions/ADR-011-career-story-ceiling.md">ADR-011</a> &mdash; the site keeps public career copy at résumé facts plus a short About tell, and the résumé is the factual spine.</li>
+    </ul>
 
     <h2>Flagship case studies</h2>
     <ul class="doors-index" aria-label="Flagship case studies">
