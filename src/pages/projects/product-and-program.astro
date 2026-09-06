@@ -566,7 +566,7 @@ import SiteNav from '../../components/SiteNav.astro';
       </thead>
       <tbody>
         <tr><td>Enrichment lost if the background task fails or the process restarts (no broker redelivery)</td><td>Low</td><td>Tags are derived and reclassification is idempotent (namespaced-tag replace), so enrichment re-runs safely. Note creation never fails on classifier errors</td></tr>
-        <tr><td>Classifier accuracy ceiling (residual label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model. I measured it at +0 rows for ~1.97&times; cost. Refine the rubric instead. A confusion breakdown found the misses clustered on one boundary, and two clauses lifted category 90.7% &rarr; 94.4%</td></tr>
+        <tr><td>Classifier accuracy ceiling (residual label ambiguity, not the model)</td><td>Medium</td><td>Do not escalate the model. I measured it at +0 rows for ~1.97&times; cost. Refine the rubric instead. A confusion breakdown found the misses clustered on one boundary, and two clauses lifted category 90.7% &rarr; 94.4%. The 90.7% start is the post-rubric eval snapshot of 2026-07-17, and the fix cost one domain row</td></tr>
         <tr><td>Breadth creep (verticals without depth)</td><td>Medium</td><td>Deep on one vehicle; other verticals are an explicit non-goal</td></tr>
         <tr><td>Planning theater (docs drift from delivery)</td><td>Medium</td><td>Keep the artifacts thin and current, and tie them to real delivery only</td></tr>
         <tr><td>Silent contract drift (separate repos)</td><td colspan="2">This is the one risk that happened. The <a href="#risk-drift">callout below</a> carries the severity, what happened, how I closed it, and what the fix still does not cover</td></tr>
