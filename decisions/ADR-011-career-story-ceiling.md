@@ -8,6 +8,8 @@
 
 **Informational, 2026-09-04.** This record explains why a choice was made at the time. It sets no floor. The owner's current call governs the site, and a session that finds this record in the way makes the change and adds a dated line here. Mechanism records (the gates and the traps) keep their floors; this one is editorial.
 
+**Owner change, 2026-09-06.** The owner added the held title to the hero line on `src/pages/index.astro`. The owner also added one résumé-fact sentence on `src/pages/about.astro` that routes the reader to the paid program work. Both sentences stay inside the ceiling below. The ceiling does not change.
+
 ## Context
 
 The site roadmap held an open item: "Career-story depth." The About section
