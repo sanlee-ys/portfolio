@@ -81,37 +81,18 @@ import SiteNav from '../components/SiteNav.astro';
     }
     .flagship-figure span { color: var(--text); font-weight: 600; }
 
-    /* The seat line, under the lede. It states what I want next. It is not an
-       argument the record has to carry, so it sits one step quieter than the
-       lede above it and keeps the lede's own measure. The lede and the seat
-       line are the owner's current copy (landing WO-E1.4; the lede is OC-1,
-       #269, 2026-08-30). No gate freezes either one (2026-09-04). The owner
-       edits them, and a session that changes either adds a dated line here.
-
-       The seat line lost its trailing clause on 2026-09-01. It read "...on an
-       AI systems team that gates delivery on evidence", and the lede three
-       lines above already ends on "gate delivery on evidence". One claim
-       states itself once. The lede kept the claim because it is the owner's
-       approved copy (OC-1), so the seat line is the copy that gave the
-       duplicate up.
+    /* The seat line left the first screen on 2026-09-05, and its .looking
+       rule left with it. It read "I want a technical program manager seat on
+       an AI systems team." The tagline already states the positioning, and
+       the proof band below states the evidence, so the first screen no longer
+       asks for a job. The same change named Claude in the lede, in the AI-use
+       posture framing (CLAUDE.md). The lede is the owner's copy (OC-1, #269,
+       2026-08-30) and no gate freezes it, so a session that changes it adds a
+       dated line here.
 
        ix-s1 and ix-s2 used to sit here. Both blocks moved to work.astro with
        the units they style: the eight-row ledger and the field-note clusters
        (landing WO-E1.1). */
-    .looking {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      line-height: 1.58;
-      max-width: 52ch;
-      margin: 0 0 26px;
-    }
-    @media (max-width: 640px) {
-      .looking {
-        font-size: 0.96rem;
-        line-height: 1.52;
-        margin-bottom: 12px;
-      }
-    }
 
     /* THE OUT-OF-MEASURE PROSE-LINK RULE LEFT THIS PAGE (OC-F closed).
        Two prose links here sit outside .measure: the capacity-gate link in
@@ -131,10 +112,9 @@ import SiteNav from '../components/SiteNav.astro';
       <p class="now">Product at JPMorganChase, on collaboration platforms serving 300,000 employees, after seven years in infrastructure and operations.</p>
       <p class="lede">
         I set direction, define the interfaces between teams and systems, and
-        gate delivery on evidence. I use AI agents to accelerate execution while
-        retaining ownership of the architecture, decisions, and quality bar.
+        gate delivery on evidence. Claude does most of the typing under those
+        contracts. The evals and the postmortems on this site are the proof.
       </p>
-      <p class="looking">I want a technical program manager seat on an AI systems team.</p>
     </div>
   </header>
 
@@ -384,11 +364,12 @@ import SiteNav from '../components/SiteNav.astro';
         <a href="projects/product-and-program.html">Product &amp; Program</a>
         page states what that means.
       </p>
-      <!-- Who built this, named. The lede says AI agents accelerate
-           execution, and the colophon names Claude. This paragraph names
-           Claude on the home page too, in the colophon's framing (CLAUDE.md,
-           AI-use posture). It sits under the solo-build line so "solo" does
-           not read as a claim that one person typed it all. -->
+      <!-- Who built this, named. The lede named AI agents until 2026-09-05
+           and names Claude now, so the first screen and this block carry the
+           same framing (CLAUDE.md, AI-use posture). This paragraph keeps the
+           full framing: direction and bar, the typing, the proof. It sits
+           under the solo-build line so "solo" does not read as a claim that
+           one person typed it all. -->
       <p>
         I set the direction and the bar. Claude does most of the typing. The
         evals and postmortems are the proof. The
