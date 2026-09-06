@@ -202,6 +202,13 @@ repairs to a correct figure.
   cut. The doubled reversal tick keeps the reversal family legible at cell
   scale, and the full-width doubled mark survives on full-rule hosts.
 
+**Amended 2026-09-06. The owner closed review finding C41 with the legend, and
+kept the mark grammar.** The 2026-09-05 review found that a sighted reader met
+the doubled rule on a page that gave no key. The Home legend now appears on
+every page that carries the reversal mark. The mark grammar in this record does
+not change. The pages add no visible verdict word, they keep the same `sr-only`
+prefix, and they keep the same colour and rules.
+
 ## Alternatives considered
 
 | Option | Why not |
