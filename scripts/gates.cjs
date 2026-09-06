@@ -135,16 +135,17 @@ function runAdrLint() {
   return run('ADR downstream-surfaces linter', cmd, [...prefix, 'scripts/lint_decisions.py'], process.env);
 }
 
-function runSiteGate(label, script) {
-  return run(label, process.execPath, [script], { ...process.env, SITE_ROOT });
+function runSiteGate(label, script, extraEnv = {}) {
+  return run(label, process.execPath, [script], { ...process.env, SITE_ROOT, ...extraEnv });
 }
 
 /*
  * Ordered cheapest-first, which is also build-independent-first. The nine checks
  * above the line need no `dist/`, no browser and no network, and finish in
- * seconds; the thirteen below either walk the built site or launch a browser —
- * contrast-check renders every page in both themes, mobile-qa renders 64
- * page-widths, hit-target hit-tests every control at 1280 and at
+ * seconds; the fourteen below either walk the built site or launch a browser —
+ * contrast-check renders every page in both themes, mobile-qa renders every
+ * page at four widths twice (the default root, then a 20px root), hit-target
+ * hit-tests every control at 1280 and at
  * 320/360/390/430px, microtext-floor measures every SVG text node at 320px. A
  * missing ADR section should redden in two seconds, not after a full render
  * pass.
@@ -253,6 +254,16 @@ const CHECKS = [
     label: 'mobile QA (no horizontal overflow at 320/360/390/430)',
     needsSite: true,
     run: () => runSiteGate('mobile-qa', 'scripts/mobile-qa.cjs'),
+  },
+  {
+    // The same gate at a 20px root, which is a reader's large-text setting. A
+    // grid track's minimum width is its content, so an element that cannot
+    // wrap fits at 16px and widens the page at 20px, behind a px query that
+    // does not follow the root. The homepage did that (scrollWidth 405 against
+    // 370 to 400px) while the default pass above stayed green.
+    label: 'mobile QA, large text (no horizontal overflow at 320/360/390/430 with a 20px root)',
+    needsSite: true,
+    run: () => runSiteGate('mobile-qa (20px root)', 'scripts/mobile-qa.cjs', { ROOT_FONT_PX: '20' }),
   },
   {
     label: 'hit targets (a control is clickable across its box, rendered)',
