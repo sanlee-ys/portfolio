@@ -993,13 +993,41 @@ em, i, cite {
   margin: 0;
   counter-reset: proof;
   display: grid;
-  /* 14rem: wide enough that the three columns hold to ~780px viewport, narrow
-     enough that a 320px screen (272px of container) takes one column cleanly.
-     The 2+1 in between is the same shape the stat strip folds through, and it
-     still reads as a ruled list because every cell keeps its own rule. */
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  /* THE BAND FOLDS FROM THREE COLUMNS TO ONE COLUMN, WITH NO STATE BETWEEN.
+
+     The band used to set `repeat(auto-fit, minmax(14rem, 1fr))`. That rule
+     folded through a two-column state from 520px to 760px. In that state cards
+     01 and 02 shared a row, and card 03 sat alone on the row below them. A
+     lone card on a row does not read as a design. It reads as a WRAP DEFECT,
+     because the reader sees a column that ran out of siblings rather than a
+     set of three. The band argues "here are the three calls", and a 2+1 grid
+     argues against it at every width it holds.
+
+     So the columns are explicit now. The band takes one column below the
+     query and three equal columns at and above it. The reader never meets a
+     half-filled row.
+
+     56rem IS A MEASUREMENT, NOT A ROUND NUMBER. The widest figure ("0 rows at
+     1.97× the cost") sets to 255.5px, and `.proof a strong` below gives every
+     figure `white-space: nowrap`. A track narrower than the figure therefore
+     spills it into the next column, silently: the cell has no overflow, so the
+     page does not widen and no gate reddens. Three tracks first reach 255.5px
+     at a viewport of 870px. The query sits at 56rem, which is 896px, for a
+     track of 264.7px and a margin of 9px. The claims need much less room. The
+     longest word ("premium-model") sets to 104.8px, so no claim breaks
+     mid-word in either state.
+
+     The unit is rem, so the query follows the reader's root font size. The
+     track width and the figure both follow it too, so the margin holds.
+
+     Measured 2026-09-06 with the pinned Playwright over the built site, from
+     320px to 1600px in 10px steps. */
+  grid-template-columns: 1fr;
   gap: clamp(22px, 2.6vw, 34px) clamp(24px, 3vw, 40px);
   text-align: left;
+}
+@media (min-width: 56rem) {
+  .proof { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* A column, not a block of text. The cell is a flex column so the claim can
@@ -1009,7 +1037,7 @@ em, i, cite {
    column one at any width that fits three. So the entry that is not one of the
    three classifier claims takes the full measure instead: it reads as a second
    beat under the set rather than as a short column that ran out of siblings.
-   No-op at one column, which is what a phone gets. */
+   No-op at one column, which is what every viewport below the fold gets. */
 .proof li.proof-span { grid-column: 1 / -1; }
 
 .proof li {
