@@ -221,55 +221,37 @@ import SiteNav from '../components/SiteNav.astro';
       <p class="kicker">The instrument</p>
       <h2 class="section-title">telltale</h2>
       <p class="section-sub">Five coding-agent CLIs, one brief, five columns &mdash; and gauges that render nothing when nothing was measured.</p>
-      <!-- The program leads, and the instrument follows (landing WO-E1.2).
-           telltale exists because a pre-registered gate on my own build
-           capacity closed without an instrument, so this section states the
-           program first and the artifact second. Every clause below is
-           checked against a live public page: the axis count, the freeze, the
-           close, the step down, and the process finding are all on
-           product-and-program.html#capacity-gate, and telltale.html#capacity
-           carries the same summary. A vendor count and a spend claim were in
-           the drafted copy and are not here: no public page states either,
-           and the capacity section reports by evidence axis, never by lane
-           and never by name.
+      <!-- ONE PARAGRAPH AND A LINK, since 2026-09-05 (ADR-012).
 
-           ORDER, revised 2026-09-01 after an independent review. The three
-           paragraphs now run lead, artifact, method. The old first paragraph
-           opened on six axes, a fixed close, a step down and a parked
-           upgrade, which is the least legible material on the page and it
-           stood in front of the plain sentence that says what telltale is.
-           Nothing left the page. The method detail is the third paragraph
-           now, and it keeps the capacity-gate link. The lead states the
-           outcome instead: a measurement, and the two rulings it produced.
+           The block held three paragraphs: a lead, an artifact paragraph and
+           a method paragraph. The essay lives in full on
+           projects/telltale.html, so Home told the case study a second time
+           above the fold. The block now states the program, the ruling and
+           the instrument in one paragraph, and it sends the reader to the
+           writeup for the rest. The block keeps its position above the
+           router, which is the order ADR-012 set.
 
-           The lead deliberately states no vendor count and no spend claim.
-           The suggested copy carried both. The rule above is why they are
-           still absent: the ruling the record can evidence is a step down
-           from the top tier and a declined upgrade, and those are the words
-           product-and-program.html#capacity-gate publishes. -->
+           WHAT LEFT THE BLOCK, AND WHERE IT STILL LIVES. The artifact
+           paragraph carried the goldens.zeroVsAbsent figure.
+           scripts/check-telltale-evidence.cjs requires a marker on
+           projects/telltale.html alone, so Home may carry fewer figures and
+           the gate still measures the page it exists for. The method
+           paragraph carried the only link on Home to
+           projects/product-and-program.html#capacity-gate. The doors list
+           below and projects/telltale.html both still reach that page.
+
+           THE COPY STATES NO VENDOR NAME AND NO SPEND CLAIM. No public page
+           states either one, and the capacity section reports by evidence
+           axis, never by lane and never by name. The section-sub above is
+           the one place that counts the seats. -->
       <p>
         I ran a month-long evaluation of the AI coding agents that build this
-        record. I wrote the test down before the evidence existed, so nothing
-        could pick its own success criterion after the fact. The measurement
-        changed my operating policy. I stepped down from the top tier, and I
-        declined a parked upgrade.
-      </p>
-      <p>
-        telltale is the instrument for that same capacity. It reads what five
-        agent CLIs leave on disk and draws one row per seat. A reading no
-        vendor exposes renders as an em dash, never as a zero, and
-        <span data-tt="goldens.zeroVsAbsent">3</span> golden files in three
-        packages fail the build if those two ever draw the same.
-      </p>
-      <p>
-        The gate behind those rulings ran on six evidence axes and a fixed close
-        date, and I froze every change until the close. Nothing ever wrote to
-        the axes, so I reconstructed the evidence from dated records.
-        Pre-registration without an instrument is half a measurement.
-        <a href="projects/product-and-program.html#capacity-gate">The capacity gate &rarr;</a>
+        record. I wrote the test down before the evidence existed. The
+        measurement changed my operating policy. telltale is the instrument
+        that reads what five agent CLIs leave on disk.
       </p>
       <p class="flagship-figure">v0.2.0 &middot; <span data-tt="goldens.total">132</span> golden files &middot; <span data-tt="tests.total">1780</span> test functions</p>
-      <p class="diagram-more standalone"><a class="card-link" href="projects/telltale.html">Read the telltale writeup <span class="arrow">&rarr;</span></a></p>
+      <p class="diagram-more standalone"><a class="card-link" href="projects/telltale.html">The writeup <span class="arrow">&rarr;</span></a></p>
     </section>
 
     <h2 class="section-title">The system</h2>
