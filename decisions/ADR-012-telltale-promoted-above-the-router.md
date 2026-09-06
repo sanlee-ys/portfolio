@@ -130,6 +130,14 @@ at 320px, and no gate fails on it.
   owner's call after two external reviews found that the old order buried the
   proof for a 90-second reader. The flagship stays whole and stays on the
   homepage. Decision 1 above still holds: no door is added.
+- Amended 2026-09-05: the owner cut the Home telltale block to one paragraph
+  and one link, because the essay lives on the case study at
+  `projects/telltale.html` and Home told it a second time. The block keeps the
+  order that PR #309 set. The `goldens.zeroVsAbsent` figure and the Home link
+  to `product-and-program.html#capacity-gate` left the block with the
+  paragraphs that carried them; both surfaces remain reachable, and
+  `scripts/check-telltale-evidence.cjs` requires a marker on
+  `projects/telltale.html` alone.
 
 ## Alternatives Considered
 
