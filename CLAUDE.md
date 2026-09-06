@@ -31,14 +31,14 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all twenty-two checks:
+runs all twenty-three checks:
 
 ```
 npm run qa
 ```
 
 **The runner prints the count, so do not take the number above on trust.** It
-opens with `gates: running 22 checks.` and closes with `OK - all 22 of 22 QA
+opens with `gates: running 23 checks.` and closes with `OK - all 23 of 23 QA
 checks ran and passed.` The loop exits at the first non-zero, so the closing
 line is the proof that every check ran. **An unrun gate is not a pass.**
 
@@ -50,15 +50,15 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Nine of the twenty-two need no build, no browser and no network — eight
+Nine of the twenty-three need no build, no browser and no network — eight
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The thirteen that walk the built site or launch a browser run after,
+seconds. The fourteen that walk the built site or launch a browser run after,
 slowest last. (`hit-target.test.cjs` and `microtext-floor.test.cjs` are
 `node --test` suites but are **not** among the cheap nine: each spawns its
 gate, which launches Chromium, so both sit at the bottom with the browser
 work.)
 
-`npm run gates` runs the same twenty-two against an existing `dist/` without
+`npm run gates` runs the same twenty-three against an existing `dist/` without
 rebuilding, and the build-independent nine still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
@@ -130,6 +130,21 @@ Before committing any layout / style / markup change:
    unstyled page does not overflow, so a `file://` run would pass while
    measuring nothing. Running it against a stale `dist/` tests the previous
    build; rebuild first.
+
+   **CI and `npm run qa` run the gate twice.** The second pass sets
+   `ROOT_FONT_PX=20`, which emulates a reader's large-text setting, and it is
+   its own step in `qa.yml` and `gates.cjs`. Every rem on this site follows
+   the root, and a grid track is never narrower than its content, so an
+   element that cannot wrap fits at 16px and widens the page at 20px. The
+   homepage did that on 2026-09-06 (scrollWidth 405 against 370 to 400px)
+   behind a `max-width: 360px` query, and the 16px pass was green. The
+   emulation injects `html { font-size: 20px }`, so a rem in a media query
+   does not follow it. Fix an overflow at large text with a rule that wraps
+   by content, not with a px or rem breakpoint. Run the pass by hand with:
+
+   ```
+   npm run build && SITE_ROOT=dist ROOT_FONT_PX=20 node scripts/mobile-qa.cjs
+   ```
 
    **Prerequisite — a Chromium matching the pinned Playwright.** `node_modules/`
    isn't tracked, and each Playwright version maps to one browser revision, so

@@ -30,6 +30,13 @@ reasoning; the operative instruction stays in `CLAUDE.md` where agents read it.
 2. **Test down to 320px, not just 430.** 430px is roughly the largest iPhone in CSS pixels,
    but Display Zoom drops the effective width to ~375px or less on a real device. A layout
    that only works at 430 still clips for a real user.
+   *(Amended 2026-09-06: the gate runs a second pass with a 20px root font size
+   (`ROOT_FONT_PX=20`), as its own CI step. The Display Zoom reader and the
+   large-text reader are the same reader. An element that cannot wrap fits at
+   16px and widens the page at 20px, and the 16px pass cannot see it; the
+   homepage shipped that way behind a px query. The emulation is an injected
+   `html { font-size }` rule, so rem media queries do not follow it, and a fix
+   must wrap by content rather than by a breakpoint.)*
 3. **The page never scrolls sideways.** Wide elements — tables, `pre` blocks, images, embeds
    — stay within the viewport. A table scrolls inside **its own box**
    (`display: block; overflow-x: auto`), it never widens the page.

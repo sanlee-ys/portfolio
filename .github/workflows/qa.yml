@@ -202,6 +202,20 @@ jobs:
         env:
           SITE_ROOT: dist
 
+      # The same gate at a 20px root font size, which is a reader's large-text
+      # setting. A grid track's minimum width is its content, so an element
+      # that cannot wrap fits at 16px and widens the page at 20px, behind a px
+      # query that does not follow the root. The homepage did exactly that
+      # (scrollWidth 405 against 370 to 400px) while the 16px pass was green.
+      # The root is an injected `html { font-size }` rule, so rem media queries
+      # do not follow it; this pass under-measures a real large-text browser
+      # and rewards a fix that wraps by content rather than by a query.
+      - name: Mobile QA gate, large text (no horizontal overflow at 320/360/390/430 with a 20px root)
+        run: node scripts/mobile-qa.cjs
+        env:
+          SITE_ROOT: dist
+          ROOT_FONT_PX: 20
+
       # Anything claiming to be a control must be clickable across its box.
       # SVG hit-testing defaults to `visiblePainted`, so `fill: none` leaves a
       # shape untouchable in its middle while every other signal — role,

@@ -1008,9 +1008,10 @@ em, i, cite {
      half-filled row.
 
      56rem IS A MEASUREMENT, NOT A ROUND NUMBER. The widest figure ("0 rows at
-     1.97× the cost") sets to 255.5px, and `.proof a strong` below gives every
-     figure `white-space: nowrap`. A track narrower than the figure therefore
-     spills it into the next column, silently: the cell has no overflow, so the
+     1.97× the cost") sets to 255.5px, and the band's one-line landing (see
+     `.proof a strong` below) needs a track at least that wide. A track
+     narrower than the figure wraps that one figure onto a second line, in one
+     column and not the others, silently: the cell has no overflow, so the
      page does not widen and no gate reddens. Three tracks first reach 255.5px
      at a viewport of 870px. The query sits at 56rem, which is 896px, for a
      track of 264.7px and a margin of 9px. The claims need much less room. The
@@ -1206,9 +1207,16 @@ em, i, cite {
    right edge with a dash on it three times over. Nothing else in the copy
    moved.
 
-   nowrap because "97.3% → 88.9%" is one token however narrow the column gets;
-   the longest of the three sets to ~230px against 272px of container at 320px,
-   which the mobile gate measures rather than trusts. */
+   NO NOWRAP HERE, SINCE 2026-09-06. The figure carried `white-space: nowrap`,
+   with a `max-width: 360px` query that let it wrap at 320px. A grid track's
+   minimum width is its content, so a figure that cannot wrap widens the
+   track, and the track widens the page. At the 16px default root every
+   figure fits above 360px. At a 20px root the widest figure ("green in 36s,
+   nothing posted") sets to 380.6px, and a px query does not follow the root,
+   so index.html reported a scrollWidth of 405 against viewports of 370, 380,
+   390 and 400px. Normal wrapping renders the same single line wherever the
+   figure fits, and wraps the figure inside its own cell where it does not.
+   The large-text pass of the mobile gate (ROOT_FONT_PX=20) measures it. */
 .proof a strong {
   display: block;
   margin-top: auto;
@@ -1224,12 +1232,6 @@ em, i, cite {
   line-height: 1.15;
   letter-spacing: -0.022em;
   color: var(--text);
-  white-space: nowrap;
-}
-@media (max-width: 360px) {
-  /* The longest figure sets wider than a 320px container at 1.5rem. The
-     figure keeps its display size and wraps inside its own cell. */
-  .proof a strong { white-space: normal; }
 }
 /* The stressed word inside a claim ("accuracy <em>fell</em>"). It used to be
    spelled out here because the band is a link and a link is where an inherited
@@ -3292,7 +3294,13 @@ figcaption code { overflow-wrap: anywhere; }
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 2px 8px;
-  white-space: nowrap;
+  /* No nowrap, since 2026-09-06. The head wraps its flex items, so the chip
+     already dropped to its own line before it could overflow. At a 20px root
+     the widest chip ("Shipped v2.0.0, then retired") sets to 269px in Geist
+     Mono, which is wider than its own line at 320px, and a chip that cannot
+     wrap widened the page by 3px. Normal wrapping keeps the chip on one line
+     wherever it fits a line, and wraps its text inside the border only where
+     it does not. The large-text pass of the mobile gate measures it. */
 }
 .rung[data-state="shipped"] .rung-state,
 .rung[data-state="partial"] .rung-state { color: var(--accent); border-color: var(--accent); }
@@ -3949,12 +3957,19 @@ main > p a:hover { text-decoration-color: var(--accent); }
 
 .ledger li strong { color: var(--text); font-weight: 600; }
 
+/* A ledger link wraps like the sentence it sits in. It carried
+   `white-space: nowrap` from 2026-07-26 to 2026-09-06. That held the arrow of
+   a `.led-to` link on its label, but the plain ledgers on work.html open each
+   row with a link, and one of them ("Classifier baseline and live demo") sets
+   to 294px at a 20px root: with the 1.9rem hanging indent and the gutter it
+   widened a 320px page to 356px. The arrow link keeps the nowrap below. Its
+   label is short, and a lone arrow on the next line reads as a stray glyph. */
 .ledger li a {
-  white-space: nowrap;
   color: var(--accent);
   text-decoration: none;
   font-weight: 500;
 }
+.ledger li .led-to a { white-space: nowrap; }
 
 .ledger li a:hover { text-decoration: underline; }
 

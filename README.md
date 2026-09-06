@@ -55,9 +55,9 @@ phantom broken links if `dist/` and `public/` are both present.
 ## QA
 
 CI (GitHub Actions, `.github/workflows/qa.yml`) and the local runner
-(`scripts/gates.cjs` / `npm run gates`) run the **same twenty-two checks**. The
-nine that need no build, browser, or network run first; the thirteen that walk
-the built site or launch Chromium run after (counted 2026-09-04 in
+(`scripts/gates.cjs` / `npm run gates`) run the **same twenty-three checks**. The
+nine that need no build, browser, or network run first; the fourteen that walk
+the built site or launch Chromium run after (counted 2026-09-06 in
 `scripts/gates.cjs`). `scripts/gates.cjs` must stay a
 faithful mirror of the workflow — add a step there, add it here.
 
@@ -88,7 +88,7 @@ faithful mirror of the workflow — add a step there, add it here.
 - **`scripts/lint_decisions.py`** — every ADR in `decisions/` carries a
   `## Downstream surfaces` section. Stdlib Python 3, no venv.
 
-**Against the built site (`SITE_ROOT=dist`; list synced 2026-09-04):**
+**Against the built site (`SITE_ROOT=dist`; list synced 2026-09-06):**
 
 - **`scripts/link-check.cjs`** — no broken internal links.
 - **`scripts/navigation-check.cjs`** — every current professional-work page is
@@ -111,6 +111,9 @@ faithful mirror of the workflow — add a step there, add it here.
   (composited pixels, not declared tokens).
 - **`scripts/mobile-qa.cjs`** — every page at 320/360/390/430 px; fails on any
   horizontal overflow. Mobile is a contract here, not an afterthought.
+- **`scripts/mobile-qa.cjs` with `ROOT_FONT_PX=20`** — the same pass at a 20px
+  root, which is a reader's large-text setting. An element that cannot wrap
+  fits at 16px and widens the page at 20px.
 - **`scripts/hit-target.cjs`** — every element that claims to be a control is
   clickable across its box (catches SVG `fill: none` hit-target bugs).
 - **`scripts/microtext-floor.cjs`** fails any SVG text that renders under 9px
