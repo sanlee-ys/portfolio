@@ -3515,8 +3515,13 @@ figcaption code { overflow-wrap: anywhere; }
 
    2026-09-04: those two rows moved to work.html#decision-log in #269
    (2026-08-30). work.html loads no diagram.js, and only diagram.js adds the
-   `target` class, so on main only .decision.target fires, on #decision-eval.
-   The .ledger li selector stays for a code session to judge. */
+   `target` class, so on main only .decision.target fired, on #decision-eval.
+
+   2026-09-05: the .ledger li selector is live again, and it is the one that
+   fires. index.html collapsed its three decision cards to three ledger rows,
+   so #decision-eval — the one node anchor that still resolves on that page —
+   is an li now and not a .decision. Keep both selectors: .decision.target
+   still serves the project pages that carry decision cards. */
 .decision,
 .ledger li { transition: background-color 0.3s ease, box-shadow 0.3s ease; }
 .decision.target,
@@ -3816,9 +3821,11 @@ main > p a:hover { text-decoration-color: var(--accent); }
 
 /* ---------------------------------------------------------------------------
    Decision ledger + stat strip (ADR-007)
-   The homepage used to carry nine full decision cards. Three stay as cards.
-   The one-line ledger rows live on work.html#decision-log since 2026-08-30
-   (landing WO-E1.1, #269); the stat strip stays on the homepage (noted
+   The homepage used to carry nine full decision cards. It carries none since
+   2026-09-05: the last three became ledger rows on that page, so the ledger
+   is now the only decision treatment the homepage uses. The eight one-row
+   rows live on work.html#decision-log since 2026-08-30 (landing WO-E1.1,
+   #269); the stat strip stays on the homepage (noted
    2026-09-04). Deliberately a stacked <ul>, never a
    <table>: a table of one-line summaries is the shape most likely to overflow
    at 320px, and ADR-001 makes that a contract, not a preference.

@@ -8,6 +8,8 @@
 
 **Informational, 2026-09-04.** This record explains why a choice was made at the time. It sets no floor. The owner's current call governs the site, and a session that finds this record in the way makes the change and adds a dated line here. Mechanism records (the gates and the traps) keep their floors; this one is editorial.
 
+**2026-09-05.** The owner collapsed the three full cards on the homepage to ledger rows, which reverses the hybrid ruling in section 4. A skimmer now reaches the doors and the proof band faster. The full decision log is on `work.html#decision-log`, and each row links to the page that records its decision in full. The three `id="decision-*"` anchors stay on the new rows, as *Downstream surfaces* requires.
+
 ## Context
 
 The complaint that opened this is the same one that opened `ADR-006`, and it is
