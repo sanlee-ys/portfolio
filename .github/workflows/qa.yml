@@ -185,7 +185,11 @@ jobs:
         working-directory: scripts
         run: |
           npm ci
-          npx playwright install --with-deps chromium
+          # No --with-deps: that step hits dl.google.com/linux/chrome-stable
+          # and failed this PR twice on 2026-09-09 (Packages.gz hash mismatch).
+          # The runner image already has the OS libs. Playwright's own
+          # Chromium is the browser the gates launch.
+          npx playwright install chromium
 
       # Measures the RENDERED colour of every text element, in both themes,
       # against WCAG AA. A declared colour can be compliant while the painted
