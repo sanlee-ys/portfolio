@@ -1244,6 +1244,13 @@ em, i, cite {
   border-radius: var(--radius-sm);
 }
 
+/* Compact first-screen result. Hidden above the phone composition
+   breakpoint: the proof band is already on screen one there. The 640px
+   block below shows it and packs it into one tap row. */
+.hero-result {
+  display: none;
+}
+
 /* The struck-entry mark, identical in construction to the one the decision
    entries carry below — same hue, same doubled rule, same 3px offset — so the
    two are read as one convention rather than two treatments that happen to
@@ -4264,19 +4271,17 @@ main > p a:hover { text-decoration-color: var(--accent); }
 
 
 /* ---- Phone composition ---------------------------------------------------
-   The one block that owns what a 390x844 first screen contains, because the
-   defect it fixes was an ADDITION defect: masthead, standfirst, dateline,
-   thesis, icon row and a three-row nav were each sized defensibly on their
-   own and together took 480 of the ~656 visible CSS px — 73% of the screen
-   before a single checkable claim. The remaining ~180px held two admissions
-   of failure and nothing else.
+   The one block that owns the first screen. Until 2026-09-09 the budget was
+   390×844: masthead through the nav rule under half of 844px, so the proof
+   band's first two claims sat on screen one. A live walk that day measured
+   the first proof cell at y=581 against a 568px viewport. An iPhone SE saw
+   identity and nav only. The owner ruled the same day: put one result on
+   the 320×568 first screen.
 
-   The budget here is explicit: everything from the top of the masthead to the
-   bottom of the nav rule must come in under HALF the 844px viewport, so the
-   proof band's first two claims are on screen one with their rules. Nothing
-   is deleted to get there — every element the desktop hero has, the phone
-   hero has. The type steps down, the vertical margins close up, and the nav
-   packs from three rows to two.
+   The floor is now 320×568. The compact `.hero-result` line under the lede
+   is that result. It reuses proof cell 01 (same words, same number, same
+   href). The .now line and the lede stay. The 390×844 band budget still
+   holds for the full index below the nav.
 
    430px would have been the obvious breakpoint (it is what the mobile gate
    measures) but the composition problem is a phone-and-small-tablet problem,
@@ -4289,10 +4294,10 @@ main > p a:hover { text-decoration-color: var(--accent); }
      painted over "San Lee". Interior pages already reserve 64px for the
      same band (`.theme-toggle + .doors .wrap`). The name starts below it.
 
-     THE FIRST-SCREEN COST. This is +44px of hero. At 390x844 the proof
-     band's first two claims stay fully on screen one, which is the budget
-     this block states. The third claim's last line now clips the fold.
-     Two claims on screen one is the recorded floor; three was slack. */
+     THE FIRST-SCREEN COST. This is +44px of hero. At 390×844 the proof
+     band's first two claims stay fully on screen one. At 320×568 the
+     compact `.hero-result` line under the lede is the result that must
+     sit fully in the viewport. */
   .hero {
     padding-top: 64px;
     padding-bottom: 14px;
@@ -4322,6 +4327,40 @@ main > p a:hover { text-decoration-color: var(--accent); }
     font-size: 1rem;
     line-height: 1.52;
     margin-bottom: 12px;
+  }
+  /* One gated figure under the lede, packed to a 44px tap row. The tick,
+     the counter, and the 1.5rem display figure stay on the full band
+     below the nav. Overrides beat `.proof a strong` by source order. */
+  .hero-result {
+    display: block;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+  }
+  .hero-result li {
+    padding: 0;
+    display: block;
+  }
+  .hero-result li::before,
+  .hero-result li::after {
+    content: none;
+    display: none;
+  }
+  .hero-result a {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.45em;
+    min-height: 44px;
+    justify-content: flex-start;
+  }
+  .hero-result a strong {
+    display: inline;
+    margin-top: 0;
+    padding-top: 0;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
   }
   /* ---- The nav, packed to two rows -------------------------------------
      The hit-area half of this lives in its own block below, at 900px, because
