@@ -51,12 +51,14 @@ down carries the full reasoning for each item.
 
 ### Later — strategic or deliberately deferred
 
-- [ ] **A second, different artifact** (the breadth gap). Biggest effort, real
-      strategic question. Note: frame it as a separate proof of method, *not* a
-      new vertical — "other verticals" is an explicit non-goal on the system
-      roadmap, and the two shouldn't read as a contradiction.
-- [ ] **Live GitHub repo cards** (the README no longer lists the plan as of
+- [x] **A second, different artifact** (the breadth gap). *Shipped 2026-09-09
+      as the tool-seam gold set and writeup (`projects/tool-seam.html`). It is a
+      second proof of method — attacks on the agent tool-result path — not a
+      new vertical.*
+- [x] **Live GitHub repo cards** (the README no longer lists the plan as of
       2026-09-04; this roadmap is the record; needs the API script).
+      *Shipped 2026-09-09, PR #352: build-time fetch of the public repos this
+      site already names. Stars are not a field.*
 - [ ] **System deploy / OpenTelemetry** — on the system's own "Later"; each
       would spawn a new decision-log entry here.
 
@@ -82,22 +84,27 @@ down carries the full reasoning for each item.
 - [x] **Dogfood the analytics** — custom events (diagram clicks, decision-card
       expands, résumé clicks) via `assets/events.js`. *(2026-09-04: the
       decision-card expand listener has had no DOM target since #152,
-      2026-07-26; two of the three events are live.)*
-- [ ] **Security on the agent's tool seam** — the gap SYS-007 itself names.
+      2026-07-26; two of the three events are live. 2026-09-09, PR #351: the
+      dead listener is gone. Resume clicks record `nav` | `footer` | `hero` |
+      `other`.)*
+- [x] **Security on the agent's tool seam** — the gap SYS-007 itself names.
       Prompt-injection hardening of kb-agent + a writeup (threat model, attacks
       tried, what held). Strongest candidate for the "second artifact" slot.
       **Phase 1 (threat model) shipped** — verified against real source and
-      committed into kb-agent at `docs/notes/tool-seam-threat-model.md`. 4 tools
-      mapped, 7 attack scenarios (T1&ndash;T7) numbered for the Phase 2 gold
-      set, mitigations credited (system-prompt spotlighting, dedicated SSRF
-      guard, the 10-iteration loop cap, unforced `tool_choice`). All four draft
-      Open Questions resolved against source — notably the draft's "no rate
-      limit" gap was wrong (`MAX_TOOL_ITERATIONS = 10` caps the loop). Next:
-      build the attack gold set (Phase 2), with citation poisoning (T4) as the
-      likely highest-yield class.
-- [ ] **Check `www.sanlee.me` resolves/redirects** — owner-side, two minutes.
+      committed into kb-agent at `docs/notes/tool-seam-threat-model.md`.
+      **Phase 2 (gold set) shipped 2026-09-09**, kb-agent PR #110: 40 items,
+      T1&ndash;T7. Structural T3 and T7 held. `t7-02` found a per-round fanout
+      hole and the cap closed it (kb-agent PR #111). T4 citation poisoning was
+      UNRUN without a model key. Writeup: `projects/tool-seam.html`.
+- [x] **Check `www.sanlee.me` resolves/redirects** — owner-side, two minutes.
+      *Verified 2026-09-09: `http://www.sanlee.me` and `https://www.sanlee.me`
+      both 301 to `https://sanlee.me/`. GitHub Pages cert covers both names.
+      HTTPS is enforced.*
 - [ ] **"What readers actually read"** — once the custom events accumulate,
-      publish the read on them: real usage data, on-thesis.
+      publish the read on them: real usage data, on-thesis. *2026-09-09: event
+      wiring is honest (PR #351). The Plausible dashboard is not public and this
+      session had no API token, so the published read is blocked on an owner
+      export.*
 
 ---
 
@@ -145,18 +152,16 @@ These have no tradeoffs worth debating. None were previously planned.
 
 ### Breadth — the strategic gap
 
-- [ ] **The whole site is one project seen from three angles.** The System /
-      Classifier / Product-and-Program are three lenses on the same defense-news
-      system. The evidence of *method* is overwhelming; the evidence of *breadth*
-      is thin. Nothing on any current roadmap closes this — the items below add
-      *depth* to the same system, not a second artifact. Open question: is one
-      genuinely different artifact worth building?
+- [x] **A second proof of method.** *Shipped 2026-09-09 as the tool-seam gold
+      set (`projects/tool-seam.html`). It is still the same system, read as
+      security measurement rather than as classifier quality. A genuinely
+      different domain remains an open question, and it is not on this track.*
 
 ### Already planned (pre-existing, folded in here so this is the one place to look)
 
-- [ ] **Live GitHub-API repo cards** (from the README). Surfaces the real repos
-      on the site — partial support for breadth by proving the four repos exist,
-      but still depth on the same system, not a new artifact.
+- [x] **Live GitHub-API repo cards** (from the README). *Shipped 2026-09-09,
+      PR #352. Work lists the public repos this site already names, refreshed
+      at build time. Stars are not a field.*
 - [x] ~~**Lab experiments** (`lab/`, marked WIP). Ongoing front-end sandbox.~~
       *Retired 2026-07-23 by [`ADR-004`](decisions/ADR-004-retire-the-lab-as-the-vehicle.md):
       the sandbox stopped being fed, and its framing was discounting the site's
