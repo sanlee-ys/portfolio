@@ -160,47 +160,45 @@ import SiteNav from '../components/SiteNav.astro';
     <section class="measure">
       <h2 id="field-notes">Field notes</h2>
       <p>Plain-language notes on the techniques used across these projects. <a href="https://sanlee-ys.github.io/learning-notes/">Read them &rarr;</a></p>
-      <!-- ix-s2, the note clusters. The twelve titles are byte-exact and the
-           order is the only thing that moved. The five headings are structural
-           labels and each one is drawn from the words the titles already use.
-           A heading names a subject. It states no result and it adds no
-           assertion the notes site does not already carry. -->
+      <!-- ix-s2, the note clusters. The twelve title strings are byte-exact.
+           2026-09-08: each title is a link to the notes site. The five
+           headings stay structural labels. -->
       <div class="notes-clusters">
         <div class="notes-cluster">
           <p class="kicker">Tool use</p>
           <ul class="notes-list">
-            <li>Structured output via tool-use</li>
-            <li>Tool use, the general idea</li>
-            <li>The agentic tool-use loop</li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/01-structured-output-via-tool-use.html">Structured output via tool-use</a></li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/04-tool-use-the-general-idea.html">Tool use, the general idea</a></li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/05-the-agentic-tool-use-loop.html">The agentic tool-use loop</a></li>
           </ul>
         </div>
         <div class="notes-cluster">
           <p class="kicker">Eval</p>
           <ul class="notes-list">
-            <li>Eval-driven development</li>
-            <li>Reading the numbers</li>
-            <li>Synthetic data and circular eval</li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/02-eval-driven-development.html">Eval-driven development</a></li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/03-reading-the-numbers.html">Reading the numbers</a></li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/08-synthetic-data-circular-eval.html">Synthetic data and circular eval</a></li>
           </ul>
         </div>
         <div class="notes-cluster">
           <p class="kicker">RAG</p>
           <ul class="notes-list">
-            <li>RAG: answering from your own docs</li>
-            <li>Embeddings and vector stores</li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/06-rag-answering-from-your-own-docs.html">RAG: answering from your own docs</a></li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/07-embeddings-and-vector-stores.html">Embeddings and vector stores</a></li>
           </ul>
         </div>
         <div class="notes-cluster">
           <p class="kicker">Model routing</p>
           <ul class="notes-list">
-            <li>Tiered model routing</li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/09-tiered-model-routing.html">Tiered model routing</a></li>
           </ul>
         </div>
         <div class="notes-cluster">
           <p class="kicker">Environments and checkpoints</p>
           <ul class="notes-list">
-            <li>Secrets and env</li>
-            <li>Reproducible environments with uv</li>
-            <li>Checkpoint, resume, and retries</li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/10-secrets-and-env.html">Secrets and env</a></li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/11-reproducible-environments-uv.html">Reproducible environments with uv</a></li>
+            <li><a href="https://sanlee-ys.github.io/learning-notes/12-checkpoint-resume-and-retries.html">Checkpoint, resume, and retries</a></li>
           </ul>
         </div>
       </div>
@@ -242,18 +240,6 @@ import SiteNav from '../components/SiteNav.astro';
 
     <p>Looking for terminology used across the projects? <a href="glossary.html">Open the glossary &rarr;</a></p>
   </main>
-
-  <footer class="footer">
-    <div class="wrap">
-      <nav>
-        <a href="mailto:hi@sanlee.me">Email</a>
-        <a href="resume.html">Résumé</a>
-        <a href="https://github.com/sanlee-ys">GitHub</a>
-        <a href="colophon.html">Colophon</a>
-      </nav>
-      <p class="disclaimer">Personal site &mdash; views and projects are my own, not my employer's.</p>
-    </div>
-  </footer>
 
   <script is:inline src="/assets/theme.js"></script>
 </Base>

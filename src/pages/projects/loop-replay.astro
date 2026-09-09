@@ -122,12 +122,9 @@ import SiteNav from '../../components/SiteNav.astro';
        ("iteration 2", "the honest number") that the homepage's three figures
        have no need for. Second, the series colour on the figure itself.
 
-       The colour is deliberate and stays: --series-a/b/c are keyed to the
-       legend above the chart and to the split map at the top of the page, so
-       the colour on the C figure is what tells a reader this figure is the
-       gold held-out number without re-reading the label. That is a legend, not
-       decoration, which is exactly the test the palette's restraint rule
-       applies -- and why the amber banner failed it while these pass. */
+       2026-09-08: --series-a/b/c reuse the monograph tokens. A is --accent,
+       B is --text-secondary, C is --text. The three remain a legend, not a
+       third palette. Oxide stays on reversal and on --diff-del. */
     .stat-strip .stat-sub {
       font-family: var(--font);
       font-size: 0.8rem;
@@ -144,39 +141,15 @@ import SiteNav from '../../components/SiteNav.astro';
     #iter-stats .stat-value { font-size: clamp(1.4rem, 3vw, 1.6rem); }
     #iter-stats { margin-top: 14px; }
 
-    /* Chart series colors. Kept separate from --accent since three series
-       need to stay distinguishable at once; tuned per theme for contrast.
-
-       "Tuned for contrast" was true of these as CHART STROKES, where the bar
-       is 3:1 against the paper, and false of them as TEXT, which is what they
-       also are: the honest-callout's figure, the diff's added lines, the stat
-       values. The light --series-c was #16875a, which is 3.9:1 on paper and
-       4.0:1 inside the callout -- under the 4.5:1 body-text floor on the two
-       backgrounds it is actually read against. #13724c is the same hue taken
-       down to 4.55:1 in the worst of those (the callout) and 5.3:1 on paper.
-       It was darkened exactly as far as AA needs and no further, because the
-       three series still have to be told apart from each other.
-
-       --diff-del joins them because it was the same mistake in a sharper form:
-       it was written as a bare #e5657a in the rule below, with no light value
-       at all, so a colour picked to sit on a near-black panel was rendering on
-       warm paper at 2.63:1. It is a per-theme token now, which is what stops
-       the next colour from being added the same way. The light value is set
-       level with --series-c's (4.9:1 vs 4.8:1 on the code block) so the two
-       sides of a diff read as peers -- an added line and a removed line should
-       not differ in weight, only in hue and in the +/- that carries the
-       meaning when hue cannot. */
-    :root, html[data-theme="dark"] {
-      --series-a: #6ea8fe; /* A: training split -- what the loop optimizes on */
-      --series-b: #f2b84b; /* B: held-back split -- what drives the stop signal */
-      --series-c: #4ac48a; /* C: gold held-out -- the honest number */
-      --diff-del: #e5657a;
-    }
-    html[data-theme="light"] {
-      --series-a: #2563eb;
-      --series-b: #b9790a;
-      --series-c: #13724c;
-      --diff-del: #be203a;
+    /* Chart series colours. Aliases of the monograph tokens, so A/B/C stay
+       a legend without a third palette (2026-09-08 critique). A is training
+       (--accent). B is the held-back stop signal (--text-secondary). C is
+       the gold held-out number (--text). --diff-del is the global oxide
+       token. Theme flips come from :root, not from a second hex table. */
+    :root {
+      --series-a: var(--accent);
+      --series-b: var(--text-secondary);
+      --series-c: var(--text);
     }
 
     /* The A/B/C split map (portfolio ADR-004's third visual candidate). Lives
@@ -724,6 +697,6 @@ import SiteNav from '../../components/SiteNav.astro';
   <script is:inline src="data/loop-replay-real.js"></script>
   <script is:inline src="data/loop-replay-run2-real.js"></script>
   <script is:inline src="../assets/theme.js"></script>
-  <script is:inline src="../assets/last-updated.js"></script>
+
   <script is:inline src="loop-replay.js"></script>
 </Base>

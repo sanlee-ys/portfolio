@@ -115,6 +115,27 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
     <span class="theme-icon-light">&#9728;</span>
   </button>
   <slot />
+  <!-- 2026-09-08: one footer on every Base page. Root-absolute hrefs so a
+       project page in /projects/ does not resolve resume.html against itself.
+       last-updated.js appends to .footer .wrap; without this landmark it
+       wrote the stamp into main (scroll-storytelling). Resume stays out:
+       it is standalone in public/ and has no Base chrome. -->
+  <footer class="footer">
+    <div class="wrap">
+      <nav aria-label="Site">
+        <a href="/resume.html">Résumé</a>
+        <a href="mailto:hi@sanlee.me">Email</a>
+        <a href="https://github.com/sanlee-ys">GitHub</a>
+        <a href="https://www.linkedin.com/in/leesan/">LinkedIn</a>
+        <a href="https://www.instagram.com/sanleeeee/">Instagram</a>
+        <a href="https://vsco.co/sanlee">VSCO</a>
+        <a href="/glossary.html">Glossary</a>
+        <a href="/colophon.html">Colophon</a>
+      </nav>
+      <p class="disclaimer">Personal site &mdash; views and projects are my own, not my employer's.</p>
+    </div>
+  </footer>
+  <script is:inline src="/assets/last-updated.js"></script>
   <!-- Glossary tooltip layer (Term.astro). One element per page, shared by
        every a.term; the script below is a no-op on pages that have none.
        The anchor's own navigation is the tap behavior -- this never calls
