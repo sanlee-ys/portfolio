@@ -297,12 +297,30 @@ function init() {
   const input = $("bdemo-input");
   const chipBox = $("bdemo-chips");
 
+  /* 2026-09-08. The first three examples render as chips. A More examples
+     button reveals chips 4 to 6. The six EXAMPLES rows stay in the array.
+     The default is three chips plus the textarea for a custom sentence. */
   EXAMPLES.forEach((ex, i) => {
     const b = el("button", "bdemo-chip", ex.chip);
     b.type = "button";
     b.dataset.index = String(i);
     b.setAttribute("aria-pressed", "false");
+    if (i >= 3) b.hidden = true;
     chipBox.appendChild(b);
+  });
+
+  const more = el("button", "bdemo-more", "More examples");
+  more.type = "button";
+  more.setAttribute("aria-expanded", "false");
+  chipBox.appendChild(more);
+
+  more.addEventListener("click", () => {
+    const open = more.getAttribute("aria-expanded") !== "true";
+    more.setAttribute("aria-expanded", open ? "true" : "false");
+    more.textContent = open ? "Fewer examples" : "More examples";
+    for (const b of chipBox.querySelectorAll(".bdemo-chip")) {
+      if (Number(b.dataset.index) >= 3) b.hidden = !open;
+    }
   });
 
   let current = null;

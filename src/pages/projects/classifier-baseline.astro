@@ -198,6 +198,9 @@ import SiteNav from '../../components/SiteNav.astro';
        main.wrap, so the rhythm ladder owns its seam, and every gap on this
        page is exactly one stated value. */
 
+    /* 2026-09-08. The verdict sits under the chips. The reader sees
+       "Run the loser" and does not scroll past the textarea. */
+
     .bdemo-kicker {
       font-family: var(--mono);
       font-size: 0.68rem;
@@ -215,9 +218,12 @@ import SiteNav from '../../components/SiteNav.astro';
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin: 0 0 22px;
+      margin: 0 0 8px;
     }
-    .bdemo-chip {
+    /* .bdemo-more is the same family as .bdemo-chip. It is a real button.
+       min-height is 44px. aria-expanded marks the open state. */
+    .bdemo-chip,
+    .bdemo-more {
       font-family: var(--font);
       font-size: 0.85rem;
       font-weight: 500;
@@ -230,12 +236,17 @@ import SiteNav from '../../components/SiteNav.astro';
       cursor: pointer;
       transition: border-color 0.15s ease, background-color 0.15s ease;
     }
-    .bdemo-chip:hover { border-color: var(--muted); }
+    .bdemo-chip:hover,
+    .bdemo-more:hover { border-color: var(--muted); }
     .bdemo-chip.is-on {
       border-color: var(--accent);
       background: var(--accent-soft);
     }
-    .bdemo-chip:focus-visible {
+    .bdemo-more[aria-expanded="true"] {
+      border-color: var(--muted);
+    }
+    .bdemo-chip:focus-visible,
+    .bdemo-more:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 3px;
     }
@@ -249,7 +260,7 @@ import SiteNav from '../../components/SiteNav.astro';
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
-      margin: 0 0 6px;
+      margin: 28px 0 6px;
     }
     .bdemo-input {
       display: block;
@@ -282,7 +293,7 @@ import SiteNav from '../../components/SiteNav.astro';
       font-size: 0.9rem;
       font-weight: 500;
       color: var(--text-secondary);
-      margin: 10px 0 24px;
+      margin: 0 0 24px;
       min-height: 1.5em;
     }
 
@@ -583,9 +594,6 @@ import SiteNav from '../../components/SiteNav.astro';
     <div class="wide bdemo" id="baseline-demo">
       <p class="bdemo-kicker">A row from the gold set, or your own sentence</p>
       <div class="bdemo-chips" id="bdemo-chips" role="group" aria-label="Example rows from the human gold set"></div>
-
-      <label class="bdemo-label" for="bdemo-input">Text to classify</label>
-      <textarea id="bdemo-input" class="bdemo-input" rows="3" autocomplete="off" spellcheck="false" placeholder="Paste a defense-news sentence&hellip;"></textarea>
       <p class="bdemo-status" id="bdemo-status" role="status" aria-live="polite">Pick an example, or type a sentence.</p>
 
       <div class="bdemo-cols">
@@ -624,6 +632,9 @@ import SiteNav from '../../components/SiteNav.astro';
           <div id="bdemo-reference"></div>
         </section>
       </div>
+
+      <label class="bdemo-label" for="bdemo-input">Text to classify</label>
+      <textarea id="bdemo-input" class="bdemo-input" rows="3" autocomplete="off" spellcheck="false" placeholder="Paste a defense-news sentence&hellip;"></textarea>
 
       <p class="bdemo-prov">The model is vendored from
         <a href="https://github.com/sanlee-ys/defense-news-classifier/blob/main/web/README.md">the

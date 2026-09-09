@@ -126,16 +126,25 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
       var anchors = document.querySelectorAll("a.term");
       if (!tip || anchors.length === 0) { if (tip) tip.remove(); return; }
       var active = null;
-      var GAP = 8;
+      var GAP = 12;
 
       function place(anchor) {
         var a = anchor.getBoundingClientRect();
+        // Force layout so height is real. A zero box made the first paint
+        // sit on the host sentence (2026-09-08 critique).
+        void tip.offsetHeight;
         var t = tip.getBoundingClientRect();
-        // Below the anchor by default; flip above only when there is no room
-        // below and there is room above. Never covers the term either way.
-        var top = a.bottom + GAP;
-        if (top + t.height > window.innerHeight - GAP && a.top - t.height - GAP >= GAP) {
-          top = a.top - t.height - GAP;
+        // Prefer ABOVE the term so the host sentence stays visible. Below
+        // the box covers the rest of the paragraph on a wrapped line.
+        var above = a.top - t.height - GAP;
+        var top;
+        if (above >= GAP) {
+          top = above;
+        } else {
+          top = a.bottom + GAP;
+          if (top + t.height > window.innerHeight - GAP) {
+            top = Math.max(GAP, window.innerHeight - t.height - GAP);
+          }
         }
         // Clamp horizontally so the tooltip can never overflow the viewport;
         // its max-width leaves 2rem spare, so the clamp always has room.
@@ -146,6 +155,9 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
       }
 
       function show(anchor) {
+        // A phone tap already follows the glossary href. An overlay there
+        // covers the sentence it explains (2026-09-08 critique).
+        if (window.matchMedia("(hover: none)").matches) return;
         var text = anchor.getAttribute("data-tip");
         if (!text) return;
         tip.textContent = text;

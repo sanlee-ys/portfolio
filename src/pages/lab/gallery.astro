@@ -45,7 +45,7 @@ import SiteNav from '../../components/SiteNav.astro';
     .lightbox {
       position: fixed;
       inset: 0;
-      z-index: 50;
+      z-index: 100;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -101,9 +101,7 @@ import SiteNav from '../../components/SiteNav.astro';
     <a class="back" href="../index.html">&larr; Back to portfolio</a>
     <h1>Photo gallery</h1>
     <p class="subtitle">
-      A masonry grid and a keyboard lightbox. CSS columns do the layout; about
-      sixty lines of JavaScript run the lightbox. A few of my own frames.
-      <a href="https://vsco.co/sanlee">More on VSCO &rarr;</a>
+      A few of my own frames. <a href="https://vsco.co/sanlee">More on VSCO &rarr;</a>
     </p>
 
     <!-- The grid. Each thumbnail is a real link to the full-size image, so with
@@ -129,19 +127,24 @@ import SiteNav from '../../components/SiteNav.astro';
         <img src="../assets/img/photo-ftx.jpeg" alt="Inside a helicopter during a field exercise" loading="lazy" />
       </a>
     </div>
-
-    <!-- The lightbox overlay, hidden until a thumbnail is clicked. role=dialog +
-         aria-modal tell assistive tech this is a modal layer. -->
-    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-      <button class="lb-close" type="button" aria-label="Close (Escape)">&times;</button>
-      <button class="lb-prev" type="button" aria-label="Previous photo (left arrow)">&lsaquo;</button>
-      <figure class="lb-figure">
-        <img class="lb-img" id="lb-img" alt="" />
-        <figcaption class="lb-caption" id="lb-caption"></figcaption>
-      </figure>
-      <button class="lb-next" type="button" aria-label="Next photo (right arrow)">&rsaquo;</button>
-    </div>
   </main>
+
+  <!-- The lightbox overlay, hidden until a thumbnail is clicked. role=dialog +
+       aria-modal tell assistive tech this is a modal layer. -->
+  <!-- 2026-09-08: The lightbox left main because of chrome z-index and
+       containing block. A fixed overlay inside .wrap does not cover the
+       primary nav or #theme-toggle (z-index 20). .lb-close shares that
+       corner. The overlay is a sibling of SiteNav and main, at z-index 100,
+       so it covers skip-link, the toggle, and #term-tip. -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <button class="lb-close" type="button" aria-label="Close (Escape)">&times;</button>
+    <button class="lb-prev" type="button" aria-label="Previous photo (left arrow)">&lsaquo;</button>
+    <figure class="lb-figure">
+      <img class="lb-img" id="lb-img" alt="" />
+      <figcaption class="lb-caption" id="lb-caption"></figcaption>
+    </figure>
+    <button class="lb-next" type="button" aria-label="Next photo (right arrow)">&rsaquo;</button>
+  </div>
 
   <script is:inline src="../assets/theme.js"></script>
   <script is:inline src="../assets/last-updated.js"></script>
@@ -172,6 +175,23 @@ import SiteNav from '../../components/SiteNav.astro';
       var current = 0;
       var lastFocused = null; // what to refocus when the lightbox closes
 
+      // Page chrome that must not receive click or focus while the lightbox
+      // is open. Do not include the lightbox itself.
+      var chrome = [
+        document.querySelector(".skip-link"),
+        document.getElementById("theme-toggle"),
+        document.querySelector("nav.doors"),
+        document.getElementById("main")
+      ];
+
+      function setChromeInert(on) {
+        for (var i = 0; i < chrome.length; i++) {
+          if (!chrome[i]) continue;
+          if (on) chrome[i].setAttribute("inert", "");
+          else chrome[i].removeAttribute("inert");
+        }
+      }
+
       function show(i) {
         current = (i + slides.length) % slides.length; // wrap around both ends
         lbImg.setAttribute("src", slides[current].src);
@@ -184,6 +204,7 @@ import SiteNav from '../../components/SiteNav.astro';
         show(i);
         lightbox.hidden = false;
         document.body.style.overflow = "hidden"; // lock the page behind the modal
+        setChromeInert(true);
         closeBtn.focus();
         document.addEventListener("keydown", onKey);
       }
@@ -192,6 +213,7 @@ import SiteNav from '../../components/SiteNav.astro';
         lightbox.hidden = true;
         document.body.style.overflow = "";
         document.removeEventListener("keydown", onKey);
+        setChromeInert(false);
         if (lastFocused) lastFocused.focus(); // return focus to the thumbnail
       }
 
