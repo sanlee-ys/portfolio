@@ -59,8 +59,11 @@ down carries the full reasoning for each item.
       2026-09-04; this roadmap is the record; needs the API script).
       *Shipped 2026-09-09, PR #352: build-time fetch of the public repos this
       site already names. Stars are not a field.*
-- [ ] **System deploy / OpenTelemetry** — on the system's own "Later"; each
-      would spawn a new decision-log entry here.
+- [x] **System deploy / OpenTelemetry** — OTel tracing shipped earlier across
+      the three services (opt-in). Local compose + kind manifests shipped
+      2026-09-09 (`architecture` #100, `deploy/`). notes-api and kb-agent
+      Dockerfiles shipped the same day (`notes-api` #58, `kb-agent` #113).
+      This is operate-what-you-built on loopback, not a public cloud deploy.
 
 > Note: the System roadmap's "Now" is effectively all shipped. The Site "Now"
 > above is what actually keeps a live roadmap live.
@@ -168,8 +171,8 @@ These have no tradeoffs worth debating. None were previously planned.
       strongest artifact. `loop-replay.html` was promoted to `projects/`; the
       gallery and scroll-storytelling pages stay at their URLs; the learning log
       left the site, and no page links it as of 2026-09-04.*
-- [ ] **Defense-news system roadmap** — lives on `projects/product-and-program.html`
-      as Now/Next/Later. That's product content for the *system*, not the site,
-      but the "Later" items (containerize/deploy, OpenTelemetry) would each
-      become new decision-log entries here. "Other verticals" is a deliberate
-      non-goal.
+- [x] **Defense-news system roadmap** — lives on `projects/product-and-program.html`
+      as Now/Next/Later. That's product content for the *system*, not the site.
+      2026-09-09 closed the remaining Later build items (local deploy, OTel
+      already shipped, kb-agent evals-as-CI tier 2, weekly cadence, durable
+      outbox). "Other verticals" stays a deliberate non-goal.
