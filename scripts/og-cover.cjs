@@ -75,6 +75,19 @@ const CARDS = [
     ],
   },
   {
+    slug: 'tool-seam',
+    filename: 'og-tool-seam.png',
+    dateline: 'sanlee.me · tool seam',
+    title: 'Tool Seam',
+    standfirst:
+      'A 40-item attack gold set on kb-agent’s tool-result path. Structural bounds held. Citation poisoning was not scored.',
+    proof: [
+      { claim: 'Structural items held after the cap', fig: '14 PASS · 0 FAIL', reversed: false },
+      { claim: 'One round executed 25 tools, then we capped it', fig: 't7-02 → 10 of 25', reversed: true },
+      { claim: 'Citation poisoning was not scored', fig: 'T4 10 UNRUN', reversed: false },
+    ],
+  },
+  {
     slug: 'false-green',
     filename: 'og-false-green.png',
     dateline: 'sanlee.me · false green',

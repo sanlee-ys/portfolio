@@ -4,6 +4,13 @@
   "fetchedAt": "2026-09-09",
   "repos": [
     {
+      "name": "kb-agent",
+      "description": "Local knowledge base over my projects. RAG and tool-use agent, with an MCP server and optional calls to project HTTP APIs.",
+      "language": "Python",
+      "pushedAt": "2026-09-09",
+      "url": "https://github.com/sanlee-ys/kb-agent"
+    },
+    {
       "name": "portfolio",
       "description": "Systems and product work by San Lee. A decision log, reversals included.",
       "language": "Astro",
@@ -30,13 +37,6 @@
       "language": "Python",
       "pushedAt": "2026-09-05",
       "url": "https://github.com/sanlee-ys/faithfulness-judge"
-    },
-    {
-      "name": "kb-agent",
-      "description": "Local knowledge base over my projects. RAG and tool-use agent, with an MCP server and optional calls to project HTTP APIs.",
-      "language": "Python",
-      "pushedAt": "2026-09-05",
-      "url": "https://github.com/sanlee-ys/kb-agent"
     },
     {
       "name": "netops-lab",
