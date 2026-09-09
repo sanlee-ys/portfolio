@@ -11,12 +11,13 @@ import SiteNav from '../components/SiteNav.astro';
   skipTo="#proof"
 >
   <Fragment slot="head">
-  <!-- 2026-09-09 owner ruling: schema.org jobTitle matches the page title
-       and the tagline. The title is Technical Program Manager. The .now
-       line stays the true employment line: Senior Product Associate at
-       JPMorganChase. This ruling replaces the 2026-09-09 live-walk P3
-       that left the two strings apart. Do not edit public/resume.html
-       for this change. -->
+  <!-- 2026-09-09 owner ruling: first-screen identity is Technical
+       Program Manager. schema.org jobTitle and the tagline match that
+       title. The .now line is the supporting employment fact: a product
+       seat at JPMorganChase. The résumé job entry stays Senior Product
+       Associate. Do not write a job-ask on the first screen. This
+       ruling replaces the earlier 2026-09-09 comment that kept .now as
+       the SPA title line. -->
   <script is:inline type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -142,7 +143,7 @@ import SiteNav from '../components/SiteNav.astro';
     <div class="wrap">
       <h1>San Lee</h1>
       <p class="tagline">Technical program manager building reliable AI systems.</p>
-      <p class="now">Senior Product Associate at JPMorganChase, on collaboration platforms serving 300,000 employees, after seven years in infrastructure and operations.</p>
+      <p class="now">In a product seat at JPMorganChase, on collaboration platforms serving 300,000 employees, after seven years in infrastructure and operations.</p>
       <p class="lede">
         I set direction, define the interfaces between teams and systems, and
         gate delivery on evidence. Claude does most of the typing under those
