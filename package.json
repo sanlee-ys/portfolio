@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/fetch-public-repos.cjs && astro build",
     "preview": "astro preview --port 4322",
     "qa": "npm run build && npm run gates",
     "gates": "node scripts/gates.cjs"

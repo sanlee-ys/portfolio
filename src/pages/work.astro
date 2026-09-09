@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import SiteNav from '../components/SiteNav.astro';
+import publicReposDoc from '../data/public-repos.json';
+
+const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos : [];
 ---
 <Base
   title="Work · San Lee, Technical Program Manager"
@@ -109,6 +112,30 @@ import SiteNav from '../components/SiteNav.astro';
       <li><a href="projects/the-system-run.html">One Note, End to End</a> &mdash; one payload traced across the real service contracts.</li>
       <li><a href="projects/netops-lab.html">Zero-Touch Provisioning</a> &mdash; a factory-blank router configured after one power cycle.</li>
     </ul>
+
+    <!-- Public repositories this site already names. The rows read from
+         src/data/public-repos.json, which scripts/fetch-public-repos.cjs
+         refreshes at build time from the GitHub public API. The allowlist is
+         the linked public set, not the full public list. Stars are not a
+         field. Each row is a link plus a sentence, so the anchor keeps the
+         WCAG 2.5.8 inline exception that hit-target.cjs applies to the other
+         ledger lists on this page. This block adds no CSS. -->
+    {publicRepos.length > 0 && (
+      <>
+        <h2 id="public-repos">Public repositories</h2>
+        <p>Each row is a public repository this site already names, with the description, the language, and the last-push date from GitHub at build time.</p>
+        <ul class="ledger" aria-label="Public repositories">
+          {publicRepos.map((repo) => (
+            <li>
+              <a href={repo.url}>{repo.name}</a>
+              {repo.description ? <> &mdash; {repo.description}</> : null}
+              {repo.language ? <> {repo.language}.</> : null}
+              {repo.pushedAt ? <> Last push: <time datetime={repo.pushedAt}>{repo.pushedAt}</time>.</> : null}
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
 
     <!-- The eight one-row decisions, moved whole from index.astro at 6859243
          (landing WO-E1.1). Every row, its id, its reversal mark, its sr-only

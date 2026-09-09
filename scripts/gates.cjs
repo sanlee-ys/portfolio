@@ -162,6 +162,7 @@ const CHECKS = [
     run: () => runNodeTest('private-repo guard suites', [
       'scripts/private-repo-check.test.cjs',
       'scripts/private-name-precommit.test.cjs',
+      'scripts/fetch-public-repos.test.cjs',
     ]),
   },
   {
