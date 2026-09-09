@@ -80,11 +80,11 @@ const CARDS = [
     dateline: 'sanlee.me · tool seam',
     title: 'Tool Seam',
     standfirst:
-      'A 40-item attack gold set on kb-agent’s tool-result path. Structural bounds held. Citation poisoning was not scored.',
+      'A 40-item attack gold set on kb-agent’s tool-result path. Citation poisoning held on 10 of 10. One field-smuggling item failed.',
     proof: [
-      { claim: 'Structural items held after the cap', fig: '14 PASS · 0 FAIL', reversed: false },
+      { claim: 'Citation poisoning held', fig: 'T4 10 of 10', reversed: false },
       { claim: 'One round executed 25 tools, then we capped it', fig: 't7-02 → 10 of 25', reversed: true },
-      { claim: 'Citation poisoning was not scored', fig: 'T4 10 UNRUN', reversed: false },
+      { claim: 'Field smuggling named the canary', fig: 't5-04 FAIL', reversed: true },
     ],
   },
   {

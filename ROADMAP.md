@@ -94,8 +94,9 @@ down carries the full reasoning for each item.
       committed into kb-agent at `docs/notes/tool-seam-threat-model.md`.
       **Phase 2 (gold set) shipped 2026-09-09**, kb-agent PR #110: 40 items,
       T1&ndash;T7. Structural T3 and T7 held. `t7-02` found a per-round fanout
-      hole and the cap closed it (kb-agent PR #111). T4 citation poisoning was
-      UNRUN without a model key. Writeup: `projects/tool-seam.html`.
+      hole and the cap closed it (kb-agent PR #111). Live T4 run 2026-09-09
+      (kb-agent PR #112): 10 of 10 PASS on `claude-sonnet-5`. One T5 FAIL
+      (`t5-04`). Writeup: `projects/tool-seam.html`.
 - [x] **Check `www.sanlee.me` resolves/redirects** — owner-side, two minutes.
       *Verified 2026-09-09: `http://www.sanlee.me` and `https://www.sanlee.me`
       both 301 to `https://sanlee.me/`. GitHub Pages cert covers both names.
