@@ -220,10 +220,7 @@ import SiteNav from '../../components/SiteNav.astro';
       gap: 8px;
       margin: 0 0 8px;
     }
-    /* .bdemo-more is the same family as .bdemo-chip. It is a real button.
-       min-height is 44px. aria-expanded marks the open state. */
-    .bdemo-chip,
-    .bdemo-more {
+    .bdemo-chip {
       font-family: var(--font);
       font-size: 0.85rem;
       font-weight: 500;
@@ -236,16 +233,39 @@ import SiteNav from '../../components/SiteNav.astro';
       cursor: pointer;
       transition: border-color 0.15s ease, background-color 0.15s ease;
     }
-    .bdemo-chip:hover,
-    .bdemo-more:hover { border-color: var(--muted); }
+    .bdemo-chip:hover { border-color: var(--muted); }
     .bdemo-chip.is-on {
       border-color: var(--accent);
       background: var(--accent-soft);
     }
-    .bdemo-more[aria-expanded="true"] {
-      border-color: var(--muted);
+    .bdemo-chip:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
     }
-    .bdemo-chip:focus-visible,
+    /* 2026-09-09. More examples is a reveal control, not a fourth chip.
+       It uses the in-flow accent underline, not chip chrome. min-height
+       stays 44px. aria-expanded marks the open state. */
+    .bdemo-more {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      background: none;
+      border: none;
+      border-radius: 0;
+      padding: 10px 0;
+      min-height: 44px;
+      margin: 0 0 8px;
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+      transition: text-decoration-color 0.15s ease;
+    }
+    .bdemo-more:hover { text-decoration-color: var(--accent); }
     .bdemo-more:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 3px;

@@ -299,7 +299,9 @@ function init() {
 
   /* 2026-09-08. The first three examples render as chips. A More examples
      button reveals chips 4 to 6. The six EXAMPLES rows stay in the array.
-     The default is three chips plus the textarea for a custom sentence. */
+     The default is three chips plus the textarea for a custom sentence.
+     2026-09-09. The button sits after the chip group. It is a reveal
+     control, not a fourth chip. */
   EXAMPLES.forEach((ex, i) => {
     const b = el("button", "bdemo-chip", ex.chip);
     b.type = "button";
@@ -312,7 +314,8 @@ function init() {
   const more = el("button", "bdemo-more", "More examples");
   more.type = "button";
   more.setAttribute("aria-expanded", "false");
-  chipBox.appendChild(more);
+  more.setAttribute("aria-controls", "bdemo-chips");
+  chipBox.after(more);
 
   more.addEventListener("click", () => {
     const open = more.getAttribute("aria-expanded") !== "true";
