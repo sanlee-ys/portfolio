@@ -54,11 +54,16 @@ const MANIFEST_PATH = path.join(REPO_ROOT, 'scripts', 'font-coverage.json');
  * variable sources rather than assumed. These fall to `--symbol-tail` and the
  * platform draws them; that is a deliberate, recorded choice, not a gap to fix.
  */
+const HANGUL_REASON =
+  'Hangul in About and gallery place names; Geist has no Korean. Platform CJK draws them.';
 const EXPECTED = new Map([
   [0x03ba, 'kappa: the judge page\'s agreement statistic; no Greek in Geist or Geist Mono'],
   [0x2600, 'sun: theme toggle; no dingbats in Geist or Geist Mono'],
   [0x263d, 'moon: theme toggle; no dingbats in Geist or Geist Mono'],
 ]);
+for (const ch of '주상절리대창덕궁후원부용정연등') {
+  EXPECTED.set(ch.codePointAt(0), HANGUL_REASON);
+}
 
 /*
  * DECLARED-ONLY exceptions: the range claims it, the file lacks it, and no

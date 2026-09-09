@@ -406,6 +406,7 @@
      the same value as "the chrome face" would hide the actual claim, which is
      that there is only one voice now. */
   --font: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, var(--symbol-tail), sans-serif;
+  --hangul: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Gothic", sans-serif;
   /* The rank the serif's stroke contrast used to supply, moved onto the
      weight axis and held in one place.
 
@@ -697,6 +698,13 @@ body {
   font-size: 1rem;
   line-height: 1.7;
   text-rendering: optimizeLegibility;
+}
+
+/* Hangul place names. Geist has no Korean; :lang(ko) takes a system CJK
+   face so 주상절리대 and 창덕궁 do not tofu. The font-coverage gate records
+   those syllables as expected platform fallbacks. */
+:lang(ko) {
+  font-family: var(--hangul);
 }
 
 /* ---- Emphasis, with no italic to spend ----------------------------------
