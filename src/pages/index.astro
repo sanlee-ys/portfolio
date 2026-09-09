@@ -11,13 +11,19 @@ import SiteNav from '../components/SiteNav.astro';
   skipTo="#proof"
 >
   <Fragment slot="head">
+  <!-- 2026-09-09 owner ruling: schema.org jobTitle matches the page title
+       and the tagline. The title is Technical Program Manager. The .now
+       line stays the true employment line: Senior Product Associate at
+       JPMorganChase. This ruling replaces the 2026-09-09 live-walk P3
+       that left the two strings apart. Do not edit public/resume.html
+       for this change. -->
   <script is:inline type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "San Lee",
     "url": "https://sanlee.me/",
-    "jobTitle": "Senior Product Associate",
+    "jobTitle": "Technical Program Manager",
     "worksFor": { "@type": "Organization", "name": "JPMorganChase" },
     "description": "Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery.",
     "sameAs": [
@@ -142,6 +148,13 @@ import SiteNav from '../components/SiteNav.astro';
         gate delivery on evidence. Claude does most of the typing under those
         contracts. The evals and the postmortems on this site are the proof.
       </p>
+      <!-- 2026-09-09 owner ruling: one proof result on the 320×568 first
+           screen. This list reuses proof cell 01 (same words, same figure,
+           same href). It is phone-only. The full band below the nav stays
+           the index. Do not invent a new metric here. -->
+      <ul class="proof hero-result" aria-label="A result from the record">
+        <li data-outcome="reversal"><a href="#decision-grounding"><span class="sr-only">Reversed. </span><span class="proof-claim">Added retrieval grounding, cut it</span> <strong>fixed 0, broke 4</strong></a></li>
+      </ul>
     </div>
   </header>
 
