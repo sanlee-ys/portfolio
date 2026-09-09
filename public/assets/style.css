@@ -3438,13 +3438,14 @@ figcaption code { overflow-wrap: anywhere; }
 
 /* The shared tooltip. Panel surface + body ink, the same pairing every
    card on the site already passes the rendered-contrast gate with, in both
-   themes. Position is set by the Base.astro script (fixed; above the
-   term when there is room, so the host sentence stays visible; below only
-   as a last resort; clamped to the viewport). Coarse-pointer devices skip
+   themes. Position is set by the Base.astro script (fixed; the side of the
+   host block first, then the side of the word, then below; never above the
+   term, so a heading and earlier lines stay visible; skip the overlay when
+   no candidate keeps the host word clear). Coarse-pointer devices skip
    the overlay: the tap already follows the glossary href (2026-09-08).
-   max-width leaves 2rem of viewport spare so the horizontal clamp can
-   always succeed -- it can never be the thing that overflows at 320px.
-   No transition, so there is nothing for prefers-reduced-motion to undo. */
+   max-width leaves 2rem of viewport spare so a side placement can sit in
+   the wrap margin at a wide desktop. No transition, so there is nothing
+   for prefers-reduced-motion to undo. */
 #term-tip {
   position: fixed;
   z-index: 40;
