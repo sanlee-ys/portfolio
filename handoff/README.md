@@ -19,7 +19,7 @@ that's still open, so it doesn't go orphaned the way `learning/` briefly did.
 
 | File | Destination repo | Status |
 |---|---|---|
-| _(none currently parked)_ | — | — |
+| [`live-walk-deferred.md`](live-walk-deferred.md) | portfolio (P3 from the 2026-09-09 live walk) | open |
 
 ## Picking one up
 
