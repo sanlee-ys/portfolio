@@ -100,11 +100,10 @@ down carries the full reasoning for each item.
       *Verified 2026-09-09: `http://www.sanlee.me` and `https://www.sanlee.me`
       both 301 to `https://sanlee.me/`. GitHub Pages cert covers both names.
       HTTPS is enforced.*
-- [ ] **"What readers actually read"** — once the custom events accumulate,
-      publish the read on them: real usage data, on-thesis. *2026-09-09: event
-      wiring is honest (PR #351). The Plausible dashboard is not public and this
-      session had no API token, so the published read is blocked on an owner
-      export.*
+- [ ] **"What readers actually read"** — Plausible collects pageviews and two
+      custom events. *Closed 2026-09-09: the public read is declined until an
+      owner export exists. This repo does not publish those counts. Collection
+      stays. Event wiring is honest (PR #351).*
 
 ---
 
