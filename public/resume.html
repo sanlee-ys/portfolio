@@ -145,9 +145,11 @@
          the tracked-caps chrome voice for labels and controls.
 
        WHAT DOCUMENT MODE KEEPS DIFFERENT, and why each one is a decision:
-         NO SITE NAV, NO SKIP LINK, NO FOLIO COUNTERS. This page is one screen
-           of record with a single back link. Numbering its sections would
-           imply a reading order a résumé does not have.
+         NO SITE NAV, NO FOLIO COUNTERS. 2026-09-08: skip-link and main
+           landmark now exist for keyboard users; still no site nav and no
+           folio counters; still no four-item primary nav. This page is one
+           screen of record with a single back link. Numbering its sections
+           would imply a reading order a résumé does not have.
          DISPLAY TYPE STAYS SMALL. On the site a section opens on 2.6rem of
            display type over its rule. Here the rule carries the whole rank and
            the label stays a tracked-caps chrome line, because this artifact is
@@ -218,6 +220,33 @@
       outline: 2px solid var(--accent);
       outline-offset: 3px;
       border-radius: var(--radius);
+    }
+
+    /* First Tab stop. Off-screen via left so the link stays focusable.
+       z-index 30 sits above the theme control. */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 30;
+      padding: 10px 14px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--rule-strong);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      left: 12px;
+      top: 12px;
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
 
     /* The controls row is this page's running head: it sits above the
@@ -374,6 +403,8 @@
         --border: #d5d2cd; --rule-strong: #423f3c;
       }
       .top-actions { display: none; }
+      /* Hide the skip link so the PDF page count does not change. */
+      .skip-link { display: none; }
       .wrap { padding: 0; max-width: 100%; }
       body { font-size: 10pt; line-height: 1.4; }
       header.masthead { margin-bottom: 12px; }
@@ -415,6 +446,7 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <div class="wrap">
     <div class="top-actions">
       <a class="back" href="index.html">&larr; Back to portfolio</a>
@@ -424,6 +456,7 @@
       </div>
     </div>
 
+    <main id="main" tabindex="-1">
     <header class="masthead">
       <h1>San Lee</h1>
       <p class="role-line">Technical Program Management &middot; Product &amp; Platform Delivery</p>
@@ -561,6 +594,7 @@
     <p class="site-note">
       Personal site &mdash; views and projects are my own, not my employer's.
     </p>
+    </main>
   </div>
 
   <script>

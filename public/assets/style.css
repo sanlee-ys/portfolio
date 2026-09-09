@@ -1937,7 +1937,10 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
 /* The return path. Every non-primary page carries one (see the navigation
    contract in CLAUDE.md), so it is a control, not a label — and it is set in
    tracked caps, which is the hardest case to read small. 0.75rem from
-   2026-09-01, up from 0.68rem, for the reason recorded at `.doors a`. */
+   2026-09-01, up from 0.68rem, for the reason recorded at `.doors a`.
+   min-height 44px from 2026-09-08: the control sat at 20px tall at 390px,
+   under the site tap floor and under WCAG 2.5.8's 24px inline exception
+   (it is not inside a sentence). inline-flex so the height applies. */
 .article-body .back {
   font-family: var(--font);
   color: var(--muted);
@@ -1946,6 +1949,9 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 .article-body .back:hover { color: var(--accent); }
 
@@ -3431,8 +3437,10 @@ figcaption code { overflow-wrap: anywhere; }
 
 /* The shared tooltip. Panel surface + body ink, the same pairing every
    card on the site already passes the rendered-contrast gate with, in both
-   themes. Position is set by the Base.astro script (fixed; below the
-   anchor, flipped above only when out of room, clamped to the viewport).
+   themes. Position is set by the Base.astro script (fixed; above the
+   term when there is room, so the host sentence stays visible; below only
+   as a last resort; clamped to the viewport). Coarse-pointer devices skip
+   the overlay: the tap already follows the glossary href (2026-09-08).
    max-width leaves 2rem of viewport spare so the horizontal clamp can
    always succeed -- it can never be the thing that overflows at 320px.
    No transition, so there is nothing for prefers-reduced-motion to undo. */
