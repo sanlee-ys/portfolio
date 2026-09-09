@@ -7,7 +7,7 @@
  */
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { extractRepoRefs, findDisclosurePhrases, checkContent } = require('./private-repo-check.cjs');
+const { extractRepoRefs, findDisclosurePhrases, checkContent, checkSnapshotNames } = require('./private-repo-check.cjs');
 
 // A stand-in public allowlist (real public repos; safe to name).
 const PUBLIC = new Set([
@@ -92,4 +92,31 @@ test('slug and phrase violations are reported together', () => {
   const v = checkContent(pages, PUBLIC);
   assert.equal(v.length, 2);
   assert.deepEqual(new Set(v.map((x) => x.kind)), new Set(['slug', 'phrase']));
+});
+
+test('a public-repos snapshot of public names passes', () => {
+  const pages = [{
+    file: 'src/data/public-repos.json',
+    text: JSON.stringify({
+      repos: [{ name: 'portfolio', url: 'https://github.com/sanlee-ys/portfolio' }],
+    }),
+  }];
+  assert.deepEqual(checkContent(pages, PUBLIC), []);
+});
+
+test('a public-repos snapshot that names a non-public repo fails even without a slug URL', () => {
+  const pages = [{
+    file: 'src/data/public-repos.json',
+    text: JSON.stringify({
+      repos: [{ name: 'secret-side-ledger', url: 'https://example.com/x' }],
+    }),
+  }];
+  const v = checkContent(pages, PUBLIC);
+  assert.ok(v.some((x) => x.kind === 'slug' && /secret-side-ledger/.test(x.detail)));
+});
+
+test('a malformed public-repos snapshot fails closed', () => {
+  const v = checkSnapshotNames('src/data/public-repos.json', '{', PUBLIC);
+  assert.equal(v.length, 1);
+  assert.match(v[0].detail, /not valid JSON/);
 });

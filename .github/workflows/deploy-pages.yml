@@ -48,6 +48,10 @@ jobs:
         run: |
           npm ci
           npm run build
+        env:
+          # Raises the GitHub API rate limit for the build-time public-repo
+          # snapshot. The fetch script calls the public-only user endpoint.
+          GITHUB_TOKEN: ${{ github.token }}
 
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -74,6 +74,33 @@ function findDisclosurePhrases(text) {
 
 // --- Pure checker (no network; this is what the test suite drives) -----------
 // pages: [{file, text}];  publicRepos: Set<string> of public repo names.
+const SNAPSHOT_REL = 'src/data/public-repos.json';
+const SNAPSHOT_ABS = path.join(path.resolve(__dirname, '..'), ...SNAPSHOT_REL.split('/'));
+
+function checkSnapshotNames(file, text, publicRepos) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return [{ file, kind: 'slug', detail: 'public-repos snapshot is not valid JSON' }];
+  }
+  if (!data || !Array.isArray(data.repos)) {
+    return [{ file, kind: 'slug', detail: 'public-repos snapshot is missing a repos array' }];
+  }
+  const violations = [];
+  for (const row of data.repos) {
+    const name = row && typeof row.name === 'string' ? row.name : '';
+    if (!name || !publicRepos.has(name)) {
+      violations.push({
+        file,
+        kind: 'slug',
+        detail: `references sanlee-ys/${name || '?'}, which is not a public repo`,
+      });
+    }
+  }
+  return violations;
+}
+
 function checkContent(pages, publicRepos) {
   const violations = [];
   for (const { file, text } of pages) {
@@ -92,6 +119,12 @@ function checkContent(pages, publicRepos) {
         kind: 'phrase',
         detail: `contains a private-repo disclosure phrase: "${phrase}"`,
       });
+    }
+    // The snapshot is committed source, so a name in repos[].name would
+    // disclose even if the page never rendered it. Scan the name list, not
+    // only sanlee-ys/ slugs in the URL field.
+    if (file.replace(/\\/g, '/').endsWith(SNAPSHOT_REL)) {
+      violations.push(...checkSnapshotNames(file, text, publicRepos));
     }
     // Layer C (bare private names) is handled OUT of CI, in the local
     // pre-commit guard scripts/private-name-precommit.cjs — knowing the private
@@ -157,6 +190,11 @@ async function main() {
     console.error('  Run `npm run build` first, or unset SITE_ROOT.');
     process.exit(1);
   }
+  // SITE_ROOT points at dist/, so the HTML walk never sees src/data/. The
+  // snapshot is public source and names repos; scan it from the repo root.
+  if (fs.existsSync(SNAPSHOT_ABS)) {
+    pages.push({ file: SNAPSHOT_REL, text: fs.readFileSync(SNAPSHOT_ABS, 'utf8') });
+  }
 
   const publicRepos = await fetchPublicRepos(); // throws -> fail-closed below
   const violations = checkContent(pages, publicRepos);
@@ -178,4 +216,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { extractRepoRefs, findDisclosurePhrases, checkContent };
+module.exports = { extractRepoRefs, findDisclosurePhrases, checkContent, checkSnapshotNames };

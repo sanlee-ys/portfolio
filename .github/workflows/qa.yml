@@ -25,9 +25,13 @@ jobs:
         run: |
           npm ci
           npm run build
+        env:
+          # Raises the GitHub API rate limit for the build-time public-repo
+          # snapshot. The fetch script calls the public-only user endpoint.
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Private-repo guard (adversarial suites, A+B and C)
-        run: node --test scripts/private-repo-check.test.cjs scripts/private-name-precommit.test.cjs
+        run: node --test scripts/private-repo-check.test.cjs scripts/private-name-precommit.test.cjs scripts/fetch-public-repos.test.cjs
 
       # The review workflow's classify step, run against synthetic execution
       # logs with `gh` stubbed. ADR-005 has been amended four times and each
