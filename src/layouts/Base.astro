@@ -149,30 +149,63 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
       var active = null;
       var GAP = 12;
 
+      function overlaps(p, q) {
+        return p.left < q.right && p.right > q.left && p.top < q.bottom && p.bottom > q.top;
+      }
+
       function place(anchor) {
         var a = anchor.getBoundingClientRect();
         // Force layout so height is real. A zero box made the first paint
         // sit on the host sentence (2026-09-08 critique).
         void tip.offsetHeight;
         var t = tip.getBoundingClientRect();
-        // Prefer ABOVE the term so the host sentence stays visible. Below
-        // the box covers the rest of the paragraph on a wrapped line.
-        var above = a.top - t.height - GAP;
-        var top;
-        if (above >= GAP) {
-          top = above;
-        } else {
-          top = a.bottom + GAP;
-          if (top + t.height > window.innerHeight - GAP) {
-            top = Math.max(GAP, window.innerHeight - t.height - GAP);
+        var tw = t.width;
+        var th = t.height;
+        var vw = window.innerWidth;
+        var vh = window.innerHeight;
+        var hostEl = anchor.closest("p, li, h1, h2, h3, h4, h5, h6") || anchor;
+        var host = hostEl.getBoundingClientRect();
+
+        function box(left, top) {
+          return { left: left, top: top, right: left + tw, bottom: top + th };
+        }
+        function inView(b) {
+          return b.left >= GAP && b.top >= GAP && b.right <= vw - GAP && b.bottom <= vh - GAP;
+        }
+        function coversWord(b) {
+          return overlaps(b, a);
+        }
+        function coversHost(b) {
+          return overlaps(b, host);
+        }
+
+        // Prefer the side of the host block, then the side of the word, then
+        // below. Do not place the box above the term: that hid the heading
+        // and the earlier lines of the host paragraph (2026-09-09 critique).
+        var cands = [
+          box(host.right + GAP, a.top),
+          box(host.left - tw - GAP, a.top),
+          box(a.right + GAP, a.top),
+          box(a.left - tw - GAP, a.top),
+          box(a.left + a.width / 2 - tw / 2, host.bottom + GAP),
+          box(a.left + a.width / 2 - tw / 2, a.bottom + GAP)
+        ];
+
+        var i, b, picked = null;
+        for (i = 0; i < cands.length; i++) {
+          b = cands[i];
+          if (inView(b) && !coversWord(b) && !coversHost(b)) { picked = b; break; }
+        }
+        if (!picked) {
+          for (i = 0; i < cands.length; i++) {
+            b = cands[i];
+            if (inView(b) && !coversWord(b) && b.top >= a.top - 0.5) { picked = b; break; }
           }
         }
-        // Clamp horizontally so the tooltip can never overflow the viewport;
-        // its max-width leaves 2rem spare, so the clamp always has room.
-        var left = a.left + a.width / 2 - t.width / 2;
-        left = Math.max(GAP, Math.min(left, window.innerWidth - t.width - GAP));
-        tip.style.top = top + "px";
-        tip.style.left = left + "px";
+        if (!picked) return false;
+        tip.style.top = picked.top + "px";
+        tip.style.left = picked.left + "px";
+        return true;
       }
 
       function show(anchor) {
@@ -182,18 +215,28 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
         var text = anchor.getAttribute("data-tip");
         if (!text) return;
         tip.textContent = text;
+        tip.style.visibility = "hidden";
         tip.hidden = false;
-        place(anchor);
+        if (!place(anchor)) {
+          tip.hidden = true;
+          tip.style.visibility = "";
+          return;
+        }
+        tip.style.visibility = "";
         // Focusing an off-screen anchor makes the browser scroll it into
         // view AFTER focusin has run, which would strand a fixed-position
         // tooltip where the anchor used to be. Re-place on the next frame.
-        requestAnimationFrame(function () { if (active === anchor) place(anchor); });
+        requestAnimationFrame(function () {
+          if (active !== anchor) return;
+          if (!place(anchor)) hide();
+        });
         anchor.setAttribute("aria-describedby", "term-tip");
         active = anchor;
       }
 
       function hide() {
         tip.hidden = true;
+        tip.style.visibility = "";
         if (active) { active.removeAttribute("aria-describedby"); active = null; }
       }
 
@@ -209,7 +252,10 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://sanlee.me${og
       });
       // Scrolling with the tooltip open: keep it on its anchor. This reads
       // geometry only; it never scrolls anything itself.
-      window.addEventListener("scroll", function () { if (active) place(active); }, { passive: true });
+      window.addEventListener("scroll", function () {
+        if (!active) return;
+        if (!place(active)) hide();
+      }, { passive: true });
     })();
   </script>
 </body>
