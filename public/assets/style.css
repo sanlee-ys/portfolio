@@ -2223,7 +2223,8 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
   margin: 0;
   background: none;
 }
-.decision h3 {
+.decision h3,
+.glossary-list .decision h2 {
   font-family: var(--font);
   font-weight: var(--display-weight);
   margin: 0 0 10px;
@@ -3621,8 +3622,14 @@ figcaption code { overflow-wrap: anywhere; }
 .notes-list li {
   color: var(--text-secondary);
   font-size: 0.95rem;
-  padding: 8px 0 7px;
+  padding: 0;
   border-bottom: 1px solid var(--border);
+}
+.notes-list a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 0 7px;
 }
 .muted-line { color: var(--muted); font-size: 0.92rem; font-weight: 500; }
 
