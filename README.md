@@ -166,10 +166,10 @@ Grouped the way the site is organized — each link is a full writeup under
 
 ## Analytics
 
-Traffic is measured with [Plausible](https://plausible.io) — privacy-friendly,
-no cookie banner, script tag on every page. Dashboard: `sanlee.me` in the
-Plausible account tied to this repo. Beyond pageviews, `public/assets/events.js`
-sends two live custom events, diagram node clicks and résumé clicks. Résumé
-clicks record `from` as `nav`, `footer`, `hero`, or `other`. A third listener,
-decision-card expands, was removed in #351 (2026-09-09); it had had no DOM
-target since the homepage cards lost their `<details>` in #152 (2026-07-26).
+[Plausible](https://plausible.io) collects pageviews on every page. The script
+is privacy-friendly and needs no cookie banner. `public/assets/events.js` also
+sends two custom events: diagram node clicks and résumé clicks. Résumé clicks
+record `from` as `nav`, `footer`, `hero`, or `other`. This repo does not
+publish those counts. A third listener, decision-card expands, was removed in
+#351 (2026-09-09). It had had no DOM target since the homepage cards lost
+their `<details>` in #152 (2026-07-26).
