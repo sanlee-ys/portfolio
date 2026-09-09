@@ -537,7 +537,12 @@ First codified as a standing rule 2026-07-01 (adversarial round,
 `ROADMAP.md`); promoted here 2026-07-03 after the same leak recurred in a
 cross-repo write-up in the `architecture` repo.
 
-## Career copy (current choice, 2026-09-04)
+## Career copy (current choice, 2026-09-09)
+
+First-screen identity is Technical Program Manager. The current product
+seat at JPMorganChase is a supporting fact, not a second headline. The
+résumé job entry stays Senior Product Associate. Do not write a job-ask
+on the first screen.
 
 Current About tell (2026-08-17):
 

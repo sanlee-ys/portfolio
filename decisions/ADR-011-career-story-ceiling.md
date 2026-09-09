@@ -10,6 +10,8 @@
 
 **Owner change, 2026-09-06.** The owner added the held title to the hero line on `src/pages/index.astro`. The owner also added one résumé-fact sentence on `src/pages/about.astro` that routes the reader to the paid program work. Both sentences stay inside the ceiling below. The ceiling does not change.
 
+**Owner change, 2026-09-09.** The owner set the first-screen identity to Technical Program Manager. The product seat at JPMorganChase is a supporting clause on `.now`. The résumé job entry stays Senior Product Associate. The locked About tell does not change. The ceiling does not change.
+
 ## Context
 
 The site roadmap held an open item: "Career-story depth." The About section
