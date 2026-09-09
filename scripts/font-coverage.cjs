@@ -61,7 +61,7 @@ const EXPECTED = new Map([
   [0x2600, 'sun: theme toggle; no dingbats in Geist or Geist Mono'],
   [0x263d, 'moon: theme toggle; no dingbats in Geist or Geist Mono'],
 ]);
-for (const ch of '주상절리대창덕궁후원부용정연등') {
+for (const ch of '주상절리대창덕궁후원부용정연등조계사종로') {
   EXPECTED.set(ch.codePointAt(0), HANGUL_REASON);
 }
 
