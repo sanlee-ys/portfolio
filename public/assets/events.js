@@ -1,16 +1,22 @@
 // Product telemetry for the site itself: which parts do readers actually use?
-// Three signals — diagram node clicks, decision-card expands, résumé clicks —
-// sent as Plausible custom events. Everything is a no-op if analytics is
-// blocked or absent; the site never depends on this file.
+// Two signals go out as Plausible custom events: diagram node clicks and
+// résumé clicks. Every call is a no-op if analytics is blocked or absent.
+// The site never depends on this file.
 //
-// 2026-09-04: two of the three signals have a DOM target on main. index.html
-// is the only page that loads this file. The decision-card listener binds
-// `.decision > details`. No page has carried a <details> since #152
-// (2026-07-26), so that block registers zero listeners. The résumé listener
-// labels every non-footer click "hero". The hero has carried no résumé link
-// since b77fd11 (2026-08-19). On main that branch labels the primary-nav item
-// (src/components/SiteNav.astro). The value stays so the Plausible series
-// stays continuous. A removal or a rename is a code change for another session.
+// index.html is the only page that loads this file.
+//
+// 2026-09-09: this file no longer sends "Decision expanded". The old
+// listener bound `.decision > details`. No page has carried a <details>
+// since #152 (2026-07-26). A ledger row and a hash jump are not an expand.
+// If this file sent the old name for either, it would pretend the control
+// still exists.
+//
+// Résumé `from` is nav, footer, hero, or other. The value comes from the
+// live DOM. SiteNav (`nav.doors`) holds the primary-nav item. The footer
+// holds the other. The hero has carried no résumé link since b77fd11
+// (2026-08-19). The old binary (footer vs hero) labeled the nav item
+// "hero". The click listener sits on document, so it still counts the
+// footer that Base.astro emits after this script.
 
 (function () {
   function track(name, props) {
@@ -38,22 +44,16 @@
     });
   }
 
-  // Decision cards: count first expand per card per pageview (opens, not toggles).
-  document.querySelectorAll(".decision > details").forEach(function (d) {
-    var sent = false;
-    d.addEventListener("toggle", function () {
-      if (d.open && !sent) {
-        sent = true;
-        var card = d.closest(".decision");
-        track("Decision expanded", { id: (card && card.id) || "unknown" });
-      }
-    });
-  });
+  function resumeFrom(a) {
+    if (a.closest(".footer")) return "footer";
+    if (a.closest(".doors")) return "nav";
+    if (a.closest(".hero")) return "hero";
+    return "other";
+  }
 
-  // Résumé clicks, with where they came from.
-  document.querySelectorAll('a[href$="resume.html"]').forEach(function (a) {
-    a.addEventListener("click", function () {
-      track("Resume click", { from: a.closest(".footer") ? "footer" : "hero" });
-    });
+  document.addEventListener("click", function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href$="resume.html"]') : null;
+    if (!a) return;
+    track("Resume click", { from: resumeFrom(a) });
   });
 })();
