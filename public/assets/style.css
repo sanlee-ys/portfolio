@@ -1880,7 +1880,9 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
 .footer a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
+  min-width: 44px;
   font-family: var(--font);
   font-size: 0.7rem;
   font-weight: 500;
@@ -1897,7 +1899,10 @@ main.wrap .tt-reader > .tt-reader-controls { margin-top: 16px; }
     gap: 2px 14px;
   }
   .footer a {
-    min-height: 36px;
+    /* 44px, not 36px. The 560px packing dropped the height under the site
+       tap floor. hit-target.cjs does not see these links: they share a
+       <nav>, so they are not standalone. The contract still binds. */
+    min-height: 44px;
     font-size: 0.85rem;
   }
   /* Tables must never widen the page. Let them scroll inside their own box. */
@@ -4278,8 +4283,18 @@ main > p a:hover { text-decoration-color: var(--accent); }
    and a 600px portrait window has the same stacked hero with the same slack
    in it. 640px is where the two-column nav stops needing the tighter setting. */
 @media (max-width: 640px) {
+  /* 64px, not 20px. The skip-link focuses at top:12px, min-height 44px, so
+     it occupies the top 56px. The 20px padding put the nameplate under that
+     box: a keyboard user who Tabs once on a phone saw "Skip to content"
+     painted over "San Lee". Interior pages already reserve 64px for the
+     same band (`.theme-toggle + .doors .wrap`). The name starts below it.
+
+     THE FIRST-SCREEN COST. This is +44px of hero. At 390x844 the proof
+     band's first two claims stay fully on screen one, which is the budget
+     this block states. The third claim's last line now clips the fold.
+     Two claims on screen one is the recorded floor; three was slack. */
   .hero {
-    padding-top: 20px;
+    padding-top: 64px;
     padding-bottom: 14px;
   }
   /* The masthead still leads the page; it just stops being 4rem of it. 2.06rem

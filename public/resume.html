@@ -213,6 +213,13 @@
        off this page if any later copy uses them. Emphasis is weight. */
     em, i, cite { font-style: normal; font-weight: 600; }
     .wrap { max-width: 52rem; margin: 0 auto; padding: clamp(40px, 7vw, 56px) 24px clamp(64px, 10vw, 96px); }
+    /* The skip-link focuses at top:12px, min-height 44px. Below 900px the
+       wrap's clamp min is 40px, so the back link sat under that box. 64px
+       is the same chrome band interior pages already reserve for the
+       toggle. Print sets padding: 0 and hides the skip link. */
+    @media (max-width: 900px) {
+      .wrap { padding-top: 64px; }
+    }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
     /* One focus ring, the site's: 2px of the link ink, offset clear of the box. */
