@@ -3,6 +3,6 @@
   "private": true,
   "description": "Pinned Playwright for the QA workflow's browser gates (mobile-qa, contrast-check, hit-target, microtext-floor); resume-pdf.cjs and og-cover.cjs use the same pin. Not part of the site build (2026-09-04).",
   "devDependencies": {
-    "playwright": "1.62.1"
+    "playwright": "1.63.0"
   }
 }
