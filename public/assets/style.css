@@ -1252,9 +1252,12 @@ em, i, cite {
   border-radius: var(--radius-sm);
 }
 
-/* Compact first-screen result. Hidden above the phone composition
-   breakpoint: the proof band is already on screen one there. The 640px
-   block below shows it and packs it into one tap row. */
+/* Compact first-screen result. Hidden by default: on most screens the
+   proof band is already on screen one, and a second copy of cell 01 above
+   the nav reads as the band bleeding into the hero (owner report,
+   2026-09-11, on a 390×844 phone). The 640px block below packs it into one
+   tap row, and the short-viewport block after it is the only rule that
+   shows it. */
 .hero-result {
   display: none;
 }
@@ -4295,6 +4298,34 @@ main > p a:hover { text-decoration-color: var(--accent); }
    measures) but the composition problem is a phone-and-small-tablet problem,
    and a 600px portrait window has the same stacked hero with the same slack
    in it. 640px is where the two-column nav stops needing the tighter setting. */
+
+/* ---- The short-viewport switch for the hero result ------------------------
+   The 2026-09-09 ruling asked for one gated figure on the 320×568 first
+   screen. The width block below packs `.hero-result` for that screen, but
+   width alone showed it on every phone, and on a 390×844 phone the band's
+   own cell 01 is already on screen one, so the reader met the same claim
+   twice inside one screen and read the hero copy as a bleed from the band
+   (owner report, 2026-09-11). Height is the fact that decides whether the
+   band's figure reaches screen one, so height gates the line.
+
+   Measured 2026-09-13 on the built page with the hero line hidden, at a
+   16px root: the bottom of the band's first figure sits at y=704 at 320px,
+   y=680 at 360px, and y=612 at 390px and 430px (the nav packs to two rows
+   from 390px, which is the 68px step). A viewport shorter than that number
+   cannot show the band's figure on screen one and needs the hero line.
+   One threshold covers the three: 720px is 704 plus a 16px margin. The
+   cost of one number is a 390-to-640px window between 613px and 720px tall
+   that still shows both copies; no portrait phone has that shape. With the
+   line shown, the hero figure bottoms out at y=476 at 320px, so it fits
+   every viewport this block can match. At a 20px root the band sits about
+   a quarter lower, so the large-text pass keeps the line on a few taller
+   viewports; that errs toward the ruling, never against it. */
+@media (max-width: 640px) and (max-height: 720px) {
+  .hero-result {
+    display: block;
+  }
+}
+
 @media (max-width: 640px) {
   /* 64px, not 20px. The skip-link focuses at top:12px, min-height 44px, so
      it occupies the top 56px. The 20px padding put the nameplate under that
@@ -4338,9 +4369,10 @@ main > p a:hover { text-decoration-color: var(--accent); }
   }
   /* One gated figure under the lede, packed to a 44px tap row. The tick,
      the counter, and the 1.5rem display figure stay on the full band
-     below the nav. Overrides beat `.proof a strong` by source order. */
+     below the nav. Overrides beat `.proof a strong` by source order.
+     The display switch is NOT here: the short-viewport block after this
+     one owns it, so a tall phone never shows the line. */
   .hero-result {
-    display: block;
     margin: 0;
     padding: 0;
     gap: 0;
