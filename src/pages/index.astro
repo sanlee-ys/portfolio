@@ -151,8 +151,10 @@ import SiteNav from '../components/SiteNav.astro';
       </p>
       <!-- 2026-09-09 owner ruling: one proof result on the 320×568 first
            screen. This list reuses proof cell 01 (same words, same figure,
-           same href). It is phone-only. The full band below the nav stays
-           the index. Do not invent a new metric here. -->
+           same href). It shows only on a short phone viewport, where the
+           band's own cell 01 cannot reach screen one; see the height-gated
+           block in style.css. The full band below the nav stays the index.
+           Do not invent a new metric here. -->
       <ul class="proof hero-result" aria-label="A result from the record">
         <li data-outcome="reversal"><a href="#decision-grounding"><span class="sr-only">Reversed. </span><span class="proof-claim">Added retrieval grounding, cut it</span> <strong>fixed 0, broke 4</strong></a></li>
       </ul>
