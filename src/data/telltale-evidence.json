@@ -1,12 +1,12 @@
 {
   "source": {
     "repo": "sanlee-ys/telltale",
-    "sha": "38f262a",
-    "pulledAt": "2026-08-30"
+    "sha": "07163dd",
+    "pulledAt": "2026-09-14"
   },
   "figures": {
     "goldens.total": {
-      "value": "132",
+      "value": "171",
       "kind": "counted",
       "command": "git ls-tree -r --name-only <sha>, matching internal/<pkg>/testdata/golden/*.txt"
     },
@@ -21,10 +21,10 @@
       ]
     },
     "tests.total": {
-      "value": "1780",
+      "value": "2191",
       "kind": "counted",
       "command": "git grep -c -E '^func Test' <sha> -- '*_test.go', summed over paths under internal/ and cmd/",
-      "files": 171
+      "files": 229
     },
     "adapters.vendor": {
       "value": "7",
@@ -146,7 +146,7 @@
         "  +------------------------------------------------------------------------------------------------------------------+  ",
         "  |  :                                                                                                               |  ",
         "  +---------------------------------------------------------------------------------------------------------  GATE  -+  ",
-        "                Write: internal/council/clock.go  |  y approve  |  n deny  |  a stop asking  |  ctrl+c cancel the turn  "
+        "                  Write: internal/council/clock.go  |  y approve  |  n deny  |  a stop asking  |  ctrl+c cancel claude  "
       ]
     },
     "floor": {

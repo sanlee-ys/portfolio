@@ -80,7 +80,8 @@ if (missingFrames.length) {
 
     /* Argument plate TT-1 (portfolio ADR-004, ADR-012). Page-scoped: the three
        states a gauge can be in, and the fact that only two of them are honest.
-       Drawn from internal/hud/testdata/golden/zero-vs-absent.txt at 38f262a,
+       Drawn from internal/hud/testdata/golden/zero-vs-absent.txt at 38f262a
+       (byte-identical at 07163dd, the 2026-09-14 pin),
        which is the strongest artifact in that repository and CANNOT be pasted:
        it carries four distinct non-ASCII characters and has no ASCII twin, so
        a paste would fail the font-coverage gate. This plate carries the
@@ -408,7 +409,7 @@ if (missingFrames.length) {
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
       <ul>
-        <li><strong>Result and evidence:</strong> v0.2.0 ships as four archives and a checksum file. Named tests enforce the honesty rules, not intent, so a reader can grep for them. The platform labels say which builds I ran and which I only built.</li>
+        <li><strong>Result and evidence:</strong> v0.3.0 ships as four archives and a checksum file. Named tests enforce the honesty rules, not intent, so a reader can grep for them. The platform labels say which builds I ran and which I only built.</li>
         <li><strong>Problem:</strong> I direct five coding-agent CLIs across several repositories. None of them tells me how much context is left or what a run cost. None tells me whether its sandbox holds, or whether a seat that looks busy died quietly. Any dashboard I built would have to invent at least one of those numbers.</li>
         <li><strong>Ownership:</strong> Sole owner and technical lead. I set the honesty contract, the read-only boundary, and the release bar, and I made every ship-or-refuse call recorded on this page. Claude did most of the typing. The golden files and the postmortems are the proof.</li>
         <li><strong>Constraints:</strong> The gauge path reads; it never writes back to a vendor. The gauge path and the stdio agent mode bind no port and send nothing off the machine. Two modes are exceptions. The optional event listener binds a loopback port on 127.0.0.1 and refuses any other host. Council mode starts vendor CLIs, which talk to their vendors, and it can write to the workspace. Windows is the primary target. Every vendor changes its on-disk format, and no vendor announces it.</li>
@@ -1435,8 +1436,8 @@ if (missingFrames.length) {
       A script re-read the counts and frames on this page from
       <code>sanlee-ys/telltale</code> at <code>{src.sha}</code> on
       <code>{src.pulledAt}</code>. The suite holds
-      <span data-tt="goldens.total">132</span> golden text renders and
-      <span data-tt="tests.total">1780</span> test functions at that commit.
+      <span data-tt="goldens.total">171</span> golden text renders and
+      <span data-tt="tests.total">2191</span> test functions at that commit.
       Each figure names the command that produced it. A check in this
       site&rsquo;s test suite fails the build when a rendered figure drifts from
       that record.
