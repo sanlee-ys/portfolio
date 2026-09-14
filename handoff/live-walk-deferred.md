@@ -12,28 +12,9 @@ Do not fold these into a mid-session question. Re-verify against live
 Blast radius if a later session picks one up: name the files in that
 session's chip. Nothing below is in flight.
 
-## P3 — first screen at 320×568
-
-At 390×844 the proof band's first two claims sit on screen one. At
-320×568 the first proof cell starts at y=581 and the viewport is 568px,
-so a 90-second reader on an iPhone SE sees identity and nav only. The
-phone composition block in `public/assets/style.css` budgets 390×844,
-not 320×568. 320px is the overflow floor. Do not steal more hero type
-without a new owner ruling on the 320 first screen.
-
-## P3 — JSON-LD job title
-
-`src/pages/index.astro` schema.org `jobTitle` is "Senior Product
-Associate". The visible title and tagline say technical program manager.
-This is a career-copy fork (ADR-011). Do not change it in a UX pass.
-
-## P3 — stale flagship-order comment
-
-`src/pages/index.astro` still says the flagship block "keeps its
-position above the router, which is the order ADR-012 set". The HTML
-puts the router first. ADR-012 Consequences, amended 2026-09-03, is
-the ruling. The comment is wrong. The layout is right. Edit the
-comment only.
+Resolved on `main` and dropped from this file, 2026-09-14: the 320×568
+first screen (#356, #369), the JSON-LD `jobTitle` (#364 made it Technical
+Program Manager), and the flagship-order comment (corrected in this pass).
 
 ## P3 — lightbox empty `src`
 
