@@ -104,10 +104,19 @@ down carries the full reasoning for each item.
       *Verified 2026-09-09: `http://www.sanlee.me` and `https://www.sanlee.me`
       both 301 to `https://sanlee.me/`. GitHub Pages cert covers both names.
       HTTPS is enforced.*
-- [ ] **"What readers actually read"** — Plausible collects pageviews and two
-      custom events. *Closed 2026-09-09: the public read is declined until an
-      owner export exists. This repo does not publish those counts. Collection
-      stays. Event wiring is honest (PR #351).*
+- [x] **"What readers actually read"** — Plausible collects pageviews and two
+      custom events. *Closed 2026-09-09 as declined: the public read waits on
+      an owner export, and this repo does not publish those counts. Collection
+      stays. Event wiring is honest (PR #351). Box checked 2026-09-14 so the
+      roadmap shows no open item it is not tracking.*
+- [x] **Live-walk P3s (2026-09-09).** *Closed 2026-09-14. Three landed on
+      `main` (#356, #364, #369, #370). The owner ruled on the rest: Home stays
+      out of the primary nav, interior pages return through `.back` (ADR-007);
+      the demo's idle verdict stays an em-dash, the site's absence grammar;
+      the gallery lightbox keeps its empty `src` until a detector becomes a
+      gate; the side-tab borders, desktop link heights and the Work ADR rows
+      stay as they are. `handoff/live-walk-deferred.md` is deleted; this
+      line is the record.*
 
 ---
 
