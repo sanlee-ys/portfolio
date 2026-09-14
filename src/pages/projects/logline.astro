@@ -124,7 +124,7 @@ if (missing.length) {
     <div class="decision" aria-label="Case study summary">
       <p class="tag">Case study summary</p>
       <ul>
-        <li><strong>Result and evidence:</strong> v0.1 reads a ledger of <span data-ll="claims.total">18</span> claims this site makes about <span data-ll="repos.count">6</span> public repositories and reports <span data-ll="claims.met">17</span> met, <span data-ll="claims.unmet">1</span> unmet, and <span data-ll="claims.unmeasured">0</span> unmeasured, each met claim beside the commit, tag or path that proves it. Named tests refuse a percent, a forecast and a verdict word, so a reader can grep for the refusals rather than trust them.</li>
+        <li><strong>Result and evidence:</strong> The first cut reads a ledger of <span data-ll="claims.total">18</span> claims this site makes about <span data-ll="repos.count">6</span> public repositories and reports <span data-ll="claims.met">17</span> met, <span data-ll="claims.unmet">1</span> unmet, and <span data-ll="claims.unmeasured">0</span> unmeasured, each met claim beside the commit, tag or path that proves it. Named tests refuse a percent, a forecast and a verdict word, so a reader can grep for the refusals rather than trust them.</li>
         <li><strong>Problem:</strong> A status report renders a percent, a colour or a phrase, and none of those is a measurement. A percent needs a denominator nobody agreed on. A colour is a verdict with the evidence removed. I gate delivery on evidence, and no artifact on this site showed what that looks like as a tool.</li>
         <li><strong>Ownership:</strong> Sole owner. I set the three states, the list of refusals, and the rule that the first ledger is my own claims. Claude did most of the typing. The tests and the record are the proof.</li>
         <li><strong>Constraints:</strong> Git only, at a pinned ref, and never the working tree, so an uncommitted file cannot satisfy a claim. No network. One ref for every repository per run. A run that measured nothing exits with a failure code, because a report that measured nothing is not a report.</li>
@@ -149,7 +149,7 @@ if (missing.length) {
           <code>{src.sha}</code>, copied byte for byte.
         </span>
         <span class="fig-limit">
-          The frame shows one run on one machine on <code>{src.pulledAt}</code>.
+          The frame shows one run on one machine on {src.pulledAt}.
           It does not show whether the claims were the right ones to make, and
           a met claim says a commit exists, not that the work behind it was
           good. The frame is 80 columns and scrolls sideways on a narrow screen.
@@ -262,8 +262,8 @@ if (missing.length) {
       <rect class="ll-box" x="182" y="16" width="72" height="30" rx="2" />
       <text class="ll-value ll-value-bad" x="218" y="35" text-anchor="middle">green</text>
       <path class="ll-strike" d="M 188 31 L 248 31" aria-hidden="true" />
-      <text class="ll-micro" x="218" y="62" text-anchor="middle">a verdict with</text>
-      <text class="ll-micro" x="218" y="74" text-anchor="middle">the evidence removed</text>
+      <text class="ll-micro" x="218" y="62" text-anchor="middle">a verdict, and</text>
+      <text class="ll-micro" x="218" y="74" text-anchor="middle">no evidence</text>
 
       <text class="ll-micro" x="130" y="90" text-anchor="middle">each refusal is a named test</text>
     </svg>
@@ -324,30 +324,34 @@ if (missing.length) {
     <h2 id="measurement">How a claim is measured</h2>
     <div class="fig fig--plate">
     <span class="fig-label">Plate 03</span>
-    <svg class="ll-plate" viewBox="0 0 260 72" role="img"
+    <svg class="ll-plate" viewBox="0 0 260 84" role="img"
          aria-label="Four boxes in a row joined by arrows. Ledger, a file. Git, at a pinned ref. Record, a JSON file with a state per claim. Render, words first. The record is what the site's gate reads.">
       <title>Ledger to git to record to render. The record is what this site checks.</title>
       <rect class="ll-box" x="4" y="14" width="54" height="28" rx="2" />
       <text class="ll-state" x="31" y="32" text-anchor="middle">LEDGER</text>
-      <text class="ll-micro" x="31" y="58" text-anchor="middle">a file</text>
+      <text class="ll-micro" x="31" y="58" text-anchor="middle">a file,</text>
+      <text class="ll-micro" x="31" y="70" text-anchor="middle">edited rarely</text>
 
       <path class="ll-arrow" d="M 58 28 L 68 28 M 65 25 L 68 28 L 65 31" aria-hidden="true" />
 
       <rect class="ll-box" x="70" y="14" width="54" height="28" rx="2" />
       <text class="ll-state" x="97" y="32" text-anchor="middle">GIT</text>
-      <text class="ll-micro" x="97" y="58" text-anchor="middle">at a pinned ref</text>
+      <text class="ll-micro" x="97" y="58" text-anchor="middle">at a</text>
+      <text class="ll-micro" x="97" y="70" text-anchor="middle">pinned ref</text>
 
       <path class="ll-arrow" d="M 124 28 L 134 28 M 131 25 L 134 28 L 131 31" aria-hidden="true" />
 
       <rect class="ll-box ll-box-met" x="136" y="14" width="54" height="28" rx="2" />
       <text class="ll-state" x="163" y="32" text-anchor="middle">RECORD</text>
-      <text class="ll-micro" x="163" y="58" text-anchor="middle">a state per claim</text>
+      <text class="ll-micro" x="163" y="58" text-anchor="middle">one state</text>
+      <text class="ll-micro" x="163" y="70" text-anchor="middle">per claim</text>
 
       <path class="ll-arrow" d="M 190 28 L 200 28 M 197 25 L 200 28 L 197 31" aria-hidden="true" />
 
       <rect class="ll-box" x="202" y="14" width="54" height="28" rx="2" />
       <text class="ll-state" x="229" y="32" text-anchor="middle">RENDER</text>
-      <text class="ll-micro" x="229" y="58" text-anchor="middle">words first</text>
+      <text class="ll-micro" x="229" y="58" text-anchor="middle">words,</text>
+      <text class="ll-micro" x="229" y="70" text-anchor="middle">never colour</text>
     </svg>
     <p class="ll-plate-caption">
       The record is the product. A render replays a stored record byte for

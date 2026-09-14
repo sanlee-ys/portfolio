@@ -94,8 +94,10 @@ function assertBoundaryLines(lines) {
   return findings;
 }
 
+const scratch = [];
 function fail(msg) {
   console.error(`✗ pull-logline-evidence: ${msg}`);
+  for (const dir of scratch) fs.rmSync(dir, { recursive: true, force: true });
   process.exit(1);
 }
 
@@ -157,6 +159,7 @@ function main() {
   const ledger = JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'logline-pull-'));
+  scratch.push(tmp);
   const bin = path.join(tmp, process.platform === 'win32' ? 'logline.exe' : 'logline');
   const build = run('go', ['build', '-o', bin, './cmd/logline'], { cwd: repo });
   if (build.status !== 0) fail(`go build exited ${build.status}\n${build.stderr || ''}`);
@@ -182,8 +185,15 @@ function main() {
   const today = new Date().toISOString().slice(0, 10);
   const at = `${today}T00:00:00Z`;
 
-  const measureDir = path.join(tmp, 'measure');
-  fs.mkdirSync(measureDir);
+  /*
+   * The measuring ledger lives INSIDE the siblings directory, so every path in
+   * it is `../<name>` and an UNMEASURED reason can never spell out where this
+   * machine keeps its clones. Measured before this line: a scratch ledger under
+   * the system temp directory produced `../../../home/<user>/...` reasons, and
+   * the boundary below rejected them, correctly.
+   */
+  const measureDir = fs.mkdtempSync(path.join(siblings, '.logline-pull-'));
+  scratch.push(measureDir);
   const recordPath = path.join(measureDir, 'record.json');
   const measured = run(bin, [
     'measure', '--ledger', ledgerAt(measureDir, siblings), '--ref', REF, '--json', recordPath, '--at', at, '--ascii',
@@ -246,6 +256,7 @@ function main() {
 
   fs.writeFileSync(OUT_PATH, `${JSON.stringify(evidence, null, 2)}\n`);
   fs.rmSync(tmp, { recursive: true, force: true });
+  fs.rmSync(measureDir, { recursive: true, force: true });
   console.log(`OK - wrote ${path.relative(REPO_ROOT, OUT_PATH)} from ${SOURCE_REPO} at ${shortSha}.`);
   for (const [k, f] of Object.entries(evidence.figures)) console.log(`  ${k.padEnd(20)} counted  ${f.value}`);
   for (const [k, f] of Object.entries(frames)) console.log(`  frame ${k.padEnd(14)} ${f.lines.length} lines`);
