@@ -17,9 +17,10 @@ that's still open, so it doesn't go orphaned the way `learning/` briefly did.
 
 ## Contents
 
-| File | Destination repo | Status |
-|---|---|---|
-| [`live-walk-deferred.md`](live-walk-deferred.md) | portfolio (P3 from the 2026-09-09 live walk) | open |
+Nothing in flight as of 2026-09-14. The last draft, `live-walk-deferred.md`
+(P3s from the 2026-09-09 live walk), closed into `ROADMAP.md` that day. When
+a draft lands here again, list it as a table row: file, destination repo,
+status.
 
 ## Picking one up
 
