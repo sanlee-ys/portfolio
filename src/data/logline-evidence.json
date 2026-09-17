@@ -1,0 +1,145 @@
+{
+  "source": {
+    "repo": "sanlee-ys/logline",
+    "sha": "041d65e",
+    "pulledAt": "2026-09-14"
+  },
+  "ledger": {
+    "path": "examples/public-system.json",
+    "ref": "main",
+    "program": "the public system"
+  },
+  "figures": {
+    "claims.total": {
+      "value": "18",
+      "kind": "counted",
+      "command": "logline measure --ledger examples/public-system.json --ref main --json record.json; record.counts.total"
+    },
+    "claims.met": {
+      "value": "17",
+      "kind": "counted",
+      "command": "logline measure --ledger examples/public-system.json --ref main --json record.json; record.counts.met"
+    },
+    "claims.unmet": {
+      "value": "1",
+      "kind": "counted",
+      "command": "logline measure --ledger examples/public-system.json --ref main --json record.json; record.counts.unmet"
+    },
+    "claims.unmeasured": {
+      "value": "0",
+      "kind": "counted",
+      "command": "logline measure --ledger examples/public-system.json --ref main --json record.json; record.counts.unmeasured"
+    },
+    "repos.count": {
+      "value": "6",
+      "kind": "counted",
+      "command": "Object.keys(ledger.repos).length over examples/public-system.json"
+    }
+  },
+  "frames": {
+    "measure": {
+      "path": "examples/public-system.json",
+      "lines": [
+        "logline  the public system  measured 2026-09-14  ref main",
+        "repos    architecture@2ee660c  defense-news-classifier@aa8e6d5  kb-agent@c1957d3",
+        "         notes-api@3f6128a  portfolio@26aaec7  telltale@07163dd",
+        "",
+        "MET 17   UNMET 1   UNMEASURED 0   of 18 claims",
+        "",
+        "MET         dnc-v321            defense-news-classifier v3.2.1 tagged 2026-08-02",
+        "                                10f6348",
+        "MET         dnc-gold            defense-news-classifier path data/gold/gold.csv",
+        "                                c095e90",
+        "MET         dnc-evals-ci        defense-news-classifier path",
+        "                                .github/workflows/evals.yml 1095bb1",
+        "            needs dnc-gold (MET)",
+        "MET         kb-gold-set         kb-agent #110 merged 2026-09-09 ed1f7e6",
+        "                                due 2026-09-09 (0d)",
+        "MET         kb-fanout-cap       kb-agent #111 merged 2026-09-09 9ee13fe",
+        "                                due 2026-09-09 (0d)",
+        "            needs kb-gold-set (MET)",
+        "MET         kb-t4-live          kb-agent #112 merged 2026-09-09 65f61ed",
+        "                                due 2026-09-09 (0d)",
+        "            needs kb-gold-set (MET)",
+        "MET         kb-retrieval-ci     kb-agent #113 merged 2026-09-09 0c50305",
+        "                                due 2026-09-09 (0d)",
+        "MET         kb-dockerfile       kb-agent path Dockerfile 93ce838",
+        "MET         na-outbox           notes-api #58 merged 2026-09-09 f77500e",
+        "                                due 2026-09-09 (0d)",
+        "MET         na-outbox-code      notes-api grep \"outbox\" in src/: 13 matches",
+        "            needs na-outbox (MET)",
+        "MET         na-dockerfile       notes-api path Dockerfile 378ad42",
+        "MET         arch-local-deploy   architecture #100 merged 2026-09-09 ed6cebc",
+        "                                due 2026-09-09 (0d)",
+        "MET         arch-compose        architecture path deploy/docker-compose.yml",
+        "                                97cb305",
+        "            needs arch-local-deploy (MET)",
+        "UNMET       arch-public-deploy  architecture path deploy/cloud: not at main",
+        "MET         tt-v030             telltale v0.3.0 tagged 2026-09-04 086c6ae",
+        "MET         tt-zero-vs-absent   telltale path",
+        "                                internal/hud/testdata/golden/zero-vs-absent.txt",
+        "                                450d4af",
+        "MET         pf-repo-cards       portfolio #352 merged 2026-09-09 b51a1ed",
+        "                                due 2026-09-09 (0d)",
+        "MET         pf-events           portfolio #351 merged 2026-09-09 d2f3c59",
+        "                                due 2026-09-09 (0d)"
+      ]
+    },
+    "nothing": {
+      "path": "examples/public-system.json",
+      "lines": [
+        "logline  the public system  measured 2026-09-14  ref main",
+        "repos    architecture@unmeasured  defense-news-classifier@unmeasured",
+        "         kb-agent@unmeasured  notes-api@unmeasured  portfolio@unmeasured",
+        "         telltale@unmeasured",
+        "",
+        "MET 0   UNMET 0   UNMEASURED 18   of 18 claims",
+        "",
+        "UNMEASURED  dnc-v321            defense-news-classifier tag v3.2.1: not a git",
+        "                                working tree at ../empty/defense-news-classifier",
+        "UNMEASURED  dnc-gold            defense-news-classifier path data/gold/gold.csv:",
+        "                                not a git working tree at",
+        "                                ../empty/defense-news-classifier",
+        "UNMEASURED  dnc-evals-ci        defense-news-classifier path",
+        "                                .github/workflows/evals.yml: not a git working",
+        "                                tree at ../empty/defense-news-classifier",
+        "            needs dnc-gold (UNMEASURED)",
+        "UNMEASURED  kb-gold-set         kb-agent #110: not a git working tree at",
+        "                                ../empty/kb-agent  due 2026-09-09",
+        "UNMEASURED  kb-fanout-cap       kb-agent #111: not a git working tree at",
+        "                                ../empty/kb-agent  due 2026-09-09",
+        "            needs kb-gold-set (UNMEASURED)",
+        "UNMEASURED  kb-t4-live          kb-agent #112: not a git working tree at",
+        "                                ../empty/kb-agent  due 2026-09-09",
+        "            needs kb-gold-set (UNMEASURED)",
+        "UNMEASURED  kb-retrieval-ci     kb-agent #113: not a git working tree at",
+        "                                ../empty/kb-agent  due 2026-09-09",
+        "UNMEASURED  kb-dockerfile       kb-agent path Dockerfile: not a git working tree",
+        "                                at ../empty/kb-agent",
+        "UNMEASURED  na-outbox           notes-api #58: not a git working tree at",
+        "                                ../empty/notes-api  due 2026-09-09",
+        "UNMEASURED  na-outbox-code      notes-api grep \"outbox\" in src/: not a git",
+        "                                working tree at ../empty/notes-api",
+        "            needs na-outbox (UNMEASURED)",
+        "UNMEASURED  na-dockerfile       notes-api path Dockerfile: not a git working",
+        "                                tree at ../empty/notes-api",
+        "UNMEASURED  arch-local-deploy   architecture #100: not a git working tree at",
+        "                                ../empty/architecture  due 2026-09-09",
+        "UNMEASURED  arch-compose        architecture path deploy/docker-compose.yml: not",
+        "                                a git working tree at ../empty/architecture",
+        "            needs arch-local-deploy (UNMEASURED)",
+        "UNMEASURED  arch-public-deploy  architecture path deploy/cloud: not a git",
+        "                                working tree at ../empty/architecture",
+        "UNMEASURED  tt-v030             telltale tag v0.3.0: not a git working tree at",
+        "                                ../empty/telltale",
+        "UNMEASURED  tt-zero-vs-absent   telltale path",
+        "                                internal/hud/testdata/golden/zero-vs-absent.txt:",
+        "                                not a git working tree at ../empty/telltale",
+        "UNMEASURED  pf-repo-cards       portfolio #352: not a git working tree at",
+        "                                ../empty/portfolio  due 2026-09-09",
+        "UNMEASURED  pf-events           portfolio #351: not a git working tree at",
+        "                                ../empty/portfolio  due 2026-09-09"
+      ]
+    }
+  }
+}

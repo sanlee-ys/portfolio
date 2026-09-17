@@ -1,0 +1,447 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+import evidence from '../../data/logline-evidence.json';
+/*
+ * THE LOAD-BEARING SPLIT, copied from projects/telltale.astro. Figures are
+ * typed as literals inside a data-ll span, so scripts/check-logline-evidence.cjs
+ * does real work: a mistyped count fails the build. Frames are interpolated
+ * from src/data/logline-evidence.json, so page-versus-record drift is
+ * impossible by construction, which is the stronger guarantee for a
+ * fixed-width render where one retyped space is invisible to a reader and
+ * fatal to the alignment. Do not swap either for the other.
+ */
+const src = evidence.source;
+const FRAME_ORDER = ['measure', 'nothing'];
+const missing = FRAME_ORDER.filter((k) => !evidence.frames[k]);
+if (missing.length) {
+  throw new Error(`logline-evidence.json lacks frame(s): ${missing.join(', ')}. Re-run scripts/pull-logline-evidence.cjs.`);
+}
+---
+<Base
+  title="logline · A Ledger That Measures Its Own Claims · San Lee"
+  description="A program ledger that measures its own claims against git. A milestone is met with a named commit, unmet, or unmeasured with a reason. It never renders a percent."
+  canonical="https://sanlee.me/projects/logline.html"
+  ogType="article"
+  ogImage="/assets/og-logline.png"
+>
+  <Fragment slot="head">
+  <style is:inline>
+    /* A rendered report is an artifact, not prose: column alignment IS the
+       content, so the shared `.article-body pre` rule (white-space: pre-wrap;
+       overflow-wrap: anywhere) is turned off here. The selector out-ranks
+       `.article-body pre` on specificity; a bare `.ll-frame` would lose and the
+       failure is silent, because a wrapped frame cannot overflow and the mobile
+       gate goes green. Same lesson, same fix, as `.tt-frame` on the telltale
+       page. The frame is 80 columns and scrolls inside its own box. */
+    .article-body pre.ll-frame {
+      white-space: pre;
+      overflow-x: auto;
+      overflow-wrap: normal;
+      max-width: 100%;
+    }
+    /* `main.wrap` is the breakout grid (ADR-008), so the figure is a grid item
+       and a grid item's default `min-width: auto` refuses to shrink below its
+       content. Both the item and the box need an explicit zero. */
+    .ll-figure,
+    .article-body pre.ll-frame { min-width: 0; }
+
+    /* Plates 01 to 03. Page-scoped. Every text node is at or above 9px in a
+       260-unit viewBox under the figure ladder's var(--fig-plate) cap, which
+       renders at scale 1.046 at 320px, so the microtext floor holds without a
+       measurement. No SVG text node carries a digit (figure contract, R-D).
+       State is word plus geometry first, colour second. Oxide marks the
+       negative finding: an UNMET claim on Plate 01, and each refused figure
+       on Plate 02. Muted marks the state where nothing was measured. */
+    .ll-plate .ll-box {
+      fill: var(--bg);
+      stroke: var(--stroke-figure);
+      stroke-width: 1;
+    }
+    .ll-plate .ll-box-met { fill: var(--bg); stroke-width: 1.5; }
+    .ll-plate .ll-box-unmet { stroke: var(--accent-warm); stroke-width: 1.5; }
+    .ll-plate .ll-box-unmeasured { stroke: var(--muted); stroke-dasharray: 3 3; }
+    .ll-plate .ll-tick {
+      fill: none;
+      stroke: var(--stroke-figure);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .ll-plate .ll-strike {
+      fill: none;
+      stroke: var(--accent-warm);
+      stroke-width: 1.5;
+    }
+    .ll-plate .ll-arrow {
+      fill: none;
+      stroke: var(--stroke-figure);
+      stroke-width: 1;
+    }
+    .ll-plate .ll-state {
+      fill: var(--text);
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .ll-plate .ll-state-unmet { fill: var(--accent-warm); }
+    .ll-plate .ll-state-unmeasured { fill: var(--muted); }
+    .ll-plate .ll-value {
+      fill: var(--text);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .ll-plate .ll-value-muted { fill: var(--muted); }
+    .ll-plate .ll-value-bad { fill: var(--accent-warm); }
+    .ll-plate .ll-micro {
+      fill: var(--muted);
+      font-family: var(--font);
+      font-size: 9px;
+      font-weight: 500;
+    }
+    .ll-plate-caption {
+      max-width: var(--fig-plate);
+      margin: 0.5rem auto 0;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    /* The closing links are the only text of their block, so hit-target.cjs
+       measures them against the 44px floor at 320 to 430px. */
+    .ll-close .card-link { display: inline-block; }
+    /* The ledger excerpt is prose-width JSON and may wrap; it is not a frame. */
+    .ll-ledger { font-size: 0.8125rem; }
+  </style>
+  </Fragment>
+  <SiteNav current="work" />
+
+  <main class="wrap article-body" id="main" tabindex="-1">
+    <a class="back" href="../index.html">&larr; Back</a>
+    <h1>logline</h1>
+    <p class="subtitle">A program ledger that measures its own claims. A milestone is met with a named commit, unmet, or unmeasured with a reason. It never renders a percent.</p>
+
+    <div class="decision" aria-label="Case study summary">
+      <p class="tag">Case study summary</p>
+      <ul>
+        <li><strong>Result and evidence:</strong> The first cut reads a ledger of <span data-ll="claims.total">18</span> claims this site makes about <span data-ll="repos.count">6</span> public repositories and reports <span data-ll="claims.met">17</span> met, <span data-ll="claims.unmet">1</span> unmet, and <span data-ll="claims.unmeasured">0</span> unmeasured, each met claim beside the commit, tag or path that proves it. Named tests refuse a percent, a forecast and a verdict word, so a reader can grep for the refusals rather than trust them.</li>
+        <li><strong>Problem:</strong> A status report renders a percent, a colour or a phrase, and none of those is a measurement. A percent needs a denominator nobody agreed on. A colour is a verdict with the evidence removed. I gate delivery on evidence, and no artifact on this site showed what that looks like as a tool.</li>
+        <li><strong>Ownership:</strong> Sole owner. I set the three states, the list of refusals, and the rule that the first ledger is my own claims. Claude did most of the typing. The tests and the record are the proof.</li>
+        <li><strong>Constraints:</strong> Git only, at a pinned ref, and never the working tree, so an uncommitted file cannot satisfy a claim. No network. One ref for every repository per run. A run that measured nothing exits with a failure code, because a report that measured nothing is not a report.</li>
+        <li><strong>Actions:</strong> One Go binary with no dependencies. Five evidence kinds: a merged pull request, a tag, a path, a pattern count, a commit. A ledger of the claims this site already publishes. A puller and a gate on this site, so the counts on this page are re-read from the instrument and a drift fails the build.</li>
+      </ul>
+    </div>
+
+    <!-- The measured report sits here, before the lead, so a phone reader sees
+         the instrument before the argument. The text is interpolated from
+         src/data/logline-evidence.json and carries no typed digit. -->
+    <figure class="ll-figure fig" data-fig="frame" id="frame-measure" tabindex="-1">
+      <span class="fig-label">Frame 01</span>
+      <pre class="ll-frame" data-ll-frame="measure" tabindex="0">{evidence.frames.measure.lines.join('\n')}</pre>
+      <figcaption>
+        <span class="fig-what">
+          The first ledger, measured. The header names the program, the date and
+          the ref. The repos line names each repository at the commit it was
+          read at. The count line is a count of states, which is a measurement.
+          Each claim line opens with its state, and a met claim carries the
+          commit or tag that proves it. Output of <code>logline measure</code>
+          on <code>examples/public-system.json</code> at
+          <code>{src.sha}</code>, copied byte for byte.
+        </span>
+        <span class="fig-limit">
+          The frame shows one run on one machine on {src.pulledAt}.
+          It does not show whether the claims were the right ones to make, and
+          a met claim says a commit exists, not that the work behind it was
+          good. The frame is 80 columns and scrolls sideways on a narrow screen.
+        </span>
+      </figcaption>
+    </figure>
+
+    <p class="lead">
+      logline is a Go program. It reads a file that lists the claims a program
+      makes about itself, measures each one against git, and renders three
+      words: met, unmet, unmeasured. The interesting part is what it will not
+      render. A status report that fills a gap with a percent is worse than no
+      report, because a reader trusts a percent. The engineering here is the
+      code that refuses to compute one.
+    </p>
+
+    <!-- ADR-014: a bare plate takes a div wrapper, never a figure (gate law),
+         and a hand-numbered label span. -->
+    <div class="fig fig--plate">
+    <span class="fig-label">Plate 01</span>
+    <svg class="ll-plate" viewBox="0 0 260 100" role="img"
+         aria-label="Three states a claim can be in. Met: a solid box with a commit id inside and a tick. Unmet: an oxide box, the measurement ran and found nothing. Unmeasured: a dashed grey box that names the reason the measurement could not run. Zero and absent never share a box.">
+      <title>Met carries a commit. Unmet found nothing. Unmeasured could not run, and says why.</title>
+
+      <rect class="ll-box ll-box-met" x="6" y="18" width="72" height="30" rx="2" />
+      <text class="ll-value" x="42" y="37" text-anchor="middle">sha</text>
+      <path class="ll-tick" d="M 14 24 L 18 28 L 26 20" />
+      <text class="ll-state" x="42" y="64" text-anchor="middle">MET</text>
+      <text class="ll-micro" x="42" y="78" text-anchor="middle">the commit</text>
+      <text class="ll-micro" x="42" y="90" text-anchor="middle">that proves it</text>
+
+      <rect class="ll-box ll-box-unmet" x="94" y="18" width="72" height="30" rx="2" />
+      <text class="ll-value ll-value-bad" x="130" y="37" text-anchor="middle">nothing</text>
+      <text class="ll-state ll-state-unmet" x="130" y="64" text-anchor="middle">UNMET</text>
+      <text class="ll-micro" x="130" y="78" text-anchor="middle">the search ran</text>
+      <text class="ll-micro" x="130" y="90" text-anchor="middle">and found nothing</text>
+
+      <rect class="ll-box ll-box-unmeasured" x="182" y="18" width="72" height="30" rx="2" />
+      <text class="ll-value ll-value-muted" x="218" y="37" text-anchor="middle">reason</text>
+      <text class="ll-state ll-state-unmeasured" x="218" y="64" text-anchor="middle">UNMEASURED</text>
+      <text class="ll-micro" x="218" y="78" text-anchor="middle">the search</text>
+      <text class="ll-micro" x="218" y="90" text-anchor="middle">could not run</text>
+    </svg>
+    <p class="ll-plate-caption">
+      A measurement that found nothing and a measurement that could not run are
+      different claims, and the render keeps them apart. The second is the state
+      a status report never admits to.
+    </p>
+    </div>
+
+    <nav class="toc" id="toc" aria-labelledby="toc-heading">
+      <p class="toc-heading" id="toc-heading">On this page</p>
+      <ol>
+      <li><a href="#what-it-is">What it is</a></li>
+      <li><a href="#refusals">What it refuses to render</a></li>
+      <li><a href="#ledger">The ledger is a file</a></li>
+      <li><a href="#measurement">How a claim is measured</a></li>
+      <li><a href="#first-ledger">The first ledger is this site&rsquo;s own claims</a></li>
+      <li><a href="#limits">What it does not show</a></li>
+      <li><a href="#built">How it was built</a></li>
+      </ol>
+    </nav>
+
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="what-it-is">What it is</h2>
+    <p>
+      A logline is the rope a ship paid out behind it to measure its own speed.
+      Knots on the rope passed through a sailor&rsquo;s hand while a sandglass
+      ran, and the count was the speed. Nobody estimated it. The name pairs
+      with telltale, the ribbon on a sail, on purpose: two instruments, one
+      rule.
+    </p>
+    <p>
+      A technical program manager keeps a list of things the program says it
+      has done or will do. A milestone shipped. A dependency cleared. A release
+      cut. Every status report ever written renders that list as a colour, a
+      percent or a phrase. logline renders it as three states, and every met
+      state carries the evidence that earned it. The rule is one sentence: a
+      claim may be met with a named commit, or it may be unmet, or it may be
+      unmeasured with the reason. It may not be seventy percent.
+    </p>
+    <p>
+      Zero and absent are different states and they never share a word. A
+      pattern count that finds zero matches is unmet, with the count. A pattern
+      count whose file does not exist at the ref is unmeasured, with the
+      reason. That is the telltale rule applied to delivery instead of gauges,
+      and it is the whole design.
+    </p>
+
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="refusals">What it refuses to render</h2>
+    <div class="fig fig--plate">
+    <span class="fig-label">Plate 02</span>
+    <svg class="ll-plate" viewBox="0 0 260 96" role="img"
+         aria-label="Three figures a status report renders and logline refuses, each struck through in oxide. A percent complete, because it needs a denominator nobody measured. An ETA, because it extrapolates. A green, because it is a verdict with the evidence removed.">
+      <title>A percent, a forecast and a colour, each struck through. Each one is a number nobody measured.</title>
+
+      <rect class="ll-box" x="6" y="16" width="72" height="30" rx="2" />
+      <text class="ll-value ll-value-bad" x="42" y="35" text-anchor="middle">percent</text>
+      <path class="ll-strike" d="M 12 31 L 72 31" aria-hidden="true" />
+      <text class="ll-micro" x="42" y="62" text-anchor="middle">no denominator</text>
+      <text class="ll-micro" x="42" y="74" text-anchor="middle">was measured</text>
+
+      <rect class="ll-box" x="94" y="16" width="72" height="30" rx="2" />
+      <text class="ll-value ll-value-bad" x="130" y="35" text-anchor="middle">ETA</text>
+      <path class="ll-strike" d="M 100 31 L 160 31" aria-hidden="true" />
+      <text class="ll-micro" x="130" y="62" text-anchor="middle">a forecast is</text>
+      <text class="ll-micro" x="130" y="74" text-anchor="middle">not a reading</text>
+
+      <rect class="ll-box" x="182" y="16" width="72" height="30" rx="2" />
+      <text class="ll-value ll-value-bad" x="218" y="35" text-anchor="middle">green</text>
+      <path class="ll-strike" d="M 188 31 L 248 31" aria-hidden="true" />
+      <text class="ll-micro" x="218" y="62" text-anchor="middle">a verdict, and</text>
+      <text class="ll-micro" x="218" y="74" text-anchor="middle">no evidence</text>
+
+      <text class="ll-micro" x="130" y="90" text-anchor="middle">each refusal is a named test</text>
+    </svg>
+    <p class="ll-plate-caption">
+      Each refusal is a test in the repository, not a sentence in a README. A
+      renderer that prints one of these fails the build before anyone reads it.
+    </p>
+    </div>
+    <p>
+      I considered each of these, and I declined it. The argument for each one
+      is short, and the test that holds the line is named.
+    </p>
+    <ul>
+      <li><strong>No percent complete.</strong> A percent needs a denominator, and nobody has ever measured what one hundred percent of a program is. <code>TestRenderNeverPercent</code> reads every render on every fixture and fails on a single percent sign.</li>
+      <li><strong>No ETA, velocity or burndown.</strong> Each one extrapolates. The render shows a declared due date beside a measured met date when both exist, and the signed difference in days, because that is arithmetic on two measured values and not a forecast.</li>
+      <li><strong>No colour as the only signal.</strong> Every state is a word. The default render is ASCII, and it is the golden.</li>
+      <li><strong>No verdict phrase.</strong> On track, at risk, green, healthy. <code>TestRenderNoVerdictWords</code> pins the list.</li>
+      <li><strong>No inference across dependencies.</strong> A claim that needs an unmet claim is not marked blocked by inference. Its own evidence is measured on its own. The render prints the dependency&rsquo;s measured state beside it, and it flags one anomaly as a fact: a claim met before a claim it needs.</li>
+      <li><strong>No report from nothing.</strong> A run in which every claim is unmeasured exits with code three. A report that measured nothing is a failed measurement, and this site has a whole page about checks that pass on work that never ran.</li>
+    </ul>
+
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="ledger">The ledger is a file</h2>
+    <p>
+      JSON, because the standard library reads it and a ledger is edited by
+      hand rarely. It names the program, the repositories it may cite, and the
+      claims. Each claim carries an id, a title, an optional owner and due date,
+      the ids it needs, and one piece of evidence.
+    </p>
+<pre class="ll-ledger">&#123;
+  "program": "the public system",
+  "repos": &#123;
+    "kb-agent": &#123; "path": "../../kb-agent", "url": "https://github.com/sanlee-ys/kb-agent" &#125;
+  &#125;,
+  "claims": [
+    &#123;
+      "id": "kb-fanout-cap",
+      "title": "kb-agent caps tool executions per round",
+      "needs": ["kb-gold-set"],
+      "evidence": &#123; "kind": "merged", "repo": "kb-agent", "pr": 111 &#125;
+    &#125;
+  ]
+&#125;</pre>
+    <p>
+      Five evidence kinds, and each one names the git plumbing it runs. A
+      <em>merged</em> claim looks for a commit reachable from the ref whose
+      subject carries the pull request number. A <em>tag</em> claim resolves
+      the tag and requires it to be an ancestor of the ref. A <em>path</em>
+      claim lists the tree. A <em>grep</em> claim counts matches at the ref and
+      needs a minimum. A <em>commit</em> claim resolves a sha and requires the
+      same ancestry. Every read goes through git against a resolved ref and
+      never the working tree, so an uncommitted file cannot satisfy a claim.
+      The site&rsquo;s own evidence pullers follow the same rule, for the same
+      reason.
+    </p>
+
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="measurement">How a claim is measured</h2>
+    <div class="fig fig--plate">
+    <span class="fig-label">Plate 03</span>
+    <svg class="ll-plate" viewBox="0 0 260 84" role="img"
+         aria-label="Four boxes in a row joined by arrows. Ledger, a file. Git, at a pinned ref. Record, a JSON file with a state per claim. Render, words first. The record is what the site's gate reads.">
+      <title>Ledger to git to record to render. The record is what this site checks.</title>
+      <rect class="ll-box" x="4" y="14" width="54" height="28" rx="2" />
+      <text class="ll-state" x="31" y="32" text-anchor="middle">LEDGER</text>
+      <text class="ll-micro" x="31" y="58" text-anchor="middle">a file,</text>
+      <text class="ll-micro" x="31" y="70" text-anchor="middle">edited rarely</text>
+
+      <path class="ll-arrow" d="M 58 28 L 68 28 M 65 25 L 68 28 L 65 31" aria-hidden="true" />
+
+      <rect class="ll-box" x="70" y="14" width="54" height="28" rx="2" />
+      <text class="ll-state" x="97" y="32" text-anchor="middle">GIT</text>
+      <text class="ll-micro" x="97" y="58" text-anchor="middle">at a</text>
+      <text class="ll-micro" x="97" y="70" text-anchor="middle">pinned ref</text>
+
+      <path class="ll-arrow" d="M 124 28 L 134 28 M 131 25 L 134 28 L 131 31" aria-hidden="true" />
+
+      <rect class="ll-box ll-box-met" x="136" y="14" width="54" height="28" rx="2" />
+      <text class="ll-state" x="163" y="32" text-anchor="middle">RECORD</text>
+      <text class="ll-micro" x="163" y="58" text-anchor="middle">one state</text>
+      <text class="ll-micro" x="163" y="70" text-anchor="middle">per claim</text>
+
+      <path class="ll-arrow" d="M 190 28 L 200 28 M 197 25 L 200 28 L 197 31" aria-hidden="true" />
+
+      <rect class="ll-box" x="202" y="14" width="54" height="28" rx="2" />
+      <text class="ll-state" x="229" y="32" text-anchor="middle">RENDER</text>
+      <text class="ll-micro" x="229" y="58" text-anchor="middle">words,</text>
+      <text class="ll-micro" x="229" y="70" text-anchor="middle">never colour</text>
+    </svg>
+    <p class="ll-plate-caption">
+      The record is the product. A render replays a stored record byte for
+      byte, and this site&rsquo;s gate reads the record rather than the screen.
+    </p>
+    </div>
+    <p>
+      <code>logline check</code> validates a ledger and prints every problem,
+      not the first: a duplicate id, a dependency cycle, an unknown evidence
+      kind, a date that does not parse. <code>logline measure</code> runs the
+      check, resolves the ref in every repository, measures each claim, writes
+      the record, and renders it. <code>logline render</code> renders a stored
+      record with the same renderer, so a run is reproducible from its file.
+      The record names the resolved commit of every repository, so a reader
+      can re-run it and get the same lines.
+    </p>
+
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="first-ledger">The first ledger is this site&rsquo;s own claims</h2>
+    <p>
+      An instrument whose first ledger is a fixture proves the fixture. So the
+      first ledger lists claims this site already publishes on its roadmap and
+      its program page: pull requests by number in kb-agent, notes-api,
+      architecture and this repository; the classifier artifact&rsquo;s tag; a
+      telltale tag and its zero-versus-absent golden file; a Dockerfile where
+      the site says one shipped. It also lists one Later row the site has not
+      built, so the first report carries an unmet line and not only met lines.
+      A ledger that only ever reports met is a badge.
+    </p>
+    <p>
+      Frame 01 at the top of this page is that run. The counts in the summary
+      are read from it by a script, and a gate on this site fails the build if
+      a count on this page drifts from the record. The second frame is the
+      same ledger pointed at an empty directory.
+    </p>
+    <figure class="ll-figure fig" data-fig="frame" id="frame-nothing" tabindex="-1">
+      <span class="fig-label">Frame 02</span>
+      <pre class="ll-frame" data-ll-frame="nothing" tabindex="0">{evidence.frames.nothing.lines.join('\n')}</pre>
+      <figcaption>
+        <span class="fig-what">
+          The same ledger with no repository on disk. Every claim is unmeasured
+          and every line says why. The count line still adds up. logline exits
+          with code three on this run, because a report that measured nothing
+          is a failed measurement. Output at <code>{src.sha}</code>, copied byte
+          for byte.
+        </span>
+        <span class="fig-limit">
+          This is a deliberate run against an empty directory, not a failure
+          that happened in use. It shows the state; it does not show how often
+          a real program lands in it.
+        </span>
+      </figcaption>
+    </figure>
+
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="limits">What it does not show</h2>
+    <p>
+      logline measures git. It does not read issues, milestones, check runs or
+      a chat thread, and a ledger cannot express a claim about a meeting or a
+      decision that left no commit. One ref for every repository per run. The
+      first ledger was written by one operator about his own repositories, and
+      it names only public ones. A met claim says a commit exists. It does not
+      say the work behind the commit was good, and it does not say the claim
+      was the right one to make. The instrument shows whether a program&rsquo;s
+      claims are backed by evidence. Which claims to make is still the job.
+    </p>
+
+    <p class="toc-return"><a href="#toc">Contents</a></p>
+    <h2 id="built">How it was built</h2>
+    <p class="tradeoff">
+      <strong>How it was built:</strong> I set the three states, the refusals,
+      and the rule that the first ledger is my own claims. Claude did most of
+      the typing. The proof is the named tests and the record this page is
+      checked against.
+      <a href="../colophon.html">How I built this site &rarr;</a>
+    </p>
+    <p class="ex-caption">
+      A script built logline from <code>sanlee-ys/logline</code> at
+      <code>{src.sha}</code> on <code>{src.pulledAt}</code>, ran it on
+      <code>examples/public-system.json</code>, and wrote the counts and both
+      frames on this page from its output. The ledger holds
+      <span data-ll="claims.total">18</span> claims about
+      <span data-ll="repos.count">6</span> repositories. A check in this
+      site&rsquo;s test suite fails the build when a rendered figure drifts from
+      that record.
+    </p>
+
+    <p class="diagram-more standalone ll-close"><a class="card-link" href="https://github.com/sanlee-ys/logline">Read the code <span class="arrow">&rarr;</span></a></p>
+    <p class="diagram-more standalone ll-close"><a class="card-link" href="product-and-program.html">The program it measures <span class="arrow">&rarr;</span></a></p>
+    <p class="diagram-more standalone ll-close"><a class="card-link" href="telltale.html">telltale, the first instrument <span class="arrow">&rarr;</span></a></p>
+  </main>
+  <script is:inline src="../assets/theme.js"></script>
+</Base>

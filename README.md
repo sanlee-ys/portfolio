@@ -83,6 +83,8 @@ faithful mirror of the workflow — add a step there, add it here.
   links, with explicit exemptions for archived standalone pages.
 - **`node --test scripts/check-telltale-evidence.test.cjs`** is the adversarial
   suite for the telltale evidence gate.
+- **`node --test scripts/check-logline-evidence.test.cjs`** is the adversarial
+  suite for the logline evidence gate.
 - **`node --test scripts/figure-contract.test.cjs`** is the adversarial suite
   for the figure contract.
 - **`scripts/lint_decisions.py`** — every ADR in `decisions/` carries a
@@ -102,6 +104,10 @@ faithful mirror of the workflow — add a step there, add it here.
   mismatch fails; an upstream fetch failure warns and passes.
 - **`scripts/check-telltale-evidence.cjs`** checks that every marked figure and
   frame on the telltale page matches `src/data/telltale-evidence.json`.
+- **`scripts/check-logline-evidence.cjs`** checks that every marked figure and
+  frame on the logline page matches `src/data/logline-evidence.json`, which
+  `scripts/pull-logline-evidence.cjs` writes by running logline on its first
+  ledger.
 - **`scripts/figure-contract.cjs`** fails a digit in a hand-drawn plate and
   requires both caption slots on every figure.
 - **`scripts/private-repo-check.cjs`** — every `sanlee-ys/<repo>` reference on
