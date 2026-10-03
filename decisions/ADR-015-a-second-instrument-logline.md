@@ -16,8 +16,13 @@ is an instrument for the capacity that built the system, not a second
 domain. The roadmap's own words: "A genuinely different domain remains an
 open question, and it is not on this track."
 
-The site's first-screen identity is Technical Program Manager (ADR-011,
-owner ruling 2026-09-09). The program page states the practice: a roadmap
+The site's first-screen identity was Technical Program Manager when this
+record was written (ADR-011, owner ruling 2026-09-09). Amended 2026-10-03:
+the owner's ruling in #379 names the work instead, product and program
+delivery, and prints no job title San has not held. The domain choice below
+stands, because a project page may still name the discipline it
+demonstrates, and logline's page names the work and not a title. The
+program page states the practice: a roadmap
 harvested from delivery, a dependency map, a risk register, a capacity gate
 with pre-registered axes. It also states the gap in its own words: "pre-
 registration without an instrument is half a measurement."
