@@ -537,12 +537,23 @@ First codified as a standing rule 2026-07-01 (adversarial round,
 `ROADMAP.md`); promoted here 2026-07-03 after the same leak recurred in a
 cross-repo write-up in the `architecture` repo.
 
-## Career copy (current choice, 2026-09-09)
+## Career copy (current choice, 2026-10-03)
 
-First-screen identity is Technical Program Manager. The current product
-seat at JPMorganChase is a supporting fact, not a second headline. The
-résumé job entry stays Senior Product Associate. Do not write a job-ask
-on the first screen.
+**Name the work. Never print a job title San has not held.** The first
+screen, the page titles, and the résumé headline say what he does: product
+and program delivery on enterprise platforms, and AI systems built in the
+open. "Technical Program Manager" and "Product Manager" are titles he has
+not held, so they do not appear as his identity anywhere. schema.org
+`jobTitle` and the résumé job entry carry the held title, Senior Product
+Associate. Do not write a job-ask on the first screen.
+
+Why: the 2026-09-09 ruling set the identity to Technical Program Manager.
+A recruiter reads the held titles in the Experience section, and the tools
+that rank applicants match on those titles too, so a title in the headline
+bought no match and read as inflation next to the dated record. San
+ordered the change on 2026-10-03 after a résumé audit. A project page may
+still name the discipline it demonstrates (for example "Technical Program
+Management for an AI System"), because that describes the work.
 
 Current About tell (2026-08-17):
 

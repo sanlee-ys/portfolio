@@ -3,30 +3,31 @@ import Base from '../layouts/Base.astro';
 import SiteNav from '../components/SiteNav.astro';
 ---
 <Base
-  title="San Lee · Technical Program Manager, AI Systems"
-  description="Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery."
+  title="San Lee · Product and Program Delivery, AI Systems"
+  description="Product and program delivery on enterprise platforms, and reliable AI systems built in the open through clear direction, explicit contracts, and evidence-based delivery."
   canonical="https://sanlee.me/"
   ogType="website"
-  ogDescription="Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery."
+  ogDescription="Product and program delivery on enterprise platforms, and reliable AI systems built in the open through clear direction, explicit contracts, and evidence-based delivery."
   skipTo="#proof"
 >
   <Fragment slot="head">
-  <!-- 2026-09-09 owner ruling: first-screen identity is Technical
-       Program Manager. schema.org jobTitle and the tagline match that
-       title. The .now line is the supporting employment fact: a product
-       seat at JPMorganChase. The résumé job entry stays Senior Product
-       Associate. Do not write a job-ask on the first screen. This
-       ruling replaces the earlier 2026-09-09 comment that kept .now as
-       the SPA title line. -->
+  <!-- 2026-10-03 owner ruling: the first screen names the WORK, not a
+       job title San has not held. The tagline says product and program
+       delivery. schema.org jobTitle is the held title, Senior Product
+       Associate. The .now line is the supporting employment fact. Do not
+       write a job-ask on the first screen. This ruling replaces the
+       2026-09-09 ruling that set the identity to Technical Program
+       Manager: a recruiter who compared the site with the résumé saw a
+       title the dated record does not show. -->
   <script is:inline type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "San Lee",
     "url": "https://sanlee.me/",
-    "jobTitle": "Technical Program Manager",
+    "jobTitle": "Senior Product Associate",
     "worksFor": { "@type": "Organization", "name": "JPMorganChase" },
-    "description": "Technical program manager building reliable AI systems through clear direction, explicit contracts, and evidence-based delivery.",
+    "description": "Product and program delivery on enterprise platforms, and reliable AI systems built in the open through clear direction, explicit contracts, and evidence-based delivery.",
     "sameAs": [
       "https://github.com/sanlee-ys",
       "https://www.linkedin.com/in/leesan/"
@@ -142,7 +143,7 @@ import SiteNav from '../components/SiteNav.astro';
   <header class="hero">
     <div class="wrap">
       <h1>San Lee</h1>
-      <p class="tagline">Technical program manager building reliable AI systems.</p>
+      <p class="tagline">Product and program delivery on enterprise platforms. Reliable AI systems, built in the open.</p>
       <p class="now">In a product seat at JPMorganChase, on collaboration platforms serving 300,000 employees, after seven years in infrastructure and operations.</p>
       <p class="lede">
         I set direction, define the interfaces between teams and systems, and
