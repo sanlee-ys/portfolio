@@ -75,6 +75,19 @@ const CARDS = [
     ],
   },
   {
+    slug: 'logline',
+    filename: 'og-logline.png',
+    dateline: 'sanlee.me · logline',
+    title: 'logline',
+    standfirst:
+      'A program ledger that measures its own claims. A milestone is met with a named commit, unmet, or unmeasured. It never renders a percent.',
+    proof: [
+      { claim: 'A claim is met only with a commit, tag, or path', fig: 'sha, not a colour', reversed: false },
+      { claim: 'A repo it cannot read is unmeasured, not unmet', fig: 'reason, not 0', reversed: false },
+      { claim: 'A report that measured nothing fails', fig: 'exit 3', reversed: true },
+    ],
+  },
+  {
     slug: 'tool-seam',
     filename: 'og-tool-seam.png',
     dateline: 'sanlee.me · tool seam',

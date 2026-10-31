@@ -31,14 +31,14 @@ npm run dev                  # local dev server with HMR
   `{` opens a JS expression.
 
 **The gates now read the build, not the repo.** `npm run qa` builds and then
-runs all twenty-three checks:
+runs all twenty-five checks:
 
 ```
 npm run qa
 ```
 
 **The runner prints the count, so do not take the number above on trust.** It
-opens with `gates: running 23 checks.` and closes with `OK - all 23 of 23 QA
+opens with `gates: running 25 checks.` and closes with `OK - all 25 of 25 QA
 checks ran and passed.` The loop exits at the first non-zero, so the closing
 line is the proof that every check ran. **An unrun gate is not a pass.**
 
@@ -50,16 +50,16 @@ until 2026-07-27: the runner had four checks and CI had seven, so an ADR could
 ship without its `## Downstream surfaces` section and `npm run qa` went green
 anyway.
 
-Nine of the twenty-three need no build, no browser and no network — eight
+Ten of the twenty-five need no build, no browser and no network — nine
 `node --test` suites and the ADR linter — so they run first and redden in
-seconds. The fourteen that walk the built site or launch a browser run after,
+seconds. The fifteen that walk the built site or launch a browser run after,
 slowest last. (`hit-target.test.cjs` and `microtext-floor.test.cjs` are
-`node --test` suites but are **not** among the cheap nine: each spawns its
+`node --test` suites but are **not** among the cheap ten: each spawns its
 gate, which launches Chromium, so both sit at the bottom with the browser
 work.)
 
-`npm run gates` runs the same twenty-three against an existing `dist/` without
-rebuilding, and the build-independent nine still run on a clone that has never
+`npm run gates` runs the same twenty-five against an existing `dist/` without
+rebuilding, and the build-independent ten still run on a clone that has never
 been built. `scripts/gates.cjs` is also what points the site gates at `dist/`
 — **a bare `SITE_ROOT=dist` prefix inside an npm script is POSIX shell syntax
 and does not work on Windows**, so the default lives in that runner rather than
