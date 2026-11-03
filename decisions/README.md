@@ -25,6 +25,7 @@ line to the record.
 | [ADR-012](ADR-012-telltale-promoted-above-the-router.md) | Promote the instrument above the router, and gate its figures | Informational (2026-09-04) |
 | [ADR-013](ADR-013-diagram-led-narrative.md) | A diagram-led narrative, and a gate under every figure | Accepted |
 | [ADR-014](ADR-014-the-monograph-identity.md) | The MONOGRAPH identity | Accepted |
+| [ADR-015](ADR-015-a-second-instrument-logline.md) | A second instrument in a different domain, and a gate under its figures | Accepted |
 
 ## Why this tier was missing
 

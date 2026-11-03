@@ -88,6 +88,13 @@ jobs:
       - name: Telltale evidence gate (adversarial suite)
         run: node --test scripts/check-telltale-evidence.test.cjs
 
+      # The logline evidence gate's own adversarial suite: the same five failure
+      # modes as the telltale suite above, plus the record-side boundary for
+      # this instrument, a percent, a verdict word, a machine identity, and a
+      # line wider than the 80-column render.
+      - name: Logline evidence gate (adversarial suite)
+        run: node --test scripts/check-logline-evidence.test.cjs
+
       # The figure contract's own adversarial suite. The gate has three ways to
       # be worthless and every one looks like a clean run: it can fail nothing,
       # it can fail the wrong thing, or it can hold an exemption for a figure
@@ -157,6 +164,16 @@ jobs:
       # to a page-wide search, and this site has a page about exactly that.
       - name: Telltale figures and frames match the generated record
         run: node scripts/check-telltale-evidence.cjs
+        env:
+          SITE_ROOT: dist
+
+      # The logline page argues that a program's status is a list of measured
+      # claims and never a percent. Its counts and both rendered reports are
+      # marked and compared against src/data/logline-evidence.json, which
+      # scripts/pull-logline-evidence.cjs writes by building logline at a
+      # pinned commit and running it on its first ledger.
+      - name: Logline figures and frames match the generated record
+        run: node scripts/check-logline-evidence.cjs
         env:
           SITE_ROOT: dist
 
