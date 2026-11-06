@@ -1,0 +1,18 @@
+---
+// A dated list of what changed on the site. Entries come from
+// src/data/changelog.json, newest first; each one is checked against git
+// before it is written. The row reuses the decision ledger's grammar
+// (.led-claim then .led-to), so work.astro's ix-s1 grid lays it out with no
+// new CSS. A link stays inline in the sentence below 48rem, which keeps the
+// WCAG 2.5.8 inline exception that hit-target.cjs applies to the other
+// ledger rows.
+import entries from '../data/changelog.json';
+---
+<ul class="ledger" aria-label="What changed, by date">
+  {entries.map((e) => (
+    <li>
+      <span class="led-claim"><time datetime={e.date}>{e.date}</time> &mdash; {e.text}</span>
+      {e.href ? <> <span class="led-to"><a href={e.href}>{e.label ?? 'Read'} &rarr;</a></span></> : null}
+    </li>
+  ))}
+</ul>
