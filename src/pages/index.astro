@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import SiteNav from '../components/SiteNav.astro';
+import changelog from '../data/changelog.json';
+
+const latest = changelog[0];
 ---
 <Base
   title="San Lee · Product and Program Delivery, AI Systems"
@@ -350,6 +353,10 @@ import SiteNav from '../components/SiteNav.astro';
          pointer that stays behind. It carries the notes-site link the section
          already carried, and it adds no claim. -->
     <p class="muted-line">Field notes on the techniques behind this work sit on the work index. <a href="work.html#field-notes">The field notes &rarr;</a></p>
+    <!-- The latest dated change, so the record sits next to a date a reader
+         can check. One line, read from src/data/changelog.json; the full
+         list is on the work index. -->
+    <p class="muted-line">Latest change, <time datetime={latest.date}>{latest.date}</time>: {latest.text} <a href="work.html#what-changed">What changed &rarr;</a></p>
 
     <section class="measure about" id="about">
       <h2 class="section-title">About</h2>

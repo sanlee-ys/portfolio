@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import SiteNav from '../components/SiteNav.astro';
 import publicReposDoc from '../data/public-repos.json';
+import Changelog from '../components/Changelog.astro';
 
 const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos : [];
 ---
@@ -172,6 +173,18 @@ const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos :
         <li id="decision-rightsized" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built the enrichment loop on Kafka to learn it properly. Then I cut it. A single-user idempotent workload <strong>never needed a distributed log</strong>. It is now an in-process background task.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
         <li id="decision-tooluse"><span class="led-claim">I forced output to a tool schema instead of a prose parse. The API layer rejects an invalid label. It rejected <strong>one out-of-enum response in 300</strong>, and a re-sample handled it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
       </ul>
+    </section>
+
+    <!-- What changed, by date. The site showed no cadence before 2026-11-06:
+         a reader could not tell a page edited last week from one edited in
+         July. The rows come from src/data/changelog.json, newest first, and
+         every date is a git date. The block reuses the decision ledger's row
+         grammar, so the ix-s1 grid in the head lays it out and it adds no
+         CSS. -->
+    <section class="measure">
+      <h2 id="what-changed">What changed</h2>
+      <p class="ledger-intro">The site changes in dated steps. Each row is one step, and a row with a page links to it.</p>
+      <Changelog />
     </section>
 
     <!-- The field-note section, moved whole from index.astro at 6859243
