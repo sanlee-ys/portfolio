@@ -120,6 +120,153 @@ down carries the full reasoning for each item.
 
 ---
 
+## Site track, refreshed 2026-11-06
+
+Every box above is checked, and the last one was checked on 2026-09-14. The
+site then had no tracked forward work for eight weeks, and the only commits in
+that window were dependency bumps. The owner ruled on 2026-11-06 that the site
+keeps evolving with new content, not only maintenance. A decision log with no
+new decisions is an archive, and this site does not describe itself as one.
+
+This refresh adds a Now / Next / Later below the first. The first track stays
+as it is, boxes and notes, because the history is the record. Same voice:
+checkboxes are the state, the notes are the reasoning.
+
+Two rules this track keeps from the one above. No page names, links, or hints
+at a private repo; every candidate below draws on a repo that
+`src/data/public-repos.json` already lists, which is the allowlisted public
+set, and nothing else. No surface prints a job title San has not held.
+
+### Now — landing 2026-11-06
+
+- [ ] **Logline** (`projects/logline.html`). *Held back 2026-11-06. The page
+      was finished on PR #373 and merged into the content PR, and CI failed
+      exactly one gate: the private-repo guard, because the repository the
+      page links is not public. The owner declined to publish a repository he
+      did not recognise, so the page came back out the same day. It lands only
+      if that repository goes public; until then the page is a finding, not
+      content. The navigation gate checks the return link and the figure
+      contract binds any plate it carries, once it does land.*
+- [x] **"What changed" on `work.html`.** *Landed 2026-11-06 in the same PR. A
+      dated changelog section on the complete index, newest first. It is the
+      public face of this roadmap: the roadmap records why, the changelog
+      records when. The first entry is this changelog itself.*
+- [ ] **The career-copy reversal on a public page.** *Drafted and withdrawn
+      2026-11-06. A dated About section and a ninth decision-log row recorded
+      the 2026-10-03 headline change. The owner read it and struck it the same
+      day: the detail was more than the page needed. CLAUDE.md and ADR-011
+      still hold the record. Open only if the owner asks for it again.*
+
+### Next — the next instrument. San picks one.
+
+An instrument on this site is a page that makes one claim, carries the
+measurement that supports it, and names what the measurement does not show.
+Three candidates below. Each is grounded only in what the site already
+publishes: its project pages and the public-repo descriptions in
+`src/data/public-repos.json`. No candidate carries a result, because none has
+been measured. The session that scoped them could not read the repos, so the
+evidence column says what the page needs, not what the repo holds. The first
+step on any of them is a read of the repo to find out whether that evidence
+exists. If it does not, the candidate is not an instrument yet.
+
+- [ ] **Candidate A — the guards ledger** (draws on `agent-ops`, "operating
+      layer for a multi-vendor agent fleet: security posture, mechanical
+      guards, postmortems, and working agreements"). *Claim: the fleet runs
+      under mechanical guards, and the record shows which guard caught what.
+      The page is a ledger, one row per guard: what it checks, when it
+      landed, and the dated postmortem or incident it answers. The site's
+      False Green page argues that a check nobody can watch fail is not a
+      check; this page would be the same argument one repo over, at fleet
+      scale. Evidence it needs: the guard inventory and its dates from the
+      repo, and for each guard at least one dated event it caught or one
+      postmortem it closed. Counts must come from the repo at a pinned
+      commit, the way `pull-telltale-evidence.cjs` reads telltale, not from a
+      hand-typed table. Gates it touches: `check-published-metrics` for every
+      count, a new puller in the shape of `check-telltale-evidence`, the
+      figure contract if it carries a plate, `private-repo-check` and
+      `private-name-precommit` above all. A fleet config names the repos the
+      fleet operates on, and the puller must read an allowlist, not the
+      config, so that nothing outside the public set reaches the page. That
+      constraint is the main cost. Size: medium. One page, one puller, one
+      data file, one gate. Two to three sessions.*
+- [ ] **Candidate B — the classifier over time** (draws on
+      `defense-news-classifier`, whose description states a version and three
+      scores: "human-graded gold at v3.2.1: 94.4% / 98.1% / 94.4%"). *Claim:
+      the classifier's accuracy moved by evidence-gated steps, and the
+      trajectory shows which decisions moved it and which ones the gates
+      declined. The classifier page already carries the decisions and the
+      current scores; the autonomy-ladder page carries two accepted and two
+      rejected levels; neither page draws the versions on one axis. This
+      page would. Evidence it needs: a per-version score record in the repo,
+      each version dated and graded on the same gold set, or the page has no
+      trajectory, only a point. If the gold set changed between versions, the
+      page says so in `.fig-limit`, because scores on two gold sets are not
+      one line. Gates it touches: the figure contract most of all. The
+      trajectory is a generated figure, so `build-plots.cjs` writes its
+      geometry into `src/data/figures.json`, the `<svg>` declares
+      `data-fig-generated="true"`, and `.fig-what` names the artifact and the
+      commit. Every score on the page is a `data-metric` span for
+      `check-published-metrics`. `contrast-check` for the series colours, in
+      both themes. Size: medium. One page, one plot producer, one data file.
+      Two sessions if the record exists, and the first session finds out.*
+- [ ] **Candidate C — the tool seam, re-run** (draws on `kb-agent` and the
+      existing `projects/tool-seam.html`). *Claim: a dated result is a result
+      on one model and one date, and the page says so. The current page
+      records one run, 2026-09-09, on one model: thirty-nine PASS, one FAIL,
+      and `t5-04` left open as a finding. The faithfulness-judge page already
+      compares two model tiers and reports that the sample does not separate
+      them. This instrument applies that shape to the seam: the same forty
+      items, run again on a later date and on a second tier, with the open
+      finding as the question. Did `t5-04` hold, fail again, or change class?
+      Evidence it needs: two more dated runs of the runner the page already
+      links, committed into kb-agent the way the first was. Model items need
+      an API key, and the page keeps the existing rule that an item without a
+      key is UNRUN, not PASS. Gates it touches: `check-published-metrics` for
+      the PASS, FAIL, and UNRUN counts; `check-telltale-evidence` is the
+      model for pulling those counts from the repo at a pinned commit rather
+      than typing them; the figure contract if the runs are drawn as a grid.
+      This candidate can land as a section on the existing page rather than a
+      new one, which is also its weakness: the Work index gains nothing new to
+      list. Size: small. One session on the site once the runs exist. The
+      runs are the owner's cost, not the site's.*
+
+The pick is San's. The session that takes the pick opens with a read of the
+repo, and if the evidence is not there, it writes that down here as a dated
+line and stops. A candidate that fails its evidence check is a finding, not a
+page.
+
+### Later — cadence, so silence reddens
+
+- [ ] **Standing rule: every content PR adds a changelog entry.** *A PR that
+      adds, moves, or retires a page, or changes what a page claims, adds a
+      dated entry to "What changed" on `work.html` in the same PR. A
+      dependency bump does not. The rule binds from 2026-11-06. Without it the
+      changelog goes stale the same way this roadmap did, and a stale
+      changelog is worse than none: it states a last-changed date that is
+      false.*
+- [ ] **Proposal: a cadence gate.** *Needs an ADR line before it is built. The
+      shape: a `node --test` suite among the cheap build-independent nine, so
+      it runs first and needs no browser. It reads the newest date in the
+      changelog and the newest date among the project pages, and it fails
+      when the changelog is older than the newest page. That half is a
+      correctness check: a page landed and the changelog did not say so. The
+      second half is the cadence itself: fail when the newest changelog entry
+      is older than N days. N is the owner's number and the ADR records it.
+      The second half is the contentious one, because it reddens CI on a
+      quiet week, and a gate that reddens on the calendar is a gate someone
+      will learn to bump past. The ADR weighs that against the alternative,
+      which is what happened between 2026-09-14 and 2026-11-06: nothing went
+      red, and nothing moved. The runner count in CLAUDE.md goes from
+      twenty-three to twenty-four when it lands, and `gates.cjs` and `qa.yml`
+      change together, or neither does.*
+
+> Note: the first track's closing note said the Site "Now" is what keeps a
+> live roadmap live. It did, until it was all checked. This section is the
+> correction: a roadmap needs an open box, and from now on it needs a date on
+> the newest one.
+
+---
+
 ## Detail & reasoning
 
 ### Mechanical / SEO — pure upside, no judgment calls

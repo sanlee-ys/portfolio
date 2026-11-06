@@ -1,0 +1,58 @@
+[
+  {
+    "date": "2026-11-06",
+    "text": "The Work index gains this dated changelog, and the roadmap gets a live track again."
+  },
+  {
+    "date": "2026-10-07",
+    "text": "Résumé: the SPFx proof of concept was for executive directors.",
+    "href": "resume.html",
+    "label": "Résumé"
+  },
+  {
+    "date": "2026-10-03",
+    "text": "Career copy ruling: name the work. The site prints no job title San has not held."
+  },
+  {
+    "date": "2026-09-17",
+    "text": "Résumé: the current-role work since July is on the record.",
+    "href": "resume.html",
+    "label": "Résumé"
+  },
+  {
+    "date": "2026-09-09",
+    "text": "The tool-seam gold set is published as a second artifact, and the Work index shows live public-repo cards.",
+    "href": "projects/tool-seam.html",
+    "label": "Tool seam"
+  },
+  {
+    "date": "2026-09-06",
+    "text": "A second mobile pass at a 20px root catches labels that widen the page under a large-text setting."
+  },
+  {
+    "date": "2026-09-02",
+    "text": "The microtext floor gets a gate: no SVG text under 9px at 320px, measured on the rendered page."
+  },
+  {
+    "date": "2026-08-31",
+    "text": "The MONOGRAPH identity lands across the site (ADR-014).",
+    "href": "colophon.html#site-decisions",
+    "label": "Site decisions"
+  },
+  {
+    "date": "2026-08-30",
+    "text": "The figure contract gate: every figure states what it argues and what it does not show (ADR-013)."
+  },
+  {
+    "date": "2026-08-29",
+    "text": "telltale lands, with figures drawn from a pinned evidence record.",
+    "href": "projects/telltale.html",
+    "label": "telltale"
+  },
+  {
+    "date": "2026-08-19",
+    "text": "A complete Work index and a dedicated About page.",
+    "href": "about.html",
+    "label": "About"
+  }
+]
