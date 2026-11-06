@@ -150,13 +150,12 @@ set, and nothing else. No surface prints a job title San has not held.
 - [x] **"What changed" on `work.html`.** *Landed 2026-11-06 in the same PR. A
       dated changelog section on the complete index, newest first. It is the
       public face of this roadmap: the roadmap records why, the changelog
-      records when. The first entry is the career-copy record below.*
-- [x] **The career-copy reversal, recorded in public on `about.html`.** *Landed
-      2026-11-06. The 2026-09-09 ruling set the first screen to a title San
-      has not held; the 2026-10-03 audit reversed it, and CLAUDE.md carried the
-      reversal while the site showed only the result. A decision log,
-      reversals included, prints its own reversals. The About page now carries
-      a dated line that says what changed and why.*
+      records when. The first entry is this changelog itself.*
+- [ ] **The career-copy reversal on a public page.** *Drafted and withdrawn
+      2026-11-06. A dated About section and a ninth decision-log row recorded
+      the 2026-10-03 headline change. The owner read it and struck it the same
+      day: the detail was more than the page needed. CLAUDE.md and ADR-011
+      still hold the record. Open only if the owner asks for it again.*
 
 ### Next — the next instrument. San picks one.
 
