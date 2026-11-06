@@ -54,7 +54,10 @@ down carries the full reasoning for each item.
 - [x] **A second, different artifact** (the breadth gap). *Shipped 2026-09-09
       as the tool-seam gold set and writeup (`projects/tool-seam.html`). It is a
       second proof of method — attacks on the agent tool-result path — not a
-      new vertical.*
+      new vertical. 2026-09-14: the different domain is program management.
+      `logline` (`projects/logline.html`) is a ledger that measures the claims
+      this roadmap makes, with the telltale honesty rule applied to delivery.
+      ADR-015.*
 - [x] **Live GitHub repo cards** (the README no longer lists the plan as of
       2026-09-04; this roadmap is the record; needs the API script).
       *Shipped 2026-09-09, PR #352: build-time fetch of the public repos this
@@ -167,7 +170,10 @@ These have no tradeoffs worth debating. None were previously planned.
 - [x] **A second proof of method.** *Shipped 2026-09-09 as the tool-seam gold
       set (`projects/tool-seam.html`). It is still the same system, read as
       security measurement rather than as classifier quality. A genuinely
-      different domain remains an open question, and it is not on this track.*
+      different domain stayed an open question until 2026-09-14, when
+      `logline` answered it with program management: an instrument that
+      measures this roadmap's own shipped rows against git and renders no
+      percent (ADR-015).*
 
 ### Already planned (pre-existing, folded in here so this is the one place to look)
 
