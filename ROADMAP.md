@@ -139,10 +139,14 @@ set, and nothing else. No surface prints a job title San has not held.
 
 ### Now — landing 2026-11-06
 
-- [x] **Logline** (`projects/logline.html`). *Landed 2026-11-06, the first new
-      project page since the tool-seam writeup on 2026-09-09. The Work index
-      lists it; the navigation gate checks the return link; the figure
-      contract binds any plate it carries.*
+- [ ] **Logline** (`projects/logline.html`). *Held back 2026-11-06. The page
+      was finished on PR #373 and merged into the content PR, and CI failed
+      exactly one gate: the private-repo guard, because the repository the
+      page links is not public. The owner declined to publish a repository he
+      did not recognise, so the page came back out the same day. It lands only
+      if that repository goes public; until then the page is a finding, not
+      content. The navigation gate checks the return link and the figure
+      contract binds any plate it carries, once it does land.*
 - [x] **"What changed" on `work.html`.** *Landed 2026-11-06 in the same PR. A
       dated changelog section on the complete index, newest first. It is the
       public face of this roadmap: the roadmap records why, the changelog
