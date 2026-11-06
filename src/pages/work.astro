@@ -28,7 +28,7 @@ const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos :
        ever sat inside section.measure, so the scope states what was already
        true rather than adding a condition. */
 
-    /* ix-s1. The decision ledger, re-laid as a strip. Eight rows carry one
+    /* ix-s1. The decision ledger, re-laid as a strip. Nine rows carry one
        grammar: the claim, then the page that records it in full. The strip
        re-lays the row. It does not rewrite it. The STE conversion of the same
        rows is a separate edit in the same commit, and the pull request keeps
@@ -43,7 +43,7 @@ const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos :
        The link stays inline in the claim below 48rem, and becomes its own
        cell only above it. scripts/hit-target.cjs measures a standalone anchor
        at 390px, and a link that is the only text of its block owes a 44px box
-       there. Eight of those boxes cost the phone reader about 0.2 screens and
+       there. Nine of those boxes cost the phone reader about 0.2 screens and
        return no reading gain, so the phone keeps the WCAG 2.5.8 inline
        exception that this row already relies on. */
     @media (min-width: 48rem) {
@@ -107,7 +107,7 @@ const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos :
       <li><a href="projects/autonomy-ladder.html">The Autonomy Ladder</a> &mdash; four levels of agent autonomy, with two shipped and two rejected.</li>
       <li><a href="projects/loop-replay.html">Loop Replay</a> &mdash; interactive playback of two autonomous improvement runs.</li>
       <li><a href="projects/context-architecture.html">Context Architecture</a> &mdash; I scored my agent context against five published criteria. Three failed.</li>
-    </ul>
+      </ul>
 
     <h2>Systems and infrastructure</h2>
     <ul class="ledger">
@@ -154,7 +154,7 @@ const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos :
          this page's other two ledger lists. -->
     <section class="measure">
       <h2 id="decision-log">The decision log</h2>
-      <p class="ledger-intro">Eight decisions, one row each. Each row links to the page that records it in full.</p>
+      <p class="ledger-intro">Nine decisions, one row each. Each row links to the page that records it in full.</p>
       <p class="mark-legend"><span class="mark-swatch" aria-hidden="true"></span>A doubled rule marks a decision that was reversed.</p>
       <!-- ix-s1, the verdict strip. Each row holds the claim and then the page
            that records it. The reversal mark and the sr-only prefix stay on the
@@ -172,6 +172,7 @@ const publicRepos = Array.isArray(publicReposDoc.repos) ? publicReposDoc.repos :
         <li id="decision-prompt" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>A prompt read better to a human and measured worse. Category moved <strong>79.0% &rarr; 76.7%</strong>, and industry recall moved 0.217 &rarr; 0.100. I reversed it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
         <li id="decision-rightsized" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I built the enrichment loop on Kafka to learn it properly. Then I cut it. A single-user idempotent workload <strong>never needed a distributed log</strong>. It is now an in-process background task.</span> <span class="led-to"><a href="projects/the-system.html">The System &rarr;</a></span></li>
         <li id="decision-tooluse"><span class="led-claim">I forced output to a tool schema instead of a prose parse. The API layer rejects an invalid label. It rejected <strong>one out-of-enum response in 300</strong>, and a re-sample handled it.</span> <span class="led-to"><a href="projects/defense-news-classifier.html">Classifier &rarr;</a></span></li>
+      <li id="decision-headline" data-outcome="reversal"><span class="led-claim"><span class="sr-only">Reversed. </span>I set the first screen to a job title I have not held. A recruiter compared it with the r&eacute;sum&eacute; and the dated record did not show it, and ranking tools match on <strong>held titles</strong>. On 2026-10-03 I removed it. The headline now names the work.</span> <span class="led-to"><a href="about.html#reversal-2026-10-03">About &rarr;</a></span></li>
       </ul>
     </section>
 
