@@ -150,8 +150,7 @@ set, and nothing else. No surface prints a job title San has not held.
 - [x] **"What changed" on `work.html`.** *Landed 2026-11-06 in the same PR. A
       dated changelog section on the complete index, newest first. It is the
       public face of this roadmap: the roadmap records why, the changelog
-      records when. The first entry is the logline page; the second is the
-      career-copy record below.*
+      records when. The first entry is the career-copy record below.*
 - [x] **The career-copy reversal, recorded in public on `about.html`.** *Landed
       2026-11-06. The 2026-09-09 ruling set the first screen to a title San
       has not held; the 2026-10-03 audit reversed it, and CLAUDE.md carried the
