@@ -198,12 +198,6 @@ const CHECKS = [
       runNodeTest('telltale-evidence suite', ['scripts/check-telltale-evidence.test.cjs']),
   },
   {
-    label: 'logline evidence gate (adversarial suite)',
-    needsSite: false,
-    run: () =>
-      runNodeTest('logline-evidence suite', ['scripts/check-logline-evidence.test.cjs']),
-  },
-  {
     label: 'figure contract (adversarial suite)',
     needsSite: false,
     run: () => runNodeTest('figure-contract suite', ['scripts/figure-contract.test.cjs']),
@@ -237,13 +231,6 @@ const CHECKS = [
     label: 'telltale figures and frames match the generated record',
     needsSite: true,
     run: () => runSiteGate('check-telltale-evidence', 'scripts/check-telltale-evidence.cjs'),
-  },
-  {
-    // The twin of the entry above, one instrument over. Same placement, for
-    // the same reason.
-    label: 'logline figures and frames match the generated record',
-    needsSite: true,
-    run: () => runSiteGate('check-logline-evidence', 'scripts/check-logline-evidence.cjs'),
   },
   {
     // Reads the BUILT page on purpose. The rule is about what a reader sees,

@@ -2803,8 +2803,7 @@ figcaption code { overflow-wrap: anywhere; }
     border-left: 0;
     border-right: 0;
   }
-  .article-body pre.tt-frame,
-  .article-body pre.ll-frame {
+  .article-body pre.tt-frame {
     background: none;
     border-left: 0;
     border-top: 1px solid var(--border);
