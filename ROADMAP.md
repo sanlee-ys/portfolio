@@ -122,6 +122,26 @@ down carries the full reasoning for each item.
 
 ## Site track, second round (2026-11-17)
 
+> **Corrections, 2026-11-18.** A wider review checked this draft against the
+> repos. Five statements below are wrong, and the section is superseded by a
+> plan that waits on the owner's decisions. The items will be rewritten after
+> that review. Until then, read the section with these corrections:
+>
+> 1. **The cutoff date.** Eleven of the fourteen project pages were last
+>    edited on 2026-09-08, not 2026-09-14. So the site also misses the
+>    2026-09-09 work: the durable outbox in notes-api and the retrieval gate
+>    in kb-agent. Those two repos do carry unpublished work.
+> 2. **The classifier.** "2 (docs only)" counts from the wrong date.
+>    defense-news-classifier has 26 non-dependency commits after the v3.2.1
+>    tag, most dated August, and none of them is on the site.
+> 3. **The lockout experiment.** It does not wait on ADR-010. netops-lab
+>    states one prerequisite, zero-touch provisioning, and that is done.
+> 4. **The telltale page.** It does show the gate card. Its first need is
+>    four corrections to sentences that its own README contradicted on the
+>    day the page was pinned.
+> 5. **"Four leaks in one week."** The agent-ops record disagrees with itself
+>    on the span. Do not use that title until the owner reconciles the dates.
+
 Every box in the first round is checked, and the site read as finished. It is
 not. The last content edit to a project page landed 2026-09-14
 (`telltale.astro`). The résumé and the first-screen copy moved on 2026-10-03
