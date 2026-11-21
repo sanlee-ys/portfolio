@@ -120,6 +120,117 @@ down carries the full reasoning for each item.
 
 ---
 
+## Site track, second round (2026-11-17)
+
+> **Corrections, 2026-11-18.** A wider review checked this draft against the
+> repos. Five statements below are wrong, and the section is superseded by a
+> plan that waits on the owner's decisions. The items will be rewritten after
+> that review. Until then, read the section with these corrections:
+>
+> 1. **The cutoff date.** Eleven of the fourteen project pages were last
+>    edited on 2026-09-08, not 2026-09-14. So the site also misses the
+>    2026-09-09 work: the durable outbox in notes-api and the retrieval gate
+>    in kb-agent. Those two repos do carry unpublished work.
+> 2. **The classifier.** "2 (docs only)" counts from the wrong date.
+>    defense-news-classifier has 26 non-dependency commits after the v3.2.1
+>    tag, most dated August, and none of them is on the site.
+> 3. **The lockout experiment.** It does not wait on ADR-010. netops-lab
+>    states one prerequisite, zero-touch provisioning, and that is done.
+> 4. **The telltale page.** It does show the gate card. Its first need is
+>    four corrections to sentences that its own README contradicted on the
+>    day the page was pinned.
+> 5. **"Four leaks in one week."** The agent-ops record disagrees with itself
+>    on the span. Do not use that title until the owner reconciles the dates.
+
+Every box in the first round is checked, and the site read as finished. It is
+not. The last content edit to a project page landed 2026-09-14
+(`telltale.astro`). The résumé and the first-screen copy moved on 2026-10-03
+and 2026-10-07, and every commit since is a dependency bump. Meanwhile the
+public repos kept moving. Measured 2026-11-17 against
+shallow clones of all ten public repos, non-dependency commits since
+2026-09-14: telltale 8, agent-ops 7, learning-notes 3, defense-news-classifier
+2 (docs only), netops-lab 1. faithfulness-judge, kb-agent, notes-api,
+architecture and sanlee-ys carry no new work. The gaps below are the
+difference between what the repos record and what the site says.
+
+### Now — the site is behind its own repos
+
+- [ ] **telltale page refresh.** The page pins its evidence to `07163dd`
+      (2026-09-14). Since then telltale shipped: replay records its own
+      timestamp and `^w c` compares two seats (#378); `--model` names the
+      model per seat and the column reads back what ran (#382); a hosted
+      room writes `room.json` and resumes its threads (#390); `ctrl+]` types
+      into the live pane (#389); the host's per-turn memory is measured
+      (#388); grok history stays unread because two measurements disagree
+      on one record (#387). The page also names none of: the rebuttal round,
+      `--record`/`--replay`, the gate card, `replay-check`. Re-pin, then add
+      the honest-gauge story that #387 and #388 tell. One PR.
+- [ ] **Field notes on Work list 12 of 30.** learning-notes now runs to note
+      30 (the honest gauge and record/replay, 2026-09-16). Notes 26–30 are a
+      natural sixth cluster, "Harness and observability": integration tests
+      with testcontainers, fan-out cost control, tracing an agent loop,
+      ablate your own scaffolding, the honest gauge. Add the cluster. Keep
+      the "this is a selection" line.
+- [ ] **netops page says nothing after ZTP.** netops-lab ADR-010 (2026-09-30,
+      status Proposed) designs FRR on the Pi: OSPF for the link, eBGP for a
+      service prefix, no default route. Not applied yet. Add one dated
+      paragraph under the write-up that states the design and its status.
+      Do not describe it as running.
+- [ ] **Keep this round live.** A checked-out roadmap is how the site went
+      quiet for two months. The owner reviews this list when a repo ships,
+      not when the site does.
+
+### Next — two new pages, each needs a one-line call from San
+
+- [ ] **"Does a second vendor's review pay?"** A page on
+      `agent-ops/evals/review-efficacy`. Two runs. The 2026-09-04 pilot:
+      Claude 8/10, Codex 8/10, zero discordant pairs, so McNemar is
+      undefined and the run cannot show equality. The 2026-09-20 harder
+      seeds: Claude 6/18, Codex UNMEASURED on the first attempt (every case
+      failed before a model), then 7/18 on a pinned model, five discordant
+      pairs, still under the power floor. This is the site's voice exactly:
+      a measurement that refuses to claim more than it can. It pairs with
+      False Green. **Call needed:** agent-ops is public, but it has never
+      been a flagship surface here. Yes or no.
+- [ ] **"Four leaks in one week."** The agent-ops incident record: five
+      postmortems from 2026-07-02 to 07-04 (plaintext API key, uncapped
+      premium fan-out, PAT recurrence, guard interpreter bypass, grep leak),
+      the `PreToolUse` credential guard, and the 2026-09-30 talk kits that
+      demonstrate the guard failing and the check that did not run. This is
+      the breadth the first round left open: a security domain, not the
+      classifier read again. **Call needed:** whether the postmortems are
+      portfolio material. They are already public on GitHub.
+- [ ] **Homepage proof band shows one system.** Three of the four cells are
+      classifier results and the fourth is False Green. Once either page
+      above ships, swap one classifier cell for it so the first screen
+      shows two domains. Do not invent a new metric for the band; reuse a
+      figure the new page already states.
+
+### Later — needs work in another repo first
+
+- [ ] **The lockout experiment.** netops-lab roadmap item 4: can an agent on
+      a live router avoid locking itself out? This is the only genuinely new
+      domain on the horizon. It waits on ADR-010 being applied. The site
+      page follows the run. It does not precede it.
+- [ ] **telltale hero capture.** The telltale README holds an open HERO SLOT
+      for an animated capture of a real room. If it lands, the site can carry
+      the same recording as a generated figure (`data-fig-generated`,
+      `src/data/figures.json`) rather than a hand-drawn plate.
+- [ ] **About and résumé.** No change now. ADR-011 keeps public career copy
+      at résumé facts, and San sets the depth. Revisit only after the two
+      Next pages ship, and ask in one sentence before adding a line.
+
+### Non-goals this round
+
+- No new repo cards beyond the allowlist. ADR-003 holds: the Work page
+  lists repos the site already names, never a survey.
+- No redesign. The MONOGRAPH identity (ADR-014) shipped 2026-09 and the
+  gates hold it. This round is content.
+- No system-roadmap merge. The defense-news system's Now/Next/Later stays
+  on `projects/product-and-program.html`.
+
+---
+
 ## Detail & reasoning
 
 ### Mechanical / SEO — pure upside, no judgment calls
